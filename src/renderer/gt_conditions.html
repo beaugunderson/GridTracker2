@@ -1,0 +1,134 @@
+<!--
+    This file is part of GridTracker.
+
+    GridTracker is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 3 of the License.
+
+    GridTracker is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GridTracker.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Current Conditions</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="./lib/style.css" />
+    <style type="text/css">
+      body,
+      html {
+        -webkit-appearance: none;
+        -webkit-user-select: none;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      table,
+      th,
+      td {
+        color: #fff;
+        white-space: nowrap;
+        font-family: Sans-Serif;
+        font-size: 12px;
+        text-align: center;
+      }
+    </style>
+    <script src="./lib/first.js"></script>
+    <script>
+      document.oncontextmenu = function (event) {
+        if (process.versions["nw-flavor"] != "sdk") {
+          ev.preventDefault();
+        }
+      };
+
+      document.addEventListener("dragover", function (event) {
+        event.preventDefault();
+      });
+
+      document.addEventListener("drop", function (event) {
+        event.preventDefault();
+      });
+
+      function timeNowSec() {
+        return parseInt(Date.now() / 1000);
+      }
+
+      function showConditionsBox() {
+        var now = timeNowSec() % 86400;
+
+        var images = document.getElementsByTagName("img");
+
+        for (var i = 0; i < images.length; i++) {
+          var parts = images[i].src.split("t=");
+          images[i].src = parts[0] + "t=" + now;
+        }
+
+        nodeTimers.setTimeout(showConditionsBox, 1800000);
+      }
+
+      function init() {
+        window.opener.GT.conditionsWindowInitialized = true;
+        showConditionsBox();
+      }
+
+
+    </script>
+  </head>
+  <body style="margin: 0; top: 3px" onload="init();">
+    <div
+      id="main"
+      style="
+        margin: 0;
+        top: 0;
+        min-height: 60px;
+        background-color: black;
+        padding: 0px;
+        text-align: center;
+        vertical-align: middle;
+        position: relative;
+        white-space: nowrap;
+
+      "
+    >
+      <div id="conditionsDataDiv">
+        <div>
+          <a target="_blank" href="http://www.hamqsl.com" title="Visit www.hamqsl.net"
+            ><img src="http://www.hamqsl.com/solar101vhf.php?t="
+          /></a>
+        </div>
+        <div>
+          <table align="center">
+            <tr>
+              <td>
+                <img src="https://sohowww.nascom.nasa.gov/data/realtime/eit_304/512/latest.jpg?t=" class="solarImg" />
+              </td>
+              <td>
+                <img src="https://sohowww.nascom.nasa.gov/data/realtime/eit_171/512/latest.jpg?t=" class="solarImg" />
+              </td>
+              <td>
+                <img src="https://sohowww.nascom.nasa.gov/data/realtime/eit_195/512/latest.jpg?t=" class="solarImg" />
+              </td>
+              <td>
+                <img src="https://sohowww.nascom.nasa.gov/data/realtime/eit_284/512/latest.jpg?t=" class="solarImg" />
+              </td>
+              <td>
+                <img src="https://sdo.gsfc.nasa.gov/assets/img/latest/f_304_211_171_256.jpg?t=" class="solarImg" />
+              </td>
+            </tr>
+            <tr>
+              <td>30.4nm</td>
+              <td>17.1nm</td>
+              <td>19.5nm</td>
+              <td>28.4nm</td>
+              <td>304/211/171</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+<!--
+    This file is part of GridTracker.
+
+    GridTracker is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 3 of the License.
+
+    GridTracker is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GridTracker.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<html lang="en" xml:lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Alerts</title>
+    <link rel="stylesheet" href="./lib/style.css" />
+    <style type="text/css">
+      body {
+        -webkit-appearance: none;
+        -webkit-user-select: none;
+        height: 98%;
+        overflow: auto;
+      }
+      table,
+      th,
+      td,
+      body {
+        color: #fff;
+        white-space: nowrap;
+        font-family: Sans-Serif;
+        font-size: 12px;
+        text-align: auto;
+      }
+    </style>
+    <script src="./lib/first.js" type="text/javascript"></script>
+    <script src="./lib/protos.js" type="text/javascript"></script>
+    <script>
+      document.addEventListener("contextmenu", function (ev) {
+          ev.preventDefault();
+      });
+    </script>
+  </head>
+
+  <body id="mainBody" onload="window.opener.GT.alertWindowInitialized = true;">
+    <div
+      id="main"
+      style="
+        margin: 0;
+        top: 0;
+        min-height: 60px;
+        width: auto;
+        background-color: black;
+        padding: 2px;
+        text-align: center;
+        vertical-align: middle;
+        position: absolute;
+        white-space: nowrap;
+        overflow: hidden;
+      "
+    >
+    <div id="alertsPopDiv" style="
+    background-color: rgb(0, 0, 0);
+    padding: 0px;
+    text-align: center;
+    vertical-align: middle;
+    border: 3px groove red;"
+     class="roundBorder">
+      <div id="alertPopListDiv" style="margin: 2px; padding: 2px"></div>
+  </div>
+</div>
+  </body>
+</html>

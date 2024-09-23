@@ -1,0 +1,4186 @@
+// GridTracker Copyright © 2024 GridTracker.org
+// All rights reserved.
+// See LICENSE for more information.
+
+// var CR is in screen.js
+CR.developerMode = false;
+CR.callRoster = {};
+CR.blockedCalls = {};
+CR.blockedCQ = {};
+CR.ignoredCQ = {};
+CR.blockedDxcc = {};
+CR.blockedGrid = {};
+CR.blockedCQz = {};
+CR.blockedITUz = {};
+CR.scriptReport = {};
+CR.modes = {};
+CR.modes_phone = {};
+CR.currentUSCallsigns = null;
+CR.currentUSState = "";
+CR.currentDXCCs = -1;
+CR.callsignManifest = null;
+CR.rosterSettings = {};
+CR.day = 0;
+CR.dayAsString = "0";
+CR.menuHide = null;
+CR.menuShow = null;
+CR.columnMenu = null;
+CR.columnMembers = {};
+CR.callMenu = null;
+CR.ageMenu = null;
+CR.callingMenuS = null;
+CR.compactMenuHide = null;
+CR.compactMenuShow = null;
+CR.menuItemForMoveLeftColumn = null;
+CR.menuItemForMoveRightColumn = null;
+CR.currentColumnName = null;
+CR.targetHash = "";
+CR.dxccMenu = null;
+CR.targetDxcc = -1;
+CR.CQMenu = null;
+CR.GridMenu = null;
+CR.MsgMenu = null;
+CR.targetCQ = "";
+CR.timerInterval = null;
+CR.awards = {};
+CR.awardTypes = {};
+CR.awardTracker = {};
+CR.callsignDatabaseDXCC = {};
+CR.callsignDatabaseUS = {};
+CR.callsignDatabaseUSplus = {};
+CR.modeColors = {};
+CR.modeColors.FT4 = "1111FF";
+CR.modeColors.FT8 = "11FF11";
+CR.modeColors.JT4 = "EE1111";
+CR.modeColors.JT9 = "7CFC00";
+CR.modeColors.JT65 = "E550E5";
+CR.modeColors.QRA64 = "FF00FF";
+CR.modeColors.MSK144 = "4949FF";
+CR.rosterTimeout = null;
+CR.rosterFocus = false;
+CR.watchers = null;
+
+CR.defaultSettings = {
+  callsign: "all",
+  hunting: "dxcc",
+  huntNeed: "confirmed",
+  requireGrid: false,
+  animateCQGT: true,
+  wantMaxDT: false,
+  wantMinDB: false,
+  wantMinFreq: false,
+  wantMaxFreq: false,
+  wantRRCQ: false,
+  maxDT: 0.5,
+  minDb: -25,
+  minFreq: 0,
+  maxFreq: 3500,
+  noMyDxcc: false,
+  onlyMyDxcc: false,
+  cqOnly: false,
+  usesLoTW: false,
+  maxLoTW: 27,
+  useseQSL: false,
+  usesOQRS: false,
+  onlySpot: false,
+  allOnlyNew: false,
+  realtime: true,
+  wanted: {
+    huntCallsign: false,
+    huntGrid: true,
+    huntDXCC: true,
+    huntCQz: false,
+    huntITUz: false,
+    huntMarathon: false,
+    huntState: true,
+    huntCounty: false,
+    huntCont: false,
+    huntPX: false,
+    huntPOTA: false,
+    huntQRZ: true,
+    huntOAMS: false,
+    huntRegex: false,
+    huntWatcher: false
+  },
+  columns: {
+    Callsign: true,
+    Band: false,
+    Mode: false,
+    Calling: true,
+    Rig: false,
+    Grid: true,
+    Msg: false,
+    DXCC: true,
+    Flag: true,
+    State: true,
+    County: false,
+    POTA: false,
+    Cont: false,
+    dB: true,
+    Freq: false,
+    DT: false,
+    Dist: false,
+    Azim: false,
+    CQz: false,
+    ITUz: false,
+    PX: false,
+    LoTW: false,
+    eQSL: false,
+    OQRS: false,
+    Spot: false,
+    Life: false,
+    OAMS: true,
+    Age: true,
+    UTC: true
+  },
+  displayFilters: {
+    brightness: 100,
+    contrast: 100,
+    saturate: 100,
+    invert: 0,
+    sepia: 0,
+    huerotate: 0
+  },
+  reference: 0,
+  controls: true,
+  controlsExtended: true,
+  compact: false,
+  settingProfiles: false,
+  sortColumn: "Age",
+  sortReverse: true,
+  clearRosterOnBandChange: true,
+  rosterAlwaysOnTop: false,
+  rosterDelayOnFocus: false,
+  rosterDelayTime: 1500,
+  rosterTime: 120,
+  compactEntity: "DXCC",
+  watchers: {}
+};
+
+CR.def_displayFilters = {
+  brightness: 100,
+  contrast: 100,
+  saturate: 100,
+  invert: 0,
+  sepia: 0,
+  huerotate: 0
+};
+
+const LOGBOOK_LIVE_BAND_LIVE_MODE = "0";
+const LOGBOOK_LIVE_BAND_MIX_MODE = "1";
+const LOGBOOK_LIVE_BAND_DIGI_MODE = "2";
+const LOGBOOK_MIX_BAND_LIVE_MODE = "3";
+const LOGBOOK_MIX_BAND_MIX_MODE = "4";
+const LOGBOOK_MIX_BAND_DIGI_MODE = "5";
+const LOGBOOK_AWARD_TRACKER = "6";
+
+const LAYERED_MODE_FOR = {}
+LAYERED_MODE_FOR[LOGBOOK_MIX_BAND_LIVE_MODE] = LOGBOOK_LIVE_BAND_LIVE_MODE;
+LAYERED_MODE_FOR[LOGBOOK_MIX_BAND_MIX_MODE] = LOGBOOK_LIVE_BAND_MIX_MODE;
+LAYERED_MODE_FOR[LOGBOOK_MIX_BAND_DIGI_MODE] = LOGBOOK_LIVE_BAND_DIGI_MODE;
+
+document.addEventListener("dragover", function (event)
+{
+  event.preventDefault();
+});
+
+document.addEventListener("drop", function (event)
+{
+  event.preventDefault();
+});
+
+window.addEventListener("message", receiveMessage, false);
+
+if (typeof GT.localStorage.awardTracker == "undefined")
+{
+  GT.localStorage.awardTracker = "{}";
+  CR.rosterSettings = {};
+  writeRosterSettings();
+}
+
+CR.awardTracker = JSON.parse(GT.localStorage.awardTracker);
+
+// These two need to stay here because of an old bug.
+if (typeof GT.localStorage.blockedCQz == "undefined")
+{
+  GT.localStorage.blockedCQz = "{}";
+}
+
+if (typeof GT.localStorage.blockedCQ == "undefined")
+{
+  GT.localStorage.blockedCQ = "{}";
+}
+
+if (typeof GT.localStorage.blockedITUz == "undefined")
+{
+  GT.localStorage.blockedITUz = "{}";
+}
+
+if (typeof GT.localStorage.blockedGrid == "undefined")
+{
+  GT.localStorage.blockedGrid = "{}";
+}
+
+if (typeof GT.localStorage.blockedCalls != "undefined")
+{
+  CR.blockedCalls = JSON.parse(GT.localStorage.blockedCalls);
+  CR.blockedCQ = JSON.parse(GT.localStorage.blockedCQ);
+  CR.blockedDxcc = JSON.parse(GT.localStorage.blockedDxcc);
+  CR.blockedGrid = JSON.parse(GT.localStorage.blockedGrid);
+  CR.blockedCQz = JSON.parse(GT.localStorage.blockedCQz);
+  CR.blockedITUz = JSON.parse(GT.localStorage.blockedITUz);
+}
+else
+{
+  GT.localStorage.blockedCalls = "{}";
+  GT.localStorage.blockedDxcc = "{}";
+  GT.localStorage.blockedGrid = "{}";
+  GT.localStorage.blockedCQz = "{}";
+  GT.localStorage.blockedITUz = "{}";
+  GT.localStorage.ignoredCQ = "{}";
+}
+
+if (typeof GT.localStorage.ignoredCQ == "undefined")
+{
+  // CR.blockedCQ is deprecated, we don't clear it, we copy it
+  // This is protection against them rolling back to a previous version 
+  // where keys are "CQ POTA from CountryString"
+  let shouldStore = false;
+  for (let key in CR.blockedCQ)
+  {
+    let test = key.split(" from ");
+    if (test.length == 2)
+    {
+      if (test[1] == "All")
+      {
+        CR.ignoredCQ[test[0]] = true;
+      }
+      else
+      {
+        CR.ignoredCQ[test[0] + ":" + window.opener.GT.altNameToDXCC[test[1]]] = true;
+      }
+
+      shouldStore = true;
+    }
+  }
+  if (shouldStore) storeBlocks(false);
+}
+else
+{
+  CR.ignoredCQ = JSON.parse(GT.localStorage.ignoredCQ);
+}
+
+function storeBlocks(render = true)
+{
+  GT.localStorage.blockedCalls = JSON.stringify(CR.blockedCalls);
+  GT.localStorage.ignoredCQ = JSON.stringify(CR.ignoredCQ);
+  GT.localStorage.blockedDxcc = JSON.stringify(CR.blockedDxcc);
+  GT.localStorage.blockedGrid = JSON.stringify(CR.blockedGrid);
+  GT.localStorage.blockedCQz = JSON.stringify(CR.blockedCQz);
+  GT.localStorage.blockedITUz = JSON.stringify(CR.blockedITUz);
+  if (render)
+  {
+    renderIgnoresTab();
+  }
+}
+
+function storeAwardTracker()
+{
+  GT.localStorage.awardTracker = JSON.stringify(CR.awardTracker);
+}
+
+function loadSettings()
+{
+  let readSettings = {};
+  if (typeof GT.localStorage.rosterSettings != "undefined")
+  {
+    readSettings = JSON.parse(GT.localStorage.rosterSettings);
+  }
+  CR.rosterSettings = deepmerge(CR.defaultSettings, readSettings);
+
+  fixLegacySettings();
+
+  // Fix because I allowed \ to be input as a key name char. -Tag
+  for (let key in CR.rosterSettings.watchers)
+  {
+    let test = key.replace(/\\/g, "");
+    if (test.length != key.length)
+    {
+      delete CR.rosterSettings.watchers[key];
+    }
+  }
+
+  writeRosterSettings();
+
+  // Code reducer
+  CR.watchers = CR.rosterSettings.watchers;
+}
+
+function fixLegacySettings()
+{
+  // Not sure why, but Paul Traina added this settings cleanup in August 2020.
+  if ("GT" in CR.rosterSettings.columns) delete CR.rosterSettings.columns.GT;
+
+  // In January 2022, we refactored roster column sorting
+  if (CR.rosterSettings.lastSortIndex)
+  {
+    CR.rosterSettings.sortColumn = LEGACY_COLUMN_SORT_ID[CR.rosterSettings.lastSortIndex] || "Age";
+    delete CR.rosterSettings.lastSortIndex;
+  }
+
+  // In January 2022, we refactored roster column sorting
+  if (CR.rosterSettings.lastSortReverse)
+  {
+    CR.rosterSettings.sortReverse = CR.rosterSettings.lastSortReverse;
+    delete CR.rosterSettings.lastSortReverse;
+  }
+
+  // In January 2022, we added a `columnOrder` setting, which we need to ensure always includes all columns
+  CR.rosterSettings.columnOrder = validateRosterColumnOrder(CR.rosterSettings.columnOrder);
+}
+
+function writeRosterSettings()
+{
+  for (let key in CR.rosterSettings.watchers)
+  {
+    CR.rosterSettings.watchers[key].test = null;
+  }
+
+  GT.localStorage.rosterSettings = JSON.stringify(CR.rosterSettings);
+}
+
+function isKnownCallsignDXCC(dxcc)
+{
+  return (dxcc in CR.callsignDatabaseDXCC);
+}
+
+function isKnownCallsignUS(dxcc)
+{
+  return (dxcc in CR.callsignDatabaseUS);
+}
+
+function isKnownCallsignUSplus(dxcc)
+{
+  return (dxcc in CR.callsignDatabaseUSplus);
+}
+
+function timeNowSec()
+{
+  return parseInt(Date.now() / 1000);
+}
+
+function hashMaker(start, callObj, reference)
+{
+  if (reference == LOGBOOK_LIVE_BAND_LIVE_MODE) return `${start}${callObj.band}${callObj.mode}`;
+
+  if (reference == LOGBOOK_AWARD_TRACKER) return `${start}${callObj.band}${callObj.mode}`;
+
+  if (reference == LOGBOOK_LIVE_BAND_MIX_MODE) return `${start}${callObj.band}`;
+
+  if (reference == LOGBOOK_LIVE_BAND_DIGI_MODE) return `${start}${callObj.band}dg`;
+
+  if (reference == LOGBOOK_MIX_BAND_LIVE_MODE) return `${start}${callObj.mode}`;
+
+  if (reference == LOGBOOK_MIX_BAND_MIX_MODE) return `${start}`;
+
+  if (reference == LOGBOOK_MIX_BAND_DIGI_MODE) return `${start}dg`;
+
+  return "";
+}
+
+function rosterInFocus()
+{
+  if (CR.rosterSettings.rosterDelayOnFocus)
+  {
+    CR.rosterFocus = true;
+  }
+}
+
+function rosterNoFocus()
+{
+  CR.rosterFocus = false;
+  if (CR.rosterTimeout != null)
+  {
+    nodeTimers.clearTimeout(CR.rosterTimeout);
+    CR.rosterTimeout = null;
+    viewRoster();
+  }
+}
+
+function processRoster(roster)
+{
+  CR.callRoster = roster;
+  if (CR.rosterTimeout != null)
+  {
+    nodeTimers.clearTimeout(CR.rosterTimeout);
+    CR.rosterTimeout = null;
+  }
+
+  if (CR.rosterFocus)
+  {
+    CR.rosterTimeout = nodeTimers.setTimeout(viewRoster, CR.rosterSettings.rosterDelayTime);
+    rosterDelayDiv.style.display = "inline-block";
+  }
+  else
+  {
+    viewRoster();
+  }
+}
+
+function viewRoster()
+{
+  CR.rosterTimeout = null;
+  rosterDelayDiv.style.display = "none";
+  let rosterSettings = prepareRosterSettings();
+  processRosterFiltering(CR.callRoster, rosterSettings);
+  processRosterHunting(CR.callRoster, rosterSettings, CR.awardTracker);
+  renderRoster(CR.callRoster, rosterSettings);
+  sendAlerts(CR.callRoster, rosterSettings);
+}
+
+function realtimeRoster()
+{
+  let now = timeNowSec();
+  CR.day = parseInt(now / 86400);
+  CR.dayAsString = String(CR.day);
+
+  if (CR.rosterSettings.realtime == false) return;
+
+  let timeCols = document.getElementsByClassName("timeCol");
+  for (const x in timeCols)
+  {
+    if ((typeof timeCols[x].id != "undefined") && (typeof CR.callRoster[timeCols[x].id.substr(2)] != "undefined"))
+    {
+      let when = now - CR.callRoster[timeCols[x].id.substr(2)].callObj.age;
+      timeCols[x].innerHTML = toDHMS(when);
+    }
+  }
+  let lifeCols = document.getElementsByClassName("lifeCol");
+  for (const x in lifeCols)
+  {
+    if ((typeof lifeCols[x].id != "undefined") && (typeof CR.callRoster[lifeCols[x].id.substr(2)] != "undefined"))
+    {
+      let when = now - CR.callRoster[lifeCols[x].id.substr(2)].callObj.life;
+      lifeCols[x].innerHTML = toDHMS(when);
+    }
+  }
+
+  if (CR.rosterSettings.columns.Spot)
+  {
+    let spotCols = document.getElementsByClassName("spotCol");
+    for (const x in spotCols)
+    {
+      if ((typeof spotCols[x].id != "undefined") && (typeof CR.callRoster[spotCols[x].id.substr(2)] != "undefined"))
+      {
+        spotCols[x].innerHTML = getSpotString(CR.callRoster[spotCols[x].id.substr(2)].callObj);
+      }
+    }
+  }
+}
+
+function getSpotString(callObj)
+{
+  let result = "&nbsp;";
+  if (callObj.spot && callObj.spot.when > 0)
+  {
+    when = timeNowSec() - callObj.spot.when;
+    if (when <= window.opener.GT.receptionSettings.viewHistoryTimeSec)
+    { result = toDHM(parseInt(when)); }
+  }
+  if (result != "&nbsp;") result += " / " + callObj.spot.snr;
+  return result;
+}
+
+function openChatToCid(cid)
+{
+  window.opener.showMessaging(true, cid);
+}
+
+function initiateQso(thisHash)
+{
+  window.opener.initiateQso(thisHash);
+}
+
+function callLookup(thisHash, grid)
+{
+  window.opener.startLookup(CR.callRoster[thisHash].DEcall, CR.callRoster[thisHash].grid);
+}
+
+function callingLookup(thisHash, grid)
+{
+  window.opener.startLookup(CR.callRoster[thisHash].DXcall, grid);
+}
+
+function callGenMessage(thisHash, grid)
+{
+  let thisCall = CR.callRoster[thisHash].DEcall;
+  let instance = CR.callRoster[thisHash].callObj.instance;
+
+  window.opener.startGenMessages(thisCall, grid, instance);
+}
+
+function callingGenMessage(thisHash, grid)
+{
+  let thisCall = CR.callRoster[thisHash].DXcall;
+  let instance = CR.callRoster[thisHash].callObj.instance;
+
+  window.opener.startGenMessages(thisCall, grid, instance);
+}
+
+function centerOn(grid)
+{
+  window.opener.centerOn(grid);
+}
+
+function instanceChange(what)
+{
+  window.opener.GT.instances[what.id].crEnable = what.checked;
+  viewRoster();
+}
+
+function updateInstances()
+{
+  if (window.opener.GT.instancesIndex.length > 1)
+  {
+    let instances = window.opener.GT.instances;
+
+    let worker = "";
+
+    let keys = Object.keys(instances).sort();
+    for (const key in keys)
+    {
+      let inst = keys[key];
+      let sp = inst.split(" - ");
+      let shortInst = sp[sp.length - 1].substring(0, 18);
+      let color = "blue";
+
+      if (instances[inst].open == false)
+      {
+        color = "purple";
+      }
+      worker +=
+        `<div class='button' style='background-color:${color};'>` +
+        `<input type='checkbox' id='${inst}' onchange='instanceChange(this);' ` +
+        (instances[inst].crEnable ? "checked" : "") +
+        `>&nbsp;${shortInst}</div>`
+    }
+    instancesDiv.innerHTML = worker;
+    instancesWrapper.style.display = "";
+  }
+  else
+  {
+    instancesDiv.innerHTML = "";
+    instancesWrapper.style.display = "none";
+  }
+}
+
+function processStatus(newMessage)
+{
+  if (newMessage.Transmitting == 0)
+  {
+    // Not Transmitting
+    if (newMessage.Decoding == 1)
+    {
+      // Decoding
+      txrxdec.style.backgroundColor = "Blue";
+      txrxdec.style.borderColor = "Cyan";
+      txrxdec.innerHTML = "DECODE";
+    }
+    else
+    {
+      txrxdec.style.backgroundColor = "Green";
+      txrxdec.style.borderColor = "GreenYellow";
+      txrxdec.innerHTML = "RECEIVE";
+    }
+  }
+  else
+  {
+    txrxdec.style.backgroundColor = "Red";
+    txrxdec.style.borderColor = "Orange";
+    txrxdec.innerHTML = "TRANSMIT";
+  }
+}
+
+function toTitleCase(str)
+{
+  return str.replace(/\w\S*/g, function (txt)
+  {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  });
+}
+
+function newOption(value, text)
+{
+  if (typeof text == "undefined") text = value;
+  let option = document.createElement("option");
+  option.value = value;
+  option.text = text;
+  return option;
+}
+
+function createSelectOptions(
+  selectElementString,
+  selectNameDefault,
+  forObject,
+  altName = null,
+  defaultValue = null,
+  checkSponsor = null
+)
+{
+  let selector = document.getElementById(selectElementString);
+  selector.innerHTML = "";
+
+  let option = document.createElement("option");
+  option.value = defaultValue;
+  option.text = selectNameDefault;
+  option.selected = true;
+  option.disabled = true;
+  option.style.display = "none";
+  selector.appendChild(option);
+
+  let obj = null;
+  if (forObject)
+  {
+    obj = Object.keys(forObject).sort();
+  }
+  for (const k in obj)
+  {
+    let opt = obj[k];
+    let option = document.createElement("option");
+    option.value = opt;
+    option.text = altName ? forObject[opt][altName] : opt;
+    if (checkSponsor && opt + "-" + checkSponsor in CR.awardTracker)
+    { option.disabled = true; }
+
+    selector.appendChild(option);
+  }
+}
+
+function awardSponsorChanged()
+{
+  awardName.style.display = "";
+  createSelectOptions(
+    "awardName",
+    "Select Award",
+    CR.awards[awardSponsor.value].awards,
+    "name",
+    null,
+    awardSponsor.value
+  );
+}
+
+function awardNameChanged()
+{
+  let awardToAdd = newAwardTrackerObject(
+    awardSponsor.value,
+    awardName.value,
+    true
+  );
+
+  let hash = awardToAdd.name + "-" + awardToAdd.sponsor;
+  if (!(hash in CR.awardTracker))
+  {
+    CR.awardTracker[hash] = awardToAdd;
+    storeAwardTracker();
+    processAward(hash);
+    updateAwardList(hash);
+    viewRoster();
+  }
+  createSelectOptions(
+    "awardName",
+    "Select Award",
+    CR.awards[awardToAdd.sponsor].awards,
+    "name",
+    null,
+    awardToAdd.sponsor
+  );
+}
+
+function updateAwardList(target = null)
+{
+  let worker =
+    "<table id='awardTable' class='awardTableCSS' >";
+  worker += "<tr>";
+  worker += "<th align='left'>Name</th><th>Award</th><th>Track</th><th></th>";
+  worker += "</tr>";
+
+  worker += "</table>";
+
+  AwardWantedList.innerHTML = worker;
+
+  let keys = Object.keys(CR.awardTracker).sort();
+
+  for (const key in keys)
+  {
+    let award = CR.awardTracker[keys[key]];
+    let rule = CR.awards[award.sponsor].awards[award.name].rule;
+    let row = awardTable.insertRow();
+    row.id = keys[key];
+    let baseAward = false;
+    let baseCount = 0;
+
+    let endorseCount = 0;
+    let endorseTotal = 0;
+    let allEndorse = false;
+
+    let tooltip = CR.awards[award.sponsor].awards[award.name].tooltip + " (" + CR.awards[award.sponsor].sponsor + ")\n";
+    tooltip += toTitleCase(award.test.qsl_req) + " QSO\n";
+    for (const mode in award.comp.counts)
+    {
+      tooltip += mode + "\n";
+      for (const count in award.comp.counts[mode])
+      {
+        endorseTotal++;
+        if (award.comp.counts[mode][count].per == 100)
+        {
+          baseAward = true;
+          endorseCount++;
+        }
+        if (award.comp.counts[mode][count].num > baseCount)
+        { baseCount = award.comp.counts[mode][count].num; }
+
+        tooltip += "\t" + award.comp.counts[mode][count].num + "/" + count + " (" + award.comp.counts[mode][count].per + "%)\n";
+        let wrk = "";
+        if (Object.keys(award.comp.endorse).length > 0)
+        {
+          for (const band in award.comp.endorse[mode])
+          {
+            endorseTotal++;
+            if (award.comp.endorse[mode][band][count] == true)
+            {
+              endorseCount++;
+              wrk += band + " ";
+            }
+          }
+        }
+        if (wrk.length > 0)
+        {
+          tooltip += "\t\t" + wrk + "\n";
+        }
+      }
+    }
+    if (baseCount > 0 && endorseCount == endorseTotal) allEndorse = true;
+
+    let cell = createCellHtml(row, award.name + " - " + award.sponsor);
+    cell.style.textAlign = "left";
+    cell.style.color = "lightblue";
+
+    createCellHtml(
+      row, (allEndorse
+        ? "<img src='img/award-trophy.png' height='14px'>"
+        : baseAward
+          ? "<img src='img/award-medal.png' height='13px'>"
+          : baseCount > 0
+            ? "<img src='img/award-tally.png' height='15px'>"
+            : "<img src='img/award-empty.png' height='12px'>"),
+      tooltip
+    );
+    createCell(row, "enable", award.enable, award.enable, "Toggle Tracking", true);
+    createCellHtml(row, "<img title='Remove Tracker' onclick='deleteAwardTracker(this)' style='margin:0;padding:0;margin-top:2px;cursor:pointer;' src='img/award-delete.png' height='12px'>");
+  }
+}
+
+function deleteAwardTracker(sender)
+{
+  let id = sender.parentNode.parentNode.id;
+  delete CR.awardTracker[id];
+  storeAwardTracker();
+  resetAwardAdd();
+  updateAwardList();
+  viewRoster();
+}
+
+function awardCheckboxChanged(sender)
+{
+  let awardId = sender.target.parentNode.parentNode.id;
+  CR.awardTracker[sender.target.parentNode.parentNode.id][sender.target.name] =
+    sender.target.checked;
+  storeAwardTracker();
+  viewRoster();
+}
+
+function awardValueChanged(sender)
+{
+  let awardId = sender.target.parentNode.parentNode.id;
+  CR.awardTracker[sender.target.parentNode.parentNode.id][sender.target.name] =
+    sender.target.value;
+  storeAwardTracker();
+  viewRoster();
+}
+
+function createCell(
+  row,
+  target,
+  value,
+  data = null,
+  title = null,
+  checkbox = false
+)
+{
+  let cell = row.insertCell();
+  if (data == null) cell.innerHTML = value;
+  if (title) cell.title = title;
+  if (checkbox)
+  {
+    let x = document.createElement("INPUT");
+    x.setAttribute("type", "checkbox");
+    x.checked = value;
+    x.name = target;
+    x.addEventListener("change", awardCheckboxChanged);
+    cell.appendChild(x);
+  }
+  else if (data)
+  {
+    cell.appendChild(createAwardSelector(cell, target, value, data));
+  }
+  return cell;
+}
+
+function createCellHtml(row, html, title = null)
+{
+  let cell = row.insertCell();
+  cell.innerHTML = html;
+  if (title) cell.title = title;
+
+  return cell;
+}
+
+function createAwardSelector(cell, target, value, forObject)
+{
+  let selector = document.createElement("select");
+  selector.name = target;
+  selector.value = value;
+  selector.disabled = forObject.length == 1;
+  selector.style.margin = "0px";
+  selector.style.padding = "1px";
+  if (selector.disabled) selector.style.cursor = "auto";
+  selector.addEventListener("change", awardValueChanged);
+  for (const opt in forObject)
+  {
+    let option = document.createElement("option");
+    option.value = forObject[opt];
+    if (option.value == "Phone" || option.value == "CW") option.disabled = true;
+    option.text = forObject[opt];
+    selector.appendChild(option);
+  }
+  return selector;
+}
+
+function resetAwardAdd()
+{
+  awardName.style.display = "none";
+  createSelectOptions("awardName", "Select Award", null);
+  createSelectOptions("awardSponsor", "Select Sponsor", CR.awards, "sponsor");
+}
+
+function openAwardPopup()
+{
+  awardHunterDiv.style.display = "";
+  resetAwardAdd();
+}
+
+function closeAwardPopup()
+{
+  awardHunterDiv.style.display = "none";
+  resetAwardAdd();
+}
+
+function toggleMoreControls()
+{
+  CR.rosterSettings.controlsExtended = !CR.rosterSettings.controlsExtended;
+  writeRosterSettings();
+
+  setVisual();
+}
+
+function setVisual()
+{
+  huntNeed.style.display = "none";
+  stateSelect.style.display = "none";
+  DxccSingleSelect.style.display = "none";
+
+  if (CR.rosterSettings.controls)
+  {
+    if (CR.rosterSettings.controlsExtended)
+    {
+      RosterControls.className = "extended";
+      instancesWrapper.style.display = "";
+    }
+    else
+    {
+      RosterControls.className = "normal";
+      instancesWrapper.style.display = "none";
+    }
+  }
+  else
+  {
+    RosterControls.className = "hidden";
+    instancesWrapper.style.display = "none";
+  }
+
+  // Award Hunter
+  if (referenceNeed.value == LOGBOOK_AWARD_TRACKER)
+  {
+    HuntModeControls.style.display = "none";
+    CallsignsControls.style.display = "none";
+    AwardTrackerControls.style.display = "";
+    updateAwardList();
+  }
+  else
+  {
+    for (const key in CR.rosterSettings.wanted)
+    {
+      if (document.getElementById(key))
+      {
+        document.getElementById(key).checked = CR.rosterSettings.wanted[key];
+      }
+    }
+
+    AwardTrackerControls.style.display = "none";
+    HuntModeControls.style.display = "";
+    huntMode.style.display = "";
+    CallsignsControls.style.display = "";
+    closeAwardPopup();
+    if (callsignNeed.value == "all" || callsignNeed.value == "hits")
+    {
+      huntingMatrixDiv.style.display = "";
+      huntNeed.style.display = "";
+      huntMode.style.display = "none";
+    }
+    else
+    {
+      huntingMatrixDiv.style.display = "none";
+      huntMode.style.display = "";
+
+      if (huntMode.value != "callsign" && huntMode.value != "usstate" && huntMode.value != "dxccs")
+      {
+        huntNeed.style.display = "";
+      }
+      if (huntMode.value == "usstate")
+      {
+        stateSelect.style.display = "";
+      }
+      if (huntMode.value == "usstates")
+      {
+        huntNeed.style.display = "";
+      }
+      if (huntMode.value == "dxccs")
+      {
+        DxccSingleSelect.style.display = "";
+      }
+    }
+  }
+
+  if (window.opener.GT.callsignLookups.lotwUseEnable == true)
+  {
+    usesLoTWDiv.style.display = "";
+  }
+  else
+  {
+    usesLoTWDiv.style.display = "none";
+  }
+
+  if (window.opener.GT.callsignLookups.eqslUseEnable == true)
+  {
+    useseQSLDiv.style.display = "";
+  }
+  else
+  {
+    useseQSLDiv.style.display = "none";
+  }
+
+  if (window.opener.GT.callsignLookups.oqrsUseEnable == true)
+  {
+    usesOQRSDiv.style.display = "";
+  }
+  else
+  {
+    usesOQRSDiv.style.display = "none";
+  }
+
+  if (CR.rosterSettings.columns.Spot == true)
+  {
+    onlySpotDiv.style.display = "";
+  }
+  else
+  {
+    onlySpotDiv.style.display = "none";
+  }
+
+  if (CR.rosterSettings.callsign == "all" || CR.rosterSettings.callsign == "hits")
+  {
+    allOnlyNewDiv.style.display = "";
+  }
+  else
+  {
+    allOnlyNewDiv.style.display = "none";
+  }
+
+  rosterBody.style.display = "block";
+
+  resize();
+}
+
+function wantedChanged(element)
+{
+  CR.rosterSettings.wanted[element.id] = element.checked;
+
+  if (element.checked == true)
+  {
+    let t = element.id.replace("hunt", "");
+
+    if (t in CR.rosterSettings.columns)
+    {
+      CR.rosterSettings.columns[t] = true;
+      if (t in CR.columnMembers)
+      {
+        CR.columnMembers[t].checked = true;
+      }
+    }
+  }
+
+  setVisual();
+
+  writeRosterSettings();
+
+  CR.scriptReport = Object();
+  for (const callHash in window.opener.GT.callRoster)
+  {
+    window.opener.GT.callRoster[callHash].callObj.alerted = false;
+  }
+  viewRoster();
+}
+
+function valuesChanged()
+{
+  CR.rosterSettings.callsign = callsignNeed.value;
+  CR.rosterSettings.hunting = huntMode.value;
+  CR.rosterSettings.huntNeed = huntNeed.value;
+  CR.rosterSettings.requireGrid = wantGrid.checked;
+
+  CR.rosterSettings.wantMaxDT = wantMaxDT.checked;
+  CR.rosterSettings.wantMinDB = wantMinDB.checked;
+  CR.rosterSettings.wantMinFreq = wantMinFreq.checked;
+  CR.rosterSettings.wantMaxFreq = wantMaxFreq.checked;
+  CR.rosterSettings.wantRRCQ = wantRRCQ.checked;
+
+  maxDTView.innerHTML = CR.rosterSettings.maxDT = maxDT.value;
+  minDbView.innerHTML = CR.rosterSettings.minDb = minDb.value;
+  minFreqView.innerHTML = CR.rosterSettings.minFreq = minFreq.value;
+  maxFreqView.innerHTML = CR.rosterSettings.maxFreq = maxFreq.value;
+  CR.rosterSettings.maxLoTW = maxLoTW.value;
+  maxLoTWView.innerHTML = CR.rosterSettings.maxLoTW < 27 ? toYM(Number(CR.rosterSettings.maxLoTW)) : "<b>&infin;</b>";
+  CR.rosterSettings.maxLoTW = maxLoTW.value;
+  CR.rosterSettings.cqOnly = cqOnly.checked;
+  CR.rosterSettings.noMyDxcc = noMyDxcc.checked;
+  CR.rosterSettings.onlyMyDxcc = onlyMyDxcc.checked;
+  CR.rosterSettings.usesLoTW = usesLoTW.checked;
+  CR.rosterSettings.useseQSL = useseQSL.checked;
+  CR.rosterSettings.usesOQRS = usesOQRS.checked;
+  CR.rosterSettings.onlySpot = onlySpot.checked;
+  CR.rosterSettings.reference = referenceNeed.value;
+  CR.rosterSettings.allOnlyNew = allOnlyNew.checked;
+
+  writeRosterSettings();
+
+  CR.scriptReport = Object();
+  for (const callHash in window.opener.GT.callRoster)
+  {
+    window.opener.GT.callRoster[callHash].callObj.alerted = false;
+  }
+
+  setVisual();
+}
+
+function loadFilterSettings()
+{
+  let filters = "";
+  for (const filter in CR.rosterSettings.displayFilters)
+  {
+    let slider = document.getElementById("filter" + filter + "Slider");
+
+    if (slider)
+    {
+      slider.value = CR.rosterSettings.displayFilters[filter];
+      let td = document.getElementById("filter" + filter + "Td");
+      if (filter != "huerotate")
+      {
+        td.innerHTML = slider.value + "%";
+        filters += filter + "(" + slider.value + "%) ";
+      }
+      else
+      {
+        td.innerHTML = slider.value + " deg";
+        filters += "hue-rotate(" + slider.value + "deg) ";
+      }
+    }
+  }
+  document.documentElement.style.filter = filters;
+}
+
+function filtersChanged()
+{
+  for (const filter in CR.rosterSettings.displayFilters)
+  {
+    let slider = document.getElementById("filter" + filter + "Slider");
+
+    if (slider)
+    {
+      CR.rosterSettings.displayFilters[filter] = slider.value;
+    }
+    else
+    {
+      // no longer a filter, get rid of it
+      delete CR.rosterSettings.displayFilters[filter];
+    }
+  }
+  loadFilterSettings();
+}
+
+function resetFilters()
+{
+  for (const filter in CR.rosterSettings.displayFilters)
+  {
+    CR.rosterSettings.displayFilters[filter] = CR.def_displayFilters[filter];
+  }
+  loadFilterSettings();
+}
+
+function getBuffer(file_url, callback, flag, mode, port, cookie)
+{
+  let http = require(mode);
+  let fileBuffer = null;
+  let options = null;
+  if (cookie != null)
+  {
+    options = {
+      host: NodeURL.parse(file_url).host, // eslint-disable-line node/no-deprecated-api
+      port: port,
+      path: NodeURL.parse(file_url).path, // eslint-disable-line node/no-deprecated-api
+      headers: {
+        Cookie: cookie
+      }
+    };
+  }
+  else
+  {
+    options = {
+      host: NodeURL.parse(file_url).host, // eslint-disable-line node/no-deprecated-api
+      port: port,
+      path: NodeURL.parse(file_url).path // eslint-disable-line node/no-deprecated-api
+    };
+  }
+  http.get(options, function (res)
+  {
+    // let fsize = res.headers["content-length"];
+    let cookies = null;
+    if (typeof res.headers["set-cookie"] != "undefined")
+    { cookies = res.headers["set-cookie"]; }
+    res
+      .on("data", function (data)
+      {
+        if (fileBuffer == null) fileBuffer = data;
+        else fileBuffer += data;
+      })
+      .on("end", function ()
+      {
+        if (typeof callback == "function")
+        {
+          // Call it, since we have confirmed it is callable
+          callback(fileBuffer, flag, cookies);
+        }
+      })
+      .on("error", function () {});
+  });
+}
+
+function callsignResult(buffer, flag)
+{
+  let rawData = JSON.parse(buffer);
+  CR.currentUSState = flag;
+
+  CR.currentUSCallsigns = Object();
+  for (const key in rawData.c) CR.currentUSCallsigns[rawData.c[key]] = true;
+
+  viewRoster();
+}
+
+function stateChangedValue(what)
+{
+  if (CR.currentUSState != stateSelect.value && stateSelect.value != "")
+  {
+    CR.currentUSState = stateSelect.value;
+
+    if (window.opener.GT.mapSettings.offlineMode == false)
+    {
+      let callState = CR.currentUSState.replace("CN-", "");
+      getBuffer(
+        "https://storage.googleapis.com/gt_app/callsigns/" + callState + ".callsigns.json",
+        callsignResult,
+        CR.currentUSState,
+        "http",
+        80
+      );
+    }
+    else
+    {
+      viewRoster();
+      CR.currentUSState = "";
+      CR.currentUSCallsigns = null;
+      stateSelect.value = "";
+
+      return;
+    }
+  }
+
+  if (stateSelect.value == "")
+  {
+    CR.currentUSState = "";
+    CR.currentUSCallsigns = null;
+
+    viewRoster();
+  }
+}
+
+function DXCCsChangedValue(what)
+{
+  CR.currentDXCCs = DxccSingleSelect.value;
+  viewRoster();
+}
+
+function initSelectors()
+{
+  for (const column in ROSTER_COLUMNS)
+  {
+    if (column != "Callsign")
+    {
+      let option = newOption(column, column);
+      if (column == CR.rosterSettings.compactEntity)
+      {
+        option.selected = true;
+      }
+      compactEntitySelect.appendChild(option);
+    }
+  }
+
+  let items = Object.keys(window.opener.GT.dxccToAltName).sort(function (a, b)
+  {
+    return window.opener.GT.dxccToAltName[a].localeCompare(
+      window.opener.GT.dxccToAltName[b]
+    );
+  });
+
+  for (const i in items)
+  {
+    let key = items[i];
+    if (window.opener.GT.dxccInfo[key].geo != "deleted")
+    {
+      let option = document.createElement("option");
+      option.value = key;
+      option.text = window.opener.GT.dxccToAltName[key] + " (" + window.opener.GT.dxccInfo[key].pp + ")";
+      DxccSingleSelect.appendChild(option);
+      // Note: do not use cloneNode on elements/nodes that have ids
+      ignoreCqDxccSelect.appendChild(option.cloneNode(true));
+      ignoreDxccSelect.appendChild(option.cloneNode(true));
+    }
+  }
+  DxccSingleSelect.oninput = DXCCsChangedValue;
+
+  items = Object.keys(window.opener.GT.cqZones).sort();
+  for (const i in items)
+  {
+    let key = items[i];
+    let option = document.createElement("option");
+    option.value = key;
+    option.text = key + " - " + window.opener.GT.cqZones[key].name;
+    ignoreCqzSelect.appendChild(option);
+  }
+
+  items = Object.keys(window.opener.GT.ituZones).sort();
+  for (const i in items)
+  {
+    let key = items[i];
+    let option = document.createElement("option");
+    option.value = key;
+    option.text = key;
+    ignoreItuzSelect.appendChild(option);
+  }
+
+  CR.ignoreTypeInputs = {};
+  CR.ignoreTypeInputs.Callsign = ignoreCallsignValue;
+  CR.ignoreTypeInputs.Grid = ignoreGridValue;
+  CR.ignoreTypeInputs.CQ = ignoreCqDiv;
+  CR.ignoreTypeInputs.DXCC = ignoreDxccSelect;
+  CR.ignoreTypeInputs.CQz = ignoreCqzSelect;
+  CR.ignoreTypeInputs.ITUz = ignoreItuzSelect;
+
+  ignoreTypeChanged("Callsign");
+  watcherTypeChanged("Callsign");
+}
+
+function hideIgnoreElements()
+{
+  ignoreCallsignValue.style.display = "none";
+  ignoreGridValue.style.display = "none";
+  ignoreCqDiv.style.display = "none";
+  ignoreDxccSelect.style.display = "none";
+  ignoreCqzSelect.style.display = "none";
+  ignoreItuzSelect.style.display = "none";
+}
+
+CR.ignoreType = "Callsign";
+
+function ignoreTypeChanged(ignoreTypeValue)
+{
+  hideIgnoreElements();
+  CR.ignoreTypeInputs[ignoreTypeValue].style.display = "";
+  if (CR.ignoreType != ignoreTypeValue)
+  {
+    ingnoreAddResultLabel.innerHTML = "";
+    CR.ignoreType = ignoreTypeValue;
+  }
+  ValidateTextInput(ignoreCallsignValue);
+  gridInputValidate(ignoreGridValue);
+  ValidateTextInput(ignoreCqCallsignValue);
+}
+
+function gridInputValidate(element)
+{
+  element.value = element.value.toUpperCase().replace(/[^A-Z0-9/]+/g, "").substr(0, 4);
+  if (!element.value.match(GRID_REGEXP))
+  {
+    element.style.color = "#000";
+    element.style.backgroundColor = "yellow";
+  }
+  else
+  {
+    element.style.color = "";
+    element.style.backgroundColor = "";
+  }
+}
+
+function addNewIgnore()
+{
+  if (CR.ignoreType == "Callsign")
+  {
+    if (ValidateTextInput(ignoreCallsignValue, ingnoreAddResultLabel))
+    {
+      ignoreCallsign(ignoreCallsignValue.value);
+    }
+  }
+  else if (CR.ignoreType == "CQ")
+  {
+    if (ValidateTextInput(ignoreCqCallsignValue, ingnoreAddResultLabel))
+    {
+      ignoreCQ("CQ " + ignoreCqCallsignValue.value, ignoreCqDxccSelect.value);
+    }
+  }
+  else if (CR.ignoreType == "DXCC")
+  {
+    ignoreDxcc(ignoreDxccSelect.value);
+  }
+  else if (CR.ignoreType == "Grid")
+  {
+    ignoreGrid(ignoreGridValue.value);
+  }
+  else if (CR.ignoreType == "CQz")
+  {
+    ignoreCQz(ignoreCqzSelect.value)
+  }
+  else if (CR.ignoreType == "ITUz")
+  {
+    ignoreITUz(ignoreItuzSelect.value);
+  }
+}
+
+function manifestResult(buffer, flag)
+{
+  CR.callsignManifest = JSON.parse(buffer);
+  let newSelect = document.getElementById("stateSelect");
+
+  for (const key in CR.callsignManifest.cnt)
+  {
+    let option = document.createElement("option");
+    if (window.opener.GT.enums[key])
+    {
+      option.value = key;
+      option.text = window.opener.GT.enums[key];
+    }
+    else
+    {
+      option.value = "CN-" + key;
+      option.text = window.opener.GT.enums["CN-" + key];
+    }
+    newSelect.appendChild(option);
+  }
+  newSelect.oninput = stateChangedValue;
+}
+
+function receiveMessage(event) {}
+
+CR.tracker = {};
+
+function updateWorked()
+{
+  CR.modes = window.opener.GT.modes;
+  CR.modes_phone = window.opener.GT.modes_phone;
+  CR.tracker = window.opener.GT.tracker;
+
+  processAllAwardTrackers();
+}
+
+function deleteCallsignIgnore(key)
+{
+  delete CR.blockedCalls[key];
+  storeBlocks();
+  viewRoster();
+}
+
+function ignoreCallsign(callsign)
+{
+  CR.blockedCalls[callsign] = true;
+  storeBlocks();
+  viewRoster();
+}
+
+function ignoreDxcc(dxcc)
+{
+  CR.blockedDxcc[dxcc] = true;
+  storeBlocks();
+  viewRoster();
+}
+
+function ignoreGrid(grid)
+{
+  CR.blockedGrid[grid] = true;
+  storeBlocks();
+  viewRoster();
+}
+
+function ignoreCQ(cq, dxcc)
+{
+  if (dxcc > 0)
+  {
+    CR.ignoredCQ[cq + ":" + dxcc] = true;
+  }
+  else
+  {
+    CR.ignoredCQ[cq] = true;
+  }
+
+  storeBlocks();
+  viewRoster();
+}
+
+function ignoreCQz(cqz)
+{
+  CR.blockedCQz[cqz] = true;
+  storeBlocks();
+  viewRoster();
+}
+
+function ignoreITUz(ituz)
+{
+  CR.blockedITUz[ituz] = true;
+  storeBlocks();
+  viewRoster();
+}
+
+function deleteDxccIgnore(key)
+{
+  delete CR.blockedDxcc[key];
+  storeBlocks();
+  viewRoster();
+}
+
+function deleteGridIgnore(key)
+{
+  delete CR.blockedGrid[key];
+  storeBlocks();
+  viewRoster();
+}
+
+function deleteCQIgnore(key)
+{
+  delete CR.ignoredCQ[key];
+  storeBlocks();
+  viewRoster();
+}
+
+function deleteCQzIgnore(key)
+{
+  delete CR.blockedCQz[key];
+  storeBlocks();
+  viewRoster();
+}
+
+function deleteITUzIgnore(key)
+{
+  delete CR.blockedITUz[key];
+  storeBlocks();
+  viewRoster();
+}
+
+function clearAllCallsignIgnores()
+{
+  CR.blockedCalls = Object();
+  storeBlocks();
+  viewRoster();
+}
+
+function clearAllDxccIgnores()
+{
+  CR.blockedDxcc = Object();
+  storeBlocks();
+  viewRoster();
+}
+
+function clearAllGridIgnores()
+{
+  CR.blockedGrid = Object();
+  storeBlocks();
+  viewRoster();
+}
+
+function clearAllCQIgnores()
+{
+  CR.ignoredCQ = Object();
+  storeBlocks();
+  viewRoster();
+}
+
+function clearAllCQzIgnores()
+{
+  CR.blockedCQz = Object();
+  storeBlocks();
+  viewRoster();
+}
+
+function clearAllITUzIgnores()
+{
+  CR.blockedITUz = Object();
+  storeBlocks();
+  viewRoster();
+}
+
+function openSettings()
+{
+  openInfoTab("generalbox", "generalSettingsDiv");
+  settingsDiv.style.display = "inline-block";
+}
+
+function openWatcher()
+{
+  openInfoTab("watcherbox", "watcherBoxDiv", openWathcherTab);
+  settingsDiv.style.display = "inline-block";
+}
+
+function openExceptions()
+{
+  openInfoTab("exceptionsbox", "exceptionsBoxDiv");
+  settingsDiv.style.display = "inline-block";
+}
+
+function openIgnores()
+{
+  openInfoTab("ingoresbox", "ignoresBoxDiv", renderIgnoresTab);
+  settingsDiv.style.display = "inline-block";
+}
+
+function openColumns()
+{
+  openInfoTab("columnsbox", "columnsBoxDiv", renderColumnsTab);
+  settingsDiv.style.display = "inline-block";
+}
+
+function closeSettings()
+{
+  settingsDiv.style.display = "none";
+}
+
+function renderIgnoresTab()
+{
+  let worker = "";
+  let clearString = "<th>none</th>";
+  if (Object.keys(CR.blockedCalls).length > 0)
+  {
+    clearString = "<th style='cursor:pointer;' onclick='clearAllCallsignIgnores()'>Clear All</th>";
+    worker += "<div class='ignoresTables'><table class='darkTable' align=center><tr><th align=left>Callsigns</th>" + clearString + "</tr>";
+    Object.keys(CR.blockedCalls)
+      .sort()
+      .forEach(function (key, i)
+      {
+        worker += "<tr><td align=left style='color:#FFFF00;' >" + key + "</td><td style='cursor:pointer;' onclick='deleteCallsignIgnore(\"" + key + "\")'><img src='img/trash_24x48.png' style='height:17px;margin:-1px;margin-bottom:-3px;padding:0px'></td></tr>";
+      });
+    worker += "</table></div>";
+  }
+
+  if (Object.keys(CR.ignoredCQ).length > 0)
+  {
+    clearString = "<th style='cursor:pointer;' onclick='clearAllCQIgnores()'>Clear All</th>";
+    worker += "<div class='ignoresTables'><table class='darkTable' align=center><tr><th align=left>CQ</th>" + clearString + "</tr>";
+    Object.keys(CR.ignoredCQ)
+      .sort()
+      .forEach(function (rawKey, i)
+      {
+        let split = rawKey.split(":");
+        let key = split[0];
+        let dxcc = -1;
+        if (split.length == 2) dxcc = parseInt(split[1]);
+        worker += "<tr><td align=left style='color:lightgreen;' >" + key + " from " + (dxcc == -1 ? "All" : window.opener.GT.dxccToAltName[dxcc]) + "</td><td style='cursor:pointer;' onclick='deleteCQIgnore(\"" + rawKey + "\")'><img src='img/trash_24x48.png' style='height:17px;margin:-1px;margin-bottom:-3px;padding:0px'></td></tr>";
+      });
+    worker += "</table></div>";
+  }
+
+  if (Object.keys(CR.blockedDxcc).length > 0)
+  {
+    clearString = "<th style='cursor:pointer;' onclick='clearAllDxccIgnores()'>Clear All</th>";
+    worker += "<div class='ignoresTables'><table class='darkTable' align=center><tr><th align=left>DXCC</th>" + clearString + "</tr>";
+    Object.keys(CR.blockedDxcc)
+      .sort()
+      .forEach(function (key, i)
+      {
+        worker += "<tr><td align=left style='color:#FFA500' >" + window.opener.GT.dxccToAltName[key] + " (" + window.opener.GT.dxccInfo[key].pp + ")</td><td style='cursor:pointer;' onclick='deleteDxccIgnore(\"" + key + "\")'><img src='img/trash_24x48.png' style='height:17px;margin:-1px;margin-bottom:-3px;padding:0px'></td></tr>";
+      });
+    worker += "</table></div>";
+  }
+
+  if (Object.keys(CR.blockedGrid).length > 0)
+  {
+    clearString = "<th style='cursor:pointer;' onclick='clearAllGridIgnores()'>Clear All</th>";
+    worker += "<div class='ignoresTables'><table class='darkTable' align=center><tr><th align=left>Grid</th>" + clearString + "</tr>";
+    Object.keys(CR.blockedGrid)
+      .sort()
+      .forEach(function (key, i)
+      {
+        worker += "<tr><td align=left style='color:cyan' >" + key + "</td><td style='cursor:pointer;' onclick='deleteGridIgnore(\"" + key + "\")'><img src='img/trash_24x48.png' style='height:17px;margin:-1px;margin-bottom:-3px;padding:0px'></td></tr>";
+      });
+    worker += "</table></div>";
+  }
+
+  if (Object.keys(CR.blockedCQz).length > 0)
+  {
+    clearString = "<th style='cursor:pointer;' onclick='clearAllCQzIgnores()'>Clear All</th>";
+    worker += "<div class='ignoresTables' ><table class='darkTable' align=center><tr><th align=left>CQ Zones</th>" + clearString + "</tr>";
+    Object.keys(CR.blockedCQz)
+      .sort()
+      .forEach(function (key, i)
+      {
+        worker += "<tr><td align=left style='color:cyan;' >" + key + "</td><td style='cursor:pointer;' onclick='deleteCQzIgnore(\"" + key + "\")'><img src='img/trash_24x48.png' style='height:17px;margin:-1px;margin-bottom:-3px;padding:0px'></td></tr>";
+      });
+    worker += "</table></div>";
+  }
+
+  if (Object.keys(CR.blockedITUz).length > 0)
+  {
+    clearString = "<th style='cursor:pointer;' onclick='clearAllITUzIgnores()'>Clear All</th>";
+    worker += "<div class='ignoresTables'><table class='darkTable' align=center><tr><th align=left>ITU Zones</th>" + clearString + "</tr>";
+    Object.keys(CR.blockedITUz)
+      .sort()
+      .forEach(function (key, i)
+      {
+        worker += "<tr><td align=left style='color:cyan;' >" + key + "</td><td style='cursor:pointer;' onclick='deleteITUzIgnore(\"" + key + "\")'><img src='img/trash_24x48.png' style='height:17px;margin:-1px;margin-bottom:-3px;padding:0px'></td></tr>";
+      });
+    worker += "</table></div>";
+  }
+
+  ignoresEditView.innerHTML = worker;
+  ignoresBoxDiv.style.height = (window.innerHeight - 50) + "px";
+
+  let elems = document.getElementsByClassName("ignoresTables");
+  for (let x = 0; x < elems.length; x++)
+  {
+    let height = 110;
+    if (elems[x].offsetHeight > window.innerHeight - height)
+    {
+      elems[x].style.height = (window.innerHeight - height) + "px";
+    }
+  }
+}
+
+function renderColumnsTab()
+{
+  let worker = "";
+  let renderHeight = 230;
+  worker += "<div id='columnEnabledView' class='columnEditView'>";
+  worker += "<div class='columnEditRowHeader'>Enabled</div>";
+  const columns = rosterColumnList(CR.rosterSettings.columns, { Callsign: false });
+  let enabled = {};
+  for (let x = 0; x != columns.length; x++)
+  {
+    let column = columns[x];
+    enabled[column] = true;
+    worker += "<div class='columnEditRow'>";
+    if (x > 0)
+    {
+      worker += `<div style='cursor:pointer' onclick='moveColumnLeft("${column}");renderColumnsTab();'>▲</div>`;
+    }
+    else
+    {
+      worker += "<div>&nbsp</div>"
+    }
+   
+    worker += `<div><input type='checkbox' checked onchange='toggleColumn(this, "${column}");renderColumnsTab();'></div>`
+    worker += "<div>" + column + "</div>";
+    if (x + 1 != columns.length)
+    {
+      worker += `<div style='cursor:pointer' onclick='moveColumnRight("${column}");renderColumnsTab();'>▼</div>`;
+    }
+    else
+    {
+      worker += "<div>&nbsp</div>";
+    }
+    worker += "</div>";
+  }
+  worker += "</div>";
+  worker += "<div id='columnAvailableView' class='columnEditView'>";
+
+  let available = [...CR.rosterSettings.columnOrder];
+  available.sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1);
+  for (let x = 0; x != available.length; x++)
+  {
+    let column = available[x];
+    if (column == "Callsign") continue;
+    if (column == "eQSL" && window.opener.GT.callsignLookups.eqslUseEnable == false) continue;
+    if (column == "LoTW" && window.opener.GT.callsignLookups.lotwUseEnable == false) continue;
+    if (column == "OQRS" && window.opener.GT.callsignLookups.oqrsUseEnable == false) continue;
+
+    if (!(column in enabled))
+    {
+      worker += "<div class='columnAvailableRow'>";
+      worker += `<div><input type='checkbox' onchange='toggleColumn(this, "${column}");renderColumnsTab();'></div>`;
+      worker += "<div>" + column + "</div>";
+      worker += "</div>";
+    }
+  }
+  worker += "</div>";
+
+  columnsEditView.innerHTML = worker;
+  renderHeight = Math.max(window.innerHeight - 200, 150);
+  columnEnabledView.style.height = renderHeight + "px";
+  columnAvailableView.style.height = renderHeight + "px";
+}
+
+function onMyKeyDown(event)
+{
+  if (event.keyCode == 27)
+  {
+    closeSettings();
+  }
+
+  if (event.ctrlKey == true)
+  {
+    if (event.code == "KeyS")
+    {
+      openSettings();
+    }
+    else if (event.code == "KeyW" || event.code == "KeyO")
+    {
+      openWatcher();
+    }
+    else if (event.code == "KeyE")
+    {
+      openExceptions();
+    }
+    else if (event.code == "KeyI")
+    {
+      openIgnores();
+    }
+    else if (event.code == "KeyC")
+    {
+      openColumns();
+    }
+    else if (event.code == "KeyR")
+    {
+      resetFilters();
+    }
+  }
+}
+
+function blurOnEnter(ele)
+{
+  if (event.key == "Enter")
+  {
+    ele.blur();
+  }
+}
+
+function resize()
+{
+  if (ignoresBoxDiv.style.display != "none")
+  {
+    renderIgnoresTab();
+  }
+  if (columnsBoxDiv.style.display != "none")
+  {
+    renderColumnsTab();
+  }
+
+  wantRenderWatchersTab();
+
+  window.opener.goProcessRoster();
+}
+
+function init()
+{
+  window.opener.GT.rosterInitialized = true;
+
+  CR.callsignDatabaseDXCC = window.opener.GT.callsignDatabaseDXCC;
+  CR.callsignDatabaseUS = window.opener.GT.callsignDatabaseUS;
+  CR.callsignDatabaseUSplus = window.opener.GT.callsignDatabaseUSplus;
+  loadAwardJson();
+
+  updateWorked();
+  // addAllAwards();
+
+  window.addEventListener("message", receiveMessage, false);
+  
+
+  if (window.opener.GT.mapSettings.offlineMode == false)
+  {
+    getBuffer(
+      "https://storage.googleapis.com/gt_app/callsigns/manifest.json",
+      manifestResult,
+      null,
+      "http",
+      80
+    );
+  }
+  loadSettings();
+  loadFilterSettings();
+  updateInstances();
+
+  // callback to addControls();
+  loadRosterI18n();
+
+  setRosterTop();
+}
+
+function toggleShowControls()
+{
+  CR.rosterSettings.controls = !CR.rosterSettings.controls;
+  writeRosterSettings();
+  setVisual();
+}
+
+// From i18n.js
+function addControls()
+{
+  WANTED_LABELS = {
+    cont: I18N("rosterColumns.Wanted.cont"),
+    cqz: I18N("rosterColumns.Wanted.cqz"),
+    ituz: I18N("rosterColumns.Wanted.ituz"),
+    dxcc: I18N("rosterColumns.Wanted.dxcc"),
+    dxccMarathon: I18N("rosterColumns.Wanted.dxccMarathon"),
+    cqzMarathon: I18N("rosterColumns.Wanted.cqzMarathon"),
+    state: I18N("rosterColumns.Wanted.state"),
+    grid: I18N("rosterColumns.Wanted.grid"),
+    cnty: I18N("rosterColumns.Wanted.cnty"),
+    wpx: I18N("rosterColumns.Wanted.wpx"),
+    call: I18N("rosterColumns.Wanted.call"),
+    watcher: I18N("roster.watcher.label"),
+    oams: I18N("rosterColumns.Wanted.oams"),
+    pota: I18N("rosterColumns.Wanted.pota")
+  }
+
+  window.opener.setRosterSpot(CR.rosterSettings.columns.Spot);
+
+  for (const key in CR.rosterSettings.wanted)
+  {
+    if (document.getElementById(key))
+    { document.getElementById(key).checked = CR.rosterSettings.wanted[key]; }
+  }
+
+  createMenuHide();
+  createMenuShow();
+  createCompactMenuHide();
+  createCompactMenuShow();
+  clearRestOfMenus();
+
+  callsignNeed.value = CR.rosterSettings.callsign;
+  huntMode.value = CR.rosterSettings.hunting;
+  huntNeed.value = CR.rosterSettings.huntNeed;
+  wantGrid.checked = CR.rosterSettings.requireGrid;
+
+  wantMaxDT.checked = CR.rosterSettings.wantMaxDT;
+  wantMinDB.checked = CR.rosterSettings.wantMinDB;
+  wantMinFreq.checked = CR.rosterSettings.wantMinFreq;
+  wantMaxFreq.checked = CR.rosterSettings.wantMaxFreq;
+  wantRRCQ.checked = CR.rosterSettings.wantRRCQ;
+
+  maxDTView.innerHTML = maxDT.value = CR.rosterSettings.maxDT;
+  minDbView.innerHTML = minDb.value = CR.rosterSettings.minDb;
+  minFreqView.innerHTML = minFreq.value = CR.rosterSettings.minFreq;
+  maxFreqView.innerHTML = maxFreq.value = CR.rosterSettings.maxFreq;
+
+  maxLoTW.value = CR.rosterSettings.maxLoTW;
+  maxLoTWView.innerHTML = maxLoTW.value < 27 ? toYM(Number(maxLoTW.value)) : "<b>&infin;</b>";
+
+  cqOnly.checked = CR.rosterSettings.cqOnly;
+  noMyDxcc.checked = CR.rosterSettings.noMyDxcc;
+  onlyMyDxcc.checked = CR.rosterSettings.onlyMyDxcc;
+
+  usesLoTW.checked = CR.rosterSettings.usesLoTW;
+  useseQSL.checked = CR.rosterSettings.useseQSL;
+  onlySpot.checked = CR.rosterSettings.onlySpot;
+  usesOQRS.checked = CR.rosterSettings.usesOQRS;
+
+  referenceNeed.value = CR.rosterSettings.reference;
+  allOnlyNew.checked = CR.rosterSettings.allOnlyNew;
+
+  clearRosterOnBandChange.checked = CR.rosterSettings.clearRosterOnBandChange;
+  rosterAlwaysOnTop.checked = CR.rosterSettings.rosterAlwaysOnTop;
+  animateCQGT.checked = CR.rosterSettings.animateCQGT;
+  rosterDelayOnFocus.checked = CR.rosterSettings.rosterDelayOnFocus;
+  displayDelayOnFocus();
+  rosterDelayTime.value = CR.rosterSettings.rosterDelayTime;
+  rosterDelayTimeTd.innerHTML = rosterDelayTime.value + "ms";
+  setRosterTimeView();
+  setCompactView();
+  initSelectors();
+  setVisual();
+  document.addEventListener("keydown", onMyKeyDown, false);
+  CR.timerInterval = nodeTimers.setInterval(realtimeRoster, 1000);
+  updateInstances();
+}
+
+function setCompactView()
+{
+  compactModeDiv.innerHTML = CR.rosterSettings.compact ? I18N("roster.menu.RosterMode") : I18N("roster.menu.CompactMode");
+  compactEnityDiv.style.display = CR.rosterSettings.compact ? "" : "none";
+  columnsBoxDiv.style.display = columnsbox.style.display = CR.rosterSettings.compact ? "none" : "";
+}
+function compactModeChanged()
+{
+  CR.rosterSettings.compact = !CR.rosterSettings.compact;
+  writeRosterSettings();
+  setCompactView();
+  viewRoster();
+}
+
+function compactEntityChanged()
+{
+  CR.rosterSettings.compactEntity = compactEntitySelect.value;
+  writeRosterSettings();
+  viewRoster();
+}
+
+function clearRosterOnBandChangeValueChanged(what)
+{
+  CR.rosterSettings.clearRosterOnBandChange = clearRosterOnBandChange.checked;
+  writeRosterSettings();
+}
+
+function rosterDelayOnFocusValueChanged(what)
+{
+  CR.rosterSettings.rosterDelayOnFocus = rosterDelayOnFocus.checked;
+  displayDelayOnFocus();
+  writeRosterSettings();
+}
+
+function displayDelayOnFocus()
+{
+  if (CR.rosterSettings.rosterDelayOnFocus)
+  {
+    rosterDelayTimeTd.style.display = "block";
+    rosterDelayTime.style.display = "block";
+  }
+  else
+  {
+    rosterDelayTimeTd.style.display = "none";
+    rosterDelayTime.style.display = "none";
+  }
+}
+
+function changeRosterDelayTime()
+{
+  CR.rosterSettings.rosterDelayTime = rosterDelayTime.value;
+  rosterDelayTimeTd.innerHTML = rosterDelayTime.value + "ms";
+  writeRosterSettings();
+}
+
+function changeRosterTime()
+{
+  CR.rosterSettings.rosterTime = rosterTime.value;
+  setRosterTimeView();
+  writeRosterSettings();
+  viewRoster();
+}
+
+function changeAnimateCQGT(butt)
+{
+  CR.rosterSettings.animateCQGT = butt.checked;
+  viewRoster();
+}
+
+function changeRosterTop(butt)
+{
+  CR.rosterSettings.rosterAlwaysOnTop = butt.checked;
+  setRosterTop();
+}
+
+function setRosterTop()
+{
+  electron.ipcRenderer.send("setAlwaysOnTop", "gt_roster", CR.rosterSettings.rosterAlwaysOnTop);
+}
+
+function setRosterTimeView()
+{
+  rosterTime.value = CR.rosterSettings.rosterTime;
+  rosterTimeTd.innerHTML = toDHMS(Number(rosterTime.value));
+}
+
+function handleContextMenu(ev)
+{
+  let mouseX = Math.round(ev.x);
+  let mouseY = Math.round(ev.y);
+
+  if (typeof ev.target != "undefined")
+  {
+    if (ev.target.className == "inputTextValue") return true;
+
+    let name = "";
+    let target = ev.target;
+    let parent = ev.target.parentNode;
+    if (target.tagName == "SPAN")
+    {
+      target = ev.target.parentNode;
+      parent = target.parentNode;
+    }
+    if (target.tagName == "TD" || (CR.rosterSettings.compact && target.tagName == "DIV"))
+    {
+      name = target.getAttribute("name");
+    }
+    if (CR.rosterSettings.compact && name != "Callsign")
+    {
+      parent = parent.parentNode;
+    }
+    if (name == "Callsign")
+    {
+      CR.targetHash = parent.id;
+      CR.callMenu.popup();
+    }
+    else if (name == "Calling")
+    {
+      CR.targetHash = parent.id;
+      CR.callingMenu.popup();
+    }
+    else if (name == "Msg")
+    {
+      CR.targetHash = parent.id;
+      CR.MsgMenu.popup();
+    }
+    else if (name == "Grid")
+    {
+      if (CR.callRoster[parent.id].callObj.grid.length == 4)
+      {
+        CR.targetHash = parent.id;
+        CR.GridMenu.popup();
+      }
+    }
+    else if (name == "CQ")
+    {
+      if (CR.callRoster[parent.id].DXcall != "CQ")
+      {
+        CR.targetCQ = parent.id;
+        CR.CQMenu.popup();
+      }
+    }
+    else if (name == "CQz")
+    {
+      CR.targetCQz = parent.id;
+      CR.CQzMenu.popup();
+    }
+    else if (name == "ITUz")
+    {
+      CR.targetITUz = parent.id;
+      CR.ITUzMenu.popup();
+    }
+    else if (name && name.startsWith("DXCC"))
+    {
+      let dxcca = name.split("(");
+      let dxcc = parseInt(dxcca[1]);
+      CR.targetDxcc = dxcc;
+      CR.dxccMenu.popup();
+    }
+    else
+    {
+      if (CR.rosterSettings.compact)
+      {
+        CR.rosterSettings.controls ? CR.compactMenuHide.popup() : CR.compactMenuShow.popup();
+      }
+      else
+      {
+        if (target.tagName == "TH" && target.getAttribute("name"))
+        {
+          CR.menuItemForMoveLeftColumn.enabled = true;
+          CR.menuItemForMoveRightColumn.enabled = true;
+
+          CR.currentColumnName = target.getAttribute("name");
+
+          const columns = rosterColumnList(CR.rosterSettings.columns, { Callsign: true });
+          const pos = columns.indexOf(CR.currentColumnName);
+          if (pos == 0)
+          {
+            CR.menuItemForMoveLeftColumn.enabled = false;
+            CR.menuItemForMoveRightColumn.enabled = false;
+          }
+          else if (pos == 1)
+          {
+            CR.menuItemForMoveLeftColumn.enabled = false;
+          }
+          if (pos + 1 == Object.keys(columns).length)
+          {
+            CR.menuItemForMoveRightColumn.enabled = false;
+          }
+
+          CR.columnMenu.popup();
+        }
+        else
+        {
+          CR.rosterSettings.controls ? CR.menuHide.popup() : CR.menuShow.popup();
+        }
+      }
+    }
+  }
+  else
+  {
+    if (CR.rosterSettings.compact == false)
+    {
+      CR.menu.popup();
+    }
+    else
+    {
+      CR.compactMenu.popup();
+    }
+  }
+
+  ev.preventDefault();
+
+  return false;
+}
+
+function getTypeFromMode(mode)
+{
+  if (mode in CR.modes)
+  {
+    if (CR.modes[mode] == true) return "Digital";
+    else if (CR.modes_phone[mode] == true) return "Phone";
+  }
+  return "";
+}
+
+function testAward(awardName, obj, baseHash)
+{
+  if (
+    CR.awardTracker[awardName].test.dxcc &&
+    CR.awardTracker[awardName].rule.dxcc.indexOf(obj.dxcc) == -1
+  )
+  { return false; }
+
+  if (
+    CR.awardTracker[awardName].test.mode &&
+    CR.awardTracker[awardName].rule.mode.indexOf(obj.mode) == -1
+  )
+  { return false; }
+
+  if (
+    CR.awardTracker[awardName].test.band &&
+    CR.awardTracker[awardName].rule.band.indexOf(obj.band) == -1
+  )
+  { return false; }
+
+  if (
+    CR.awardTracker[awardName].test.DEcall &&
+    CR.awardTracker[awardName].rule.call.indexOf(obj.DEcall) == -1
+  )
+  { return false; }
+
+  if (
+    CR.awardTracker[awardName].test.cont &&
+    CR.awardTracker[awardName].rule.cont.indexOf(obj.cont) == -1
+  )
+  { return false; }
+
+  if (
+    CR.awardTracker[awardName].test.prop &&
+    CR.awardTracker[awardName].rule.propMode != obj.propMode
+  )
+  { return false; }
+
+  if (
+    CR.awardTracker[awardName].test.sat &&
+    CR.awardTracker[awardName].rule.satName.indexOf(obj.satName) == -1
+  )
+  { return false; }
+
+  return CR.awardTypes[CR.awardTracker[awardName].rule.type].test(
+    CR.awardTracker[awardName],
+    obj,
+    baseHash
+  );
+}
+
+function processAward(awardName)
+{
+  let award =
+    CR.awards[CR.awardTracker[awardName].sponsor].awards[
+      CR.awardTracker[awardName].name
+    ];
+  CR.awardTracker[awardName].rule = award.rule;
+  let test = (CR.awardTracker[awardName].test = {});
+  let mode = award.rule.mode.slice();
+
+  let Index = mode.indexOf("Mixed");
+  if (Index > -1) mode.splice(Index, 1);
+
+  Index = mode.indexOf("Digital");
+  if (Index > -1) mode.splice(Index, 1);
+
+  Index = mode.indexOf("Phone");
+  if (Index > -1) mode.splice(Index, 1);
+
+  test.mode = mode.length > 0;
+  test.confirmed = "qsl_req" in CR.awards[CR.awardTracker[awardName].sponsor].awards[CR.awardTracker[awardName].name].rule ? CR.awards[CR.awardTracker[awardName].sponsor].awards[CR.awardTracker[awardName].name].rule.qsl_req == "confirmed" : CR.awards[CR.awardTracker[awardName].sponsor].qsl_req == "confirmed";
+  test.look = "confirmed";
+  test.qsl_req = "qsl_req" in CR.awards[CR.awardTracker[awardName].sponsor].awards[CR.awardTracker[awardName].name].rule ? CR.awards[CR.awardTracker[awardName].sponsor].awards[CR.awardTracker[awardName].name].rule.qsl_req : CR.awards[CR.awardTracker[awardName].sponsor].qsl_req;
+  test.DEcall = "call" in award.rule;
+  test.band = "band" in award.rule && award.rule.band.indexOf("Mixed") == -1;
+  test.dxcc = "dxcc" in award.rule;
+  test.cont = "cont" in award.rule;
+  test.prop = "propMode" in award.rule;
+  test.sat = "satName" in award.rule;
+
+  CR.awardTracker[awardName].stat = {};
+
+  for (const i in window.opener.GT.QSOhash)
+  {
+    let obj = window.opener.GT.QSOhash[i];
+
+    if (test.confirmed && !obj.confirmed) continue;
+
+    if (obj.dxcc < 1) continue;
+
+    if (test.dxcc && award.rule.dxcc.indexOf(obj.dxcc) == -1) continue;
+
+    if (test.mode && award.rule.mode.indexOf(obj.mode) == -1) continue;
+
+    if (test.band && award.rule.band.indexOf(obj.band) == -1) continue;
+
+    if (test.DEcall && award.rule.call.indexOf(obj.DEcall) == -1) continue;
+
+    if (test.cont && award.rule.cont.indexOf(obj.cont) == -1) continue;
+
+    if (test.prop && award.rule.propMode != obj.propMode) continue;
+
+    if (test.sat && award.rule.satName.indexOf(obj.satName) == -1) continue;
+
+    CR.awardTypes[award.rule.type].score(CR.awardTracker[awardName], obj);
+  }
+
+  CR.awardTracker[awardName].comp = CR.awardTypes[award.rule.type].compile(
+    CR.awardTracker[awardName],
+    CR.awardTracker[awardName].stat
+  );
+  CR.awardTracker[awardName].stat = {};
+}
+
+function newAwardCountObject()
+{
+  let statCountObject = {};
+
+  statCountObject.bands = {};
+  statCountObject.bands.Mixed = {};
+  statCountObject.bands.Digital = {};
+  statCountObject.bands.Phone = {};
+  statCountObject.modes = {};
+  statCountObject.modes.Mixed = {};
+  statCountObject.modes.Digital = {};
+  statCountObject.modes.Phone = {};
+  statCountObject.unique = null;
+  return statCountObject;
+}
+
+function workAwardObject(obj, band, mode, isDigital, isPhone, unique = null)
+{
+  obj.bands.Mixed[band] = ~~obj.bands.Mixed[band] + 1;
+  if (!(mode in obj.bands)) obj.bands[mode] = {};
+  obj.bands[mode][band] = ~~obj.bands[mode][band] + 1;
+  obj.modes.Mixed[mode] = ~~obj.modes.Mixed[mode] + 1;
+
+  if (isDigital)
+  {
+    obj.bands.Digital[band] = ~~obj.bands.Digital[band] + 1;
+    obj.modes.Digital[mode] = ~~obj.modes.Digital[mode] + 1;
+  }
+  if (isPhone)
+  {
+    obj.bands.Phone[band] = ~~obj.bands.Phone[band] + 1;
+    obj.modes.Phone[mode] = ~~obj.modes.Phone[mode] + 1;
+  }
+  if (unique)
+  {
+    if (obj.unique == null) obj.unique = {};
+    if (!(unique in obj.unique)) obj.unique[unique] = newAwardCountObject();
+    workAwardObject(obj.unique[unique], band, mode, isDigital, isPhone);
+  }
+  return true;
+}
+
+function buildAwardTypeHandlers()
+{
+  CR.awardTypes = {
+    IOTA: { name: "Islands On The Air" },
+    call: { name: "Callsign" },
+    callarea: { name: "Call Area" },
+    calls2dxcc: { name: "Stations per DXCC" },
+    cnty: { name: "County" },
+    cont: { name: "Continents" },
+    cont5: { name: "5 Continents" },
+    cont52band: { name: "5 Continents per Band" },
+    cqz: { name: "CQ Zone" },
+    dxcc: { name: "DXCC" },
+    grids: { name: "Grids" },
+    numsfx: { name: "Call Area + Suffix" },
+    px: { name: "Prefix" },
+    pxa: { name: "Prefixes" },
+    pxplus: { name: "Special Calls" },
+    sfx: { name: "Suffix" },
+    states: { name: "States" },
+    cont2band: { name: "Continents per Band" },
+    calls2band: { name: "Stations per Band" },
+    dxcc2band: { name: "DXCC per Band" },
+    states2band: { name: "States per Band" }
+  };
+
+  CR.awardTypes.IOTA.score = scoreAIOTA;
+  CR.awardTypes.call.score = scoreAcall;
+  CR.awardTypes.callarea.score = scoreAcallarea;
+  CR.awardTypes.calls2dxcc.score = scoreAcalls2dxcc;
+  CR.awardTypes.cnty.score = scoreAcnty;
+  CR.awardTypes.cont.score = scoreAcont;
+  CR.awardTypes.cont5.score = scoreAcont5;
+  CR.awardTypes.cont52band.score = scoreAcont52band;
+  CR.awardTypes.cqz.score = scoreAcqz;
+  CR.awardTypes.dxcc.score = scoreAdxcc;
+  CR.awardTypes.grids.score = scoreAgrids;
+  CR.awardTypes.numsfx.score = scoreAnumsfx;
+  CR.awardTypes.px.score = scoreApx;
+  CR.awardTypes.pxa.score = scoreApxa;
+  CR.awardTypes.pxplus.score = scoreApxplus;
+  CR.awardTypes.sfx.score = scoreAsfx;
+  CR.awardTypes.states.score = scoreAstates;
+  CR.awardTypes.cont2band.score = scoreAcont2band;
+  CR.awardTypes.calls2band.score = scoreAcalls2band;
+  CR.awardTypes.dxcc2band.score = scoreAdxcc2band;
+  CR.awardTypes.states2band.score = scoreAstates2band;
+
+  CR.awardTypes.IOTA.test = testAIOTA;
+  CR.awardTypes.call.test = testAcall;
+  CR.awardTypes.callarea.test = testAcallarea;
+  CR.awardTypes.calls2dxcc.test = testAcalls2dxcc;
+  CR.awardTypes.cnty.test = testAcnty;
+  CR.awardTypes.cont.test = testAcont;
+  CR.awardTypes.cont5.test = testAcont5;
+  CR.awardTypes.cont52band.test = testAcont52band;
+  CR.awardTypes.cqz.test = testAcqz;
+  CR.awardTypes.dxcc.test = testAdxcc;
+  CR.awardTypes.grids.test = testAgrids;
+  CR.awardTypes.numsfx.test = testAnumsfx;
+  CR.awardTypes.px.test = testApx;
+  CR.awardTypes.pxa.test = testApxa;
+  CR.awardTypes.pxplus.test = testApxplus;
+  CR.awardTypes.sfx.test = testAsfx;
+  CR.awardTypes.states.test = testAstates;
+  CR.awardTypes.cont2band.test = testAcont2band;
+  CR.awardTypes.calls2band.test = testAcalls2band;
+  CR.awardTypes.dxcc2band.test = testAdxcc2band;
+  CR.awardTypes.states2band.test = testAstates;
+
+  CR.awardTypes.IOTA.compile = singleCompile;
+  CR.awardTypes.call.compile = singleCompile;
+  CR.awardTypes.callarea.compile = singleCompile;
+  CR.awardTypes.calls2dxcc.compile = doubleCompile;
+  CR.awardTypes.cnty.compile = singleCompile;
+  CR.awardTypes.cont.compile = singleCompile;
+  CR.awardTypes.cont5.compile = singleCompile;
+  CR.awardTypes.cont52band.compile = doubleCompile;
+  CR.awardTypes.cqz.compile = singleCompile;
+  CR.awardTypes.dxcc.compile = singleCompile;
+  CR.awardTypes.grids.compile = singleCompile;
+  CR.awardTypes.numsfx.compile = singleCompile;
+  CR.awardTypes.px.compile = singleCompile;
+  CR.awardTypes.pxa.compile = singleCompile;
+  CR.awardTypes.pxplus.compile = singleCompile;
+  CR.awardTypes.sfx.compile = singleCompile;
+  CR.awardTypes.states.compile = singleCompile;
+  CR.awardTypes.cont2band.compile = doubleCompile;
+  CR.awardTypes.calls2band.compile = doubleCompile;
+  CR.awardTypes.dxcc2band.compile = doubleCompile;
+  CR.awardTypes.states2band.compile = doubleCompile;
+}
+
+function scoreAstates(award, obj)
+{
+  if (obj.state)
+  {
+    if (!(obj.state in award.stat))
+    { award.stat[obj.state] = newAwardCountObject(); }
+    return workAwardObject(
+      award.stat[obj.state],
+      obj.band,
+      obj.mode,
+      obj.digital,
+      obj.phone
+    );
+  }
+  return false;
+}
+
+function testAstates(award, obj, baseHash)
+{
+  // calls with empty state will not match anything in the hash map. so filter those out
+  if (!obj.state || obj.state + baseHash in CR.tracker[award.test.look].state)
+  {
+    return false;
+  }
+  return true;
+}
+
+function scoreAstates2band(award, obj)
+{
+  if (obj.state)
+  {
+    if (!(obj.band in award.stat)) award.stat[obj.band] = newAwardCountObject();
+    return workAwardObject(
+      award.stat[obj.band],
+      obj.band,
+      obj.mode,
+      obj.digital,
+      obj.phone,
+      obj.state
+    );
+  }
+  return false;
+}
+
+function scoreAdxcc(award, obj)
+{
+  if (!(obj.dxcc in award.stat)) award.stat[obj.dxcc] = newAwardCountObject();
+  return workAwardObject(
+    award.stat[obj.dxcc],
+    obj.band,
+    obj.mode,
+    obj.digital,
+    obj.phone
+  );
+}
+
+function testAdxcc(award, obj, baseHash)
+{
+  if (String(obj.dxcc) + "|" + baseHash in CR.tracker[award.test.look].dxcc)
+  {
+    return false;
+  }
+  return true;
+}
+
+function scoreAcont(award, obj)
+{
+  if (obj.cont)
+  {
+    let cont = obj.cont;
+    if (cont == "AN") cont = "OC";
+    if (!(cont in award.stat)) award.stat[cont] = newAwardCountObject();
+    return workAwardObject(
+      award.stat[cont],
+      obj.band,
+      obj.mode,
+      obj.digital,
+      obj.phone
+    );
+  }
+  return false;
+}
+
+function testAcont(award, obj, baseHash)
+{
+  if (obj.cont)
+  {
+    let cont = obj.cont;
+    if (cont == "AN") cont = "OC";
+
+    if (cont + baseHash in CR.tracker[award.test.look].cont)
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+function scoreAcont5(award, obj, baseHash)
+{
+  if (obj.cont)
+  {
+    let cont = obj.cont;
+    if (cont == "NA" || cont == "SA") cont = "AM";
+    if (cont == "AN") cont = "OC";
+
+    if (!(cont in award.stat)) award.stat[cont] = newAwardCountObject();
+    return workAwardObject(
+      award.stat[cont],
+      obj.band,
+      obj.mode,
+      obj.digital,
+      obj.phone
+    );
+  }
+  return false;
+}
+
+function testAcont5(award, obj, baseHash)
+{
+  if (obj.cont)
+  {
+    let cont = obj.cont;
+    if (cont == "NA" || cont == "SA") cont = "AM";
+    if (cont == "AN") cont = "OC";
+
+    if (cont + baseHash in CR.tracker[award.test.look].cont)
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+function scoreAcont2band(award, obj)
+{
+  if (!(obj.band in award.stat)) award.stat[obj.band] = newAwardCountObject();
+
+  return workAwardObject(
+    award.stat[obj.band],
+    obj.band,
+    obj.mode,
+    obj.digital,
+    obj.phone,
+    obj.cont
+  );
+}
+
+function testAcont2band(award, obj, baseHash)
+{
+  if (obj.cont)
+  {
+    let cont = obj.cont;
+    if (cont == "AN") cont = "OC";
+
+    if (cont + baseHash in CR.tracker[award.test.look].cont)
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+function scoreAcont52band(award, obj)
+{
+  if (obj.cont)
+  {
+    let cont = obj.cont;
+    if (cont == "NA" || cont == "SA") cont = "AM";
+    if (cont == "AN") cont = "OC";
+
+    if (!(obj.band in award.stat)) award.stat[obj.band] = newAwardCountObject();
+    return workAwardObject(
+      award.stat[obj.band],
+      obj.band,
+      obj.mode,
+      obj.digital,
+      obj.phone,
+      cont
+    );
+  }
+  return false;
+}
+
+function testAcont52band(award, obj, baseHash)
+{
+  if (obj.cont)
+  {
+    let cont = obj.cont;
+    if (cont == "NA" || cont == "SA") cont = "AM";
+    if (cont == "AN") cont = "OC";
+
+    if (cont + baseHash in CR.tracker[award.test.look].cont)
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+function scoreAgrids(award, obj)
+{
+  if (obj.grid && obj.grid.length > 0)
+  {
+    let grid = obj.grid.substr(0, 4);
+
+    if (!(grid in award.stat)) award.stat[grid] = newAwardCountObject();
+    return workAwardObject(
+      award.stat[grid],
+      obj.band,
+      obj.mode,
+      obj.digital,
+      obj.phone
+    );
+  }
+  return false;
+}
+
+function testAgrids(award, obj, baseHash)
+{
+  if (obj.grid && obj.grid + baseHash in CR.tracker[award.test.look].grid)
+  {
+    return false;
+  }
+  if (!obj.grid || obj.grid.length == 0)
+  {
+    return false;
+  }
+  return true;
+}
+
+function scoreAcnty(award, obj)
+{
+  if (obj.cnty)
+  {
+    if (!(obj.cnty in award.stat)) award.stat[obj.cnty] = newAwardCountObject();
+    return workAwardObject(
+      award.stat[obj.cnty],
+      obj.band,
+      obj.mode,
+      obj.digital,
+      obj.phone
+    );
+  }
+  return false;
+}
+
+function testAcnty(award, obj, baseHash)
+{
+  if (obj.cnty && obj.cnty + baseHash in CR.tracker[award.test.look].cnty)
+  {
+    return false;
+  }
+  return true;
+}
+
+function scoreAcall(award, obj)
+{
+  let call = obj.DEcall;
+
+  if (call.indexOf("/") > -1)
+  {
+    if (call.endsWith("/MM")) return false;
+    call = call.replace("/P", "").replace("/R", "").replace("/QRP");
+  }
+
+  if (!(call in award.stat)) award.stat[call] = newAwardCountObject();
+  return workAwardObject(
+    award.stat[call],
+    obj.band,
+    obj.mode,
+    obj.digital,
+    obj.phone
+  );
+}
+
+function testAcall(award, obj, baseHash)
+{
+  if (obj.DEcall.indexOf("/") > -1 && obj.DEcall.endsWith("/MM")) return false;
+
+  if (obj.DEcall + baseHash in CR.tracker[award.test.look].call)
+  {
+    return false;
+  }
+  return true;
+}
+
+function scoreAIOTA(award, obj)
+{
+  if (obj.IOTA)
+  {
+    let test = CR.awards[award.sponsor].awards[award.name];
+
+    if ("IOTA" in test.rule && test.rule.IOTA.indexOf(obj.IOTA) == -1)
+    { return false; }
+
+    if (!(obj.IOTA in award.stat)) award.stat[obj.IOTA] = newAwardCountObject();
+    return workAwardObject(
+      award.stat[obj.IOTA],
+      obj.band,
+      obj.mode,
+      obj.digital,
+      obj.phone
+    );
+  }
+  return false;
+}
+
+// NO IOTA YET
+function testAIOTA(award, obj, baseHash)
+{
+  /* if ( obj.IOTA )
+  {
+    let test = CR.awards[award.sponsor].awards[award.name];
+
+    if ( "IOTA" in test.rule && test.rule.IOTA.indexOf(obj.IOTA) == -1 )
+      return false;
+
+  } */
+
+  return false;
+}
+
+function scoreAcallarea(award, obj)
+{
+  if (obj.zone != null)
+  {
+    let test = CR.awards[award.sponsor].awards[award.name];
+
+    if ("zone" in test.rule && test.rule.zone.indexOf(obj.zone) == -1)
+    { return false; }
+
+    if (!(obj.zone in award.stat)) award.stat[obj.zone] = newAwardCountObject();
+    return workAwardObject(
+      award.stat[obj.zone],
+      obj.band,
+      obj.mode,
+      obj.digital,
+      obj.phone
+    );
+  }
+  return false;
+}
+
+function testAcallarea(award, obj, baseHash)
+{
+  if (obj.zone != null)
+  {
+    let test = CR.awards[award.sponsor].awards[award.name];
+
+    if ("zone" in test.rule && test.rule.zone.indexOf(obj.zone) == -1)
+    { return false; }
+  }
+  return true;
+}
+
+function scoreApx(award, obj)
+{
+  if (obj.px)
+  {
+    let test = CR.awards[award.sponsor].awards[award.name];
+    let px = obj.px;
+    if ("px" in test.rule)
+    {
+      px = px.substr(0, test.rule.px[0].length);
+      if (test.rule.px.indexOf(px) == -1) return false;
+    }
+
+    if (!(px in award.stat)) award.stat[px] = newAwardCountObject();
+    return workAwardObject(
+      award.stat[px],
+      obj.band,
+      obj.mode,
+      obj.digital,
+      obj.phone
+    );
+  }
+  return false;
+}
+
+function testApx(award, obj, baseHash)
+{
+  if (obj.px)
+  {
+    let test = CR.awards[award.sponsor].awards[award.name];
+    let px = obj.px;
+    if ("px" in test.rule)
+    {
+      px = px.substr(0, test.rule.px[0].length);
+      if (test.rule.px.indexOf(px) == -1) return false;
+    }
+
+    if (String(obj.px) + baseHash in CR.tracker[award.test.look].px)
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+function scoreApxa(award, obj)
+{
+  if (obj.px)
+  {
+    let test = CR.awards[award.sponsor].awards[award.name];
+    for (const i in test.rule.pxa)
+    {
+      if (test.rule.pxa[i].indexOf(obj.px) > -1)
+      {
+        if (!(i in award.stat)) award.stat[i] = newAwardCountObject();
+        return workAwardObject(
+          award.stat[i],
+          obj.band,
+          obj.mode,
+          obj.digital,
+          obj.phone
+        );
+      }
+    }
+  }
+  return false;
+}
+
+function testApxa(award, obj, baseHash)
+{
+  if (obj.px)
+  {
+    let test = CR.awards[award.sponsor].awards[award.name];
+    for (const i in test.rule.pxa)
+    {
+      if (test.rule.pxa[i].indexOf(obj.px) > -1)
+      {
+        if (String(obj.px) + baseHash in CR.tracker[award.test.look].px)
+        {
+          return false;
+        }
+        else
+        {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+function scoreAsfx(award, obj)
+{
+  let test = CR.awards[award.sponsor].awards[award.name];
+  let suf = obj.DEcall.replace(obj.px, "");
+  for (const i in test.rule.sfx)
+  {
+    for (const s in test.rule.sfx[i])
+    {
+      if (suf.indexOf(test.rule.sfx[i][s]) == 0)
+      {
+        if (!(i in award.stat)) award.stat[i] = newAwardCountObject();
+        return workAwardObject(
+          award.stat[i],
+          obj.band,
+          obj.mode,
+          obj.digital,
+          obj.phone
+        );
+      }
+    }
+  }
+
+  return false;
+}
+
+function testAsfx(award, obj, baseHash)
+{
+  let test = CR.awards[award.sponsor].awards[award.name];
+  let suf = obj.DEcall.replace(obj.px, "");
+  for (const i in test.rule.sfx)
+  {
+    for (const s in test.rule.sfx[i])
+    {
+      if (suf.indexOf(test.rule.sfx[i][s]) == 0)
+      {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+function scoreAcalls2dxcc(award, obj)
+{
+  if (!(obj.dxcc in award.stat)) award.stat[obj.dxcc] = newAwardCountObject();
+
+  return workAwardObject(
+    award.stat[obj.dxcc],
+    obj.band,
+    obj.mode,
+    obj.digital,
+    obj.phone,
+    obj.DEcall
+  );
+}
+
+function testAcalls2dxcc(award, obj, baseHash)
+{
+  if (obj.DEcall + baseHash in CR.tracker[award.test.look].call)
+  {
+    return false;
+  }
+  return true;
+}
+
+function scoreAcalls2band(award, obj)
+{
+  if (!(obj.band in award.stat)) award.stat[obj.band] = newAwardCountObject();
+
+  return workAwardObject(
+    award.stat[obj.band],
+    obj.band,
+    obj.mode,
+    obj.digital,
+    obj.phone,
+    obj.DEcall
+  );
+}
+
+function testAcalls2band(award, obj, baseHash)
+{
+  if (obj.DEcall + baseHash in CR.tracker[award.test.look].call)
+  {
+    return false;
+  }
+  return true;
+}
+
+function scoreAdxcc2band(award, obj)
+{
+  if (!(obj.band in award.stat)) award.stat[obj.band] = newAwardCountObject();
+
+  return workAwardObject(
+    award.stat[obj.band],
+    obj.band,
+    obj.mode,
+    obj.digital,
+    obj.phone,
+    obj.dxcc
+  );
+}
+
+function testAdxcc2band(award, obj, baseHash)
+{
+  if (String(obj.dxcc) + "|" + baseHash in CR.tracker[award.test.look].dxcc)
+  {
+    return false;
+  }
+  return true;
+}
+
+function scoreAcqz(award, obj)
+{
+  if (obj.cqz)
+  {
+    if (!(obj.cqz in award.stat)) award.stat[obj.cqz] = newAwardCountObject();
+
+    return workAwardObject(
+      award.stat[obj.cqz],
+      obj.band,
+      obj.mode,
+      obj.digital,
+      obj.phone
+    );
+  }
+  return false;
+}
+
+function testAcqz(award, obj, baseHash)
+{
+  // calls with empty cqz will not match anything in the hash map. so filter those out
+  if (!obj.cqz || obj.cqz + "|" + baseHash in CR.tracker[award.test.look].cqz)
+  {
+    return false;
+  }
+  return true;
+}
+
+function scoreAnumsfx(award, obj)
+{
+  if (obj.px)
+  {
+    let test = CR.awards[award.sponsor].awards[award.name];
+    let px = obj.px.substr(0, obj.px.length - 1);
+    let suf = obj.DEcall.replace(px, "");
+    suf = suf.substr(0, test.rule.numsfx[0][0].length);
+    for (const i in test.rule.numsfx)
+    {
+      for (const s in test.rule.numsfx[i])
+      {
+        if (suf.indexOf(test.rule.numsfx[i][s]) == 0)
+        {
+          if (!(i in award.stat)) award.stat[i] = newAwardCountObject();
+          return workAwardObject(
+            award.stat[i],
+            obj.band,
+            obj.mode,
+            obj.digital,
+            obj.phone
+          );
+        }
+      }
+    }
+  }
+  return false;
+}
+
+function testAnumsfx(award, obj)
+{
+  if (obj.px)
+  {
+    let test = CR.awards[award.sponsor].awards[award.name];
+    let px = obj.px.substr(0, obj.px.length - 1);
+    let suf = obj.DEcall.replace(px, "");
+    suf = suf.substr(0, test.rule.numsfx[0][0].length);
+    for (const i in test.rule.numsfx)
+    {
+      for (const s in test.rule.numsfx[i])
+      {
+        if (suf.indexOf(test.rule.numsfx[i][s]) == 0)
+        {
+          return false;
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
+function scoreApxplus(award, obj)
+{
+  let test = CR.awards[award.sponsor].awards[award.name];
+
+  if (test.rule.pxplus)
+  {
+    for (const i in test.rule.pxplus)
+    {
+      if (obj.DEcall.indexOf(test.rule.pxplus[i]) == 0)
+      {
+        if (!(i in award.stat)) award.stat[i] = newAwardCountObject();
+        return workAwardObject(
+          award.stat[i],
+          obj.band,
+          obj.mode,
+          obj.digital,
+          obj.phone
+        );
+      }
+    }
+  }
+  return false;
+}
+
+function testApxplus(award, obj)
+{
+  let test = CR.awards[award.sponsor].awards[award.name];
+
+  if (test.rule.pxplus)
+  {
+    for (const i in test.rule.pxplus)
+    {
+      if (obj.DEcall.indexOf(test.rule.pxplus[i]) == 0)
+      {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+function loadAwardJson()
+{
+  CR.awards = {};
+  try
+  {
+    CR.awards = requireJson("data/awards.json");
+    for (const sp in CR.awards)
+    {
+      for (const aw in CR.awards[sp].awards)
+      {
+        if (!("unique" in CR.awards[sp].awards[aw].rule))
+        { CR.awards[sp].awards[aw].rule.unique = 1; }
+
+        if (CR.awards[sp].awards[aw].rule.band[0] == "Mixed")
+        {
+          CR.awards[sp].awards[aw].rule.band.shift();
+        }
+
+        if (CR.awards[sp].awards[aw].rule.band.length == 0)
+        {
+          CR.awards[sp].awards[aw].rule.band = [];
+          for (let key in CR.awards[sp].mixed)
+          {
+            CR.awards[sp].awards[aw].rule.band.push(CR.awards[sp].mixed[key]);
+          }
+        }
+        if (
+          CR.awards[sp].awards[aw].rule.endorse.length == 1 &&
+          CR.awards[sp].awards[aw].rule.endorse[0] == "Mixed"
+        )
+        {
+          CR.awards[sp].awards[aw].rule.endorse = [];
+          for (let key in CR.awards[sp].mixed)
+          {
+            CR.awards[sp].awards[aw].rule.endorse.push(
+              CR.awards[sp].mixed[key]
+            );
+          }
+        }
+      }
+    }
+
+    buildAwardTypeHandlers();
+  }
+  catch (e)
+  {
+    alert("Core awards.json : " + e);
+    CR.awards = {};
+  }
+}
+
+function processAllAwardTrackers()
+{
+  for (let tracker in CR.awardTracker)
+  {
+    if (!(CR.awardTracker[tracker].sponsor in CR.awards))
+    {
+      delete CR.awardTracker[tracker];
+      continue;
+    }
+    if (
+      !(
+        CR.awardTracker[tracker].name in
+        CR.awards[CR.awardTracker[tracker].sponsor].awards
+      )
+    )
+    {
+      delete CR.awardTracker[tracker];
+      continue;
+    }
+    processAward(tracker);
+  }
+  updateAwardList();
+}
+
+function newAwardTrackerObject(sponsor, award, enable)
+{
+  let newAward = {};
+  newAward.sponsor = sponsor;
+  newAward.name = award;
+  newAward.enable = enable;
+  newAward.mode = CR.awards[sponsor].awards[award].rule.mode[0];
+  newAward.band = CR.awards[sponsor].awards[award].rule.band[0];
+  newAward.count = CR.awards[sponsor].awards[award].rule.count[0];
+  newAward.stat = {};
+  newAward.comp = {};
+  newAward.test = {};
+  return newAward;
+}
+
+function addAllAwards()
+{
+  for (let sponsor in CR.awards)
+  {
+    for (let award in CR.awards[sponsor].awards)
+    {
+      let awardToAdd = newAwardTrackerObject(sponsor, award, true);
+
+      let hash = awardToAdd.name + "-" + awardToAdd.sponsor;
+      if (!(hash in CR.awardTracker))
+      {
+        CR.awardTracker[hash] = awardToAdd;
+        processAward(hash);
+        storeAwardTracker();
+      }
+    }
+  }
+  updateAwardList();
+  viewRoster();
+}
+
+function delAllAwards()
+{
+  CR.awardTracker = {};
+  storeAwardTracker();
+  updateAwardList();
+  viewRoster();
+}
+
+function newCompileCountObject()
+{
+  let compileCountObject = {};
+  compileCountObject.bands = {};
+  compileCountObject.modes = {};
+  compileCountObject.endorse = {};
+  compileCountObject.counts = {};
+  return compileCountObject;
+}
+
+function singleCompile(award, obj)
+{
+  let test = CR.awards[award.sponsor].awards[award.name];
+  let rule = test.rule;
+  let comp = newCompileCountObject();
+  for (let mode in rule.mode)
+  {
+    comp.modes[rule.mode[mode]] = 0;
+    comp.bands[rule.mode[mode]] = {};
+
+    for (let band in rule.band)
+    {
+      comp.bands[rule.mode[mode]][rule.band[band]] = 0;
+    }
+    for (let key in obj)
+    {
+      if (
+        rule.mode[mode] in obj[key].bands &&
+        Object.keys(obj[key].bands[rule.mode[mode]]).length
+      )
+      {
+        comp.modes[rule.mode[mode]] += 1;
+
+        for (let band in rule.band)
+        {
+          if (rule.band[band] in obj[key].bands[rule.mode[mode]])
+          { comp.bands[rule.mode[mode]][rule.band[band]] += 1; }
+        }
+      }
+    }
+  }
+
+  for (let mode in comp.modes)
+  {
+    comp.endorse[mode] = {};
+    comp.counts[mode] = {};
+    for (let cnts in rule.count)
+    {
+      comp.counts[mode][rule.count[cnts]] = {
+        num: comp.modes[mode],
+        per: parseInt(
+          Math.min(100, (comp.modes[mode] / rule.count[cnts]) * 100.0)
+        )
+      };
+    }
+
+    for (let endorse in rule.endorse)
+    {
+      comp.endorse[mode][rule.endorse[endorse]] = {};
+      for (let cnts in rule.count)
+      {
+        comp.endorse[mode][rule.endorse[endorse]][rule.count[cnts]] =
+          comp.bands[mode][rule.endorse[endorse]] >= rule.count[cnts];
+      }
+    }
+  }
+
+  return comp;
+}
+
+function doubleCompile(award, firstLevel)
+{
+  let test = CR.awards[award.sponsor].awards[award.name];
+  let rule = test.rule;
+
+  for (let k in firstLevel)
+  {
+    firstLevel[k].bands = {};
+    // firstLevel[k].modes = {};
+    let obj = singleCompile(award, firstLevel[k].unique);
+
+    for (let mode in obj.bands)
+    {
+      for (let cnt in test.rule.count)
+      {
+        if (obj.counts[mode][test.rule.count[cnt]].num >= test.rule.unique)
+        {
+          for (let band in obj.bands[mode])
+          {
+            if (!(mode in firstLevel[k].bands)) firstLevel[k].bands[mode] = {};
+
+            if (obj.bands[mode][band] > 0)
+            {
+              firstLevel[k].bands[mode][band] =
+                ~~firstLevel[k].bands[mode][band] + 1;
+            }
+          }
+        }
+      }
+    }
+    /* for ( let mode in obj.modes )
+    {
+      if ( !(mode in firstLevel[k].modes) )
+        firstLevel[k].modes[mode] = 0;
+      if ( obj.modes[mode] > 0 )
+        firstLevel[k].modes[mode] +=  1;
+    } */
+
+    delete firstLevel[k].unique;
+    firstLevel[k].unique = null;
+  }
+
+  return singleCompile(award, firstLevel);
+}
+
+function listShortInstances()
+{
+  let shortInstances = [];
+  if (typeof window.opener.GT.instancesIndex != "undefined" && typeof window.opener.GT.instances != "undefined")
+  {
+    if (window.opener.GT.instancesIndex.length > 1)
+    {
+      let instances = window.opener.GT.instances;
+      let keys = Object.keys(instances).sort();
+      for (let key in keys)
+      {
+        let inst = keys[key];
+        let sp = inst.split(" - ");
+        let shortInst = sp[sp.length - 1].substring(0, 18);
+        shortInstances.push(shortInst);
+      }
+    }
+  }
+  return shortInstances;
+}
+
+function openInfoTab(evt, tabName, callFunc, callObj)
+{
+  // Declare all variables
+  var i, infoTabcontent, infoTablinks;
+  // Get all elements with class="infoTabcontent" and hide them
+  infoTabcontent = document.getElementsByClassName("infoTabcontent");
+  for (i = 0; i < infoTabcontent.length; i++)
+  {
+    infoTabcontent[i].style.display = "none";
+  }
+  // Get all elements with class="infoTablinks" and remove the class "active"
+  infoTablinks = document.getElementsByClassName("infoTablinks");
+  for (i = 0; i < infoTablinks.length; i++)
+  {
+    infoTablinks[i].className = infoTablinks[i].className.replace(
+      " active",
+      ""
+    );
+  }
+  // Show the current tab, and add an "active" class to the button that opened the tab
+
+  document.getElementById(tabName).style.display = "block";
+  if (typeof evt == "string")
+  {
+    for (i = 0; i < infoTablinks.length; i++)
+    {
+      if (infoTablinks[i].id == evt)
+      {
+        infoTablinks[i].className += " active";
+      }
+    }
+  }
+  else if (typeof evt.currentTarget != "undefined")
+  {
+    evt.currentTarget.className += " active";
+  }
+  else
+  {
+    evt.className += " active";
+  }
+
+  if (callFunc)
+  {
+    if (typeof callFunc == "function")
+    {
+      if (callObj) callFunc(callObj);
+      else callFunc();
+    }
+  }
+}
+
+function ValidateTextInput(inputText, validDiv = null)
+{
+  if (inputText.value.length > 0)
+  {
+    var passed = false;
+    inputText.value = inputText.value.toUpperCase();
+    if (/\d/.test(inputText.value) || /[A-Z]/.test(inputText.value))
+    {
+      passed = true;
+    }
+    if (passed)
+    {
+      inputText.style.color = "#FF0";
+      inputText.style.backgroundColor = "green";
+      if (validDiv) validDiv.innerHTML = "";
+      return true;
+    }
+    else
+    {
+      inputText.style.color = "#000";
+      inputText.style.backgroundColor = "yellow";
+      if (validDiv) validDiv.innerHTML = I18N("stats.Validate.Invalid");
+      return false;
+    }
+  }
+  else
+  {
+    inputText.style.color = "#000";
+    inputText.style.backgroundColor = "yellow";
+    if (validDiv) validDiv.innerHTML = I18N("stats.Validate.Invalid");
+    return false;
+  }
+}
+
+function watcherOnName()
+{
+  watcherName.value = watcherName.value.replace(/[$%.'"\\,<>]/g, "");
+  watcherNameValidate();
+}
+
+function watcherNameValidate()
+{
+  if (watcherName.value.length == 0 || (watcherName.value in CR.watchers && watcherName.value != CR.watcherEditKey))
+  {
+    watcherName.style.color = "#000";
+    watcherName.style.backgroundColor = "red";
+    return false;
+  }
+  else
+  {
+    watcherName.style.color = "";
+    watcherName.style.backgroundColor = "";
+    return true;
+  }
+}
+
+function watcherTypeChanged(value)
+{
+  watcherType.value = value;
+  if (value == "Callsign")
+  {
+    watcherTextTh.innerHTML = I18N("roster.controls.hunting.callsign");
+  }
+  if (value == "Calling")
+  {
+    watcherTextTh.innerHTML = I18N("alerts.QRZ.speech");
+  }
+  if (value == "Grid")
+  {
+    watcherTextTh.innerHTML = I18N("roster.controls.hunting.grid");
+  }
+  if (value == "Message")
+  {
+    watcherTextTh.innerHTML = I18N("gt.WSJTMessage.Message");
+  }
+
+  watcherStartDateEnable(watcherStartDateCheckbox.checked);
+  watcherEndDateEnable(watcherEndDateCheckbox.checked);
+}
+
+function watcherRegexChanged(checked)
+{
+  watcherOnText();
+}
+
+function watcherOnText()
+{
+  var testCallsign = false;
+  if (watcherRegexCheckbox.checked == false)
+  {
+    if (watcherType.value == "Message")
+    {
+      watcherText.value = watcherText.value.toUpperCase().replace(/[^A-Z0-9/<>\s]+/g, "");
+    }
+    else if (watcherType.value == "Calling")
+    {
+      testCallsign = true;
+      watcherText.value = watcherText.value.toUpperCase().replace(/[^A-Z0-9/\s]+/g, "");
+    }
+    else if (watcherType.value == "Grid")
+    {
+      gridInputValidate(watcherText);
+      return;
+    }
+    else
+    {
+      testCallsign = true;
+      watcherText.value = watcherText.value.toUpperCase().replace(/[^A-Z0-9/]+/g, "");
+    }
+  }
+  watcherTextValidate(testCallsign);
+}
+
+function watcherTextValidate(testCallsign = false)
+{
+  if (watcherText.value.length == 0)
+  {
+    watcherText.style.color = "#000";
+    watcherText.style.backgroundColor = "red";
+    return false;
+  }
+  else
+  {
+    if (testCallsign && !watcherText.value.match(CALLSIGN_REGEXP))
+    {
+      watcherText.style.color = "#000";
+      watcherText.style.backgroundColor = "yellow";
+    }
+    else
+    {
+      watcherText.style.color = "";
+      watcherText.style.backgroundColor = "";
+    }
+    return true;
+  }
+}
+
+function watcherStartDateEnable(checked)
+{
+  watcherStartDateTh.style.display = watcherStartDateTd.style.display = (checked ? "" : "none");
+}
+
+function watcherEndDateEnable(checked)
+{
+  watcherAutoDeleteTd.style.display = watcherAutoDeleteTh.style.display = watcherEndDateTh.style.display = watcherEndDateTd.style.display = (checked ? "" : "none");
+}
+
+function newWatcherEntry()
+{
+  let entry = Object();
+
+  entry.watch = true;
+  entry.type = "Callsign";
+  entry.regex = false;
+  entry.text = "";
+  entry.test = null;
+  entry.start = false;
+  entry.end = false;
+  entry.startTime = Date.now();
+  entry.startTime -= (entry.startTime % 86400000);
+  entry.endTime = Date.now();
+  entry.endTime -= (entry.endTime % 86400000);
+  entry.autoDelete = false;
+
+  return entry;
+}
+
+function saveWatcher()
+{
+  watcherName.value = watcherName.value.trim();
+  watcherText.value = watcherText.value.trim();
+  if (watcherNameValidate() == false || watcherTextValidate() == false) return;
+
+  if (CR.watcherEditKey.length > 0 && CR.watcherEditKey in CR.watchers)
+  {
+    delete CR.watchers[CR.watcherEditKey];
+  }
+
+  let entry = newWatcherEntry();
+  entry.watch = true;
+  entry.type = watcherType.value;
+  entry.regex = watcherRegexCheckbox.checked;
+  entry.text = watcherText.value;
+  entry.test = null;
+  entry.start = watcherStartDateCheckbox.checked;
+  entry.end = watcherEndDateCheckbox.checked;
+  entry.autoDelete = entry.end ? watcherAutoDeleteCheckbox.checked : false;
+
+  if (entry.start)
+  {
+    if (watcherStartDate.value.length == 0)
+    {
+      entry.startTime = Date.now();
+    }
+    else
+    {
+      entry.startTime = Date.parse(watcherStartDate.value + "Z");
+    }
+  }
+
+  if (entry.end)
+  {
+    if (watcherEndDate.value.length == 0)
+    {
+      entry.endTime = Date.now();
+    }
+    else
+    {
+      entry.endTime = Date.parse(watcherEndDate.value + "Z");
+    }
+    if (entry.start && entry.endTime <= entry.startTime)
+    {
+      // Good for a minute, least we can do :)
+      entry.endTime = entry.startTime + 60000;
+    }
+  }
+  CR.watchers[watcherName.value] = entry;
+  writeRosterSettings();
+  openWathcherTab();
+  window.opener.goProcessRoster();
+}
+
+function addWatcher(value, type)
+{
+  if (!(value in CR.watchers))
+  {
+    let entry = newWatcherEntry();
+    entry.watch = true;
+    entry.type = type;
+    entry.regex = false;
+    entry.text = value;
+    entry.test = null;
+    entry.autoDelete = false;
+    CR.watchers[value] = entry;
+    CR.rosterSettings.wanted.huntWatcher = huntWatcher.checked = true;
+    writeRosterSettings();
+    window.opener.goProcessRoster();
+    wantRenderWatchersTab();
+  }
+}
+
+function clearWatcher()
+{
+  CR.watcherEditKey = "";
+
+  watcherName.style.color = "";
+  watcherName.style.backgroundColor = "";
+  watcherText.style.color = "";
+  watcherText.style.backgroundColor = "";
+
+  loadWatcherValues("", newWatcherEntry());
+}
+
+function toggleWatcher(key)
+{
+  CR.watchers[key].watch = !CR.watchers[key].watch;
+  writeRosterSettings();
+  wantRenderWatchersTab();
+  window.opener.goProcessRoster();
+}
+
+function deleteWatcher(key)
+{
+  delete CR.watchers[key];
+  writeRosterSettings();
+  wantRenderWatchersTab();
+  window.opener.goProcessRoster();
+}
+
+CR.watcherEditKey = "";
+
+function editWatcher(key)
+{
+  CR.watcherEditKey = key;
+  
+  loadWatcherValues(key, CR.watchers[key]);
+}
+ 
+function loadWatcherValues(key, entry)
+{
+  watcherName.value = key;
+  watcherType.vale = entry.type;
+  watcherRegexCheckbox.checked = entry.regex;
+  watcherText.value = entry.text;
+  watcherStartDateCheckbox.checked = entry.start;
+  watcherEndDateCheckbox.checked = entry.end;
+  let date = new Date(entry.startTime);
+  watcherStartDate.value = date.toISOString().slice(0, 16);
+  date = new Date(entry.endTime);
+  watcherEndDate.value = date.toISOString().slice(0, 16);
+  watcherAutoDeleteCheckbox.checked = entry.autoDelete;
+  watcherTypeChanged(entry.type);
+}
+
+function htmlEntities(str)
+{
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function openWathcherTab()
+{
+  clearWatcher();
+  wantRenderWatchersTab();
+}
+
+function wantRenderWatchersTab()
+{
+  if (watcherBoxDiv.style.display != "none")
+  {
+    renderWatchersTab();
+  }
+}
+
+function renderWatchersTab()
+{
+  if (Object.keys(CR.watchers).length > 0)
+  {
+    let worker = "<div id='watcherTable'><table class='darkTable' align=center><tr><td>👁️</td><th>Name</th><th>Type</th><th>Regex</th><th>Text</th><th>Start Date</th><th>End Date</th><th>Edit</th><th>Delete</th></tr>";
+    Object.keys(CR.watchers)
+      .sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1)
+      .forEach(function (key)
+      {
+        worker += "<tr><td style='cursor:pointer;font-size:larger;' onclick='toggleWatcher(\"" + key + "\")'>" + (CR.watchers[key].watch ? "👀" : "🙈") + "</td>";
+        worker += "<td align=left style='color:yellow;' >" + key + "</td><td>" + CR.watchers[key].type + "</td><td>" + (CR.watchers[key].regex ? "☑️" : "") + "</td>";
+        let text = htmlEntities(CR.watchers[key].text);
+        worker += "<td style='color:cyan;'>" + (CR.watchers[key].regex ? text : formatCallsign(text)) + "</td>";
+        worker += "<td>" + (CR.watchers[key].start ? window.opener.userTimeString(CR.watchers[key].startTime) : "") + "</td>";
+        worker += "<td>" + (CR.watchers[key].end ? window.opener.userTimeString(CR.watchers[key].endTime) : "") + "</td>";
+        worker += "<td style='cursor:pointer;font-size:larger;' onclick='editWatcher(\"" + key + "\")'>📝</td>";
+        worker += "<td style='cursor:pointer;font-size:larger;' onclick='deleteWatcher(\"" + key + "\")'>";
+        worker += CR.watchers[key].autoDelete ? "🤖" : "🚮";
+        worker += "</td></tr>";
+      });
+    worker += "</table></div>";
+    
+    watcherEditView.innerHTML = worker;
+    let height = 40;
+    if (watcherBoxDiv.offsetHeight >= window.innerHeight - height)
+    {
+      watcherBoxDiv.style.height = (window.innerHeight - height) + "px";
+    }
+    else
+    {
+      watcherBoxDiv.style.height = "";
+    }
+  }
+  else
+  {
+    watcherBoxDiv.style.height = "";
+    watcherEditView.innerHTML = "";
+  }
+}
+
+function createMenuHide()
+{
+  CR.menuHide = new Menu();
+  let item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.HideControls"),
+    click: function ()
+    {
+      toggleShowControls();
+    }
+  });
+  CR.menuHide.append(item);
+
+  item = new MenuItem({ type: "separator" });
+  CR.menuHide.append(item);
+
+  item = new MenuItem({
+    type: "checkbox",
+    label: I18N("roster.menu.Realtime"),
+    checked: CR.rosterSettings.realtime,
+    click: function (item)
+    {
+      CR.rosterSettings.realtime = item.checked;
+      CR.menuShow.items[2].checked = item.checked;
+      writeRosterSettings();
+      viewRoster();
+    }
+  });
+  CR.menuHide.append(item);
+}
+
+function createMenuShow()
+{
+  CR.menuShow = new Menu();
+  let item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.ShowControls"),
+    click: function ()
+    {
+      toggleShowControls();
+    }
+  });
+  CR.menuShow.append(item);
+
+  item = new MenuItem({ type: "separator" });
+  CR.menuShow.append(item);
+
+  item = new MenuItem({
+    type: "checkbox",
+    label: I18N("roster.menu.Realtime"),
+    checked: CR.rosterSettings.realtime,
+    click: function (item)
+    {
+      CR.rosterSettings.realtime = item.checked;
+      CR.menuHide.items[2].checked = item.checked;
+      writeRosterSettings();
+      viewRoster();
+    }
+  });
+  CR.menuShow.append(item);
+}
+
+function createCompactMenuHide()
+{
+  CR.compactMenuHide = new Menu();
+  let item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.HideControls"),
+    click: function ()
+    {
+      toggleShowControls();
+    }
+  });
+  CR.compactMenuHide.append(item);
+}
+
+function createCompactMenuShow()
+{
+  CR.compactMenuShow = new Menu();
+  let item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.ShowControls"),
+    click: function ()
+    {
+      toggleShowControls();
+    }
+  });
+  CR.compactMenuShow.append(item);
+}
+
+function clearRestOfMenus()
+{
+  CR.callMenu = new Menu();
+  let item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.Lookup"),
+    click: function ()
+    {
+      callLookup(CR.targetHash, "");
+    }
+  });
+
+  CR.callMenu.append(item);
+
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.GenMesg"),
+    click: function ()
+    {
+      callGenMessage(CR.targetHash, "");
+    }
+  });
+  CR.callMenu.append(item);
+
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.add.watcher.label"),
+    click: function ()
+    {
+      addWatcher(CR.callRoster[CR.targetHash].DEcall, "Callsign");
+    }
+  });
+
+  CR.callMenu.append(item);
+
+  item = new MenuItem({ type: "separator" });
+  CR.callMenu.append(item);
+
+  if (window.opener.GT.pstrotatorSettings.enable)
+  {
+    item = new MenuItem({
+      type: "normal",
+      label: I18N("roster.menu.AimRotator"),
+      click: function ()
+      {
+        let target = CR.callRoster[CR.targetHash]
+        window.opener.aimRotator(target, "");
+      }
+    });
+    CR.callMenu.append(item);
+
+    item = new MenuItem({ type: "separator" });
+    CR.callMenu.append(item);
+  }
+
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.IgnoreCall"),
+    click: function ()
+    {
+      ignoreCallsign(CR.callRoster[CR.targetHash].DEcall);
+    }
+  });
+
+  CR.callMenu.append(item);
+
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.EditIgnores"),
+    enabled: true,
+    click: function ()
+    {
+      openIgnores();
+    }
+  });
+
+  CR.callMenu.append(item);
+
+  CR.callingMenu = new Menu();
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.Lookup"),
+    click: function ()
+    {
+      callingLookup(CR.targetHash, "");
+    }
+  });
+
+  CR.callingMenu.append(item);
+
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.GenMesg"),
+    click: function ()
+    {
+      callingGenMessage(CR.targetHash, "");
+    }
+  });
+
+  CR.callingMenu.append(item);
+
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.add.watcher.label"),
+    click: function ()
+    {
+      addWatcher(CR.callRoster[CR.targetHash].DXcall, "Callsign");
+    }
+  });
+
+  CR.callingMenu.append(item);
+
+  item = new MenuItem({ type: "separator" });
+  CR.callingMenu.append(item);
+
+  if (window.opener.GT.pstrotatorSettings.enable)
+  {
+    item = new MenuItem({
+      type: "normal",
+      label: I18N("roster.menu.AimRotator"),
+      click: function ()
+      {
+        let target = CR.callRoster[CR.targetHash]
+        window.opener.aimRotator(target, "");
+      }
+    });
+    CR.callingMenu.append(item);
+  }
+
+  CR.columnMenu = new Menu();
+
+  CR.menuItemForMoveLeftColumn = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.MoveLeft"),
+    click: function ()
+    {
+      moveColumnLeft(CR.currentColumnName);
+    }
+  })
+  CR.columnMenu.append(CR.menuItemForMoveLeftColumn)
+
+  CR.menuItemForMoveRightColumn = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.MoveRight"),
+    click: function ()
+    {
+      moveColumnRight(CR.currentColumnName);
+    }
+  })
+  CR.columnMenu.append(CR.menuItemForMoveRightColumn)
+
+  item = new MenuItem({ type: "separator" });
+  CR.columnMenu.append(item);
+
+  for (const columnIndex in CR.rosterSettings.columnOrder)
+  {
+    let key = CR.rosterSettings.columnOrder[columnIndex];
+    if (key != "Callsign")
+    {
+      let itemx = new MenuItem({
+        type: "checkbox",
+        label: key,
+        checked: CR.rosterSettings.columns[key],
+        click: function (item)
+        {
+          toggleColumn(item);
+        }
+      });
+
+      CR.columnMenu.append(itemx);
+      CR.columnMembers[key] = itemx;
+    }
+  }
+
+  CR.MsgMenu = new Menu();
+
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.add.watcher.label"),
+    click: function ()
+    {
+      addWatcher(CR.callRoster[CR.targetHash].callObj.msg, "Message");
+    }
+  });
+
+  CR.MsgMenu.append(item);
+
+  CR.CQMenu = new Menu();
+
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.add.watcher.label"),
+    click: function ()
+    {
+      addWatcher(CR.callRoster[CR.targetCQ].DXcall, "Calling");
+    }
+  });
+
+  CR.CQMenu.append(item);
+
+  item = new MenuItem({
+    type: "normal",
+    label: "Ignore CQ from DXCC",
+    click: function ()
+    {
+      ignoreCQ(CR.callRoster[CR.targetCQ].DXcall, CR.callRoster[CR.targetCQ].callObj.dxcc);
+    }
+  });
+
+  CR.CQMenu.append(item);
+
+  item = new MenuItem({
+    type: "normal",
+    label: "Ignore CQ from All",
+    click: function ()
+    {
+      ignoreCQ(CR.callRoster[CR.targetCQ].DXcall, -1);
+    }
+  });
+
+  CR.CQMenu.append(item);
+
+  CR.CQzMenu = new Menu();
+
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.IgnoreCQZone"),
+    click: function ()
+    {
+      ignoreCQz(CR.callRoster[CR.targetCQz].callObj.cqz);
+    }
+  });
+
+  CR.CQzMenu.append(item);
+
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.EditIgnores"),
+    enabled: true,
+    click: function ()
+    {
+      openIgnores();
+    }
+  });
+
+  CR.CQzMenu.append(item);
+
+  CR.ITUzMenu = new Menu();
+
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.IgnoreITUZone"),
+    click: function ()
+    {
+      ignoreITUz(CR.callRoster[CR.targetITUz].callObj.itu);
+    }
+  });
+
+  CR.ITUzMenu.append(item);
+
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.EditIgnores"),
+    enabled: true,
+    click: function ()
+    {
+      openIgnores();
+    }
+  });
+
+  CR.ITUzMenu.append(item);
+
+  CR.dxccMenu = new Menu();
+
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.IgnoreDXCC"),
+    click: function ()
+    {
+      ignoreDxcc(CR.targetDxcc);
+    }
+  });
+
+  CR.dxccMenu.append(item);
+
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.EditIgnores"),
+    enabled: true,
+    click: function ()
+    {
+      openIgnores();
+    }
+  });
+
+  CR.dxccMenu.append(item);
+
+  CR.GridMenu = new Menu();
+
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.add.watcher.label"),
+    click: function ()
+    {
+      addWatcher(CR.callRoster[CR.targetHash].callObj.grid, "Grid");
+    }
+  });
+
+  CR.GridMenu.append(item);
+
+  item = new MenuItem({
+    type: "normal",
+    label: "Ignore Grid",
+    click: function ()
+    {
+      ignoreGrid(CR.callRoster[CR.targetHash].callObj.grid);
+    }
+  });
+
+  CR.GridMenu.append(item);
+
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.EditIgnores"),
+    enabled: true,
+    click: function ()
+    {
+      openIgnores();
+    }
+  });
+
+  CR.GridMenu.append(item);
+}

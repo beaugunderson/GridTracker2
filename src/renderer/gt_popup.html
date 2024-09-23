@@ -1,0 +1,82 @@
+<!--
+    This file is part of GridTracker.
+
+    GridTracker is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 3 of the License.
+
+    GridTracker is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GridTracker.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Data Breakout</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="./lib/style.css" />
+    <style type="text/css">
+      body {
+        -webkit-appearance: none;
+        -webkit-user-select: none;
+        height: 98%;
+        overflow: auto;
+      }
+      table,
+      th,
+      td,
+      body {
+        color: #fff;
+        white-space: nowrap;
+        font-family: Sans-Serif;
+        font-size: 12px;
+        text-align: auto;
+      }
+    </style>
+    <script src="./lib/first.js"></script>
+    <script>
+      function startLookup(call, grid)
+      {
+        window.opener.startLookup(call, grid);
+        window.opener.focus();
+      }
+
+      function init()
+      {
+        window.opener.GT.popupWindowInitialized = true
+      }
+
+      document.oncontextmenu = function (event)
+      {
+        event.preventDefault();
+      };
+    </script>
+  </head>
+  <body id="mainBody" onload="init();" style="background-color: black">
+    <div
+      id="main"
+      style="
+        margin: 0;
+        left:0;
+        right:0;
+        top: 0;
+        min-height: 60px;
+        width: auto;
+        background-color: black;
+        padding: 2px;
+        text-align: center;
+        vertical-align: middle;
+        position: relative;
+        white-space: nowrap;
+        overflow: hidden;
+        z-index: 600;
+      "
+    >
+      <div id="adifTable" style="display:inline-block;"></div>
+    </div>
+  </body>
+</html>

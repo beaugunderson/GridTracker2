@@ -1,0 +1,243 @@
+{
+  "Mapnik by OpenStreetMap (Intl)": {
+    "sourceType" : "XYZ",
+    "url": "http://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    "attributions": "<a href=\"http://openstreetmap.org/\" target=\"_blank\">OpenStreetMap</a>",
+    "minZoom": 0,
+    "maxZoom": 19,
+    "offline": false
+  },
+  "Mapnik by OpenStreetMap (Deutsch)": {
+    "sourceType" : "XYZ",
+    "url": "http://{a-c}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png",
+    "attributions": "<a href=\"http://openstreetmap.de/\" target=\"_blank\">OpenStreetMap DE</a>",
+    "minZoom": 0,
+    "maxZoom": 18,
+    "offline": false
+  },
+  "Mapnik by OpenStreetMap (français)": {
+    "sourceType" : "XYZ",
+    "url": "http://{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
+    "attributions": "<a href=\"http://openstreetmap.fr/\" target=\"_blank\">OpenStreetMap FR</a>",
+    "minZoom": 0,
+    "maxZoom": 18,
+    "offline": false
+  },
+  "Toner by Stamen (No Labels)(Offline)": {
+    "sourceType" : "XYZ",
+    "url": "map/toner-background/{z}/{x}/{y}.png",
+    "attributions": "Stamen Design",
+    "minZoom": 0,
+    "maxZoom": 5,
+    "offline": true
+  },
+  "National Geographic by Esri (English)": {
+    "sourceType" : "XYZ",
+    "url": "http://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}",
+    "attributions": "Esri &mdash; National Geographic",
+    "maxZoom": 16,
+    "offline": false
+  },
+  "Street by Esri (English)": {
+    "sourceType" : "XYZ",
+    "url": "http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+    "attributions": "Esri",
+    "offline": false
+  },
+  "Topographical by Esri (English)": {
+    "sourceType" : "XYZ",
+    "url": "http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+    "attributions": "Esri",
+    "offline": false
+  },
+  "Physical by Esri (No Labels)": {
+    "sourceType" : "XYZ",
+    "url": "http://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}",
+    "attributions": "Esri",
+    "maxZoom": 8,
+    "offline": false
+  },
+  "Satellite by Esri (No Labels)": {
+    "sourceType" : "XYZ",
+    "url": "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    "attributions": "Esri",
+    "maxZoom": 18,
+    "offline": false
+  },
+  "Terrain by Esri (No Labels)": {
+    "sourceType" : "XYZ",
+    "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}",
+    "attribution": "Esri",
+    "maxZoom": 13,
+    "offline": false
+  },
+  "Shaded Relief by Esri (No Labels)": {
+    "sourceType" : "XYZ",
+    "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}",
+    "attribution": "Esri",
+    "maxZoom": 13,
+    "offline": false
+  },
+  "Humanitarian by OpenStreetMap (Intl)": {
+    "sourceType" : "XYZ",
+    "url": "http://{a-c}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+    "attributions": "<a href=\"http://openstreetmap.org/\" target=\"_blank\">OpenStreetMap</a>",
+    "minZoom": 0,
+    "maxZoom": 19,
+    "offline": false
+  },
+  "Dark Gray by Esri (English)": {
+    "sourceType" : "XYZ",
+    "url": "http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+    "attributions": "Esri",
+    "maxZoom": 19,
+    "offline": false
+  },
+  "Light Gray by Esri (English)": {
+    "sourceType" : "XYZ",
+    "url": "http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+    "attributions": "Esri",
+    "maxZoom": 16,
+    "offline": false
+  },
+  "Oceans by Esri (No Labels)": {
+    "sourceType" : "XYZ",
+    "url": "https://server.arcgisonline.com/arcgis/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}",
+    "attributions": "Esri",
+    "maxZoom": 10,
+    "offline": false
+  },
+  "Voyager by Carto (English)": {
+    "sourceType" : "XYZ",
+    "url": "https://{a-d}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}.png",
+    "attributions": "Carto",
+    "maxZoom": 19,
+    "offline": false
+  },
+  "Positron by Carto (English)": {
+    "sourceType" : "XYZ",
+    "url": "https://{a-d}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png",
+    "attributions": "Carto",
+    "maxZoom": 19,
+    "offline": false
+  },
+  "Dark Matter by Carto (English)": {
+    "sourceType" : "XYZ",
+    "url": "https://{a-d}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png",
+    "attributions": "Carto",
+    "maxZoom": 19,
+    "offline": false
+  },
+  "Voyager by Carto (No Labels)": {
+    "sourceType" : "XYZ",
+    "url": "https://{a-d}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png",
+    "attributions": "Carto",
+    "maxZoom": 19,
+    "offline": false
+  },
+  "Positron by Carto (No Labels)": {
+    "sourceType" : "XYZ",
+    "url": "https://{a-d}.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png",
+    "attributions": "Carto",
+    "maxZoom": 19,
+    "offline": false
+  },
+  "Dark Matter by Carto (No Labels)": {
+    "sourceType" : "XYZ",
+    "url": "https://{a-d}.basemaps.cartocdn.com/rastertiles/dark_nolabels/{z}/{x}/{y}.png",
+    "attributions": "Carto",
+    "maxZoom": 19,
+    "offline": false
+  },
+  "Satellite by MapTiler (No Labels)(Offline)": {
+    "sourceType" : "XYZ",
+    "url": "map/sat/{z}/{x}/{y}.png",
+    "attributions": "MapTiler",
+    "minZoom": 0,
+    "maxZoom": 5,
+    "offline": true
+  },
+  "HamGames by N0TTL (Intl)(Offline)": {
+    "sourceType" : "XYZ",
+    "url": "map/hamgames/{z}/{x}/{y}.png",
+    "attributions": "N0TTL",
+    "minZoom": 0,
+    "maxZoom": 4,
+    "offline": true
+  },
+  "City Lights by NASA (No Labels)": {
+    "sourceType" : "XYZ",
+    "url": "https://tagloomis.com/maps/CityLights2016/{z}/{x}/{-y}.png",
+    "attributions": "NASA",
+    "minZoom": 0,
+    "maxZoom": 5,
+    "offline": false
+  },
+  "天地图 矢量 (Chinese)": {
+    "sourceType" : "Group",
+    "keyId" : "SkyMaps",
+    "attributions": "天地图",
+    "group" : [ 
+    {
+      "sourceType" : "XYZ",
+      "_url" : "http://t{r7}.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk={k}",
+      "maxZoom": 18,
+      "attributions": "天地图"
+    },
+    { 
+      "sourceType" : "XYZ",
+      "_url" : "http://t{r7}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk={k}" ,
+      "maxZoom": 18
+    }
+    ],
+    "offline": false
+  },
+  "天地图 卫星 (Chinese)": {
+    "sourceType" : "Group",
+    "keyId" : "SkyMaps",
+    "attributions": "天地图",
+    "group" : [ 
+    {
+      "sourceType" : "XYZ",
+      "_url" : "http://t{r7}.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk={k}",
+      "maxZoom": 18,
+      "attributions": "天地图"
+    },
+    { 
+      "sourceType" : "XYZ",
+      "_url" : "http://t{r7}.tianditu.gov.cn/cia_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cia&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk={k}" ,
+      "maxZoom": 18
+    }
+    ],
+    "offline": false
+  },
+  "天地图 地形 (Chinese)": {
+    "sourceType" : "Group",
+    "keyId" : "SkyMaps",
+    "attributions": "天地图",
+    "group" : [ 
+    {
+      "sourceType" : "XYZ",
+      "_url" : "http://t{r7}.tianditu.gov.cn/ter_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ter&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk={k}",
+      "maxZoom": 14,
+      "attributions": "天地图"
+    },
+    { 
+      "sourceType" : "XYZ",
+      "_url" : "http://t{r7}.tianditu.gov.cn/cta_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cta&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk={k}" ,
+      "maxZoom": 14
+    }
+    ],
+    "offline": false
+  },
+  "Bathymetric Oceans by GEBCO (No Labels)": {
+    "sourceType" : "TileWMS",
+    "projection": "EPSG:3857",
+    "url": "https://wms.gebco.net/mapserv",
+    "params": { "layers": "GEBCO_LATEST_SUB_ICE_TOPO"},
+    "serverType" : "mapserver",
+    "attributions": "<a href=\"https://www.gebco.net/about_us/overview/\" target=\"_blank\">GEBCO</a>",
+    "crossOrigin": "Anonymous",
+    "offline": false
+  }
+}

@@ -1,0 +1,384 @@
+// Basic regexp that identifies a callsign and any pre- and post-indicators.
+const CALLSIGN_REGEXP =
+  /^([A-Z0-9]+\/){0,1}([0-9][A-Z]{1,2}[0-9]|[A-Z]{1,2}[0-9])([A-Z0-9]+)(\/[A-Z0-9/]+){0,1}$/
+/*
+  `^ ... $`
+    to ensure the callsign has no extraneous characters
+
+  `( [A-Z0-9]+ \/ ){0,1}`
+    to match an optional preindicator, separated by `\/` from the rest of the call
+
+  `( [0-9][A-Z]{1,2}[0-9] | [A-Z]{1,2}[0-9] )`
+    to match either number-letter-number, number-letter-letter-number, letter-number and letter-letter-number prefixes
+
+  `( [A-Z0-9]+ )`
+    for the rest of the callsign, which must include at least one more letter or digit after the prefix
+
+  `( \/ [A-Z0-9/]+ ){0,1}`
+    for a optional list of postindicators separated by `\/` from the rest of the call
+ */
+
+const GRID_REGEXP = /^[A-Z]{2}[0-9]{2}$/
+
+function processRosterFiltering(callRoster, rosterSettings)
+{
+  // First loop, exclude calls, mostly based on "Exceptions" settings
+  // this whole section is full of individual if's that could be broken out
+  for (const callHash in callRoster)
+  {
+    let entry = callRoster[callHash];
+    let callObj = entry.callObj;
+    let call = entry.DEcall;
+
+    entry.tx = true;
+    callObj.shouldAlert = false;
+    callObj.reason = Array();
+    callObj.awardReason = "Callsign";
+
+    if (!call || !call.match(CALLSIGN_REGEXP))
+    {
+      // console.error(`Invalid Callsign ${call}`, entry)
+      entry.tx = false
+      continue;
+    }
+
+    if (CR.rosterSettings.columns.Spot == true)
+    {
+      callObj.spot = window.opener.getSpotTime(callObj.DEcall + callObj.mode + callObj.band);
+      if (CR.rosterSettings.onlySpot == true && (callObj.spot.when == 0 || (timeNowSec() - callObj.spot.when > window.opener.GT.receptionSettings.viewHistoryTimeSec)))
+      {
+        entry.tx = false;
+        continue;
+      }
+    }
+    else
+    {
+      callObj.spot = { when: 0, snr: 0 };
+    }
+    
+    if (rosterSettings.now - callObj.age > CR.rosterSettings.rosterTime)
+    {
+      entry.tx = false;
+      entry.alerted = false;
+      callObj.qrz = false;
+      callObj.reset = true;
+      continue;
+    }
+    if (!callObj.dxcc)
+    {
+      entry.tx = false;
+      continue;
+    }
+    if (window.opener.GT.instances[callObj.instance].crEnable == false)
+    {
+      entry.tx = false;
+      continue;
+    }
+    if (call in CR.blockedCalls)
+    {
+      entry.tx = false;
+      continue;
+    }
+    if (entry.DXcall in CR.ignoredCQ || entry.DXcall + ":" + callObj.dxcc in CR.ignoredCQ)
+    {
+      entry.tx = false;
+      continue;
+    }
+    if (callObj.ituz in CR.blockedITUz)
+    {
+      entry.tx = false;
+      continue;
+    }
+    if (callObj.cqz in CR.blockedCQz)
+    {
+      entry.tx = false;
+      continue;
+    }
+    if (callObj.dxcc in CR.blockedDxcc)
+    {
+      entry.tx = false;
+      continue;
+    }
+    if (callObj.grid in CR.blockedGrid)
+    {
+      entry.tx = false;
+      continue;
+    }
+    if (CR.rosterSettings.cqOnly == true)
+    {
+      if (CR.rosterSettings.wantRRCQ == true)
+      {
+        if (callObj.RR73 == false && callObj.CQ == false)
+        {
+          entry.tx = false;
+          continue;
+        }
+      }
+      else if (callObj.CQ == false)
+      {
+        entry.tx = false;
+        continue;
+      }
+    }
+    if (CR.rosterSettings.requireGrid == true && callObj.grid.length != 4)
+    {
+      entry.tx = false;
+      continue;
+    }
+    if (CR.rosterSettings.wantMinDB == true && entry.message.SR < CR.rosterSettings.minDb)
+    {
+      entry.tx = false;
+      continue;
+    }
+    if (CR.rosterSettings.wantMaxDT == true && Math.abs(entry.message.DT) > CR.rosterSettings.maxDT)
+    {
+      entry.tx = false;
+      continue;
+    }
+    if (CR.rosterSettings.wantMinFreq == true && entry.message.DF < CR.rosterSettings.minFreq)
+    {
+      entry.tx = false;
+      continue;
+    }
+    if (CR.rosterSettings.wantMaxFreq == true && entry.message.DF > CR.rosterSettings.maxFreq)
+    {
+      entry.tx = false;
+      continue;
+    }
+
+    if (callObj.dxcc == window.opener.GT.myDXCC)
+    {
+      if (CR.rosterSettings.noMyDxcc == true)
+      {
+        entry.tx = false;
+        continue;
+      }
+    }
+    else if (CR.rosterSettings.onlyMyDxcc == true)
+    {
+      entry.tx = false;
+      continue;
+    }
+
+    let usesOneOf = 0;
+    let checkUses = 0;
+
+    if (window.opener.GT.callsignLookups.lotwUseEnable == true && CR.rosterSettings.usesLoTW == true)
+    {
+      checkUses++;
+      if (call in window.opener.GT.lotwCallsigns)
+      {
+        usesOneOf++;
+        if (CR.rosterSettings.maxLoTW < 27)
+        {
+          let months = (CR.day - window.opener.GT.lotwCallsigns[call]) / 30;
+          if (months > CR.rosterSettings.maxLoTW)
+          {
+            usesOneOf--;
+          }
+        }
+      }
+    }
+
+    if (window.opener.GT.callsignLookups.eqslUseEnable == true && CR.rosterSettings.useseQSL == true)
+    {
+      checkUses++;
+      if (call in window.opener.GT.eqslCallsigns)
+      {
+        usesOneOf++;
+      }
+    }
+
+    if (window.opener.GT.callsignLookups.oqrsUseEnable == true && CR.rosterSettings.usesOQRS == true)
+    {
+      checkUses++;
+      if (call in window.opener.GT.oqrsCallsigns)
+      {
+        usesOneOf++;
+      }
+    }
+
+    if (checkUses > 0 && usesOneOf == 0)
+    {
+      entry.tx = false;
+      continue;
+    }
+
+    if (rosterSettings.callMode != "all")
+    {
+      if (entry.DXcall == "CQ DX" && callObj.dxcc == window.opener.GT.myDXCC)
+      {
+        entry.tx = false;
+        continue;
+      }
+
+      let hash = hashMaker(call, callObj, CR.rosterSettings.reference);
+      if (rosterSettings.callMode == "worked" && hash in CR.tracker.worked.call)
+      {
+        entry.tx = false;
+        continue;
+      }
+      if (rosterSettings.callMode == "confirmed" && hash in CR.tracker.confirmed.call)
+      {
+        entry.tx = false;
+        continue;
+      }
+
+      if (CR.rosterSettings.hunting == "grid")
+      {
+        let hash = hashMaker(callObj.grid.substr(0, 4),
+          callObj, CR.rosterSettings.reference);
+        if (rosterSettings.huntIndex && hash in rosterSettings.huntIndex.grid)
+        {
+          entry.tx = false;
+          continue;
+        }
+        if (callObj.grid.length == 0)
+        {
+          entry.tx = false;
+          continue;
+        }
+        continue;
+      }
+      if (CR.rosterSettings.hunting == "dxcc")
+      {
+        let hash = hashMaker(String(callObj.dxcc) + "|", callObj, CR.rosterSettings.reference);
+
+        if (rosterSettings.huntIndex && (hash in rosterSettings.huntIndex.dxcc))
+        {
+          entry.tx = false;
+          continue;
+        }
+        continue;
+      }
+
+      if (CR.rosterSettings.hunting == "dxccs" && CR.currentDXCCs != -1)
+      {
+        if (callObj.dxcc != CR.currentDXCCs)
+        {
+          entry.tx = false;
+          continue;
+        }
+      }
+
+      if (CR.rosterSettings.hunting == "wpx")
+      {
+        if (String(callObj.px) == null)
+        {
+          entry.tx = false;
+          continue;
+        }
+        let hash = hashMaker(String(callObj.px),
+          callObj, CR.rosterSettings.reference);
+
+        if (rosterSettings.huntIndex && (hash in rosterSettings.huntIndex.px))
+        {
+          entry.tx = false;
+          continue;
+        }
+
+        continue;
+      }
+
+      if (CR.rosterSettings.hunting == "cq")
+      {
+        if (callObj.cqz == null || !rosterSettings.huntIndex)
+        {
+          entry.tx = false;
+          continue;
+        }
+
+        let hash = hashMaker(callObj.cqz + "|", callObj, CR.rosterSettings.reference);
+
+        if (hash in rosterSettings.huntIndex.cqz)
+        {
+          entry.tx = false;
+          continue;
+        }
+
+        continue;
+      }
+
+      if (CR.rosterSettings.hunting == "itu")
+      {
+        if (callObj.ituz == null || !rosterSettings.huntIndex)
+        {
+          entry.tx = false;
+          continue;
+        }
+
+        let hash = hashMaker(callObj.ituz + "|", callObj, CR.rosterSettings.reference);
+
+        if (hash in rosterSettings.huntIndex.ituz)
+        {
+          entry.tx = false;
+          continue;
+        }
+
+        continue;
+      }
+
+      if (CR.rosterSettings.hunting == "usstates" && window.opener.GT.callsignLookups.ulsUseEnable == true)
+      {
+        let state = callObj.state;
+        let finalDxcc = callObj.dxcc;
+        if (finalDxcc == 291 || finalDxcc == 110 || finalDxcc == 6)
+        {
+          if (state in window.opener.GT.StateData)
+          {
+            let hash = hashMaker(state, callObj, CR.rosterSettings.reference);
+
+            if (rosterSettings.huntIndex && hash in rosterSettings.huntIndex.state)
+            {
+              entry.tx = false;
+              continue;
+            }
+          }
+          else entry.tx = false;
+        }
+        else entry.tx = false;
+
+        continue;
+      }
+
+      if (CR.rosterSettings.hunting == "usstate" && CR.currentUSCallsigns)
+      {
+        if (call in CR.currentUSCallsigns)
+        {
+          // Do Nothing
+        }
+        else
+        {
+          entry.tx = false;
+          continue;
+        }
+        continue;
+      }
+    }
+
+    if (rosterSettings.isAwardTracker)
+    {
+      let tx = false;
+      let baseHash = hashMaker("", callObj, CR.rosterSettings.reference);
+
+      for (const award in CR.awardTracker)
+      {
+        if (CR.awardTracker[award].enable)
+        {
+          tx = testAward(award, callObj, baseHash);
+          if (tx)
+          {
+            let x = CR.awardTracker[award];
+
+            // TODO: Move award reason out of exclusions code?
+            callObj.awardReason = CR.awards[x.sponsor].awards[x.name].tooltip + " (" + CR.awards[x.sponsor].sponsor + ")";
+            callObj.shouldAlert = true;
+            break;
+          }
+        }
+      }
+
+      entry.tx = tx;
+    }
+  }
+}

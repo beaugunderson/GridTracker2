@@ -1,0 +1,3228 @@
+<!DOCTYPE html>
+<!--
+GridTracker Copyright © 2024 Stephen Loomis, NØTTL, Henry Forte, N2VFL, Matthew Chambers, NRØQ, Sebastian Delmont, KI2D, Christian Bayer, WA4YA, Paul Traina, K6PST, Jon Angliss, KF5QHQ, Beau Gunderson, N7YHF, Jonathan Fick, KEØYBL, Florian Wolters, DF2ET, GridTricker.org
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<html lang="en" xml:lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>GridTracker2</title>
+  <link rel="stylesheet" href="./lib/ol.css" />
+  <link rel="stylesheet" href="./lib/style.css" />
+  <script src="./lib/first.js" type="text/javascript"></script>
+  <script src="./lib/defaults.js" type="text/javascript"></script>
+  <script src="./lib/protos.js" type="text/javascript"></script>
+  <script src="./lib/gtCommon.js" type="text/javascript"></script>
+  <script src="./lib/alerts.js" type="text/javascript"></script>
+  <script src="./lib/third-party.js" type="text/javascript"></script>
+  <script src="./lib/grid-math.js" type="text/javascript"></script>
+  <script src="./lib/adif.js" type="text/javascript"></script>
+  <script src="./lib/proj4.js" type="text/javascript"></script>
+  <script src="./lib/ol.js" type="text/javascript"></script>
+  <script src="./lib/arc.js" type="text/javascript"></script>
+  <script src="./lib/moment-with-locales.js" type="text/javascript"></script>
+  <script src="./lib/moment-timezone-with-data.js" type="text/javascript"></script>
+  <script src="./lib/callsigns.js" type="text/javascript"></script>
+  <script src="./lib/i18n.js" type="text/javascript"></script>
+  <script src="./lib/grayline.js" type="text/javascript"></script>
+  <script src="./lib/gtws.js" type="text/javascript"></script>
+  <script src="./lib/pota.js" type="text/javascript"></script>
+  <script src="./lib/services/pstrotator.js" type="text/javascript"></script>
+  <script src="./lib/gt.js" type="text/javascript"></script>
+</head>
+
+<body id="mainBody" onload="startupApplication();">
+  <div id="startupDiv">
+    <div class="fill">
+      <img src="img/gridtracker.png" alt="" />
+    </div>
+    <div>
+      <h1>
+        <div data-i18n="settings.about.AppName">GridTracker2</div>
+      </h1>
+    </div>
+    <div>
+      <h3><i data-i18n="appname-sub-title">An Amateur Radio Companion</i></h3>
+    </div>
+    <div id="startupStatusDiv">Initial Startup</div>
+  </div>
+  <div id="main" style="display: none;">
+    <div id="mapDiv" class="mapDivEnd"></div>
+    <div id="mouseTrackDiv" class="mouseTrack"></div>
+    <div id="spotsDiv"
+      style="display: none;"
+      class="spotsDivEnd">
+      <table align="center">
+        <tr>
+          <td id="spotCountDiv">Spots: 0</td>
+          <td id="spotRefreshDiv">Refresh: -</td>
+        </tr>
+        <tr>
+          <td colspan="2" align="center" id="spotHistoryTimeTd"></td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <input type="range" min="5" max="1440" value="15" step="5" class="slider" id="spotHistoryTimeValue"
+              oninput="changeSpotValues();" onkeyup="redrawSpots();" onmouseup="redrawSpots();" />
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div id="chevronDiv" class="chevronDivStart" title="Click to show menu" onclick="collapseMenu(false)">≤</div>
+    <div id="menuDiv" class="menuDivEnd">
+      <div id="localInfoDiv"
+        style="border: 1px solid white; margin: 1px; margin-top: 1px; margin-bottom: 1px; padding: 0px"
+        class="roundBorder">
+        <table align="center">
+          <tr>
+            <td colspan="2">
+              <div data-i18n="appname-title" class="button" title="Click to hide menu" style="
+                    color: #fff;
+                    margin: 0;
+                    padding: 0;
+                    font-weight: bold;
+                    width: 150px;
+                    padding-top: 2px;
+                    border-width: 2px;
+                  " onclick="collapseMenu(true);">
+                GridTracker
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div id="frequency" title="Frequency (Band)" style="font-weight: bold">0.000.000 Hz (?)</div>
+            </td>
+            <td>
+              <div id="wsjtxMode" title="Mode"></div>
+            </td>
+          </tr>
+        </table>
+        <div id="currentTime" style="cursor: pointer" title="Toggle Local / UTC Time" onclick="toggleTime();"></div>
+
+        <table align="center" style="border-collapse: collapse; margin-bottom: 2px">
+          <tr id="dxCallBoxDiv" class="DXCallBox">
+            <td>
+              <div id="localDXcall" style="cursor: pointer" title="Who you're calling or last called"
+                onclick="startLookup(GT.localDXcall,localDXGrid.innerHTML);"
+                oncontextmenu="showWorkedByCall(GT.localDXcall, event);">
+                -
+              </div>
+            </td>
+            <td>
+              <div id="localDXGrid" style="cursor: pointer" title="Their Gridsquare"
+                onclick="centerOn(localDXGrid.innerHTML);">
+                -
+              </div>
+            </td>
+            <td>
+              <div id="localDXReport" title="Last known SNR">&nbsp;</div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div id="localDXCountry" style="font-size: smaller; font-weight: italic; color: lightgreen" title="DXCC">
+                &nbsp;
+              </div>
+            </td>
+            <td>
+              <div id="localDXDistance" style="font-size: smaller; font-weight: italic; color: lightblue"
+                title="Distance">
+                &nbsp;
+              </div>
+            </td>
+            <td>
+              <div id="localDXAzimuth" style="font-size: smaller; font-weight: italic; color: lightgreen"
+                title="Heading">
+                &nbsp;
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div id="rigWrap" style="
+            display: none;
+            background-color: blue;
+            border-style: inset;
+            border-color: lightblue;
+            border-width: 3px;
+            margin: 0;
+            margin-bottom: 1px;
+            color: yellow;
+            padding: 2px;
+          " class="roundBorder">
+        <div style="display: inline-block; padding-top: 0px; cursor: pointer; left: 0px" onClick="rigChange(false);">
+          ◀&nbsp;
+        </div>
+        <div style="display: inline-block" id="rigDiv">-no rig-</div>
+        <div style="display: inline-block; cursor: pointer; right: 0px" onClick="rigChange(true);">&nbsp;▶</div>
+      </div>
+      <div id="operatingMode" style="margin: 0; margin-bottom: 1px; cursor: pointer" onclick="ignoreMessagesToggle()"
+        title="Click to ignore incoming messages">
+        <div data-i18n="sidebarNoMessages" id="txrxdec" style="background-color: Green; border-style: outset; border-color: yellow; border-width: 3px"
+          class="roundBorder">
+          waiting for message
+        </div>
+      </div>
+
+      <div id="bandActivityDiv" class="roundBorder" style="
+            position: relative;
+            background-color: #000;
+            border: 1px solid purple;
+            margin: 1px;
+            height: 49px;
+            margin-bottom: 1px;
+            padding: 0px;
+          " title="Band Activity" oncontextmenu="toggleBaWindow()">
+        <div data-i18n="sidebarNoDataYet" id="graphDiv" style="bottom: 0; position: absolute; width: 100%; padding: 0px; margin-bottom: 2px">
+         ...no data yet...
+        </div>
+      </div>
+
+      <div id="actionDiv" style="border: 1px solid blue; margin: 1px; margin-bottom: 1px; padding: 3px"
+        class="roundBorder" title="Quick Stats">
+        <table align="center">
+          <tr>
+            <td data-i18n="quickStats.CallRX.label" style="cursor: pointer"
+              onclick="openInfoTab('calbox', 'callsignBoxDiv', showCallsignBox)" title="Callsigns Heard" align="right">
+              Rx Calls
+            </td>
+            <td style="cursor: pointer" onclick="openInfoTab('calbox', 'callsignBoxDiv', showCallsignBox)"
+              title="Callsigns Heard" class="roundBorderValue" align="center">
+              <div id="callsignCount">0</div>
+            </td>
+            <td data-i18n="quickStats.QSO.label" style="cursor: pointer"
+              onclick="resetSearch(); openInfoTab('qsobox', 'workedBoxDiv', showWorkedBox);" title="Worked Stations"
+              align="right">
+              QSO
+            </td>
+            <td style="cursor: pointer" class="roundBorderValue"  
+              onclick="resetSearch(); openInfoTab('qsobox', 'workedBoxDiv', showWorkedBox);" title="Worked Stations"
+              align="center">
+              <div id="qsoCount">0</div>
+            </td>
+          </tr>
+          <tr>
+            <td data-i18n="quickStats.DXCCRx.label" style="cursor: pointer"
+              onclick="openInfoTab('calbox', 'callsignBoxDiv', showCallsignBox);" title="DXCC Heard" align="right">
+              Rx DXCC
+            </td>
+            <td style="cursor: pointer" class="roundBorderValue"
+              onclick="openInfoTab('calbox', 'callsignBoxDiv', showCallsignBox);" title="DXCC Heard" align="center">
+              <div id="countryCount">0</div>
+            </td>
+            <td data-i18n="quickStats.QSL.label" style="cursor: pointer"
+              onclick="resetSearch(); GT.filterQSL='true'; openInfoTab('qsobox', 'workedBoxDiv', showWorkedBox)"
+              title="Show Confirmed List" align="right">
+              QSL
+            </td>
+            <td style="cursor: pointer" class="roundBorderValue" 
+              onclick="resetSearch(); GT.filterQSL='true'; openInfoTab('qsobox', 'workedBoxDiv', showWorkedBox)"
+              title="Show Confirmed List" align="center">
+              <div id="qslCount">0</div>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2">
+              <div data-i18n="quickLoad.clearLive.label" class="button" onclick="clearLive();"
+                title="Clear Live Data from GridTracker">
+                Clear Live
+              </div>
+            </td>
+            <td colspan="2">
+              <div data-i18n="callsigns.processing" style="display:none; padding-left:2px;padding-right:2px;" id="busyDiv" class="busyDiv">...</div>
+              <div data-i18n="quickLoad.clearLog.label" id="clearOrLoadButton" class="button"
+                onclick="clearOrLoadQSOs();updateCountStats();"
+                title="Clear or Reload Log Data">
+                Clear Log
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div id="filterDiv" class="roundBorder"
+        style="position: relative; background-color: #000; border: 1px solid cyan; margin: 1px; margin-bottom: 1px"
+        >
+        <div>
+          <div data-i18n="mapFilter.title.label" style="display:inline-block;font-weight:bold;" onclick="checkMapViewFiltersMaximize()">Map View Filters</div>
+          <div style="float:right;margin-top:1px;margin-right:1px;cursor: pointer;" onclick="toggleMapViewFiltersCollapse()"><img id="mapViewFiltersCollapseImg" class="roundBorder" src="img/minimize.png" height="12" title="Hide Controls" /></div>
+        </div>
+        <table align="center" id="mapViewFiltersTable">
+          <tr data-i18n="mapFilter.band.hover" title="Select Band&#10;(Auto tracks WSJT-X)">
+            <td data-i18n="mapFilter.band.label" style="color:lightgreen">Band</td>
+            <td>
+              <select id="gtBandFilter" onkeypress="return false;" onchange="gtBandFilterChanged(this);">
+                <option data-i18n="mapFilter.band.Auto" value="auto">Auto</option>
+                <option value="xx" disabled>--------</option>
+                <option data-i18n="mapFilter.band.Mixed" value="">Mixed</option>
+                <option data-i18n="mapFilter.band.4000m" value="4000m">4000m</option>
+                <option data-i18n="mapFilter.band.2200m" value="2200m">2200m</option>
+                <option data-i18n="mapFilter.band.630m" value="630m">630m</option>
+                <option data-i18n="mapFilter.band.160m" value="160m">160m</option>
+                <option data-i18n="mapFilter.band.80m" value="80m">80m</option>
+                <option data-i18n="mapFilter.band.60m" value="60m">60m</option>
+                <option data-i18n="mapFilter.band.40m" value="40m">40m</option>
+                <option data-i18n="mapFilter.band.30m" value="30m">30m</option>
+                <option data-i18n="mapFilter.band.20m" value="20m">20m</option>
+                <option data-i18n="mapFilter.band.17m" value="17m">17m</option>
+                <option data-i18n="mapFilter.band.15m" value="15m">15m</option>
+                <option data-i18n="mapFilter.band.12m" value="12m">12m</option>
+                <option data-i18n="mapFilter.band.11m" value="11m">11m</option>
+                <option data-i18n="mapFilter.band.10m" value="10m">10m</option>
+                <option data-i18n="mapFilter.band.8m" value="8m">8m</option>
+                <option data-i18n="mapFilter.band.6m" value="6m">6m</option>
+                <option data-i18n="mapFilter.band.4m" value="4m">4m</option>
+                <option data-i18n="mapFilter.band.2m" value="2m">2m</option>
+                <option data-i18n="mapFilter.band.1_25m" value="1.25m">1.25m</option>
+                <option data-i18n="mapFilter.band.70cm" value="70cm">70cm</option>
+                <option data-i18n="mapFilter.band.33cm" value="33cm">33cm</option>
+                <option data-i18n="mapFilter.band.23cm" value="23cm">23cm</option>
+                <option data-i18n="mapFilter.band.13cm" value="13cm">13cm</option>
+                <option data-i18n="mapFilter.band.9cm" value="9cm">9cm</option>
+                <option data-i18n="mapFilter.band.3cm" value="3cm">3cm</option>
+                <option data-i18n="mapFilter.band.1_2cm" value="1.2cm">1.2cm</option>
+                <option data-i18n="mapFilter.band.6mm" value="6mm">6mm</option>
+                <option data-i18n="mapFilter.band.4mm" value="4mm">4mm</option>
+                <option data-i18n="mapFilter.band.2_5mm" value="2.5mm">2.5mm</option>
+                <option data-i18n="mapFilter.band.2mm" value="2mm">2mm</option>
+                <option data-i18n="mapFilter.band.1mm" value="1mm">1mm</option>
+                <option data-i18n="mapFilter.band.OOB" value="oob">OOB</option>
+              </select>
+            </td>
+          </tr>
+          <tr data-i18n="mapFilter.mode.hover" title="Select Mode">
+            <td data-i18n="mapFilter.mode.label" style="color:orange">Mode</td>
+            <td>
+              <select id="gtModeFilter" onkeypress="return false;" onchange="gtModeFilterChanged(this);">
+                <option data-i18n="mapFilter.mode.Auto" value="auto">Auto</option>
+                <option value="xx" disabled>----------</option>
+                <option data-i18n="mapFilter.mode.Mixed" value="">Mixed</option>
+                <option data-i18n="mapFilter.mode.Digital" value="Digital">Digital</option>
+                <option data-i18n="mapFilter.mode.Phone" value="Phone">Phone</option>
+              </select>
+            </td>
+          </tr>
+          <tr data-i18n="mapFilter.prop.hover" title="Select Propagation Mode">
+            <td data-i18n="mapFilter.prop.label" style="color:yellow">Prop</td>
+            <td>
+              <select id="gtPropFilter" onkeypress="return false;" onchange="gtPropFilterChanged(this);">
+                <option data-i18n="mapFilter.prop.Mixed" value="mixed">Mixed</option>
+                <option value="xx" disabled>----------</option>
+                <option data-i18n="mapFilter.prop.Unknown" value="">Unknown</option>
+                <option value="xx" disabled>----------</option>
+                <option data-i18n="mapFilter.prop.AircraftScatter" value="AS">Aircraft Scatter</option>
+                <option data-i18n="mapFilter.prop.AuroraE" value="AUE">Aurora-E</option>
+                <option data-i18n="mapFilter.prop.Aurora" value="AUR">Aurora</option>
+                <option data-i18n="mapFilter.prop.BackScatter" value="BS">Back Scatter</option>
+                <option data-i18n="mapFilter.prop.EchoLink" value="ECH">EchoLink</option>
+                <option data-i18n="mapFilter.prop.EME" value="EME">EME</option>
+                <option data-i18n="mapFilter.prop.SporadicE" value="ES">Sporadic E</option>
+                <option data-i18n="mapFilter.prop.F2Reflection" value="F2">F2 Reflection</option>
+                <option data-i18n="mapFilter.prop.FieldAlignedIregularities" value="FAI">Field Aligned I</option>
+                <option data-i18n="mapFilter.prop.InternetAssist" value="INTERNET">Inet-assist</option>
+                <option data-i18n="mapFilter.prop.Ionscatter" value="ION">Ionoscatter</option>
+                <option data-i18n="mapFilter.prop.IRLP" value="IRL">IRLP</option>
+                <option data-i18n="mapFilter.prop.MeteorScatter" value="MS">Meteor Scatter</option>
+                <option data-i18n="mapFilter.prop.Repeater" value="RPT">Repeater</option>
+                <option data-i18n="mapFilter.prop.RainScatter" value="RS">Rain Scatter</option>
+                <option data-i18n="mapFilter.prop.Satellite" value="SAT">Satellite</option>
+                <option data-i18n="mapFilter.prop.TransEquatorial" value="TEP">Trans-equatorial</option>
+                <option data-i18n="mapFilter.prop.TropoDuct" value="TR">Tropo-ducting</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td data-i18n="mapFilter.data.label" style="color:cyan">Data</td>
+            <td>
+              <select id="gtGridViewMode" onkeypress="return false;" onchange="setGridView()">
+                <option data-i18n="mapFilter.data.Live"    value="1">Live</option>
+                <option data-i18n="mapFilter.data.Logbook" value="2">Logbook</option>
+                <option data-i18n="mapFilter.data.LogLive" value="3">Logbook &amp; Live</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td data-i18n="roster.award.Award">Award</td>
+            <td>
+              <select id="gtTrophyLayer" onkeypress="return false;" onchange="gtTrophyLayerChanged(this);">
+                <option data-i18n="settings.OAMS.message.newAlert.none" value="0">None</option>
+                <option value="1">CQ</option>
+                <option value="2">ITU</option>
+                <option value="3">WAC</option>
+                <option value="4">WAS</option>
+                <option value="5">DXCC</option>
+                <option value="6">USC</option>
+                <option value="7">US48</option>
+                <option value="8">WACP</option>
+              </select>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div id="buttonsDiv" style="margin-top:1px;margin-left: 1px; display:grid;gap:0px;grid-template-columns: 1fr 1fr 1fr 1fr 1fr;grid-template-rows: auto;">
+        <div id="projectionButton" class="iconButton" onclick="changeMapProjection();" title="Toggle AEQD">
+          <img id="projectionImg" src="img/aeqd.png" class="buttonImg" />
+        </div>
+        <div id="callRosterButton" class="iconButton" onclick="openCallRosterWindow();" title="Open Call Roster">
+          <img src="img/roster-icon.png" class="buttonImg" />
+        </div>
+        <div id="pushPinButton" onclick="togglePushPinMode();" class="iconButton" title="Toggle Push-Pin Mode">
+          <img id="pinImg" src="" class="buttonImg" />
+        </div>
+        <div id="gridModeDiv" onclick="toggleGridMode()" class="iconButton" title="Toggle Maidenhead Width">
+          <img id="modeImg" src="" class="buttonImg" />
+        </div>
+        <div id="statsDiv" onclick="showRootInfoBox();" class="iconButton" title="Show Stats">
+          <img src="img/stats-button.png" class="buttonImg" />
+        </div>
+        <div id="Grayline" onclick="toggleEarth()" class="iconButton" title="Toggle Grayline">
+          <img id="graylineImg" src="" class="buttonImg" />
+        </div>
+        <div id="lunaButton" onclick="toggleMoon();" class="iconButton" title="Toggle Moon">
+          <img id="lunaButonImg" src="img/luna.png" class="buttonImg" />
+        </div>
+        <div id="helpButton" onclick="toggleHelp();" class="iconButton" title="Toggle Hotkey List">
+          <img src="img/help.png" class="buttonImg" />
+        </div>
+        <div id="alterMuteDiv" onclick="toggleAlertMute()" class="iconButton" title="Toggle Audio Mute">
+          <img id="alertMuteImg" src="" class="buttonImg" />
+        </div>
+        <div id="settingsButton" onclick="showSettingsBox();" class="iconButton" title="Settings">
+          <img src="img/settings-button.png" class="buttonImg" />
+        </div>
+        <div id="adifLoadDiv" onclick="adifLoadDialog()" class="iconButton" title="Load ADIF Log">
+          <img src="img/adif.png" class="buttonImg" />
+        </div>
+        <div id="buttonAdifCheckBoxDiv" onclick="startupAdifLoadFunction()" class="iconButton" title="Reload Local ADIF Files">
+          <img src="img/log_local.png" class="buttonImg" />
+        </div>
+        <div id="timezoneButton" onclick="toggleTimezones()" class="iconButton" title="Toggle Timezone Layer">
+          <img id="timezoneImg" src="img/timezone-button.png" class="buttonImg" />
+        </div>
+        <div id="gridOverlayButton" onclick="toggleAllGrids()" class="iconButton" title="Toggle All Grid Overlay">
+            <img id="gridOverlayImg" src="img/grid-overlay.png" class="buttonImg" />
+        </div>
+        <div id="modeModeDiv" onclick="toggleOffline()" class="iconButton" title="Toggle Online/Offline Mode">
+          <img id="offlineImg" src="" class="buttonImg" />
+        </div>
+        <div id="radarButton" onclick="toggleNexrad()" class="iconButton" title="Toggle US Nexrad">
+          <img id="radarImg" src="img/radar-button.png" class="buttonImg" />
+        </div>
+        <div id="predButton" onclick="cyclePredLayer()" class="iconButton" title="Cycle Prediction Layer">
+          <img id="predImg" src="img/no-pred.png" class="buttonImg" />
+        </div>
+        <div id="conditionsButton" onclick="showConditionsBox();" class="iconButton" title="View Current Conditions">
+          <img src="img/conditions.png" class="buttonImg" />
+        </div>
+        <div id="buttonSpotsBoxDiv" onclick="cycleSpotsView()" class="iconButton" title="View Spot Reports">
+          <img id="spotsButtonImg" src="img/spots.png" class="buttonImg" />
+        </div>
+        <div id="donateButton" onclick="gotoDonate();" class="iconButton" title="Support GridTracker with a donation">
+          <img style="-webkit-filter: brightness(70%); filter: brightness(70%)" src="img/donate.png" class="buttonImg" />
+        </div>
+        <div id="lookupButton" onclick="toggleLookupWindow()" class="iconButton" title="Open Lookup Window">
+          <img src="img/lookup.png" class="buttonImg" />
+        </div>
+        <div id="buttonPsk24CheckBoxDiv" onclick="grabPsk24()" class="iconButton" title="Your PSK 24hour report">
+          <img id="pskImg" src="img/psk_24_32.png" class="buttonImg" />
+        </div>
+        <div id="buttonQRZCheckBoxDiv" onclick="if ( ValidateQrzApi(qrzApiKey ) ) grabQrzComLog()" class="iconButton" title="Download log from QRZ.com">
+            <img id="qrzLogImg" src="img/log_QRZ.png" class="buttonImg" />
+        </div>
+        <div id="buttonLOTWCheckBoxDiv" onclick="if ( ValidateText(lotwLogin) && ValidateText(lotwPassword) ) {  grabLOtWLog(false); } " class="iconButton" title="Download log from Logbook of the World">
+            <img id="lotwLogImg" src="img/log_LoTW.png" class="buttonImg" />
+        </div>
+        <div id="buttonClubCheckBoxDiv" onclick="if ( ValidateText(clubEmail) && ValidateText(clubPassword) ) grabClubLog()" class="iconButton" title="Download log from ClubLog">
+            <img id="ClubLogImg" src="img/log_club.png" class="buttonImg" />
+        </div>
+        <div id="potaButton" onClick="togglePotaMap();" class="iconButton" title="Parks On The Air">
+          <img id="potaImg" src="img/pota.png" class="buttonImg" />
+        </div>
+        <div id="gtShareButton" onclick="toggleGtShareEnable();" class="iconButton" title="Share your On-Air Status with other GridTracker users">
+          <img id="gtShareFlagImg" src="img/share-off.png" class="buttonImg" />
+        </div>
+        <div id="gtFlagButton" onclick="toggleGtMap();" class="iconButton" title="Toggle View GridTracker Users">
+          <img id="gtFlagImg" src="" class="buttonImg" />
+        </div>
+        <div id="msgButton" onclick="toggleMessaging();" class="iconButton" title="Messaging Window">
+          <img id="msgImg" src="img/gt_chat.png" class="buttonImg" />
+        </div>
+      </div>
+      <div id="predDiv" style="border: 1px solid rgb(0, 247, 255); margin: 1px; margin-bottom: 1px; margin-top: 2px;" class="roundBorder">
+        <table align="center">
+          <tr style="font-weight: bold;">
+            <td id="mufTitle"  colspan="3">Maximum Usable Frequency</td>
+            <td id="fof2Title" colspan="3">Critical Frequency NVIS</td>
+            <td id="epiTitle"  colspan="3">Es Probability Index</td>
+            <td id="aufTitle"  colspan="3">Probability of Aurora</td>
+          </tr>
+          <tr id="epiTimeTr"><td colspan="3" align="center" id="epiTimeTd"></td></tr>
+          <tr id="aufForTimeTr" style="color: cyan">
+            <td colspan="3" align="center" id="aufForTimeTd"></td>
+          </tr>
+          <tr id="epiTimeOffsetTr">
+            <td id="epiTimeOffsetTd">0</td>
+            <td colspan="2">
+              <input type="range" min="-11" max="11" value="0" step="1" style="width: auto" id="epiTimeValue"
+                oninput="changeEpiTimeValue();" />
+            </td>
+          </tr>
+          <tr id="epiBarTr">
+            <td colspan="3" style="background: rgb(0,0,0);
+                      background: linear-gradient(90deg,
+                      rgb(114,136,144) 0%,
+                      rgb(57,221,206) 11%,
+                      rgb(77,152,23) 23%,
+                      rgb(247,245,0) 34%,
+                      rgb(251,184,0) 46%,
+                      rgb(219,45,1) 57%,
+                      rgb(112,48,160) 69%,
+                      rgb(242,242,242) 80%,
+                      rgb(92,92,97) 100%);" class="barGraph"></td>
+          </tr>
+          <tr id="epiRangeTr">
+            <td align="left">Poor</td>
+            <td></td>
+            <td align="right">Good</td>
+          </tr>
+          <tr id="mufBarTr">
+            <td colspan="3" style="background: linear-gradient(90deg,
+                      rgb(184,159,190) 0%,
+                      rgb(170,219,209) 50%,
+                      rgb(253,246,171) 100%);width: 170px;" class="barGraph"></td>
+          </tr>
+          <tr id="fof2BarTr">
+            <td colspan="3" style="background: linear-gradient(90deg,
+                      rgb(184,159,190) 0%,
+                      rgb(170,219,209) 50%,
+                      rgb(253,246,171) 100%);width: 170px;" class="barGraph"></td>
+          </tr>
+          <tr id="aufPercentTr" style="color: yellow; margin-bottom:-8px;">
+            <td align="center">10%</td>
+            <td align="center">50%</td>
+            <td align="center">90%</td>
+          </tr>
+          <tr id="aufBarTr">
+            <td colspan="3" class="barGraph"><img style="width:170px; height:8px" src="img/auf_bar.png" /></td>
+          </tr>
+          <tr id="mufRangeTr">
+            <td align="left">&lt;5</td>
+            <td align="right">14</td>
+            <td align="right">&gt;28</td>
+          </tr>
+          <tr id="fof2RangeTr">
+            <td align="left">&lt;1</td>
+            <td align="right">5</td>
+            <td align="right">&gt;14</td>
+          </tr>
+          <tr id="aufRangeTr">
+            <td colspan="3">
+              <table align="center" style="width:195px; margin-top:-8px">
+              <tr>
+              <td>0</td>
+              <td style="padding-left:7px">1</td>
+              <td style="padding-left:7px">2</td>
+              <td style="padding-left:7px">3</td>
+              <td style="padding-left:7px">4</td>
+              <td alight="right">&gt;4</td>
+              </tr>
+              <tr><td colspan="6" align="center">ergs/cm2</td></tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div id="trafficDiv" class="roundBorder" style="
+            position: relative;
+            background-color: #000;
+            color: #888;
+            border: 1px solid black;
+            margin: 2px;
+            bottom: 2px;
+            right: 2px;
+            white-space: no-wrap;
+            overflow: hidden;
+          "></div>
+    </div>
+    <div id="myFlagtip" class="myFlagtipEnd"></div>
+    <div id="myTimezoneTip" class="myFlagtipEnd"></div>
+      <div id="myParktip" style="
+          -webkit-user-select: text;
+          user-select: text;
+          background-color: black;
+          padding: 2px;
+          text-align: center;
+          display: block;
+          position: absolute;
+          z-index: -500;
+          left: -1000px;
+          top: -1000px;
+          border: 2px solid white;
+          white-space: nowrap;
+          overflow: hidden;
+        "
+        class="roundBorder"></div>
+      <div
+        id="myTooltip"
+        style="
+          -webkit-user-select: text;
+          user-select: text;
+          background-color: black;
+          padding: 5px;
+          text-align: center;
+          display: block;
+          position: absolute;
+          z-index: -500;
+          left: -1000px;
+          top: -1000px;
+          border: 2px solid white;
+          white-space: nowrap;
+          overflow: hidden;
+        " class="roundBorder"></div>
+    <div id="myGridTooltip" style="
+          background-color: black;
+          padding: 5px;
+          text-align: center;
+          display: block;
+          position: absolute;
+          z-index: -499;
+          left: 50px;
+          top: 50px;
+          border: 2px solid white;
+          white-space: nowrap;
+          overflow: hidden;
+        " class="roundBorder"></div>
+    <div id="myTrophyTooltip" style="
+          background-color: black;
+          padding: 5px;
+          text-align: center;
+          display: block;
+          position: absolute;
+          z-index: -499;
+          left: 50px;
+          top: 50px;
+          border: 2px solid white;
+          white-space: nowrap;
+          overflow: hidden;
+        " class="roundBorder"></div>
+    <div id="myMoonTooltip" style="
+          background-color: black;
+          padding: 5px;
+          text-align: center;
+          display: block;
+          position: absolute;
+          z-index: -499;
+          left: 50px;
+          top: 50px;
+          border: 2px solid white;
+          white-space: nowrap;
+          overflow: hidden;
+        " class="roundBorder"></div>
+    <div id="helpDiv" style="
+          animation: fadeInEffect 0.1s;
+          margin: 2px;
+          left: 30px;
+          top: 20px;
+          display: none;
+          background-color: black;
+          padding: 5px;
+          text-align: center;
+          vertical-align: middle;
+          position: absolute;
+          z-index: 600;
+          border: 1px cyan;
+        " class="roundBorder">
+      <div id="printHotKeyDiv" style="border: 1px solid cyan; color: white; text-align: auto">
+        <table align="center" class="darkTable">
+          <tr>
+            <th colspan="6">Hot Key List (v1.23.1220+)</th>
+          </tr>
+          <tr>
+            <th>Key</th>
+            <th align="left">Action</th>
+            <th>Condition</th>
+            <th>Key</th>
+            <th align="left">Action</th>
+            <th>Condition</th>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td align="left">Show General Map Layer</td>
+            <td></td>
+            <td>Q</td>
+            <td align="left">Cycle Logbook/Live View</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td align="left">Show CQ Zones Award Layer</td>
+            <td></td>
+            <td>R</td>
+            <td align="left">Open Call Roster Window</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td align="left">Show ITU Zones Award Layer</td>
+            <td></td>
+            <td>S</td>
+            <td align="left">Open Settings</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td align="left">Show Continents Award Layer</td>
+            <td></td>
+            <td>T</td>
+            <td align="left">Toggle RX Spots over Grids</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td align="left">Show US States Award Layer</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td align="left">Show DXCC Award Layer</td>
+            <td></td>
+            <td>U</td>
+            <td align="left">Toggle Award Layer Merge</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td align="left">Show US Counties Award Layer</td>
+            <td></td>
+            <td></td>
+            <td align="left"></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td align="left">Show US Continental Grids Award Layer</td>
+            <td></td>
+            <td>W</td>
+            <td align="left">Toggle Maidenhead Grid Size</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td align="left">Show CA Provinces Award Layer</td>
+            <td></td>
+            <td>X</td>
+            <td align="left">Toggle Map Position Info</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>0</td>
+            <td align="left">Toggle US Nexrad Overlay</td>
+            <td></td>
+            <td></td>
+            <td align="left"></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>=</td>
+            <td align="left">Cycle Award Layers</td>
+            <td></td>
+            <td>Z</td>
+            <td align="left">Center Map on QTH Grid</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>A</td>
+            <td align="left">Toggle Active Path Animation</td>
+            <td></td>
+            <td>F1</td>
+            <td align="left">Hot Key List (This List)</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>B</td>
+            <td align="left">Toggle All Grid Overlay</td>
+            <td></td>
+            <td>F5</td>
+            <td align="left">Recall Map Position 1</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>C</td>
+            <td align="left">Open Conditions Windows</td>
+            <td></td>
+            <td>F5</td>
+            <td align="left">Store Map Position 1</td>
+            <td>Shift-Key</td>
+          </tr>
+          <tr>
+            <td>D</td>
+            <td align="left">Toggle Moon Tracking</td>
+            <td></td>
+            <td>F6</td>
+            <td align="left">Recall Map Position 2</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>E</td>
+            <td align="left">Toggle 24h Moon Trajectory</td>
+            <td></td>
+            <td>F6</td>
+            <td align="left">Store Map Position 2</td>
+            <td>Shift-Key</td>
+          </tr>
+          <tr>
+            <td>F</td>
+            <td align="left">Toggle RX Spots Flight</td>
+            <td></td>
+            <td>F7</td>
+            <td align="left">Recall Map Position 3</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>G</td>
+            <td align="left">Toggle GridTracker Flags</td>
+            <td></td>
+            <td>F7</td>
+            <td align="left">Store Map Position 3</td>
+            <td>Shift-Key</td>
+          </tr>
+          <tr>
+            <td>H</td>
+            <td align="left">Toggle Timezone Overlay</td>
+            <td></td>
+            <td>F8</td>
+            <td align="left">Recall Map Position 4</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>I</td>
+            <td align="left">Open Stats/Info</td>
+            <td></td>
+            <td>F8</td>
+            <td align="left">Store Map Position 4</td>
+            <td>Shift-Key</td>
+          </tr>
+          <tr>
+            <td>K</td>
+            <td align="left">Capture Screenshot</td>
+            <td></td>
+            <td>F9</td>
+            <td align="left">Recall Map Position 5</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>L</td>
+            <td align="left">Open ADIF file</td>
+            <td></td>
+            <td>F9</td>
+            <td align="left">Store Map Position 5</td>
+            <td>Shift-Key</td>
+          </tr>
+          <tr>
+            <td>M</td>
+            <td align="left">Toggle Audio Mute</td>
+            <td></td>
+            <td>F10</td>
+            <td align="left">Recall Map Position 6</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td align="left"></td>
+            <td></td>
+            <td>F10</td>
+            <td align="left">Store Map Position 6</td>
+            <td>Shift-Key</td>
+          </tr>
+          <tr>
+            <td>N</td>
+            <td align="left">Toggle Grayline</td>
+            <td></td>
+            <td>F11</td>
+            <td align="left">Toggle Fullscreen</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>O</td>
+            <td align="left">Cycle Spot View</td>
+            <td></td>
+            <td>F12</td>
+            <td align="left">Toggle Sidebar Menu</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>P</td>
+            <td align="left">Toggle Grid/PushPin Mode</td>
+            <td></td>
+          </tr>
+        </table>
+      </div>
+      <div>
+        <br />
+        <div class="button"
+          onclick="window.open('https://storage.googleapis.com/gt_app/gt_print.html');">
+          Print
+        </div>
+      </div>
+      <div style="top: 6px; right: 6px; position: absolute">
+        <button class="Xbutton" onclick="GT.helpShow=false;helpDiv.style.display='none';">X</button>
+      </div>
+    </div>
+
+    <div id="rootSettingsDiv" style="
+          margin: 0;
+          top: 1px;
+          display: none;
+          background-color: #00000000;
+          padding: 0px;
+          text-align: center;
+          vertical-align: middle;
+          position: relative;
+          z-index: 600;
+        " class="roundBorder">
+      <div class="settingstab">
+        <button data-i18n="settings.General.label" id="generalbut" class="settingsTablinks active"
+          onclick="openSettingsTab(event, 'udpSettingsDiv')">General</button>
+        <button data-i18n="settings.Lookups.label" id="lookupbut" class="settingsTablinks"
+          onclick="openSettingsTab(event, 'lookupsSettingsDiv')">Lookups</button>
+        <button data-i18n="settings.Audio.label" class="settingsTablinks"
+          onclick="openSettingsTab(event, 'SpeechSettingsDiv')">Audio</button>
+        <button data-i18n="settings.Map.label" class="settingsTablinks"
+          onclick="openSettingsTab(event, 'mapSettingsDiv')">Map</button>
+        <button data-i18n="settings.Grids.label" class="settingsTablinks"
+          onclick="openSettingsTab(event, 'gridSettingsDiv')">Grids</button>
+        <button data-i18n="settings.Logging.label" class="settingsTablinks"
+          onclick="openSettingsTab(event, 'logSettingsDiv')">Logging</button>
+        <button data-i18n="settings.Alerts.label" class="settingsTablinks"
+          onclick="openSettingsTab(event, 'alertsDiv')">Alerts</button>
+        <button data-i18n="settings.OAMS.label" class="settingsTablinks"
+          onclick="openSettingsTab(event, 'chatSettingsDiv')">OAMS</button>
+        <button data-i18n="settings.Logbook.label" id="logbut" class="settingsTablinks"
+          onclick="openSettingsTab(event, 'logbookSettingsDiv')">Logbook</button>
+        <button data-i18n="settings.About.label" class="settingsTablinks" style="margin-right: 25px"
+          onclick="openSettingsTab(event, 'aboutDiv')">About</button>
+      </div>
+      <div id="udpSettingsDiv" class="settingsTabcontent" style="display: block">
+        <table align="center">
+          <tr>
+            <td colspan="3">
+              <div class="mapItem">
+                <table align="center">
+                  <tr>
+                    <td data-i18n="settings.general.AppStatus.label">Application Status</td>
+                  </tr>
+                  <tr>
+                    <td id="runningAppsDiv" class="roundBorderValue">WSJT-X is not running.</td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <table align="center">
+          <tr>
+            <td>
+              <div class="mapItem">
+                <table align="center">
+                  <tr>
+                    <td data-i18n="settings.general.UDP.Messages.label"><b>Receive UDP Messages</b></td>
+                  </tr>
+                  <tr>
+                    <td id="lastMsgTimeDiv">No messages yet.</td>
+                  </tr>
+                  <tr>
+                    <td id="secondsAgoMsg" class="roundBorderValue">Never</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label data-i18n="settings.general.UDP.Multicast.label" for="multicastEnable">Multicast?</label>
+                      <input title="Enable / Disable Local Network Multicast" type="checkbox" id="multicastEnable"
+                        onclick="setMulticastEnable(this);" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td id="multicastTD" >
+                      <label data-i18n="settings.general.UDP.IP.label" for="multicastIpInput">IP</label>
+                      <input id="multicastIpInput" type="text" class="inputTextValue" maxlength="255" size="16"
+                        onkeypress="return validIpKeys(event.charCode);"
+                        oninput=" if ( ValidateMulticast(this) ) setMulticastIp();   " />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label data-i18n="settings.general.UDP.Port.label" for="udpPortInput">Port</label>
+                      <input id="udpPortInput" type="text" class="inputTextValue" maxlength="5" size="5"
+                        onkeypress="return validNumberKeys(event.charCode);"
+                        oninput="if ( ValidatePort(this, null, CheckReceivePortIsNotForwardPort) ) setUdpPort();" />
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+            <td>
+              <div class="mapItem">
+                <table align="center">
+                  <tr>
+                    <td data-i18n="settings.general.Fwd.Messages.label1"><b>Forward UDP Messsages</b></td>
+                  </tr>
+                  <tr>
+                    <td data-i18n="settings.general.Fwd.Messages.label2"><i>e.g. GridTracker on another host</i></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label data-i18n="settings.general.Fwd.IP.label" for="udpForwardIpInput">IP</label>
+                      <input id="udpForwardIpInput" type="text" class="inputTextValue" maxlength="255" size="16"
+                        onkeypress="return validIpKeys(event.charCode);"
+                        oninput=" if ( ValidateIPaddress(this, udpForwardEnable) ) setForwardIp();   " />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label data-i18n="settings.general.Fwd.Port.label" for="udpForwardPortInput">Port</label>
+                      <input id="udpForwardPortInput" type="text" class="inputTextValue" maxlength="5" size="5"
+                        onkeypress="return validNumberKeys(event.charCode);"
+                        oninput="if ( ValidatePort(this, udpForwardEnable, CheckForwardPortIsNotReceivePort) )  setForwardPort();  " />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label data-i18n="settings.general.Fwd.Enabled.label" for="udpForwardEnable">Enabled?</label>
+                      <input title="Enable / Disable UDP Message forwarding" type="checkbox" id="udpForwardEnable"
+                        onclick="setUdpForwardEnable(this);" />
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+            <td>
+              <div class="mapItem" id="multiRigCRDiv" style="display:none;">
+                <table align="center">
+                  <tr align="center">
+                    <td data-i18n="settings.callroster.MultiRig.label" align="center">On QSO Reply</td>
+                  </tr>
+                  <tr align="center">
+                    <td data-i18n="settings.callroster.MultiRig.SwitchView.label" align="center">Switch View To Transmitting
+                      Instance</td>
+                  </tr>
+                  <tr align="center">
+                    <td colspan="2">
+                      <input type="checkbox" id="focusRigValue" onchange="changeFocusRigValue(this);" />
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <table align="center">
+          <tr>
+            <td>
+              <div id="CenterGridDiv" class="mapItem">
+                <table align="center">
+                  <tr>
+                    <td data-i18n="settings.general.CenterGrid.label">Center Gridsquare</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input id="homeQTHInput" type="text" class="inputTextValue" maxlength="8" size="8"
+                        oninput="{ if ( ValidateGridsquare(this,null) ) { setCenterGridsquare(); }}" />
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+            <td>
+              <div class="mapItem">
+                <table align="center">
+                  <tr>
+                    <td data-i18n="settings.general.DistanceUnits.label" title="Distance Units">Distance Units</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <select id="distanceUnit" value="KM" onchange="changeDistanceUnit();">
+                        <option data-i18n="settings.general.Distance.km" value="KM">Kilometres</option>
+                        <option data-i18n="settings.general.Distance.mi" value="MI">Statute Miles</option>
+                        <option data-i18n="settings.general.Distance.nm" value="NM">Nautical Miles</option>
+                        <option data-i18n="settings.general.Distance.dg" value="DG">Degrees</option>
+                      </select>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+            <td>
+              <div class="mapItem" id="haltTXDiv" style="display:none;">
+                <table align="center">
+                  <tr align="center">
+                    <td data-i18n="settings.callroster.MultiRig.label" align="center">On QSO Reply</td>
+                  </tr>
+                  <tr align="center">
+                    <td data-i18n="settings.callroster.MultiRig.HaltTx.label" align="center">Halt TX On All Other Instances</td>
+                  </tr>
+                  <tr align="center">
+                    <td colspan="2">
+                      <input type="checkbox" id="haltAllOnTxValue" onchange="changeHaltOntTxValue(this);" />
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <table align="center">
+          <tr>
+            <td>
+              <div class="mapItem">
+                <table align="center" title="Enable Decode Traffic Visual in Menu">
+                  <tr>
+                    <td data-i18n="settings.general.DecodeWaterfall.label">Decode Traffic Waterfall</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="checkbox" id="trafficDecode" onclick="changeTrafficDecode()" />
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <table align="center">
+          <tr>
+            <td>
+              <div class="mapItem">
+                <table align="center">
+                  <tr>
+                    <td>
+                      <div data-i18n="settings.general.ResetButtonPanel.label" class="button" onclick="setButtonPanelOrder(GT.defaultButtons)">
+                        Reset-Button-Panel
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+            <td>
+              <div class="mapItem">
+                <table align="center">
+                  <tr>
+                    <td data-i18n="settings.general.Language.label" title="Language">Language</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <select id="languageLocale" value="en" onchange="changeLocale();">
+                        <option value="en">English</option>
+                        <option value="cn">简体中文</option>
+                        <option value="cnt">繁體中文</option>
+                        <option value="de">Deutsch</option>
+                        <option value="fr">Français</option>
+                        <option value="it">Italiano</option>
+                        <option value="es">Español</option>
+                      </select>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <table align="center">
+        <tr>
+          <td>
+            <div class="mapItem">
+              <table align="center">
+                <tr>
+                  <td>
+                    <div data-i18n="settings.general.ClearAllSettings.label" class="button"
+                      onclick="if ( imSureCheck.checked ) { clearAndReload(); }">
+                      Clear All Settings!
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <label data-i18n="settings.general.ClearSettingSure.label" for="imSureCheck">Yes, I'm sure!</label>
+                    <input type="checkbox" id="imSureCheck" title="Must be checked to enable clearing of settings" />
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </td>
+          <td>
+            <div class="mapItem">
+              <table align="center">
+                <tr>
+                  <td>
+                    <div data-i18n="settings.general.ExportSettings.label" class="button" onclick="exportSettings();">
+                      Export Settings</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div data-i18n="settings.general.ImportSettings.label" 
+                      id="importSettingsButton" class="button" onclick="importSettings();">
+                      Import Settings
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <font id="importSettingsFile"></font>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div id="lookupsSettingsDiv" class="settingsTabcontent">
+      <div class="mapItem">
+        <table align="center">
+          <tr align="center">
+            <td data-i18n="settings.lookup.label" align="center" style="font-weight: bold; color: cyan">Callsign Lookup
+              Service</td>
+          </tr>
+          <tr align="center">
+            <td colspan="1">
+              <select id="lookupService" value="CALLOOK" onchange="lookupValueChanged();">
+                <option data-i18n="settings.lookup.Callook" value="CALLOOK">C A L L O O K (US only)</option>
+                <option data-i18n="settings.lookup.HamQTH" value="HAMQTH">HamQTH (Free Login Required)</option>
+                <option data-i18n="settings.lookup.QRZcom" value="QRZ">QRZ.com (Free and Paid Members Only)</option>
+                <option data-i18n="settings.lookup.QRZCQ" value="QRZCQ">QRZCQ.com (Paid Members Only)</option>
+              </select>
+            </td>
+          </tr>
+          <tr align="center" id="lookupCredentials" style="display: none">
+            <td data-i18n="settings.lookup.Username.label">Username</td>
+            <td><input id="lookupLogin" type="text" class="inputTextValue" size="8" oninput="lookupValueChanged();" /></td>
+            <td data-i18n="settings.lookup.Password.label">Password</td>
+            <td><input id="lookupPassword" type="password"    class="inputTextValue" size="8" oninput="lookupValueChanged();" /></td>
+            <td>
+              <div data-i18n="settings.lookup.QRZTest" class="button" onclick="GetSessionID(lookupQrzTestResult);">Test
+              </div>
+            </td>
+            <td id="lookupQrzTestResult">&nbsp;</td>
+          </tr>
+        </table>
+      </div>
+      <br />
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.lookup.AddData.label" align="center">Add Lookup Data to QSO Log event</td>
+          </tr>
+          <tr align="center">
+            <td title="When finsihing a QSO...&#10;add extra data from Lookup service">
+              <input type="checkbox" id="lookupMerge" onclick="changeLookupMerge(this)" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem" id="lookupMissingGridDiv">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.lookup.AddGrid.label" align="center">Add Lookup Grid if QSO Grid missing</td>
+          </tr>
+          <tr align="center">
+            <td title="Add Lookup Grid if QSO Grid Missing">
+              <input type="checkbox" id="lookupMissingGrid" onclick="changeLookupMerge(this)" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <br />
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.lookup.OpenOnTx.label" align="center">Open Lookup On Transmit</td>
+          </tr>
+          <tr align="center">
+            <td title="Open Lookup Window On Transmit">
+              <input type="checkbox" id="lookupOnTx" onclick="changelookupOnTx()" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem" id="lookupCloseLogDiv">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.lookup.CloseOnLog.label" align="center">Close Lookup After Logging</td>
+          </tr>
+          <tr align="center">
+            <td title="Close Lookup Window After Logging">
+              <input type="checkbox" id="lookupCloseLog" onclick="changelookupOnTx()" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem" id="lookupCallookPreferredDiv">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.lookup.CallookFirst.label" align="center">Use Callook before using other service
+            </td>
+          </tr>
+          <tr align="center">
+            <td title="Use Callook before using other service. Free Callook yields more data than free QRZ.">
+              <input type="checkbox" id="lookupCallookPreferred" onclick="lookupValueChanged()" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <br />
+          <div id="bigctyDiv" class="mapItem" style="display:none;" >
+             <div class="button" onclick="downloadCtyDat()">Update BIGCTY</div>
+             <div id="ctyDatStatus"></div>
+             <div id="ctyDatFinal"></div>
+          </div>
+      <div id="callsignDatabaseDiv" class="mapItem">
+        <table align="center" class="darkTable">
+          <tr>
+            <th data-i18n="settings.lookup.Databases.label" colspan="6" style="font-weight: bold; color: yellow">Callsign Databases</th>
+          </tr>
+          <tr>
+            <th data-i18n="settings.lookup.Databases.header">Database</th>
+            <th data-i18n="settings.lookup.Enabled.header">Enabled</th>
+            <th data-i18n="settings.lookup.LastDwnld.header">Last Download</th>
+            <th data-i18n="settings.lookup.Count.header">Count</th>
+          </tr>
+          <tr>
+            <td data-i18n="settings.lookup.db.ULS">US Callsigns</td>
+            <td>
+              <input type="checkbox" id="ulsUseEnable" onclick="ulsValuesChanged();" />
+            </td>
+            <td id="ulsUpdatedTd">Never</td>
+            <td id="ulsCountTd">0</td>
+          </tr>
+          <tr>
+            <td>Canada Callsigns</td>
+            <td>
+              <input type="checkbox" id="cacUseEnable" onclick="cacValuesChanged();" />
+            </td>
+            <td id="cacUpdatedTd">Never</td>
+            <td id="cacCountTd">0</td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.lookup.db.LoTW">Logbook of The World</td>
+            <td>
+              <input type="checkbox" id="lotwUseEnable" onclick="lotwValuesChanged();" />
+            </td>
+            <td id="lotwUpdatedTd">Never</td>
+            <td id="lotwCountTd">0</td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.lookup.db.eQSL">eQSL</td>
+            <td>
+              <input type="checkbox" id="eqslUseEnable" onclick="eqslValuesChanged();" />
+            </td>
+            <td id="eqslUpdatedTd">Never</td>
+            <td id="eqslCountTd">0</td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.lookup.db.OQRS">ClubLog OQRS</td>
+            <td>
+              <input type="checkbox" id="oqrsUseEnable" onclick="oqrsValuesChanged();" />
+            </td>
+            <td id="oqrsUpdatedTd">Never</td>
+            <td id="oqrsCountTd">0</td>
+          </tr>
+            </table>
+          </div>
+          <div id="featureControlDiv" class="mapItem">
+            <table align="center" class="darkTable">
+              <tr>
+                <th colspan="6" style="font-weight: bold; color: yellow">Feature Control</th>
+              </tr>
+              <tr>
+                <th>Feature</th>
+                <th>Enabled</th>
+                <th>Menu Button</th>
+              </tr>
+              <tr>
+                <td>POTA</td>
+                <td>
+                  <input type="checkbox" id="potaEnabled" onclick="changePotaEnable();" />
+                </td>
+                <td>
+                  <input type="checkbox" id="potaMenu" onclick="changePotaMenu();" />
+                </td>
+              </tr>
+              <tr>
+                <td>Clear on CQ</td>
+                <td>
+                  <input type="checkbox" id="clearOnCQ" onclick="changeClearOnCQ();" />
+                </td>
+              </tr>
+
+        </table>
+      </div>
+    </div>
+    <div id="SpeechSettingsDiv" class="settingsTabcontent">
+      <div class="roundBorder" style="border: 1px solid #666; margin: 2px; padding: 5px">
+        <div class="mapItem">
+          <table align="center">
+            <tr align="center">
+              <td data-i18n="settings.audio.TextToSpeech.label" align="center">Text-to-speech Voice</td>
+            </tr>
+            <tr align="center">
+              <td colspan="1" id="voicesDiv"></td>
+            </tr>
+          </table>
+        </div>
+        <br />
+        <div class="mapItem">
+          <table align="center">
+            <tr align="center">
+              <td data-i18n="settings.audio.Speech.Rate.label" align="center">Speech Rate</td>
+              <td align="center" id="speechRateTd">1</td>
+            </tr>
+            <tr align="center">
+              <td colspan="2">
+                <input type="range" min="0.1" max="10" value="1" step="0.1" class="slider" id="speechRate"
+                  oninput="changeSpeechValues()" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="mapItem">
+          <table align="center">
+            <tr>
+              <td data-i18n="settings.audio.Speech.Pitch.label" align="center">Speech Pitch</td>
+              <td align="center" id="speechPitchTd">1</td>
+            </tr>
+            <tr align="center">
+              <td colspan="2">
+                <input type="range" min="0" max="2" value="1" step="0.1" class="slider" id="speechPitch"
+                  oninput="changeSpeechValues()" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="mapItem">
+          <table align="center">
+            <tr>
+              <td data-i18n="settings.audio.Speech.Volume.label" align="center">Speech Volume</td>
+              <td align="center" id="speechVolumeTd">1</td>
+            </tr>
+            <tr align="center">
+              <td colspan="2">
+                <input type="range" min="0.1" max="1" value="1" step="0.05" class="slider" id="speechVolume"
+                  oninput="changeSpeechValues()" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="mapItem">
+          <table align="center">
+            <tr>
+              <td data-i18n="settings.audio.Speech.Phonetics.label"
+                title="Speak Callsigns and Gridsquares phonetically">Phonetics</td>
+            </tr>
+            <tr>
+              <td title="Speak Callsigns and Gridsquares phonetically">
+                <input type="checkbox" id="speechPhonetics" onclick="changeSpeechValues()" />
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="mapItem">
+        <table align="center">
+          <tr align="center">
+            <td data-i18n="settings.audio.Device.label" align="center">Audio Device</td>
+          </tr>
+          <tr align="center">
+            <td colspan="1">
+              <div id="soundCardDiv"></div>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <br />
+      <div class="mapItem" style="white-space: nowrap">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.audio.File.Volume.label" align="center">File Audio Volume</td>
+            <td align="center" id="audioVolumeTd">1</td>
+          </tr>
+          <tr align="center">
+            <td colspan="2">
+              <input type="range" min="0.00" max="1" value="1" step="0.01" class="slider" id="audioVolume"
+                oninput="changeAudioValues()" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <br />
+      <div class="mapItem" style="white-space: nowrap">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.audio.QSOLogEventFile.label" align="center">QSO Log Event Notification</td>
+          </tr>
+          <tr align="center">
+            <td>
+              <select id="logEventMedia" onchange="newLogEventSetting(this); alertLogMessage();"></select>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div id="logbookSettingsDiv" class="settingsTabcontent" style="padding: 5px">
+      <div style="padding: 5px" class="mapItem">
+        <div style="padding: 5px" class="mapItem"
+          title="Filter Logbook QSOs to include these Callsigns only&#10;(comma separated)">
+          <table align="center">
+            <tr>
+              <td data-i18n="settings.logbook.callsigns.label">Working Callsign(s)</td>
+            </tr>
+            <tr>
+              <td>
+                <label data-i18n="settings.logbook.callsigns.enable" for="workingCallsignEnable">Enable?</label>
+                <input title="Enable Filtering" type="checkbox" id="workingCallsignEnable"
+                  onclick="workingCallsignEnableChanged(this);" />
+              </td>
+            </tr>
+            <tr>
+              <td id="workingCallsignsTd">
+                <label data-i18n="settings.logbook.callsigns.callsigns" for="workingCallsignsValue">Callsign(s)</label>
+                <input id="workingCallsignsValue" type="text" class="inputTextValue" size="15"
+                  onkeypress="return validCallsignsKeys(event.charCode);"
+                  oninput="if ( ValidateCallsigns(this) ) workingCallsignsChanged(this);" />
+              </td>
+            </tr>
+            <tr>
+              <td id="qsoCallsignsFound"></td>
+            </tr>
+          </table>
+        </div>
+        <div style="padding: 5px" class="mapItem"
+        title="Filter Logbook QSOs to include these Grids only&#10;(comma separated)">
+        <table align="center">
+          <tr>
+            <td>Working Grid(s)</td>
+          </tr>
+          <tr>
+            <td>
+              <label for="workingGridEnable">Enable?</label>
+              <input title="Enable Filtering" type="checkbox" id="workingGridEnable"
+                onclick="workingGridEnableChanged(this);" />
+            </td>
+          </tr>
+          <tr>
+            <td id="workingGridsTd">
+              <label  for="workingGridsValue">Grid(s)</label>
+              <input id="workingGridsValue" type="text" class="inputTextValue" size="15"
+                onkeypress="return validGridKeys(event.charCode);"
+                oninput="if ( ValidateGrids(this) ) workingGridsChanged(this);" />
+            </td>
+          </tr>
+          <tr>
+            <td id="qsoGridsFound"></td>
+          </tr>
+        </table>
+      </div>
+        <br />
+        <div style="padding: 5px" class="mapItem" title="Filter Logbook QSOs from before this Date">
+          <table align="center">
+            <tr>
+              <td data-i18n="settings.logbook.date.label"><b>Working Date</b></td>
+            </tr>
+            <tr>
+              <td>
+                <label data-i18n="settings.logbook.date.enable" for="workingDateEnable">Enable?</label>
+                <input title="Enable Filtering" type="checkbox" id="workingDateEnable"
+                  onclick="workingDateEnableChanged(this);" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="roundBorderValue" style="margin-bottom:10px; width: auto; font-size: larger; font-weight: bold"
+                  id="workingDateString">
+                  No Date
+                </div>
+              </td>
+              <td></td>
+            </tr>
+
+            <tr>
+              <td id="workingDateTd" title="Date/Time is UTC">
+                <label data-i18n="settings.logbook.date.date" for="workingDateValue">Date</label> <input type="date" id="workingDateValue" value="1970-01-01" style="background-color: green; color: yellow;" onchange="workingDateChanged()" />
+                <label data-i18n="settings.logbook.date.time" for="workingTimeValue">Time</label> <input type="time" id="workingTimeValue" value="00:00" style="background-color: green; color: yellow;" onchange="workingDateChanged()" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <br />
+        <div data-i18n="settings.logbook.apply.label"
+          style="padding: 5px; display: none; font-size: larger; font-weight: bold; color: cyan"
+          id="applyCallsignsAndDateDiv" class="button" onclick="applyCallsignsAndDates();"
+          title="Apply Changes and Re-Import Logbook(s)">
+          Apply Changes
+        </div>
+      </div>
+      <br/>
+      <div  style="padding: 5px" class="mapItem">
+        <table align="center">
+          <tr>
+            <td> QSL Location Authority</td>
+          </tr>
+          <tr>
+            <td>
+              <select id="qslAuthority" onchange="qslAuthorityChanged();">
+                <option value="L">LoTW</option>
+                <option value="Q">QRZ.com</option>
+                <option value="e">eQSL</option>
+                <option value="C">Clublog</option>
+                <option value="O">Other</option>
+                <option value="0">Last Loaded</option>
+                <option value="1">None</option>
+              </select>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem" style="padding: 5px">
+        <table align="center">
+          <tr>
+            <td align="center">Logbook Items Per Page</td>
+          </tr>
+          <tr>
+            <td align="center" id="qsoItemsPerPageTd">100</td>
+          </tr>
+          <tr align="center">
+            <td colspan="2">
+              <input type="range" min="50" max="1000" value="100" step="50" class="slider" id="qsoItemsPerPageValue"
+                oninput="changeLogbookPage()" onmouseup="updateLogbook()" onkeyup="updateLogbook()" />
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div id="gridSettingsDiv" class="settingsTabcontent">
+      <div class="mapItem" style="padding:10px;">
+        <div class="mapItem" style="height:49px;">
+          <table align="center">
+            <tr align="center">
+              <td data-i18n="settings.grids.reset.title" align="center"><b><i>Gridsquare Colors</i></b>
+            </tr>
+            <tr align="center">
+              <td title="Reset Gridsquare Colors To Default">
+                <div data-i18n="settings.grids.reset.label" class="button" onclick="resetLegendColors()">Reset Colors
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="mapItem" id="QSOgridDiv">
+          <table align="center">
+            <tr align="center">
+              <td align="center" data-i18n="settings.grids.QSO.label"><b>QSO / Worked</b></td>
+            </tr>
+            <tr align="center">
+              <td colspan="2">
+                <input type="color" id="QSOgridValue" value="#000000" oninput="changeLegendColor(this)" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="mapItem" id="QSLgridDiv">
+          <table align="center">
+            <tr align="center">
+              <td align="center" data-i18n="settings.grids.QSL.label"><b>QSL / Confirmed</b></td>
+            </tr>
+            <tr align="center">
+              <td colspan="2">
+                <input type="color" id="QSLgridValue" value="#000000" oninput="changeLegendColor(this)" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="mapItem" id="QSXgridDiv">
+          <table align="center">
+            <tr align="center">
+              <td align="center" data-i18n="settings.grids.QSX.label"><b>QSX / Station-2-Station</b></td>
+            </tr>
+            <tr align="center">
+              <td colspan="2">
+                <input type="color" id="QSXgridValue" value="#000000" oninput="changeLegendColor(this)" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <br />
+        <div class="mapItem" id="CQgridDiv">
+          <table align="center">
+            <tr align="center">
+              <td align="center" data-i18n="settings.grids.CQ.label"><b>'CQ' Stations</b></td>
+            </tr>
+            <tr align="center">
+              <td colspan="2">
+                <input type="color" id="CQgridValue" value="#000000" oninput="changeLegendColor(this)" />
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="mapItem" id="CQDXgridDiv">
+          <table align="center">
+            <tr align="center">
+              <td align="center" data-i18n="settings.grids.CQDX.label"><b>'CQ DX' Stations</b></td>
+            </tr>
+            <tr align="center">
+              <td colspan="2">
+                <input type="color" id="CQDXgridValue" value="#000000" oninput="changeLegendColor(this)" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="mapItem" id="QRZgridDiv">
+          <table align="center">
+            <tr align="center">
+              <td align="center" data-i18n="settings.grids.QRZ.label"><b>QRZ / Your Traffic</b></td>
+            </tr>
+            <tr align="center">
+              <td colspan="2">
+                <input type="color" id="QRZgridValue" value="#000000" oninput="changeLegendColor(this)" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="mapItem" id="QTHgridDiv">
+          <table align="center">
+            <tr align="center">
+              <td align="center" data-i18n="settings.grids.QTH.label"><b>QTH / Home Gridsquare</b></td>
+            </tr>
+            <tr align="center">
+              <td colspan="2">
+                <input type="color" id="QTHgridValue" value="#000000" oninput="changeLegendColor(this)" />
+              </td>
+            </tr>
+          </table>
+        </div>
+
+      </div>
+
+      <br />
+      <br />
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.grids.spotsOverGrids.label" title="Place RX Spots over Grid Layer">PSK-Spots Over
+              Grids</td>
+          </tr>
+          <tr>
+            <td title="Place RX Spots over Grid Layer">
+              <input type="checkbox" id="spotMergeValue" onclick="changeSpotValues();redrawSpots();" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.grids.opacity.label" align="center">Grid Opacity</td>
+            <td align="left" id="showOpacityTd">10%</td>
+          </tr>
+          <tr align="center">
+            <td colspan="2">
+              <input type="range" min="16" max="255" value="136" step="1" class="slider" id="opacityValue"
+                oninput="changeGridOpacity()" onkeyup="redrawGrids()" onmouseup="redrawGrids()" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.grids.splitQSL.label" align="center">Split QSL Grids</td>
+          </tr>
+          <tr align="center">
+            <td title="Toggle Split QSL Grids with Live Grids">
+              <input type="checkbox" id="splitQSLValue" onclick="changeSplitQSL()" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.grids.AutoMouseOver.label" align="center">Auto Mouseover Grids</td>
+          </tr>
+          <tr align="center">
+            <td title="Toggle Auto Mouseover Grid Tables">
+              <input type="checkbox" id="mouseOverValue" onclick="changeMouseOverValue()" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <br />
+      <div class="mapItem" id="decayRateDiv">
+        <table align="center">
+          <tr align="center">
+            <td data-i18n="settings.grids.liveDecay.label" align="center">Live Grid Decay</td>
+          </tr>
+          <tr>
+            <td align="center" id="decayRateTd">10m</td>
+          </tr>
+          <tr align="center">
+            <td colspan="2">
+              <input type="range" min="0" max="86400" value="600" step="60" class="slider" id="gridDecay"
+                oninput="changeGridDecay()" onkeyup="redrawGrids()" onmouseup="redrawGrids()" />
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div id="mapSettingsDiv" class="settingsTabcontent"
+      style="background-color: #00000044; text-shadow: 0 0 5px #000000ff">
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.map.current.label" title="Change map">Current Map</td>
+          </tr>
+          <tr>
+            <td>
+              <select id="mapSelect" value="terrain-background" onchange="changeMapValues();"></select>
+              <select id="offlineMapSelect" value="terrain-background" onchange="changeOfflineMap();"></select>
+            </td>
+          </tr>
+          <tr id="mapApiKeyTr">
+            <td>
+              <label data-i18n="settings.logging.QRZcom.details.apikey" for="mapApiKeyInput">API Key</label>
+              <input id="mapApiKeyInput" type="test" class="inputTextValue"  size="21" oninput="mapApiKeyInputChanged()" /><br/>
+              <div id="mapApiKeyApplyDiv" data-i18n="settings.Update.label" class="button" onclick="changeMapLayer()">Apply Changes
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.map.animatePaths.label" colspan="1" align="center">Animate Active Paths</td>
+          </tr>
+          <tr align="center">
+            <td style="padding: 0px; margin: 0px" title="Toggle Traffic Path Animation">
+              <input type="checkbox" id="animateValue" onclick="changeAnimate()" />
+            </td>
+          </tr>
+          <tr id="animationSpeedTd">
+            <td>
+              <input title="Animation Speed" type="range" min="1" max="20" value="10" step="1" class="slider"
+                id="animateSpeedValue" oninput="changeAnimateSpeedValue()" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.map.transparency.label" align="center" colspan="2">Map Settings Transparency</td>
+          </tr>
+          <tr>
+            <td align="center" id="mapTransTd">50%</td>
+          </tr>
+          <tr align="center">
+            <td colspan="2">
+              <input type="range" min="0" max="1" value="0.5" step="0.01" class="slider" id="mapTransValue"
+                oninput="mapTransChange();" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <br />
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.map.QSXPath.width.label" align="center">QSX Path Width</td>
+            <td align="left" id="pathWidthTd">1.5</td>
+          </tr>
+          <tr align="center">
+            <td colspan="2">
+              <input type="range" min="0.0" max="8" value="1.5" step="0.1" class="slider" id="pathWidthValue"
+                oninput="changePathValues()" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem" id="pathColorDiv">
+        <table align="center">
+          <tr align="center">
+            <td data-i18n="settings.map.QSXPath.color.label" align="center"><b>QSX Path Color</b></td>
+          </tr>
+          <tr align="center">
+            <td colspan="2">
+              <input type="range" min="0" max="361" value="0" class="slider" id="pathColorValue"
+                oninput="changePathValues()" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.map.QRZPath.width.label" align="center">QRZ Path Width</td>
+            <td align="left" id="qrzPathWidthTd">1.5</td>
+          </tr>
+          <tr align="center">
+            <td colspan="2">
+              <input type="range" min="0.0" max="10" value="1.5" step="0.1" class="slider" id="qrzPathWidthValue"
+                oninput="changePathValues()" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem" id="qrzPathColorDiv">
+        <table align="center">
+          <tr align="center">
+            <td data-i18n="settings.map.QRZPath.color.label" align="center"><b>QRZ Path Color</b></td>
+          </tr>
+          <tr align="center">
+            <td colspan="2">
+              <input type="range" min="0" max="361" value="360" class="slider" id="qrzPathColorValue"
+                oninput="changePathValues()" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <br />
+
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.map.GraylineDarkness.label" align="center">Grayline Darkness</td>
+            <td align="left" id="showDarknessTd">10%</td>
+          </tr>
+          <tr align="center">
+            <td colspan="2">
+              <input type="range" min="0.03" max="0.70" value="0.1" step="0.01" class="slider" id="graylineValue"
+                oninput="changeGrayline()" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.map.Brightness.label" align="center">Brightness</td>
+          </tr>
+          <tr align="center">
+            <td colspan="2">
+              <input type="range" min="0" max="1" value="1" step="0.01" class="slider" id="brightnessValue"
+                oninput="changeMapValues()" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.map.MergeAward.label" align="center">Merge Award Overlay</td>
+          </tr>
+          <tr align="center">
+            <td title="Toggle Merge Award Overlay">
+              <input type="checkbox" id="mergeOverlayValue" onclick="changeMergeOverlayValue()" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.map.FitMapToQRZ.label" align="center">Fit Map To QRZ</td>
+          </tr>
+          <tr align="center">
+            <td title="Toggle Fit Map To QRZ">
+              <input type="checkbox" id="fitQRZvalue" onclick="changeFitQRZvalue()" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <br />
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.map.CQHighlight.label" align="center">'CQ' Highlighting</td>
+          </tr>
+          <tr align="center">
+            <td title="Toggle 'CQ XX' Highlighting">
+              <input type="checkbox" id="CqHiliteValue" onclick="changeCqHiliteValue(this);" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.map.MissingGrid.label" align="center">QRZ Missing Grid<br />DXCC Fallback</td>
+          </tr>
+          <tr align="center">
+            <td title="If a station grid is not known use the DXCC">
+              <input type="checkbox" id="qrzDxccFallbackValue" onclick="changeQrzDxccFallbackValue();" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem" id="spotPathColorDiv">
+        <table align="center">
+          <tr align="center">
+            <td data-i18n="settings.map.RXSpotPath.color.label" align="center"><b>PSK-Spot Color</b></td>
+          </tr>
+          <tr align="center">
+            <td colspan="2">
+              <input type="range" min="-1" max="361" value="-1" class="slider" id="spotPathColorValue"
+                oninput="spotPathChange();" onkeyup="redrawSpots();" onmouseup="redrawSpots();" />
+            </td>
+          </tr>
+          <tr align="center">
+            <td data-i18n="settings.map.RXSpotPath.color.default" id="spotPathInfoTd">PSK-Reporter Palette</td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem" id="spotPathsDiv">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.map.RXSpotPath.enable.label" title="Toggle flight paths to spots">PSK-Spot Paths
+            </td>
+          </tr>
+          <tr>
+            <td title="Toggle flight paths to spots">
+              <input type="checkbox" id="spotPathsValue" onclick="changeSpotValues();redrawSpots();" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <br />
+      <div class="mapItem" id="spotPathWidthDiv">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.map.RXSpotPath.width.label" align="center">PSK-Spot Path Width</td>
+            <td align="left" id="spotWidthTd">1.5</td>
+          </tr>
+          <tr align="center">
+            <td colspan="2">
+              <input type="range" min="0.0" max="5" value="1.5" step="0.05" class="slider" id="spotWidthValue"
+                oninput="spotPathChange();" onkeyup="redrawSpots();" onmouseup="redrawSpots();" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem" id="predOpacityDiv">
+        <table align="center">
+          <tr>
+            <td align="center">Prediction Layer Opacity</td>
+            <td align="left" id="predOpacityTd">0.3</td>
+          </tr>
+          <tr align="center">
+            <td colspan="2">
+              <input type="range" min="0.05" max="1" value="0.3" step="0.01" class="slider" id="predOpacityValue"
+                oninput="changePredOpacityValue();" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <br />
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.map.AutoNight.enable.label" title="Night Map">Auto Night Map</td>
+          </tr>
+          <tr align="center">
+            <td title="Toggle Automatic Night Map Switching">
+              <input type="checkbox" id="nightMapEnable" onclick="changeNightMapEnable(this);" />
+            </td>
+          </tr>
+
+          <tr>
+            <td  id="nightMapTd">
+              <div class="mapItem">
+                <table align="center">
+                  <tr>
+                    <td data-i18n="settings.map.NightMap.select.label" title="Change map">Night Map</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <select id="mapNightSelect" value="18" onchange="changeMapNightValues();"></select>
+                      <select id="offlineMapNightSelect" value="terrain-background" onchange="changeOfflineNightMap();"></select>
+                    </td>
+                  </tr>
+                  <tr id="nightMapApiKeyTr">
+                    <td>
+                      <label data-i18n="settings.logging.QRZcom.details.apikey" for="nightMapApiKeyInput">API Key</label>
+                      <input id="nightMapApiKeyInput" type="test" class="inputTextValue"  size="21" oninput="nightMapApiKeyInputChanged()" /><br/>
+                      <div id="nightMapApiKeyApplyDiv" data-i18n="settings.Update.label" class="button" onclick="changeMapLayer()">Apply Changes
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <br />
+              <div class="mapItem" id="pathNightColorDiv">
+                <table align="center">
+                  <tr align="center">
+                    <td data-i18n="settings.map.NightQSXPath.color.label" align="center"><b>Night QSX Path Color</b>
+                    </td>
+                  </tr>
+                  <tr align="center">
+                    <td colspan="2">
+                      <input type="range" min="0" max="361" value="0" class="slider" id="nightPathColorValue"
+                        oninput="changeMapNightPathValues()" />
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <div class="mapItem" id="pathNightQrzColorDiv">
+                <table align="center">
+                  <tr align="center">
+                    <td data-i18n="settings.map.NightQRZPath.color.label" align="center"><b>Night QRZ Path Color</b>
+                    </td>
+                  </tr>
+                  <tr align="center">
+                    <td colspan="2">
+                      <input type="range" min="0" max="361" value="0" class="slider" id="nightQrzPathColorValue"
+                        oninput="changeMapNightPathValues()" />
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <div class="mapItem" id="spotNightPathColorDiv">
+                <table align="center">
+                  <tr align="center">
+                    <td data-i18n="settings.map.NightRXSpot.color.label" align="center"><b>Night PSK-Spot Color</b></td>
+                  </tr>
+                  <tr align="center">
+                    <td colspan="2">
+                      <input type="range" min="-1" max="361" value="-1" class="slider" id="spotNightPathColorValue"
+                        oninput="spotPathChange();" onkeyup="redrawSpots();" onmouseup="redrawSpots();" />
+                    </td>
+                  </tr>
+                  <tr align="center">
+                    <td data-i18n="settings.map.NightRXSpot.color.default" id="spotNightPathInfoTd">PSK-Reporter Palette
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <br />
+              <div class="mapItem">
+                <table align="center">
+                  <tr>
+                    <td data-i18n="settings.map.NightBrightness.label" align="center">Night Brightness</td>
+                  </tr>
+                  <tr align="center">
+                    <td colspan="2">
+                      <input type="range" min="0" max="1" value="1" step="0.01" class="slider" id="nightBrightnessValue"
+                        oninput="changeMapNightValues()" />
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div id="logSettingsDiv" class="settingsTabcontent">
+        <table class="darkTable" align="center">
+          <tr>
+            <th data-i18n="settings.logging.tableheader.source">Source/Sync</th>
+            <th data-i18n="settings.logging.tableheader.menu">Menu?</th>
+            <th data-i18n="settings.logging.tableheader.startup">Startup?</th>
+            <th data-i18n="settings.logging.tableheader.log">Log?</th>
+            <th data-i18n="settings.logging.tableheader.details">Details</th>
+            <th data-i18n="settings.logging.tableheader.test">Test</th>
+            <th data-i18n="settings.logging.tableheader.result">Result</th>
+          </tr>
+          <tr>
+            <td data-i18n="settings.logging.gridtracker.source">GridTracker2</td>
+            <td></td>
+            <td>
+              <input type="checkbox" checked="false" id="loadGTCheckBox" onclick="adifStartupCheckBoxChanged(this);" />
+            </td>
+            <td>
+              <input type="checkbox" checked="false" id="logGTqsoCheckBox" onclick="adifLogQsoCheckBoxChanged(this);" />
+            </td>
+            <td data-i18n="settings.logging.gridtracker.details">GridTracker2 QSO Logfile</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.logging.LocalFiles.source">Local File(s)</td>
+            <td>
+              <input type="checkbox" checked="false" id="buttonAdifCheckBox" onclick="adifMenuCheckBoxChanged(this);" />
+            </td>
+            <td>
+              <input type="checkbox" checked="false" id="loadAdifCheckBox"
+                onclick="adifStartupCheckBoxChanged(this);" />
+            </td>
+            <td></td>
+            <td>
+              <div id="selectFileOnStartupDiv" style="display: none">
+                <table align="center" class="subtable">
+                  <tr>
+                    <td>
+                      <div data-i18n="settings.logging.LocalFiles.details.add" class="button" id="selectAdifButton">Add File</div>
+                    </td>
+                    <td>
+                      <div id="startupLogFileDiv"></div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr id="pskTr">
+            <td data-i18n="settings.logging.PSKReporter.source">PSK-Reporter</td>
+            <td>
+              <input type="checkbox" checked="false" id="buttonPsk24CheckBox"
+                onclick="adifMenuCheckBoxChanged(this);" />
+            </td>
+            <td>
+              <input type="checkbox" checked="false" id="loadPsk24CheckBox"
+                onclick="adifStartupCheckBoxChanged(this);" />
+            </td>
+            <td></td>
+            <td>
+              <div data-i18n="settings.logging.PSKReporter.details" id="pskDaysDiv">24 Hour History</div>
+            </td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.logging.QRZcom.source">QRZ.com</td>
+            <td>
+              <input type="checkbox" checked="false" id="buttonQRZCheckBox" onclick="adifMenuCheckBoxChanged(this);" />
+            </td>
+            <td>
+              <input type="checkbox" checked="false" id="loadQRZCheckBox" onclick="adifStartupCheckBoxChanged(this);" />
+            </td>
+            <td>
+              <input type="checkbox" checked="false" id="logQRZqsoCheckBox"
+                onclick="adifLogQsoCheckBoxChanged(this);" />
+            </td>
+            <td>
+              <label data-i18n="settings.logging.QRZcom.details.apikey" for="qrzApiKey">API Key</label>
+              <input id="qrzApiKey" type="password" class="inputTextValue" maxlength="19" size="21"
+                oninput="ValidateQrzApi(this); adifTextValueChange(this);" />
+            </td>
+            <td>
+              <div data-i18n="settings.logging.QRZcom.test.button" class="button"
+                onclick="if ( ValidateQrzApi(qrzApiKey ) ) grabQrzComLog(true);">Test</div>
+            </td>
+            <td id="qrzTestResult"></td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.logging.ClubLog.source">ClubLog</td>
+            <td>
+              <input type="checkbox" checked="false" id="buttonClubCheckBox" onclick="adifMenuCheckBoxChanged(this);" />
+            </td>
+            <td>
+              <input type="checkbox" checked="false" id="loadClubCheckBox"
+                onclick="adifStartupCheckBoxChanged(this);" />
+            </td>
+            <td>
+              <input type="checkbox" checked="false" id="logClubqsoCheckBox"
+                onclick="adifLogQsoCheckBoxChanged(this);" />
+            </td>
+            <td>
+              <label data-i18n="settings.logging.ClubLog.details.callsign" for="clubCall">Callsign</label>
+              <input id="clubCall" type="text" class="inputTextValue" size="8" oninput=" ValidateText(this);
+                  adifTextValueChange(this);" />
+              <label data-i18n="settings.logging.ClubLog.details.password" for="clubPassword">Password</label>
+              <input id="clubPassword" type="password" class="inputTextValue" size="8"
+                oninput=" ValidateText(this); adifTextValueChange(this);" />
+              <br />
+              <label data-i18n="settings.logging.ClubLog.details.email" for="clubEmail">Email</label>
+              <input id="clubEmail" type="text" class="inputTextValue" size="20"
+                oninput="ValidateText(this); adifTextValueChange(this);" />
+            </td>
+            <td>
+              <div data-i18n="settings.logging.ClubLog.test.button" class="button"
+                onclick="if ( ValidateText(clubEmail) && ValidateText(clubPassword) ) grabClubLog(true);">
+                Test
+              </div>
+            </td>
+            <td id="clubTestResult"></td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.logging.HRDLogNet.source">HRDLOG.net</td>
+            <td></td>
+            <td></td>
+            <td>
+              <input type="checkbox" checked="false" id="logHRDLOGqsoCheckBox"
+                onclick="adifLogQsoCheckBoxChanged(this);" />
+            </td>
+            <td>
+              <label data-i18n="settings.logging.HRDLogNet.details.callsign" for="HRDLOGCallsign">Callsign</label>
+              <input id="HRDLOGCallsign" type="text" class="inputTextValue" size="12"
+                oninput="ValidateText(this); adifTextValueChange(this);" />
+              <label data-i18n="settings.logging.HRDLogNet.details.upcode" for="HRDLOGUploadCode">Upload Code</label>
+              <input id="HRDLOGUploadCode" type="password" class="inputTextValue" size="8"
+                oninput=" ValidateText(this); adifTextValueChange(this);" />
+              <br />
+              <a href="http://www.hrdlog.net/docs/Tips.aspx#upcode" target="_blank"
+                data-i18n="settings.logging.HRDLogNet.details.help.label"
+                title="Click to learn how to get upload code">*** How to get upload code ***</a>
+            </td>
+            <td>
+              <div data-i18n="settings.logging.HRDLogNet.test.button" class="button"
+                onclick="if ( ValidateText(HRDLOGCallsign) && ValidateText(HRDLOGUploadCode) ) hrdCredentialTest(true);">
+                Test
+              </div>
+            </td>
+            <td id="HRDLogTestResult"></td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.logging.CloudLog.source">Cloudlog</td>
+            <td></td>
+            <td></td>
+            <td>
+              <input type="checkbox" checked="false" id="logCloudlogQSOCheckBox"
+                onclick="adifLogQsoCheckBoxChanged(this);" />
+            </td>
+            <td>
+              <label data-i18n="settings.logging.CloudLog.details.URL" for="CloudlogURL">URL</label>
+              <input id="CloudlogURL" type="text" class="inputTextValue" size="35"
+                oninput="ValidateText(this); CloudLogValidateURL(false); adifTextValueChange(this);" />
+              <br />
+              <label data-i18n="settings.logging.CloudLog.details.API" for="CloudlogAPI">API Key</label>
+              <input id="CloudlogAPI" type="password" class="inputTextValue" size="12"
+                oninput="ValidateText(this); adifTextValueChange(this);" />
+              <br />
+              <label data-i18n="settings.logging.CloudLog.details.StationProfile" for="CloudlogStationProfile">Station Profile</label>
+              <select id="CloudlogStationProfile" size="1"
+                onChange="CloudLogProfileChanged(this)" />
+                <option> </option>
+              </select>
+            </td>
+            <td>
+              <div data-i18n="settings.logging.CloudLog.test.button" class="button"
+                onclick="CloudlogTest(true);">
+                Test
+              </div>
+            </td>
+            <td id="CloudlogTestResult"></td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.logging.eQSLcc.source">eQSL.cc</td>
+            <td></td>
+            <td></td>
+            <td>
+              <input type="checkbox" checked="false" id="logeQSLQSOCheckBox"
+                onclick="adifLogQsoCheckBoxChanged(this);" />
+            </td>
+            <td>
+              <label data-i18n="settings.logging.eQSLcc.details.user" for="eQSLUser">User</label>
+              <input id="eQSLUser" type="text" class="inputTextValue" size="8"
+                oninput="ValidateText(this); adifTextValueChange(this);" />
+              <label data-i18n="settings.logging.eQSLcc.details.password" for="eQSLPassword">Password</label>
+              <input id="eQSLPassword" type="password" class="inputTextValue" size="8"
+                oninput=" ValidateText(this); adifTextValueChange(this);" /><br />
+              <label data-i18n="settings.logging.eQSLcc.details.QTHnick" for="nicknameeQSLCheckBox">QTH Nickname</label>
+              <input type="checkbox" checked="false" id="nicknameeQSLCheckBox"
+                onclick="adifNicknameCheckBoxChanged(this);" />
+              <input id="eQSLNickname" style="display: none" type="text" class="inputTextValue" size="12"
+                oninput=" ValidateText(this); adifTextValueChange(this);" />
+            </td>
+            <td>
+              <div data-i18n="settings.logging.eQSLcc.test.button" class="button"
+                onclick="if ( ValidateText(eQSLUser) && ValidateText(eQSLPassword) ) eQSLTest(true);">
+                Test
+              </div>
+            </td>
+            <td id="eQSLTestResult"></td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.logging.LoTW.source">LotW</td>
+            <td>
+              <input type="checkbox" checked="false" id="buttonLOTWCheckBox" onclick="adifMenuCheckBoxChanged(this);" />
+            </td>
+            <td>
+              <input type="checkbox" checked="false" id="loadLOTWCheckBox"
+                onclick="adifStartupCheckBoxChanged(this);" />
+            </td>
+            <td>
+              <input type="checkbox" checked="false" id="logLOTWqsoCheckBox"
+                onclick="adifLogQsoCheckBoxChanged(this);" />
+            </td>
+            <td>
+              <label data-i18n="settings.logging.LoTW.details.login" for="lotwLogin">Login</label>
+              <input id="lotwLogin" type="text" class="inputTextValue" size="8" oninput="ValidateText(this);
+                  adifTextValueChange(this);" />
+              <label data-i18n="settings.logging.LoTW.details.password" for="lotwPassword">Password</label>
+              <input id="lotwPassword" type="password" class="inputTextValue" size="8"
+                oninput="ValidateText(this); adifTextValueChange(this);" /><br />
+              <div id="lotwUpload" style="display: none">
+                <div data-i18n="settings.logging.LoTW.details.TQSLPath" class="button" id="selectTQSLButton">TQSL Path
+                </div>
+                <text id="tqslFileDiv" style="margin-top: 2px; padding: 2px" class="roundBorderValue">No file
+                  selected</text><br />
+                <label data-i18n="settings.logging.LoTW.details.TQSLPass" for="lotwTrusted">TQSL Password</label>
+                <input id="lotwTrusted" type="password" class="inputTextValue" size="8"
+                  oninput="ValidateText(this); adifTextValueChange(this);" /><br />
+                <label data-i18n="settings.logging.LoTW.details.station" for="lotwStation">Station Name</label>
+                <select id="lotwStation" class="inputTextValue"
+                  onchange="ValidateText(this); adifTextValueChange(this);"></select>
+              </div>
+            </td>
+            <td>
+              <div data-i18n="settings.logging.LoTW.test.downloadButton" class="button"
+                onclick="if ( ValidateText(lotwLogin) && ValidateText(lotwPassword) ) grabLOtWLog(true);">
+                Test Download
+              </div>
+              <br />
+              <div data-i18n="settings.logging.LoTW.test.TQSLButton" id="trustedTestButton" style="margin-top: 25px"
+                class="button" onclick="testTrustedQSL(true);">
+                Test TQSL
+              </div>
+            </td>
+            <td id="lotwTestResult"></td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.logging.HamCQ.source">HamCQ.cn</td>
+            <td></td>
+            <td></td>
+            <td>
+              <input type="checkbox" checked="false" id="logHamCQqsoCheckBox"
+                onclick="adifLogQsoCheckBoxChanged(this);" />
+            </td>
+            <td>
+              <label data-i18n="settings.logging.HamCQ.details.apiKey" for="HamCQApiKey">API Key</label>
+              <input id="HamCQApiKey" type="password" class="inputTextValue" size="21"
+                oninput=" ValidateText(this); adifTextValueChange(this);" />
+            
+            </td>
+            <td>
+              <div data-i18n="settings.logging.HamCQ.test.button" class="button"
+                onclick="if ( ValidateText(HamCQApiKey) ) HamCQTest(true);">
+                Test
+              </div>
+            </td>
+            <td id="HamCQTestResult"></td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.logging.N1MM.source">N1MM Logger+</td>
+            <td></td>
+            <td></td>
+            <td>
+              <input type="checkbox" checked="false" class="inputTextValue" id="buttonN1MMCheckBox"
+                onclick=" ValidateIPaddress(N1MMIpInput,this); ValidatePort(N1MMPortInput,this, null ); n1mmLoggerChanged(); " />
+            </td>
+            <td>
+              <label data-i18n="settings.logging.N1MM.details.IP" for="N1MMIpInput">IP</label>
+              <input id="N1MMIpInput" type="text" class="inputTextValue" maxlength="15" size="15"
+                onkeypress='return validIpKeys(event.charCode);' oninput="ValidateIPaddress(this,buttonN1MMCheckBox);
+                  n1mmLoggerChanged(); " />
+              <label data-i18n="settings.logging.N1MM.details.Port" for="N1MMPortInput">Port</label>
+              <input id="N1MMPortInput" type="text" class="inputTextValue" maxlength="5" size="5"
+                onkeypress='return validNumberKeys(event.charCode);'
+                oninput="ValidatePort(this,buttonN1MMCheckBox, null ); n1mmLoggerChanged(); " />
+            </td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.logging.Log4OM.source">Log4OM</td>
+            <td></td>
+            <td></td>
+            <td>
+              <input type="checkbox" checked="false" class="inputTextValue" id="buttonLog4OMCheckBox"
+                onclick=" ValidateIPaddress(log4OMIpInput,this); ValidatePort(log4OMPortInput,this, null ); log4OMLoggerChanged(); " />
+            </td>
+            <td>
+              <label data-i18n="settings.logging.Log4OM.details.IP" for="log4OMIpInput">IP</label>
+              <input id="log4OMIpInput" type="text" class="inputTextValue" maxlength="15" size="15"
+                onkeypress='return validIpKeys(event.charCode);'
+                oninput="ValidateIPaddress(this,buttonLog4OMCheckBox); log4OMLoggerChanged(); " />
+              <label data-i18n="settings.logging.Log4OM.details.Port" for="log4OMPortInput">Port</label>
+              <input id="log4OMPortInput" type="text" class="inputTextValue" maxlength="5" size="5" onkeypress='return
+                  validNumberKeys(event.charCode);' oninput="ValidatePort(this,buttonLog4OMCheckBox, null );
+                  log4OMLoggerChanged(); " />
+            </td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.logging.N3FJP.source">N3FJP Loggers</td>
+            <td></td>
+            <td></td>
+            <td>
+              <input type="checkbox" checked="false" class="inputTextValue" id="buttonacLogCheckBox"
+                onclick=" ValidateIPaddress(acLogIpInput,this); ValidatePort(acLogPortInput,this, null ); acLogLoggerChanged(); " />
+            </td>
+            <td>
+              <label data-i18n="settings.logging.N3FJP.details.IP" for="acLogIpInput">IP</label>
+              <input id="acLogIpInput" type="text" class="inputTextValue" maxlength="15" size="15"
+                onkeypress='return validIpKeys(event.charCode);' oninput="ValidateIPaddress(this,buttonacLogCheckBox);
+                  acLogLoggerChanged(); " />
+              <label data-i18n="settings.logging.N3FJP.details.Port" for="acLogPortInput">Port</label>
+              <input id="acLogPortInput" type="text" class="inputTextValue" maxlength="5" size="5"
+                onkeypress='return validNumberKeys(event.charCode);'
+                oninput="ValidatePort(this,buttonacLogCheckBox, null ); acLogLoggerChanged(); " />
+            </td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.logging.DXKeeper.source">DXKeeper</td>
+            <td></td>
+            <td></td>
+            <td>
+              <input type="checkbox" checked="false" class="inputTextValue" id="buttondxkLogCheckBox"
+                onclick=" ValidateIPaddress(dxkLogIpInput,this); ValidatePort(dxkLogPortInput,this, null ); dxkLogLoggerChanged(); " />
+            </td>
+            <td>
+              <label data-i18n="settings.logging.DXKeeper.details.IP" for="dxkLogIpInput">IP</label>
+              <input id="dxkLogIpInput" type="text" class="inputTextValue" maxlength="15" size="15"
+                onkeypress='return validIpKeys(event.charCode);'
+                oninput="ValidateIPaddress(this,buttondxkLogCheckBox); dxkLogLoggerChanged(); " />
+              <label data-i18n="settings.logging.DXKeeper.details.Port" for="dxkLogPortInput">Port</label>
+              <input id="dxkLogPortInput" type="text" class="inputTextValue" maxlength="5" size="5" onkeypress='return
+                  validNumberKeys(event.charCode);' oninput="ValidatePort(this,buttondxkLogCheckBox, null );
+                  dxkLogLoggerChanged(); " />
+            </td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.logging.HRDLogbook.source">HRD Logbook</td>
+            <td></td>
+            <td></td>
+            <td>
+              <input type="checkbox" checked="false" class="inputTextValue" id="buttonHrdLogbookCheckBox"
+                onclick=" ValidateIPaddress(hrdLogbookIpInput,this); ValidatePort(hrdLogbookPortInput,this, null ); hrdLogbookLoggerChanged(); " />
+            </td>
+            <td>
+              <label data-i18n="settings.logging.HRDLogbook.details.IP" for="hrdLogbookIpInput">IP</label>
+              <input id="hrdLogbookIpInput" type="text" class="inputTextValue" maxlength="15" size="15"
+                onkeypress='return validIpKeys(event.charCode);'
+                oninput="ValidateIPaddress(this,buttonHrdLogbookCheckBox); hrdLogbookLoggerChanged(); " />
+              <label data-i18n="settings.logging.HRDLogbook.details.Port" for="hrdLogbookPortInput">Port</label>
+              <input id="hrdLogbookPortInput" type="text" class="inputTextValue" maxlength="5" size="5" onkeypress='return
+                  validNumberKeys(event.charCode);' oninput="ValidatePort(this,buttonHrdLogbookCheckBox, null );
+                  hrdLogbookLoggerChanged(); " />
+            </td>
+            <td></td>
+            <td></td>
+          </tr>
+        </table>
+        <h2 data-i18n="settings.logging.other.title">Other Services</h2>
+        <table class="darkTable" align="center">
+          <tr>
+            <th data-i18n="settings.logging.otherheader.service">Service</th>
+            <th data-i18n="settings.logging.otherheader.active">Active?</th>
+            <th data-i18n="settings.logging.otherheader.details">Details</th>
+          </tr>
+          <tr>
+            <td data-i18n="settings.logging.pstrotator.label">CatRotator / PstRotator</td>
+            <td>
+              <input type="checkbox" checked="false" class="inputTextValue" id="pstrotatorCheckBox"
+                onclick=" ValidateIPaddress(pstrotatorIpInput, this); ValidatePort(pstrotatorPortInput, this, null ); pstrotatorServiceChanged(); " />
+            </td>
+            <td>
+              <label data-i18n="settings.logging.pstrotator.details.IP" for="pstrotatorIpInput">IP</label>
+              <input id="pstrotatorIpInput" type="text" class="inputTextValue" maxlength="15" size="15"
+                onkeypress='return validIpKeys(event.charCode);'
+                oninput="ValidateIPaddress(this, pstrotatorCheckBox); pstrotatorServiceChanged(); " />
+              <label data-i18n="settings.logging.pstrotator.details.Port" for="pstrotatorPortInput">UDP Port</label>
+              <input id="pstrotatorPortInput" type="text" class="inputTextValue" maxlength="5" size="5" onkeypress='return
+                  validNumberKeys(event.charCode);' oninput="ValidatePort(this, pstrotatorCheckBox, null );
+                  pstrotatorServiceChanged(); " />
+            </td>
+          </tr>
+        </table>
+    </div>
+    <div id="alertsDiv" class="settingsTabcontent">
+      <div id="alertMatrixDiv" style="display: inline-block">
+        <table class="roundBorder" align="left" style="border: 1px solid #066; margin: auto; padding: 1px">
+          <tr>
+            <th data-i18n="settings.alerts.AudioAlert.label" colspan="5">Audio Alerts</th>
+          </tr>
+          <tr colspan="5" title="Log file reference">
+            <td data-i18n="settings.alerts.AudioAlert.Reference.label" align="right" colspan="3">Reference</td>
+            <td align="left" colspan="2">
+              <select id="referenceNeed" onchange="exceptionValuesChanged();">
+                <option data-i18n="settings.alerts.AudioAlert.Reference.currentBandAndMode" value="0">Current Band and
+                  Mode</option>
+                <option data-i18n="settings.alerts.AudioAlert.Reference.currentBandAnyMode" value="1">Current Band, Any
+                  Mode</option>
+                <option data-i18n="settings.alerts.AudioAlert.Reference.currentBandAnyDigi" value="2">Current Band, Any
+                  Digi Mode</option>
+                <option data-i18n="settings.alerts.AudioAlert.Reference.currentModeAnyBand" value="3">Current Mode, Any
+                  Band</option>
+                <option data-i18n="settings.alerts.AudioAlert.Reference.anyBandAnyMode" value="4">Any Band, Any Mode
+                </option>
+                <option data-i18n="settings.alerts.AudioAlert.Reference.anyBandAnyDigi" value="5">Any Band, Any Digi
+                  Mode</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td></td>
+            <td data-i18n="settings.alerts.AudioAlert.Header.Enable">Enable</td>
+            <td data-i18n="settings.alerts.AudioAlert.Header.Status">Status</td>
+            <td data-i18n="settings.alerts.AudioAlert.Header.Notify">Notify</td>
+            <td data-i18n="settings.alerts.AudioAlert.Header.Value">Value</td>
+          </tr>
+          <tr>
+            <th data-i18n="settings.alerts.AudioAlert.Types.Callsign">Callsign</th>
+            <td>
+              <input type="checkbox" id="huntCallsign" onchange="wantedChanged(this);" />
+            </td>
+            <td>
+              <select title="Used by All Classic Alerts" id="huntCallsignNeed" onchange="wantedChanged(this);">
+                <option data-i18n="settings.alerts.AudioAlert.Status.worked" value="worked">New</option>
+                <option data-i18n="settings.alerts.AudioAlert.Status.confirmed" value="confirmed">New+Unconf</option>
+              </select>
+            </td>
+            <td>
+              <select id="huntCallsignNotify" onchange="wantedChanged(this);">
+                <option data-i18n="settings.alerts.AudioAlert.Notify.TextToSpeech" value="1">Text-to-Speech</option>
+                <option data-i18n="settings.alerts.AudioAlert.Notify.MediaFile" value="0">Media File</option>
+              </select>
+            </td>
+            <td>
+              <input id="huntCallsignNotifyWord" type="text" class="inputTextValue" size="14"
+                onkeyup="if (event.keyCode == 13) { speakAlertString(this.value); }"
+                oninput="ValidateText(this);wantedChanged(this);" />
+              <select id="huntCallsignNotifyMedia" onchange="wantedChanged(this);"></select>
+            </td>
+          </tr>
+          <tr>
+            <th data-i18n="settings.alerts.AudioAlert.Types.Grid">Grid</th>
+            <td>
+              <input type="checkbox" id="huntGrid" onchange="wantedChanged(this);" />
+            </td>
+            <td>
+              <select id="huntGridNeed" onchange="wantedChanged(this);">
+                <option data-i18n="settings.alerts.AudioAlert.Status.worked" value="worked">New</option>
+                <option data-i18n="settings.alerts.AudioAlert.Status.confirmed" value="confirmed">New+Unconf</option>
+              </select>
+            </td>
+            <td>
+              <select id="huntGridNotify" onchange="wantedChanged(this);">
+                <option data-i18n="settings.alerts.AudioAlert.Notify.TextToSpeech" value="1">Text-to-Speech</option>
+                <option data-i18n="settings.alerts.AudioAlert.Notify.MediaFile" value="0">Media File</option>
+              </select>
+            </td>
+            <td>
+              <input id="huntGridNotifyWord" type="text" class="inputTextValue" size="14"
+                onkeyup="if (event.keyCode == 13) { speakAlertString(this.value);}"
+                oninput="ValidateText(this);wantedChanged(this);" />
+              <select id="huntGridNotifyMedia" style="display: block" onchange="wantedChanged(this);"></select>
+            </td>
+          </tr>
+          <tr>
+            <th data-i18n="settings.alerts.AudioAlert.Types.DXCC">DXCC</th>
+            <td>
+              <input type="checkbox" id="huntDXCC" onchange="wantedChanged(this);" />
+            </td>
+            <td>
+              <select id="huntDXCCNeed" onchange="wantedChanged(this);">
+                <option data-i18n="settings.alerts.AudioAlert.Status.worked" value="worked">New</option>
+                <option data-i18n="settings.alerts.AudioAlert.Status.confirmed" value="confirmed">New+Unconf</option>
+              </select>
+            </td>
+            <td>
+              <select id="huntDXCCNotify" onchange="wantedChanged(this);">
+                <option data-i18n="settings.alerts.AudioAlert.Notify.TextToSpeech" value="1">Text-to-Speech</option>
+                <option data-i18n="settings.alerts.AudioAlert.Notify.MediaFile" value="0">Media File</option>
+              </select>
+            </td>
+            <td>
+              <input id="huntDXCCNotifyWord" type="text" class="inputTextValue" size="14"
+                onkeyup="if (event.keyCode == 13) { speakAlertString(this.value);}"
+                oninput="ValidateText(this);wantedChanged(this);" />
+              <select id="huntDXCCNotifyMedia" style="display: block" onchange="wantedChanged(this);"></select>
+            </td>
+          </tr>
+          <tr>
+            <th data-i18n="settings.alerts.AudioAlert.Types.CQZone">CQ Zone</th>
+            <td>
+              <input type="checkbox" id="huntCQz" onchange="wantedChanged(this);" />
+            </td>
+            <td>
+              <select id="huntCQzNeed" onchange="wantedChanged(this);">
+                <option data-i18n="settings.alerts.AudioAlert.Status.worked" value="worked">New</option>
+                <option data-i18n="settings.alerts.AudioAlert.Status.confirmed" value="confirmed">New+Unconf</option>
+              </select>
+            </td>
+            <td>
+              <select id="huntCQzNotify" onchange="wantedChanged(this);">
+                <option data-i18n="settings.alerts.AudioAlert.Notify.TextToSpeech" value="1">Text-to-Speech</option>
+                <option data-i18n="settings.alerts.AudioAlert.Notify.MediaFile" value="0">Media File</option>
+              </select>
+            </td>
+            <td>
+              <input id="huntCQzNotifyWord" type="text" class="inputTextValue" size="14"
+                onkeyup="if (event.keyCode == 13) { speakAlertString(this.value);}"
+                oninput="ValidateText(this);wantedChanged(this);" />
+              <select id="huntCQzNotifyMedia" style="display: block" onchange="wantedChanged(this);"></select>
+            </td>
+          </tr>
+          <tr>
+            <th data-i18n="settings.alerts.AudioAlert.Types.ITUZone">ITU Zone</th>
+            <td>
+              <input type="checkbox" id="huntITUz" onchange="wantedChanged(this);" />
+            </td>
+            <td>
+              <select id="huntITUzNeed" onchange="wantedChanged(this);">
+                <option data-i18n="settings.alerts.AudioAlert.Status.worked" value="worked">New</option>
+                <option data-i18n="settings.alerts.AudioAlert.Status.confirmed" value="confirmed">New+Unconf</option>
+              </select>
+            </td>
+            <td>
+              <select id="huntITUzNotify" onchange="wantedChanged(this);">
+                <option data-i18n="settings.alerts.AudioAlert.Notify.TextToSpeech" value="1">Text-to-Speech</option>
+                <option data-i18n="settings.alerts.AudioAlert.Notify.MediaFile" value="0">Media File</option>
+              </select>
+            </td>
+            <td>
+              <input id="huntITUzNotifyWord" type="text" class="inputTextValue" size="14"
+                onkeyup="if (event.keyCode == 13) { speakAlertString(this.value);}"
+                oninput="ValidateText(this);wantedChanged(this);" />
+              <select id="huntITUzNotifyMedia" style="display: block" onchange="wantedChanged(this);"></select>
+            </td>
+          </tr>
+          <tr>
+            <th data-i18n="settings.alerts.AudioAlert.Types.USStates">US States</th>
+            <td>
+              <input type="checkbox" id="huntStates" onchange="wantedChanged(this);" />
+            </td>
+            <td>
+              <select id="huntStatesNeed" onchange="wantedChanged(this);">
+                <option data-i18n="settings.alerts.AudioAlert.Status.worked" value="worked">New</option>
+                <option data-i18n="settings.alerts.AudioAlert.Status.confirmed" value="confirmed">New+Unconf</option>
+              </select>
+            </td>
+            <td>
+              <select id="huntStatesNotify" onchange="wantedChanged(this);">
+                <option data-i18n="settings.alerts.AudioAlert.Notify.TextToSpeech" value="1">Text-to-Speech</option>
+                <option data-i18n="settings.alerts.AudioAlert.Notify.MediaFile" value="0">Media File</option>
+              </select>
+            </td>
+            <td>
+              <input id="huntStatesNotifyWord" type="text" class="inputTextValue" size="14"
+                onkeyup="if (event.keyCode == 13) { speakAlertString(this.value);}"
+                oninput="ValidateText(this);wantedChanged(this);" />
+              <select id="huntStatesNotifyMedia" style="display: block" onchange="wantedChanged(this);"></select>
+            </td>
+            <tr>
+              <td colspan="5">
+                <div class="mapItem">
+                  <table align="center" title="Alert when new 'Wanted Row(s)' appear in the Call Roster">
+                    <tr>
+                      <td data-i18n="settings.callroster.AudioAlert.label" colspan="2">Call Roster On <b>New Wanted</b></td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">
+                        <input type="checkbox" id="huntRoster" onchange="wantedChanged(this);" />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <select id="huntRosterNotify" onchange="wantedChanged(this);">
+                          <option data-i18n="settings.callroster.AudioAlert.TextToSpeech" value="1">Text-to-Speech</option>
+                          <option data-i18n="settings.callroster.AudioAlert.MediaFile" value="0">Media File</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input id="huntRosterNotifyWord" type="text" class="inputTextValue" size="14"
+                          onkeyup="if (event.keyCode == 13) { speakAlertString(this.value);}"
+                          oninput="ValidateText(this);wantedChanged(this);" />
+                        <select id="huntRosterNotifyMedia" style="display: block" onchange="wantedChanged(this);"></select>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </tr>
+        </table>
+        <table class="roundBorder" align="left"
+          style="border: 1px solid #622; margin: auto; padding: 1px; text-align: left">
+          <tr>
+            <th data-i18n="settings.alerts.AudioAlert.Exceptions.label" colspan="6" align="center">Exceptions</th>
+          </tr>
+          <tr>
+            <td>
+              <table>
+                <tr>
+                  <td colspan="2">
+                    <input type="checkbox" id="cqOnly" onchange="exceptionValuesChanged();" />
+                    <label data-i18n="settings.alerts.AudioAlert.Exceptions.CQOnly" for="cqOnly">CQ Only</label>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    <input type="checkbox" id="wantGrid" onchange="exceptionValuesChanged();" />
+                    <label data-i18n="settings.alerts.AudioAlert.Exceptions.ReqGrid" for="wantGrid">Require Grid</label>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <input type="checkbox" id="wantMinDB" onchange="exceptionValuesChanged();" />
+                    <label data-i18n="settings.alerts.AudioAlert.Exceptions.MinDB" for="wantMinDB">Min DB</label>
+                  </td>
+                  <td>
+                    <input type="range" min="-25" max="0" step="1" class="slider" id="minDb"
+                      oninput="exceptionValuesChanged();" style="width: 75px" />
+                  </td>
+                  <td align="center" id="minDbView" class="roundBorderValue">-24</td>
+                </tr>
+                <tr>
+                  <td>
+                    <input type="checkbox" id="wantMaxDT" onchange="exceptionValuesChanged();" />
+                    <label data-i18n="settings.alerts.AudioAlert.Exceptions.MaxDT" for="wantMaxDT">Max DT</label>
+                  </td>
+                  <td>
+                    <input type="range" min="0.1" max="2" step="0.1" class="slider" id="maxDT"
+                      oninput="exceptionValuesChanged();" style="width: 75px" />
+                  </td>
+                  <td align="center" id="maxDTView" class="roundBorderValue">.5</td>
+                </tr>
+                <tr>
+                  <td>
+                    <input type="checkbox" id="wantMinFreq" onchange="exceptionValuesChanged();" />
+                    <label data-i18n="settings.alerts.AudioAlert.Exceptions.MinFreq" for="wantMinFreq">Min Freq</label>
+                  </td>
+                  <td>
+                    <input type="range" min="0" max="2500" step="10" class="slider" id="minFreq"
+                      oninput="exceptionValuesChanged();" style="width: 75px" />
+                  </td>
+                  <td align="center" id="minFreqView" class="roundBorderValue">400</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" id="wantMaxFreq" onchange="exceptionValuesChanged();" />
+                    <label data-i18n="settings.alerts.AudioAlert.Exceptions.MaxFreq" for="wantMaxFreq">Max Freq</label>
+                  </td>
+                  <td>
+                    <input type="range" min="500" max="3000" step="10" class="slider" id="maxFreq"
+                      oninput="exceptionValuesChanged();" style="width: 75px" />
+                  </td>
+                  <td align="center" id="maxFreqView" class="roundBorderValue">3000</td>
+                </tr>
+              </table>
+            </td>
+            <td>
+              <table>
+                <tr>
+                  <td colspan="2">
+                    <input type="checkbox" id="noMyDxcc"
+                      onchange="onlyMyDxcc.checked=false; exceptionValuesChanged();" />
+                    <label data-i18n="settings.alerts.AudioAlert.Exceptions.NotMyDXCC" for="noMyDxcc">Not My
+                      DXCC</label>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    <input type="checkbox" id="onlyMyDxcc"
+                      onchange="noMyDxcc.checked=false; exceptionValuesChanged();" />
+                    <label data-i18n="settings.alerts.AudioAlert.Exceptions.OnlyMyDXCC" for="onlyMyDxcc">Only My
+                      DXCC</label>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    <input type="checkbox" id="noRoundUp"
+                      onchange="onlyRoundUp.checked=false; exceptionValuesChanged();" />
+                    <label data-i18n="settings.alerts.AudioAlert.Exceptions.NoRoundUp" for="noRoundUp">No
+                      Round-Up</label>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    <input type="checkbox" id="onlyRoundUp"
+                      onchange="noRoundUp.checked=false; exceptionValuesChanged();" />
+                    <label data-i18n="settings.alerts.AudioAlert.Exceptions.OnlyRoundUp" for="onlyRoundUp">Only
+                      Round-Up</label>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    <div id="usesLoTWDiv" style="display: none">
+                      <input type="checkbox" id="usesLoTW" onchange="exceptionValuesChanged();" />
+                      <label data-i18n="settings.alerts.AudioAlert.Exceptions.UsesLoTW" for="usesLoTW">Uses LoTW</label>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    <div id="useseQSLDiv" style="display: none">
+                      <input type="checkbox" id="useseQSL" onchange="exceptionValuesChanged();" />
+                      <label data-i18n="settings.alerts.AudioAlert.Exceptions.UsesEQSL" for="useseQSL">Uses eQSL</label>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <br />
+      <div id="alertFormDiv" style="display: inline-block">
+        <table align="center" class="roundBorder" style="border: 3px groove darkred; margin: 0 auto">
+          <th data-i18n="settings.alerts.CustomAlerts.label" colspan="8">Custom Alerts</th>
+          <tr>
+            <td data-i18n="settings.alerts.CustomAlerts.new.type.label">Type</td>
+            <td data-i18n="settings.alerts.CustomAlerts.new.value.label">Value</td>
+            <td data-i18n="settings.alerts.CustomAlerts.new.notify.label">Notify</td>
+            <td></td>
+            <td data-i18n="settings.alerts.CustomAlerts.new.repeat.label">Repeat</td>
+          </tr>
+          <tr>
+            <td>
+              <select id="alertTypeSelect" name="alertTypeSelect" onchange="alertTypeChanged();">
+                <option data-i18n="settings.alerts.CustomAlerts.new.type.callsign.exact" value="0">Callsign (exact)
+                </option>
+                <option data-i18n="settings.alerts.CustomAlerts.new.type.callsign.partial" value="5">Callsign (partial)
+                </option>
+                <option data-i18n="settings.alerts.CustomAlerts.new.type.callsign.regex" value="6">Callsign (regex)
+                </option>
+                <option data-i18n="settings.alerts.CustomAlerts.new.type.gridsquare" value="2">Gridsquare</option>
+                <option data-i18n="settings.alerts.CustomAlerts.new.type.QRZ" value="4">QRZ</option>
+              </select>
+            </td>
+            <td id="alertValueSelect">
+              <input id="alertValueInput" type="text" class="inputTextValue" size="7"
+                oninput="ValidateCallsign(this,null);" />
+            </td>
+            <td>
+              <select id="alertNotifySelect" name="alertNotifySelect" onchange="alertNotifyChanged();">
+                <option data-i18n="settings.alerts.CustomAlerts.new.notify.textToSpeech" value="1">Text-to-speech
+                </option>
+                <option data-i18n="settings.alerts.CustomAlerts.new.notify.mediaFile" value="0">Media File</option>
+                <option data-i18n="settings.alerts.CustomAlerts.new.notify.visual" value="2">Visual Popup</option>
+                <option data-i18n="settings.alerts.CustomAlerts.new.notify.mapcenter" value="3">Map Center</option>
+              </select>
+            </td>
+            <td>
+              <select style="display: none" id="alertMediaSelect" onchange="alertNotifyChanged('media');"></select>
+            </td>
+            <td>
+              <select id="alertRepeatSelect" name="alertRepeatSelect">
+                <option data-i18n="settings.alerts.CustomAlerts.new.repeat.deleted" value="2">Until Deleted</option>
+                <option data-i18n="settings.alerts.CustomAlerts.new.repeat.exit" value="3">Until Exit</option>
+                <option data-i18n="settings.alerts.CustomAlerts.new.repeat.once" value="1">Once</option>
+                <option data-i18n="settings.alerts.CustomAlerts.new.repeat.never" value="0">Never</option>
+              </select>
+            </td>
+            <td id="addButton">
+              <div data-i18n="settings.alerts.CustomAlerts.new.addButton" class="button"
+                style="min-width: 26px; width: 26px" onclick="addNewAlert();">ADD</div>
+            </td>
+            <td id="addError" style="color: red"></td>
+          </tr>
+        </table>
+      </div>
+      <br />
+      <div id="alertListDiv" style="margin: 4px; padding: 4px"></div>
+    </div>
+    <div id="chatSettingsDiv" class="settingsTabcontent">
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.OAMS.message.enable.label" title="hat Messaging">Chat Messaging</td>
+          </tr>
+          <tr>
+            <td>
+              <input title="Enable / Disable Messaging" type="checkbox" id="msgEnable" onclick="setMsgEnable(this);" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.OAMS.spotting.enable.label"
+              title="Send and Recieve Spot Reports through the OAMS network">Spotting</td>
+          </tr>
+          <tr>
+            <td>
+              <input title="Enable / Disable Spotting" type="checkbox" id="GTspotEnable"
+                onclick="setGTspotEnable(this);" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="mapItem">
+        <table align="center">
+          <tr>
+            <td data-i18n="settings.OAMS.BandActivity.enable.label"
+              title="Receive Band Activity Reports through the OAMS network">Band Activity</td>
+          </tr>
+          <tr>
+            <td>
+              <input title="Enable / Disable Band Activity" type="checkbox" id="oamsBandActivity"
+                onclick="setOamsBandActivity(this);" />
+            </td>
+          </tr>
+        </table>
+        <div class="mapItem" id="bandActivityNeighborDiv">
+          <table align="center">
+            <tr>
+              <td data-i18n="settings.OAMS.BandActivity.neighbor.enable.label"
+                title="Include your 8 neighboring grids in report">Neighboring Grids</td>
+            </tr>
+            <tr>
+              <td>
+                <input title="Enable / Disable Neighbor Grids" type="checkbox" id="oamsBandActivityNeighbors"
+                  onclick="setOamsBandActivityNeighbors(this);" />
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <br />
+      <div id="msgSettingsDiv" class="mapItem" style="padding: 3px">
+      <div id="msgAlertSettingsDiv" class="mapItem" style="padding: 3px">
+        <div class="mapItem">
+          <table align="center">
+            <tr>
+              <td data-i18n="settings.OAMS.message.newAlert.label" title="New Chat Message Alert">New Chat Message Alert</td>
+            </tr>
+            <tr>
+              <td>
+                <select id="msgAlertSelect" name="msgAlertSelect"
+                  onchange="newMessageSetting(this); alertChatMessage();">
+                  <option data-i18n="settings.OAMS.message.newAlert.none" value="0">None</option>
+                  <option data-i18n="settings.OAMS.message.newAlert.textToSpeech" value="1">Text-to-Speech</option>
+                  <option data-i18n="settings.OAMS.message.newAlert.mediaFile" value="2">Media File</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input id="msgAlertWord" type="text" class="inputTextValue" size="14"
+                  onkeyup="if (event.keyCode == 13) {newMessageSetting(this); alertChatMessage(); }"
+                  oninput="ValidateText(this);newMessageSetting(this);" />
+                <select id="msgAlertMedia" onchange="newMessageSetting(this); alertChatMessage();"></select>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="mapItem" id="msgFrequencySelectDiv">
+          <table align="center">
+            <tr>
+              <td data-i18n="settings.OAMS.message.newAlert.Frequency" title="New Message Alert Frequency">Alert
+                Frequency</td>
+            </tr>
+            <tr>
+              <td>
+                <select id="msgFrequencySelect" name="msgFrequencySelect" onchange="newMessageSetting(this);">
+                  <option data-i18n="settings.OAMS.message.newAlert.Once" value="0">Once</option>
+                  <option data-i18n="settings.OAMS.message.newAlert.1min" value="1">1 minute</option>
+                  <option data-i18n="settings.OAMS.message.newAlert.3min" value="3">3 minutes</option>
+                  <option data-i18n="settings.OAMS.message.newAlert.5min" value="5">5 minutes</option>
+                  <option data-i18n="settings.OAMS.message.newAlert.10min" value="10">10 minutes</option>
+                  <option data-i18n="settings.OAMS.message.newAlert.15min" value="15">15 minutes</option>
+                  <option data-i18n="settings.OAMS.message.newAlert.30min" value="30">30 minutes</option>
+                  <option data-i18n="settings.OAMS.message.newAlert.60min" value="60">1 hour</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="mapItem">
+          <table align="center">
+            <tr>
+              <td data-i18n="settings.OAMS.message.newAlert.Action" title="New Chat Message Action">New Chat Message Action</td>
+            </tr>
+            <tr>
+              <td>
+                <select id="msgActionSelect" name="msgActionSelect" onchange="newMessageSetting(this);">
+                  <option data-i18n="settings.OAMS.message.newAlert.Nothing" value="0">Do nothing</option>
+                  <option data-i18n="settings.OAMS.message.newAlert.OpenWindow" value="1">Open Messaging Window</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <br />
+        <div class="mapItem">
+          <table align="center">
+            <tr>
+              <td data-i18n="settings.OAMS.message.awayMode" title="Away Mode">Away Mode</td>
+            </tr>
+            <tr>
+              <td>
+                <select id="msgAwaySelect" name="msgAwaySelect" onchange="newMessageSetting(this);">
+                  <option data-i18n="settings.OAMS.message.NotAway" value="0">Not Away</option>
+                  <option data-i18n="settings.OAMS.message.AmAway" value="1">I Am Away</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <br />
+        <div class="mapItem" id="msgAwayTextDiv">
+          <table align="center">
+            <tr>
+              <td data-i18n="settings.OAMS.message.awayText" title="Away Text">Away Text</td>
+            </tr>
+            <tr>
+              <td>
+                <input id="msgAwayText" type="text" class="inputTextValue" size="30"
+                  oninput="ValidateText(this); newMessageSetting(this);" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        </div>
+        <br/>
+        <div class="mapItem">
+          <table align="center">
+            <tr>
+              <td>
+                <label data-i18n="settings.OAMS.simplepush.enable.label" for="msgSimplepush" >
+                  Enable / Disable Simplepush Message forwarding</label>
+              </td>
+            </tr>
+            <tr><td><input title="Enable / Disable Simplepush" type="checkbox" id="msgSimplepush"
+              onclick="setOamsSimplepush(this);" /></td></tr>
+          </table>
+          <div class="mapItem" id="simplePushDiv">
+                <table>
+                  <tr>
+                    <td data-i18n="settings.OAMS.simplepush.apikey.label"
+                  title="SimplePush API Key to forward messages to your phone">SimplePush API Key</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input title="SimplePush API Key to forward messages to your phone" type="text" id="msgSimplepushApiKey"
+                       class="inputTextValue" maxlength="255" size="16"
+                       oninput="ValidateText(this); newMessageSetting(this);" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><input title="Enable / Disable Chat Message Forward" type="checkbox" id="msgSimplepushChat"
+                      onclick="setOamsSimplepushChat(this);" data-i18n="settings.OAMS.forward.chat" />Forward Chat Messages</td>
+                  </tr>
+                  <tr>
+                    <td><input title="Enable / Disable Roster Alert Forward" type="checkbox" id="msgSimplepushRoster"
+                      onclick="setOamsSimplepushRoster(this);" data-i18n="settings.OAMS.forward.roster" />Forward Roster Alerts</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div data-i18n="settings.OAMS.simplepush.test" class="button" onclick="sendSimplePushMessage({'call' : 'Test', 'msg' : 'Test Message'});">Test</div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+        </div>
+        <div class="mapItem">
+          <table align="center">
+            <tr>
+              <td>
+                <label data-i18n="settings.OAMS.pushover.enable.label" for="msgPushover">
+                  Enable / Disable Pushover Message forwarding
+                </label>
+               </td>
+            </tr>
+            <tr><td><input title="Enable / Disable Pushover" type="checkbox" id="msgPushover"
+              onclick="setOamsPushover(this);" /></td></tr>
+              </table>
+             <div class="mapItem" id="pushOverDiv">
+              <table>
+            <tr>
+              <td data-i18n="settings.OAMS.pushover.credentials.label"
+                  title="Pushover Credentials to forward messages to your phone">Pushover Credentials</td>
+            </tr>
+            <tr>
+              <td>
+                <label data-i18n="settings.OAMS.pushover.userkey.label" for="msgPushoverUserKey">User Key</label>
+                <input title="Pushover User Key to forward messages to your phone" type="text" id="msgPushoverUserKey"
+                       class="inputTextValue" maxlength="255" size="16"
+                       oninput="ValidateText(this); newMessageSetting(this);" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label data-i18n="settings.OAMS.pushover.token.label" for="msgPushoverToken">API Token</label>
+                <input title="Pushover API Token to forward messages to your phone" type="text" id="msgPushoverToken"
+                       class="inputTextValue" maxlength="255" size="16"
+                       oninput="ValidateText(this); newMessageSetting(this);" />
+              </td>
+            </tr>
+            <tr>
+              <td><input title="Enable / Disable Chat Message Forward" type="checkbox" id="msgPushoverChat"
+                onclick="setOamsPushoverChat(this);" data-i18n="settings.OAMS.forward.chat" />Forward Chat Messages</td>
+            </tr>
+            <tr>
+              <td><input title="Enable / Disable Roster Alert Forward" type="checkbox" id="msgPushoverRoster"
+                onclick="setOamsPushoverRoster(this);" data-i18n="settings.OAMS.forward.roster" />Forward Roster Alerts</td>
+            </tr>
+            <tr>
+              <td>
+                <div data-i18n="settings.OAMS.pushover.test" class="button" onclick="sendPushOverMessage({'call' : 'Test', 'msg' : 'Test Message'}, true);">Test
+                </div>
+                <div id="pushOverTestResultsDiv"></div>
+              </td>
+            </tr>
+      
+          </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="aboutDiv" class="settingsTabcontent">
+      <div class="mapItem" style="padding: 4px">
+        <h2>
+          <div data-i18n="settings.about.AppName" >GridTracker2</div>
+          <div style="font-size:small; font-weight: normal;" id="aboutVersionText"></div>
+        </h2>
+        <p>
+          GridTracker2 is a warehouse of amateur radio information presented in an easy to use interface<br />
+          <br/>
+          Learn more at
+          <a href="https://gridtracker.org" target="_blank" style="cursor: pointer; font-weight: bold; color:cyan;">GridTracker.org!</a>
+        </p>
+        <p>Copyright &copy; 2024 Stephen Loomis, NØTTL, Henry Forte, N2VFL, Matthew Chambers, NRØQ<br/>
+        Sebastian Delmont, KI2D, Christian Bayer, WA4YA, Paul Traina, K6PST<br/>
+        Jon Angliss, KF5QHQ, Beau Gunderson, N7YHF, Jonathan Fick, KEØYBL<br/>
+        Florian Wolters, DF2ET, GridTracker.org</p>
+        <img src="img/gridtracker.png" /> <br />
+      </div>
+    </div>
+    <div style="top: 0; right: 1px; position: absolute">
+      <button class="Xbutton" onclick="rootSettingsDiv.style.display='none';">X</button>
+    </div>
+  </div>
+  </div>
+  <div id="selectNodeDiv" style="-webkit-user-select: text; user-select: text; display: block; z-index: -10000"></div>
+</body>
+
+</html>

@@ -1,0 +1,821 @@
+/* == General Elements ==================================== */
+table,
+th,
+td {
+  color: #eee;
+  white-space: nowrap;
+  font-family: Sans-Serif;
+  text-align: auto;
+  vertical-align: baseline;
+  padding: 0px;
+  margin: 0px;
+  top: 0;
+}
+
+th {
+  vertical-align: bottom;
+}
+
+table,
+th,
+td,
+select,
+.compact {
+  font-size: 12px;
+}
+
+th,
+td {
+  padding-bottom: 1px;
+  padding-right: 1px;
+
+}
+
+input[type="checkbox"] {
+  appearance: checkbox !important;
+  margin: 0;
+  margin-top: -1px;
+  margin-right: 1px;
+  vertical-align: top;
+  position: relative;
+
+}
+
+select {
+  appearance: none;
+  border-radius: 6px;
+  text-indent: 0.2px;
+  text-overflow: "";
+  padding: 2px;
+  padding-right: 3px;
+  background-color: darkgreen;
+  color: #ff0;
+  cursor: pointer;
+}
+select:focus {
+  outline: none;
+}
+
+select:hover {
+  border-color: #fff;
+}
+
+select:disabled {
+  border: 1px solid #333;
+  background-color: #000;
+  color: #aaa;
+  outline: none;
+}
+
+select option {
+  margin: 40px;
+  background: #000;
+  color: #eee;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+  appearance: none;
+  border-radius: 8px;
+  text-indent: 0.2px;
+  text-overflow: "";
+  text-align: left;
+  padding: 5px;
+}
+
+select option:focus {
+  color: #f00;
+}
+
+option:disabled {
+  color: #666;
+}
+
+/* == Layout ============================================== */
+
+body.roster {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  margin: 0;
+  padding: 0;
+
+  background-color: black;
+  white-space: nowrap;
+
+  overflow: auto;
+}
+
+#MainCallRoster {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+#MainCallRoster header {
+  flex: 0;
+}
+
+#MainCallRoster main {
+  flex: 1;
+}
+
+#RosterControls {
+  display: grid;
+}
+
+#RosterControls.hidden {
+  display: none;
+}
+
+#RosterControls.normal #SecondaryRosterControls {
+  display: none;
+}
+
+#RosterControls.normal {
+  min-height: 28px;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+#RosterControls.normal #MainRosterControls {
+  margin-left: 1px;
+  margin-top: 3px;
+  display: flex;
+}
+
+#TransmitControls {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 246px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+#LessControls {
+  position: absolute;
+  top: 7px;
+  right: 6px;
+  text-align: center;
+}
+
+#MoreControls {
+  position: absolute;
+  top: 7px;
+  right: 6px;
+  text-align: right;
+}
+
+
+#RosterControls.normal #ShowFewerControlsLink {
+  display: none;
+}
+#RosterControls.normal #ShowMoreControlsLink {
+  display: block;
+}
+
+#RosterControls.normal #MainRosterControls {
+  position: absolute;
+  top: 3px;
+  left: 250px;
+  text-align: left;
+  justify-content: left;
+}
+
+#RosterControls.extended {
+  margin-top: 7px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+#RosterControls.extended #MainRosterControls {
+  margin-top: 30px;
+  min-width: 250px;
+  flex: 0;
+}
+
+#RosterControls.extended #SecondaryRosterControls {
+  flex: 1;
+}
+
+#MainRosterControls label {
+  margin-right: 4px;
+  margin-left: 8px;
+}
+
+#RosterControls.extended #MainRosterControls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+
+#RosterControls.extended #MainRosterControls > div {
+  margin-bottom: 4px;
+}
+
+#RosterControls.extended #MainRosterControls select {
+  min-width: 140px;
+}
+
+#RosterControls.extended #HuntModeControls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+#AwardWantedList {
+  overflow: auto;
+  overflow-x: hidden;
+  max-height: 142px;
+}
+
+@media (max-width: 1000px) {
+  #RosterControls.normal #HuntModeControls {
+    display: none !important;
+  }
+}
+
+@media (max-width: 800px) {
+  #RosterControls.normal #CallsignsControls {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  #RosterControls.normal #LogbookControls {
+    display: none;
+  }
+}
+
+#RosterControls.normal #AwardTrackerControls {
+  display: none !important;
+}
+
+#RosterControls.extended #AwardTrackerControls {
+  margin-left: 8px;
+  width: 100%;
+}
+
+#awardTable {
+  width: 100%;
+}
+
+#RosterControls.extended #ShowFewerControlsLink {
+  display: block;
+}
+#RosterControls.extended #ShowMoreControlsLink {
+  display: none;
+}
+#RosterControls.extended #SecondaryRosterControls {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin-right: 1px;
+  margin-bottom: 4px;
+}
+
+@media (max-width: 650px) {
+  #RosterControls.extended #SecondaryRosterControls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 735px) {
+  #RosterControls.extended {
+    margin-top: 7px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+
+  #RosterControls.extended #MainRosterControls {
+    align-self: flex-start;
+  }
+
+  #RosterControls.extended #SecondaryRosterControls {
+    width: 100%;
+  }
+}
+
+.secondaryControlGroup {
+  flex: 1;
+  margin-left: 4px;
+  padding: 0px;
+}
+
+#huntingMatrixDiv {
+  flex: .9;
+}
+
+#exceptionDiv {
+  flex: .7;
+}
+
+.secondaryControlGroup h3 {
+  text-align: left;
+  font-size: 12px;
+  margin: 0px;
+  margin-bottom: 2px;
+  padding: 0;
+}
+
+#huntingMatrixDiv h3 {
+  color: #099;
+  border-bottom: 2px solid #066;
+  margin-bottom: 3px;
+}
+
+#exceptionDiv h3 {
+  color: rgb(206, 89, 89);
+  border-bottom: 2px solid rgba(253, 113, 113, 0.644);
+  margin-bottom: 3px;
+}
+
+.secondaryControlGroup .columns {
+  /* column-count: 2; */
+  max-height: 100px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: left;
+}
+
+.secondaryControlGroup .columns div {
+  text-align: left;
+  vertical-align: bottom;
+  margin-top: 3px;
+  margin-right: 0px;
+}
+
+input.slider {
+  display: inline-block;
+  width: max-content;
+}
+
+.inputTextValue {
+  border-radius: 6px;
+  border: 1px solid #999;
+  background-color: green;
+  color: yellow;
+  outline: none;
+  margin: 0px;
+  padding: 2px;
+  border-style: inset;
+}
+
+.inputTextValue:hover {
+  border-color: #fff;
+  border-style: outset;
+}
+
+.roundBorderValue {
+  padding: 3px;
+  font-size: larger;
+}
+
+#instancesWrapper .button {
+  display: inline-block;
+  margin: 1px;
+  padding: 2px;
+  border-width: 1px;
+  text-align: left;
+}
+
+#RosterTable > table {
+  width: 100%;
+}
+/* == Other Elements ====================================== */
+
+#txrxdec {
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 3px;
+  border-width: 2px;
+  width: 68px;
+}
+
+.link {
+  cursor: hand;
+  color: #ffffaaa1;
+}
+
+.link:hover {
+  color: #ffff00;
+  text-decoration: underline;
+}
+
+table.awardTableCSS {
+  border-collapse: collapse;
+  border: 0px solid #888;
+  background-color: black;
+  text-align: center;
+  padding: 0;
+  margin: 0;
+}
+
+table.awardTableCSS td,
+table.awardTableCSS th {
+  border: 1px solid #888;
+  padding: 0px;
+  margin: 0px;
+  border-left: none;
+  border-right: none;
+  font-size: 12px;
+  vertical-align: baseline;
+}
+
+table.awardTableCSS tr {
+  padding: 0px;
+  margin: 0px;
+  max-height: 16px;
+}
+
+table.awardTableCSS thead {
+  border-bottom: 0px solid #888;
+}
+table.awardTableCSS thead th {
+  font-weight: bold;
+  text-align: center;
+  border-left: none;
+}
+table.awardTableCSS thead th:first-child {
+  border-left: none;
+}
+
+.awardTableCSS tr:hover td {
+  box-shadow: inset 0px 11px 6px -8px #888, inset 0px -11px 6px -8px #888;
+}
+
+table.rosterTable {
+  border-collapse: collapse;
+  border: 1px solid #555;
+  background-color: black;
+  text-align: center;
+  width: 100%;
+}
+
+table.rosterTable td,
+table.rosterTable th {
+  border: 1px solid #555;
+  padding: 2px;
+  padding-bottom: 1px;
+}
+
+table.rosterTable thead {
+  border-bottom: 1px solid #555;
+}
+table.rosterTable thead th {
+  font-weight: bold;
+  text-align: center;
+  border-left: 1px solid #555;
+  top: -1px;
+  position: sticky;
+  background-color: #000000ff;
+}
+
+table.rosterTable thead th:first-child {
+  border-left: none;
+}
+
+.rosterTable tr:hover td {
+  box-shadow: inset 0px 11px 6px -8px #555, inset 0px -11px 6px -8px #555;
+}
+
+.oneByOne {
+  background-clip: content-box;
+  box-shadow: 0 0 8px 3px inset #fff;
+  background-color: #000;
+  color: #ff0;
+}
+
+.regexMatch {
+  background-color: #ffffff;
+  color: #000;
+}
+
+.dxCaller {
+  background-clip: content-box;
+  box-shadow: 0 0 4px 4px inset #0f0;
+  background-color: #000;
+  color: #ff0;
+}
+
+.dxCalling {
+  background-clip: content-box;
+  box-shadow: 0 0 4px 4px inset #f00;
+  background-color: #000;
+  color: #ff0;
+}
+
+.compact {
+  cursor: pointer;
+  margin: 0px;
+  padding: 0px;
+  margin-right: 2px;
+  margin-bottom: 2px;
+  border-width: 2px;
+  border-color: #999;
+  border-style: outset;
+  min-width: 9em;
+  min-height: 2em;
+  display: inline-block;
+  color: #eee;
+  transition: border-style;
+  border-radius: 4px;
+}
+
+.compact:active {
+  border-style: inset;
+}
+
+.compact:hover {
+  border-color: #fff;
+}
+
+.compactCallsign {
+  padding: 1px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.compactData {
+  padding: 2px;
+  max-width: 9em;
+  min-width: 9em;
+  max-height: 14px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.rosterTable tr:hover td {
+  box-shadow: inset 0px 11px 6px -8px #888, inset 0px -11px 6px -8px #888;
+}
+
+.acknowledged {
+  float: right;
+  font-size: 70%;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+.ackBadge {
+  padding: 0px;
+  margin: 0px;
+  height: 12px;
+  margin-bottom: -2px;
+}
+
+.wantedCol {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Style the tab */
+.infotab {
+  overflow: hidden;
+  background-color: black;
+}
+
+/* Style the buttons that are used to open the tab content */
+.infotab button {
+  border: 1px solid lightblue;
+  padding: 3px;
+  font-weight: bold;
+  border-top-right-radius: 6px;
+  border-top-left-radius: 6px;
+  margin-left: 5px;
+  margin-right: 0px;
+  color: #eee;
+  background: black;
+  text-align: center;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom-style: none;
+  transition: 0.1s;
+}
+
+/* Create an active/current tablink class */
+.infotab button.active {
+  background-color: cyan;
+  color: black;
+}
+/* Style the tab content */
+.infoTabcontent {
+  margin: auto;
+  display: none;
+  background-color: black;
+  padding: 0;
+  padding-top: 4px;
+  text-align: center;
+  width: auto;
+  left:0;
+  right:0;
+  border-top: 1px solid lightblue;
+  vertical-align: top;
+  white-space: normal;
+  overflow:auto;
+  min-width: 480px;
+}
+
+.exceptionTab {
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(150px, 1fr));
+  justify-content:center;
+  align-items:center;
+}
+
+.exceptionTab > div {
+  margin: 6px;
+  padding: 5px;
+  height: 35px;
+  width: 140px;
+  border-width: 1px;
+  border-color: #aaa;
+  border-style: inset;
+  vertical-align:baseline;
+  border-radius: 4px;
+  transition: border-color;
+}
+
+p {
+  margin-top: 4px;
+  margin-bottom: 1px;
+  margin-left: 1px;
+  margin-right: 1px;
+}
+
+.exceptionTab > div:hover {
+  border-color: #fff;
+}
+
+.break {
+  flex-basis: 100%;
+}
+
+:root {
+  accent-color: #4ab9f8;
+  color-scheme: dark;
+}
+
+.columnEditView {
+  margin:5px;
+  padding:5px;
+  vertical-align:top;
+  display:inline-block;
+  overflow:auto;
+  overflow-x:hidden;
+  height: fit-content;
+}
+
+.columnEditRow {
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  margin-top:2px;
+  margin-bottom: 5px;
+}
+
+.columnEditRowHeader {
+  border: 1px solid #cecccc;
+  grid-row: 1 / span 4;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.columnEditRow:hover {
+  box-shadow: inset 0px 11px 6px -8px #888, inset 0px -11px 6px -8px #888;
+}
+
+.columnAvailableRow {
+  display:grid;
+  grid-template-columns: 1fr 3fr;
+  margin-top:2px;
+  margin-bottom: 5px;
+}
+
+.columnAvailableRow:hover {
+  box-shadow: inset 0px 11px 6px -8px #888, inset 0px -11px 6px -8px #888;
+}
+
+.huzzah {
+  background: linear-gradient(135deg, #360000, #00580f, rgb(11, 0, 80));
+  background-size: 500% 500%;
+  animation: AnimationHuzzah 5s alternate infinite;
+  text-shadow: black 0 0 6px;
+}
+
+@keyframes AnimationHuzzah {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.rowBuilder {
+  border-width: 1px;
+  border-color: #aaa;
+  border-style: outset;
+  vertical-align: top;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: row;
+  transition: border-color;
+  text-align: center; 
+  vertical-align:middle;
+  justify-content:center;
+  align-items:center;
+  width: fit-content;
+  left:0;
+  right:0;
+  margin: auto;
+  padding: 4px;
+}
+
+.rowBuilder:hover {
+  border-color: #fff;
+}
+
+.rowBuilder > * {
+  margin-right: 4px;
+  padding: 2px;
+}
+
+.flexButton {
+  border-radius: 4px;
+  cursor: pointer;
+  border-width: 1px;
+  border-color: #999;
+  border-style: outset;
+  color: #eee;
+  transition: border-style;
+  vertical-align: middle;
+  padding: 2px;
+  padding-bottom: 1px;
+  text-align: center;
+  width: fit-content;
+}
+
+.flexButton:hover {
+  border-color: #fff;
+}
+.ignoresTables  {
+  margin:10px;
+  padding:0px;
+  vertical-align:top;
+  display:inline-block;
+  margin-right:2px;
+  overflow:auto;
+  overflow-x:hidden;
+}
+
+#watcherTable  {
+  margin: auto;
+  left:0;
+  right:0;
+  width:fit-content;
+  padding:0px;
+  vertical-align:top;
+  display:inline-block;
+  margin-top:2px;
+  overflow:auto;
+  overflow-x:hidden;
+}
+
+#settingsDiv {
+  padding: 3px;
+  overflow: hidden;
+  margin: auto;
+  top: 3px;
+  left:0;
+  right:0;
+  width: fit-content;
+  display:none;
+  padding: 1px;
+  text-align: center;
+  vertical-align: middle;
+  position: absolute;
+  z-index: 600;
+  border: 1px solid lightblue;
+}

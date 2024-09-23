@@ -1,0 +1,3 @@
+provider: generic
+url: https://download2.gridtracker.org
+updaterCacheDirName: GridTracker2-updater

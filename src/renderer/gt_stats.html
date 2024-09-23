@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!--
+    This file is part of GridTracker.
+
+    GridTracker is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 3 of the License.
+
+    GridTracker is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GridTracker.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<html lang="en" xml:lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Statistics</title>
+    <link rel="stylesheet" href="./lib/style.css" />
+    <script src="./lib/first.js"></script>
+    <script src="./lib/protos.js" type="text/javascript"></script>
+    <script src="./lib/i18n.js" type="text/javascript"></script>
+    <script src="./lib/stats.js"></script>
+  </head>
+
+  <body id="mainBody" onresize="Resize();" onload="init();window.opener.GT.statsWindowInitialized = true">
+    <div
+      id="rootInfoDiv"
+      style="
+        margin: 0px;
+        right: 0px;
+        left: 0px;
+        bottom: 0px;
+        top: 3px;
+        display: block;
+        background-color: black;
+        padding: 0px;
+        text-align: center;
+        vertical-align: middle;
+        position: absolute;
+        z-index: 600;
+        border: 1px green;
+      "
+      class="roundBorder"
+    >
+      <div class="infotab">
+        <button
+          id="qsobox"
+          data-i18n="stats.tabs.logbook"
+          class="infoTablinks active"
+          onclick="resetSearch(); openInfoTab(event, 'workedBoxDiv', 'showWorkedBox')"
+        >
+          Logbook
+        </button>
+        <button id="stabox" data-i18n="stats.tabs.scores" class="infoTablinks" onclick="openInfoTab(event, 'statBoxDiv', 'showStatBox');">
+          Scores
+        </button>
+        <button id="dxcbox" data-i18n="stats.tabs.DXCCs" class="infoTablinks" onclick="openInfoTab(event, 'dxccBoxDiv', 'showDXCCsBox')">
+          DXCCs
+        </button>
+        <button id="cqzbox" data-i18n="stats.tabs.Zones" class="infoTablinks" onclick="openInfoTab(event, 'zonesBoxDiv', 'showZonesBox')">
+          Zones / WAC
+        </button>
+        <button id="waswacbox" data-i18n="stats.tabs.WAS"  class="infoTablinks" onclick="openInfoTab(event, 'wasPlusBoxDiv', 'showWASPlusBox')">
+          WAS / WACP / US48
+        </button>
+        <button id="wpxbox" class="infoTablinks" onclick="openInfoTab(event, 'wpxBoxDiv', 'showWPXBox')">WPX</button>
+        <button id="calbox" data-i18n="stats.tabs.live"  class="infoTablinks" onclick="openInfoTab(event, 'callsignBoxDiv', 'showCallsignBox')">
+          Live
+        </button>
+        <button id="ldrbox" class="infoTablinks" onclick="openInfoTab(event, 'decodeLastDiv', null)">Decodes</button>
+      </div>
+      <div id="statBoxDiv" class="infoTabcontent">
+        <div id="statViewDiv" style="margin: 2px; padding: 2px; overflow: auto"></div>
+      </div>
+      <div id="dxccBoxDiv" class="infoTabcontent">
+        <div id="dxccListDiv" style="margin: 2px; padding: 2px; bottom: 5px"></div>
+      </div>
+      <div id="zonesBoxDiv" class="infoTabcontent">
+        <div id="zonesListDiv" style="margin: 2px; padding: 2px"></div>
+      </div>
+      <div id="wasPlusBoxDiv" class="infoTabcontent">
+        <div id="wasPlusListDiv" style="margin: 2px; padding: 2px"></div>
+      </div>
+      <div id="wpxBoxDiv" class="infoTabcontent">
+        <div id="wpxListDiv" style="margin: 2px; padding: 2px"></div>
+      </div>
+      <div id="workedBoxDiv" class="infoTabcontent">
+        <div id="workedHeadDiv"></div>
+        <div id="workedListDiv" style="margin: 2px; padding: 2px; overflow: auto"></div>
+      </div>
+      <div id="callsignBoxDiv" class="infoTabcontent">
+        <div id="callsignListDiv" style="margin: 2px; padding: 2px"></div>
+      </div>
+      <div id="decodeLastDiv" class="infoTabcontent">
+        <div id="decodeLastListDiv" style="margin: 2px; padding: 2px; overflow: auto; overflow-x: hidden">
+          No decodes yet
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

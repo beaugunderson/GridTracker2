@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<!--
+    This file is part of GridTracker.
+
+    GridTracker is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 3 of the License.
+
+    GridTracker is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GridTracker.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<html xmlns="http://www.w3.org/1999/xhtml" style="height: 100%; width: 100%">
+  <head>
+    <title>Call Roster</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="./lib/style.css" />
+    <link id="roster" rel="stylesheet" href="./lib/style_roster.css" />
+    <script src="./lib/first.js" type="text/javascript"></script>
+    <script src="./lib/protos.js" type="text/javascript"></script>
+    <script src="./lib/third-party.js" type="text/javascript"></script>
+    <script src="./lib/i18n.js" type="text/javascript"></script>
+    <script src="./lib/roster.js " type="text/javascript"></script>
+    <script src="./lib/roster/prepareRosterSettings.js" type="text/javascript"></script>
+    <script src="./lib/roster/processRosterFiltering.js" type="text/javascript"></script>
+    <script src="./lib/roster/processRosterHunting.js" type="text/javascript"></script>
+    <script src="./lib/roster/renderCompactRoster.js" type="text/javascript"></script>
+    <script src="./lib/roster/renderNormalRoster.js" type="text/javascript"></script>
+    <script src="./lib/roster/renderRoster.js" type="text/javascript"></script>
+    <script src="./lib/roster/rosterColumns.js" type="text/javascript"></script>
+    <script src="./lib/roster/rosterColumnFunctions.js" type="text/javascript"></script>
+    <script src="./lib/roster/sendAlerts.js" type="text/javascript"></script>
+  </head>
+  <body id="rosterBody" onload="init()"  onresize="resize()" style="display:none;" class="roster" oncontextmenu="return handleContextMenu(event);">
+    <div id="settingsDiv">
+      <div style="top: 1px; right: 1px; position: absolute">
+        <button class="Xbutton" onclick="closeSettings()">X</button>
+      </div>
+      <div class="infotab">
+        <button data-i18n="settings.General.label" id="generalbox" class="infoTablinks active" onclick="openInfoTab(event, 'generalSettingsDiv')">
+          General
+        </button>
+        <button data-i18n="roster.watcher.label" id="watcherbox" class="infoTablinks" onclick="openInfoTab(event, 'watcherBoxDiv', openWathcherTab);">
+          Watcher
+        </button>
+        <button data-i18n="roster.exceptions.label" id="exceptionsbox" class="infoTablinks" onclick="openInfoTab(event, 'exceptionsBoxDiv')">
+          Exceptions
+        </button>
+        <button data-i18n="roster.ignores.label" id="ingoresbox" class="infoTablinks" onclick="openInfoTab(event, 'ignoresBoxDiv', renderIgnoresTab)">
+          Ignores
+        </button>
+        <button data-i18n="settings.Columns.label" id="columnsbox" class="infoTablinks" onclick="openInfoTab(event, 'columnsBoxDiv', renderColumnsTab)">
+          Columns
+        </button>
+      </div>
+      <div id="generalSettingsDiv" class="infoTabcontent">
+        <div class="mapItem"  align="center">
+          <table >
+            <tr align="center" >
+              <td>Animate 'CQ GT'</td>
+            </tr>
+            <tr align="center">
+              <td>
+                <input type="checkbox" id="animateCQGT" onchange="changeAnimateCQGT(this)" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="mapItem"  align="center">
+          <table >
+            <tr align="center" >
+              <td data-i18n="settings.callroster.AlwaysOnTop.label" >Window Always On Top</td>
+            </tr>
+            <tr align="center">
+              <td>
+                <input type="checkbox" id="rosterAlwaysOnTop" onchange="changeRosterTop(this)" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="mapItem"  align="center">
+          <table>
+            <tr align="center">
+              <td data-i18n="settings.callroster.MaxAge.label">Roster Max Age</td>
+            </tr>
+            <tr align="center">
+              <td id="rosterTimeTd">2m 0s</td>
+            </tr>
+            <tr align="center">
+              <td colspan="2">
+                <input type="range" min="5" max="300" value="120" step="5" class="slider" id="rosterTime"
+                  oninput="changeRosterTime()" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <br/>
+        <div class="mapItem"  align="center">
+          <table>
+            <tr align="center">
+              <td>Clear Roster on Band change</td>
+            </tr>
+            <tr align="center">
+              <td colspan="1">
+                <input type="checkbox" id="clearRosterOnBandChange" onchange="clearRosterOnBandChangeValueChanged(this)" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="mapItem"  align="center">
+          <table>
+            <tr align="center">
+              <td>Decode Delay On Focus</td>
+            </tr>
+            <td  align="center" colspan="1">
+              <input type="checkbox" id="rosterDelayOnFocus" onchange="rosterDelayOnFocusValueChanged(this)" />
+            </td>
+            <tr align="center">
+              <td  style="display:none;" id="rosterDelayTimeTd">1500ms</td>
+            </tr>
+            <tr align="center">
+              <td >
+                <input type="range" min="50" max="5000" value="1500" step="10" class="slider" id="rosterDelayTime"
+                  oninput="changeRosterDelayTime()" style="display:none;" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="mapItem">
+          <div class="button" style="margin: 5px; font:larger; padding:5px;" id="compactModeDiv" onclick="compactModeChanged()">Compact Mode</div>
+        </div>
+        <div class="mapItem" id="compactEnityDiv">
+          <label>Compact Mode Entity<label><br />
+              <select id="compactEntitySelect" onchange="compactEntityChanged()"></select>
+        </div>
+        <br />
+        <div class="mapItem">
+          <table align="center">
+            <tr align="center">
+              <td align="center">Window Filters</td>
+            </tr>
+            <tr align="center">
+              <td align="center">
+                <div class="mapItem">
+                  <table align="center">
+                    <tr align="center">
+                      <td align="center">Brightness</td>
+                    </tr>
+                    <tr align="center">
+                      <td align="center" id="filterbrightnessTd"></td>
+                    </tr>
+                    <tr align="center">
+                      <td colspan="2">
+                        <input type="range" min="10" max="100" value="100" step="1" class="slider"
+                          id="filterbrightnessSlider" oninput="filtersChanged()" />
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+                <div class="mapItem">
+                  <table align="center">
+                    <tr align="center">
+                      <td align="center">Contrast</td>
+                    </tr>
+                    <tr align="center">
+                      <td align="center" id="filtercontrastTd"></td>
+                    </tr>
+                    <tr align="center">
+                      <td colspan="2">
+                        <input type="range" min="10" max="100" value="100" step="1" class="slider" id="filtercontrastSlider"
+                          oninput="filtersChanged()" />
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+                <div class="mapItem">
+                  <table align="center">
+                    <tr align="center">
+                      <td align="center">Saturate</td>
+                    </tr>
+                    <tr align="center">
+                      <td align="center" id="filtersaturateTd"></td>
+                    </tr>
+                    <tr align="center">
+                      <td colspan="2">
+                        <input type="range" min="0" max="200" value="100" step="1" class="slider" id="filtersaturateSlider"
+                          oninput="filtersChanged()" />
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+                <br />
+                <div class="mapItem">
+                  <table align="center">
+                    <tr align="center">
+                      <td align="center">Invert</td>
+                    </tr>
+                    <tr align="center">
+                      <td align="center" id="filterinvertTd"></td>
+                    </tr>
+                    <tr align="center">
+                      <td colspan="2">
+                        <input type="range" min="0" max="100" value="0" step="1" class="slider" id="filterinvertSlider"
+                          oninput="filtersChanged()" />
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+                <div class="mapItem">
+                  <table align="center">
+                    <tr align="center">
+                      <td align="center">Sepia</td>
+                    </tr>
+                    <tr align="center">
+                      <td align="center" id="filtersepiaTd"></td>
+                    </tr>
+                    <tr align="center">
+                      <td colspan="2">
+                        <input type="range" min="0" max="100" value="0" step="1" class="slider" id="filtersepiaSlider"
+                          oninput="filtersChanged()" />
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+                <div class="mapItem">
+                  <table align="center">
+                    <tr align="center">
+                      <td align="center">Hue Rotate</td>
+                    </tr>
+                    <tr align="center">
+                      <td align="center" id="filterhuerotateTd"></td>
+                    </tr>
+                    <tr align="center">
+                      <td colspan="2">
+                        <input type="range" min="0" max="359" value="0" step="1" class="slider" id="filterhuerotateSlider"
+                          oninput="filtersChanged()" />
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="mapItem">
+                  <div class="button" style="margin: 10px;padding:3px;" onclick="resetFilters()" title="Reset Filters">Reset Filters
+                    (Ctrl-R)</div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div id="watcherBoxDiv" class="infoTabcontent">
+        <div class="rowBuilder">
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Regex</th>
+            <th id="watcherTextTh">Input</th>
+            <th>Start<br/>Date</th>
+            <th id="watcherStartDateTh">UTC</th>
+            <th>End<br/>Date</th>
+            <th id="watcherEndDateTh">UTC</th>
+            <th id="watcherAutoDeleteTh"></thid>Auto<br/>Delete</th>
+            <th>Clear</th>
+            <th>Save</th>
+          </tr>
+          <tr>
+            <td>
+              <input id="watcherName" type="text" class="inputTextValue" oninput="watcherOnName()" size="7"/>
+              </td>
+            <td>
+              <select id="watcherType" onchange="watcherTypeChanged(this.value)">
+                <option value="Callsign" data-i18n="roster.controls.hunting.callsign">Callsign</option>
+                <option value="Calling" data-i18n="alerts.QRZ.speech">Calling</option>
+                <option value="Grid" data-i18n="roster.controls.hunting.grid">Grid</option>
+                <option value="Message" data-i18n="gt.WSJTMessage.Message">Message</option>
+              </select>
+            </td>
+            <td>
+              <input type="checkbox" id="watcherRegexCheckbox" onchange="watcherRegexChanged(this.checked)" />
+            </td>
+            <td>
+            <input id="watcherText" type="text" class="inputTextValue" value=""  oninput="watcherOnText()" size="10"/>
+            </td>
+            <td>
+              <input type="checkbox" id="watcherStartDateCheckbox" onchange="watcherStartDateEnable(this.checked)" />
+            </td>
+            <td id="watcherStartDateTd">
+              <input type="datetime-local" required id="watcherStartDate" style="background-color: green; color: yellow;" />
+            </td>
+            <td>
+              <input type="checkbox" id="watcherEndDateCheckbox" onchange="watcherEndDateEnable(this.checked)" />
+            </td>
+            <td id="watcherEndDateTd">
+              <input type="datetime-local" required id="watcherEndDate" style="background-color: green; color: yellow;" />
+            </td>
+            <td id="watcherAutoDeleteTd">
+              <input type="checkbox" id="watcherAutoDeleteCheckbox" />
+            </td>
+            <td style="font:xx-large;cursor:pointer;" onclick="clearWatcher()">🛑</td>
+            <td style="font:xx-large;cursor:pointer;" onclick="saveWatcher()">✅</td>
+          </tr>
+          </table>
+        </div>
+        <div id="watcherEditView"></div>
+      </div>
+      <div id="exceptionsBoxDiv" class="infoTabcontent">
+        <div class="exceptionTab">
+        <div>
+          <input type="checkbox" id="wantMinDB" onchange="valuesChanged();" />
+          <label data-i18n="roster.secondary.exceptions.minDB" for="wantMinDB">Min dB</label>
+          <span id="minDbView" class="roundBorderValue">-24</span>
+          <p>
+          <input
+            type="range"
+            min="-25"
+            max="0"
+            step="1"
+            class="slider"
+            id="minDb"
+            oninput="valuesChanged();"
+          />
+        </div>
+        <div>
+          <input type="checkbox" id="wantMaxDT" onchange="valuesChanged();" />
+          <label data-i18n="roster.secondary.exceptions.maxDT" for="wantMaxDT">Max DT</label>
+          <span id="maxDTView" class="roundBorderValue">.5</span>
+          <p>
+          <input
+            type="range"
+            min="0.1"
+            max="2"
+            step="0.1"
+            class="slider"
+            id="maxDT"
+            oninput="valuesChanged();"
+          />
+        </div>
+        <div>
+          <input type="checkbox" id="wantMinFreq" onchange="valuesChanged();" />
+          <label data-i18n="roster.secondary.exceptions.minFreq" for="wantMinFreq">Min freq</label>
+          <span id="minFreqView" class="roundBorderValue">400</span>
+          <p>
+          <input
+            type="range"
+            min="0"
+            max="2500"
+            step="10"
+            class="slider"
+            id="minFreq"
+            oninput="valuesChanged();"
+          />
+        </div>
+        <div>
+          <input type="checkbox" id="wantMaxFreq" onchange="valuesChanged();" />
+          <label data-i18n="roster.secondary.exceptions.maxFreq" for="wantMaxFreq">Max freq</label>
+          <span id="maxFreqView" class="roundBorderValue">3500</span>
+          <p>
+          <input
+            type="range"
+            min="500"
+            max="3500"
+            step="10"
+            class="slider"
+            id="maxFreq"
+            oninput="valuesChanged();"
+          />
+        </div>
+        <div id="usesLoTWDiv">
+          <input type="checkbox" id="usesLoTW" onchange="valuesChanged();" />
+          <label data-i18n="roster.secondary.exceptions.usesLoTW" for="usesLoTW">Uses LoTW</label>
+          <span id="maxLoTWView" class="roundBorderValue" style="width: 35px;">3</span>
+          <p>
+          <input
+            title="Max time since their last upload"
+            type="range"
+            min="3"
+            max="27"
+            step="3"
+            class="slider"
+            id="maxLoTW"
+            oninput="valuesChanged();"
+          />
+          
+        </div>
+        </div>
+      </div>
+      <div id="ignoresBoxDiv" class="infoTabcontent">
+        <div class="rowBuilder" >
+          Entity&nbsp;
+          <select id="ignoreTypeSelect" onchange="ignoreTypeChanged(this.value);">
+            <option value="Callsign" selected="true">Callsign</option>
+            <option value="CQ">CQ</option>
+            <option value="DXCC">DXCC</option>
+            <option value="Grid">Grid</option>
+            <option value="CQz">CQ Zone</option>
+            <option value="ITUz">ITU Zone</option>
+          </select>
+          <input id="ignoreCallsignValue" type="text" class="inputTextValue"  oninput="this.value = this.value.toUpperCase()" size="10"/>
+          <input id="ignoreGridValue" type="text" class="inputTextValue"  oninput="gridInputValidate(this)" size="10"/>
+          <div id ="ignoreCqDiv">
+            CQ "<input id="ignoreCqCallsignValue" type="text"  class="inputTextValue" oninput="this.value = this.value.toUpperCase()" size="4" value=""/>"
+            From
+            <select id="ignoreCqDxccSelect"><option  value=-1 selected="true">All</option></select>
+          </div>
+          <select id="ignoreDxccSelect" >
+            <option value=-1 selected="true" data-i18n="mapFilter.prop.Unknown">Unknown</option>
+          </select>
+          <select id="ignoreCqzSelect"></select>
+          <select id="ignoreItuzSelect"></select>
+          <button onclick="addNewIgnore()" class="flexButton" style="background-color: #000000;font-weight:bold;font-size:larger;color:lightgreen;">+</button>
+          <labal id="ingnoreAddResultLabel"></label>
+        </div>
+        <div id="ignoresEditView"></div>
+      </div>
+      <div id="columnsBoxDiv" class="infoTabcontent">
+        <div id="columnsEditView">
+        </div>
+      </div>
+    </div>
+    <div id="MainCallRoster" style="display:block;";>
+      <header id="RosterControls">
+        <div id="TransmitControls">
+          <div id="txrxdec" style="background-color: Green; border-style: outset; border-color: yellow;" class="roundBorder">
+          Waiting…
+          </div>
+          <div class="button" style="margin: 3px;" onclick="window.opener.haltAllTx(true);" data-i18n="roster.haltTX">Halt Tx</div>
+          <div class="button" style="margin: 3px;color:cyan;" onclick="openSettings();" data-i18n="roster.menu.Settings"></div>
+
+        </div>
+
+        <div id="MoreControls">
+          <div data-i18n="roster.controls.more" class="link" onclick="toggleMoreControls()" id="ShowMoreControlsLink">More Controls</div>
+        </div>
+
+        <div id="LessControls">
+          <div data-i18n="roster.controls.less" class="link" onclick="toggleMoreControls()" id="ShowFewerControlsLink">Fewer Controls</div>
+        </div>
+
+        <div id="MainRosterControls">
+          <div id="LogbookControls">
+            <label data-i18n="roster.controls.logbook.label" for="referenceNeed">Logbook</label>
+            <select id="referenceNeed" onchange="valuesChanged();">
+              <option data-i18n="roster.controls.logbook.awardTracker" value="6">Award Tracker</option>
+              <option data-i18n="roster.controls.logbook.liveBandMode" value="0" selected="true">Live Band &amp; Mode</option>
+              <option data-i18n="roster.controls.logbook.liveBandMixMode" value="1">Live Band, Mix Modes</option>
+              <option data-i18n="roster.controls.logbook.liveBandDigiMode" value="2">Live Band, Digi Modes</option>
+              <option data-i18n="roster.controls.logbook.mixBandLiveMode" value="3">Mix Band, Live Mode</option>
+              <option data-i18n="roster.controls.logbook.mixBandMode" value="4">Mix Band &amp; Modes</option>
+              <option data-i18n="roster.controls.logbook.mixBandDigiMode" value="5">Mix Band &amp; Digi Modes</option>
+            </select>
+          </div>
+
+          <div id="CallsignsControls">
+            <label data-i18n="roster.controls.callsigns.label" for="callsignNeed">Callsigns</label>
+            <select id="callsignNeed" onchange="valuesChanged();">
+              <option data-i18n="roster.controls.callsigns.worked" value="worked">New</option>
+              <option data-i18n="roster.controls.callsigns.confirmed" value="confirmed">New+Unconfirmed</option>
+              <option data-i18n="roster.controls.callsigns.all" value="all">All Traffic</option>
+              <option data-i18n="roster.controls.callsigns.hits" value="hits">All Traffic/Only Wanted</option>
+            </select>
+          </div>
+
+          <div id="HuntModeControls">
+            <label data-i18n="roster.controls.hunting.label" for="huntMode">Hunting</label>
+            <select id="huntMode" onchange="valuesChanged();" value="callsign">
+              <option data-i18n="roster.controls.hunting.callsign" value="callsign">Callsign</option>
+              <option data-i18n="roster.controls.hunting.grid" value="grid">Grid</option>
+              <option data-i18n="roster.controls.hunting.dxcc" value="dxcc">DXCC</option>
+              <option data-i18n="roster.controls.hunting.dxccSingle" value="dxccs">DXCC (Single)</option>
+              <option data-i18n="roster.controls.hunting.cqZone" value="cq">CQ Zone</option>
+              <option data-i18n="roster.controls.hunting.ituZone" value="itu">ITU Zone</option>
+              <option data-i18n="roster.controls.hunting.usStates" value="usstates">US States (WAS)</option>
+              <option data-i18n="roster.controls.hunting.usState" value="usstate">US State (Single)</option>
+              <option  data-i18n="roster.controls.hunting.wpx"value="wpx">Prefix (WPX)</option>
+            </select>
+
+            <select id="huntNeed" onchange="valuesChanged();">
+              <option data-i18n="roster.controls.huntNeed.worked" value="worked">New</option>
+              <option data-i18n="roster.controls.huntNeed.confirmed" value="confirmed">New+Unconfirmed</option>
+              <option data-i18n="roster.controls.huntNeed.mixed" value="mixed">Mixed</option>
+            </select>
+
+            <select id="stateSelect" onchange="valuesChanged();">
+              <option data-i18n="roster.controls.huntState.label"value="" selected="true">Select Territory</option>
+            </select>
+
+            <select id="DxccSingleSelect" onchange="valuesChanged();"">
+              <option data-i18n="roster.controls.huntDXCC.label" value="-1" selected="true">Select DXCC</option>
+            </select>
+          </div>
+
+          <div id="scriptIcon" style="display: none; padding: 0; margin: 0"></div>
+
+          <div id="AwardTrackerControls">
+            <div id="AwardWantedList"></div>
+            <div data-i18n="roster.controls.awardTracker.addButton" style="margin-top:2px;" class="button" onclick="openAwardPopup()">Add Awards</div>
+
+            <div id="awardHunterDiv" style="display: none;">
+              <table style="padding: 15px">
+                <tr>
+                  <th data-i18n="roster.controls.awardTracker.new" align="center">New Award Tracker</th>
+                </tr>
+                <tr>
+                  <td align="left">
+                    <select id="awardSponsor" onchange="awardSponsorChanged();">
+                      <option data-i18n="roster.controls.awardTracker.sponsor" value="" disabled selected>Sponsor</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left">
+                    <select id="awardName" onchange="awardNameChanged();">
+                      <option data-i18n="roster.controls.awardTracker.name" value="" disabled selected>Name</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center">
+                    <div data-i18n="roster.controls.awardTracker.add" class="button" style="margin: 3px" onclick="closeAwardPopup()">Done</div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <div id="SecondaryRosterControls">
+          <div id="huntingMatrixDiv" class="secondaryControlGroup">
+            <h3 data-i18n="roster.secondary.wanted.label">Wanted</h3>
+            <div class="columns">
+              <div>
+                <input type="checkbox" id="huntCallsign" onchange="wantedChanged(this);" />
+                <label data-i18n="roster.secondary.wanted.callsign" for="huntCallsign">Callsign</label>
+              </div>
+              <div>
+                <input type="checkbox" id="huntGrid" onchange="wantedChanged(this);" />
+                <label data-i18n="roster.secondary.wanted.grid" for="huntGrid">Grid</label>
+              </div>
+              <div>
+                <input type="checkbox" id="huntDXCC" onchange="wantedChanged(this);" />
+                <label data-i18n="roster.secondary.wanted.dxcc" for="huntDXCC">DXCC</label>
+              </div>
+              <div>
+                <input type="checkbox" id="huntQRZ" onchange="wantedChanged(this);" />
+                <label data-i18n="roster.secondary.wanted.qrz" for="huntQRZ" title="Stations calling *you*">QRZ</label>
+              </div>
+              <div>
+                <input type="checkbox" id="huntPX" onchange="wantedChanged(this);" />
+                <label data-i18n="roster.secondary.wanted.wpx" for="huntPX">WPX</label>
+              </div>
+              <div id="huntingMatrixPotaDiv">
+                <input type="checkbox" id="huntPOTA" onchange="wantedChanged(this);" />
+                <label data-i18n="roster.secondary.wanted.pota" for="huntPOTA" title="Parks On The Air">POTA</label>
+              </div>
+               <div id="huntingMatrixOAMSDiv">
+                <input type="checkbox" id="huntOAMS" onchange="wantedChanged(this);" />
+                <label data-i18n="roster.secondary.wanted.OAMS" for="huntOAMS" title="Off-Air Message Service Users">OAMS</label>
+              </div>
+              <div>
+                <input type="checkbox" id="huntCQz" onchange="wantedChanged(this);" />
+                <label data-i18n="roster.secondary.wanted.cqzone" for="huntCQz" title="CQ Zones">CQz</label>
+              </div>
+              <div>
+                <input type="checkbox" id="huntITUz" onchange="wantedChanged(this);" />
+                <label data-i18n="roster.secondary.wanted.ituzone" for="huntITUz" title="ITU Zones">ITUz</label>
+              </div>
+              <div>
+                <input type="checkbox" id="huntMarathon" onchange="wantedChanged(this);" />
+                <label data-i18n="roster.secondary.wanted.marathon" for="huntMarathon" title="CQ DX Marathon">Marathon</label>
+              </div>
+              <div>
+                <input type="checkbox" id="huntState" onchange="wantedChanged(this);" />
+                <label data-i18n="roster.secondary.wanted.state" for="huntState" title="State">State</label>
+              </div>
+              <div>
+                <input type="checkbox" id="huntCounty" onchange="wantedChanged(this);" />
+                <label data-i18n="roster.secondary.wanted.county" for="huntCounty" title="County">County</label>
+              </div>
+              <div>
+                <input type="checkbox" id="huntCont" onchange="wantedChanged(this);" />
+                <label data-i18n="roster.secondary.wanted.cont" for="huntCont" title="Continent">Continent</label>
+              </div>
+              <div>
+                <input  type="checkbox" id="huntWatcher" onchange="wantedChanged(this);" />
+                <label data-i18n="roster.watcher.label" for="huntWatcher" class="flexButton" onclick="openWatcher();">Watcher</label>
+              </div>
+            </div>
+          </div>
+          <div  id="exceptionDiv" class="secondaryControlGroup" >
+            <h3 data-i18n="roster.exceptions.label">Exceptions</h3>
+            <div class="columns">
+              <div>
+                <input type="checkbox" id="cqOnly" onchange="valuesChanged();" />
+              <label data-i18n="roster.secondary.exceptions.cqOnly" for="cqOnly">CQ Only</label>
+              </div>
+              <div>
+                <input type="checkbox" id="wantRRCQ" onchange="valuesChanged();" />
+                <label data-i18n="roster.secondary.exceptions.wantRRCQ" for="wantRRCQ">RR73 as CQ</label>
+              </div>
+              <div>
+                <input type="checkbox" id="wantGrid" onchange="valuesChanged();" />
+                <label data-i18n="roster.secondary.exceptions.hasGrid" for="wantGrid">Has Grid</label>
+            </div>
+              <div>
+                <input type="checkbox" id="noMyDxcc" onchange="onlyMyDxcc.checked=false; valuesChanged();" />
+                <label data-i18n="roster.secondary.exceptions.noMyDXCC" for="noMyDxcc">Not My DXCC</label>
+              </div>
+              <div>
+                <input type="checkbox" id="onlyMyDxcc" onchange="noMyDxcc.checked=false; valuesChanged();" />
+                <label data-i18n="roster.secondary.exceptions.onlyMyDXCC" for="onlyMyDxcc">Only My DXCC</label>
+              </div>   
+
+   
+            <div id="allOnlyNewDiv">
+              <input type="checkbox" id="allOnlyNew" onchange="valuesChanged();" />
+              <label data-i18n="roster.secondary.exceptions.allOnlyNew" for="allOnlyNew">New Calls</label>
+            </div>
+             <div id="onlySpotDiv">
+              <input type="checkbox" id="onlySpot" onchange="valuesChanged();" />
+              <label data-i18n="roster.secondary.exceptions.spottedMe" for="onlySpot">Spotted Me</label>
+            </div>
+            <div id="useseQSLDiv">
+              <input type="checkbox" id="useseQSL" onchange="valuesChanged();" />
+              <label data-i18n="roster.secondary.exceptions.useseQSL" for="useseQSL">Uses eQSL</label>
+            </div>
+            <div id="usesOQRSDiv">
+              <input type="checkbox" id="usesOQRS" onchange="valuesChanged();" />
+              <label data-i18n="roster.secondary.exceptions.usesOQRS" for="usesOQRS">Uses OQRS</label>
+            </div>
+            <div class="flexButton"  style="margin-left: 18px;font-weight: bolder;" onclick="openExceptions()">&nbsp;. . .&nbsp;</div>           
+       
+         </div>
+
+        </div>
+
+      </header>
+
+      <div id="instancesWrapper">
+        <div id="instancesDiv"></div>
+      </div>
+
+      <main id="RosterTable"></main>
+    </div>
+
+    <div id="rosterDelayDiv" class="roundBorder" style="display:none; margin: 0px; margin-top: -1px; position:fixed; top:3px; left:3px;font-size:larger;">&#8987;</div>
+
+
+  </body>
+</html>

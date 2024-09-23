@@ -1,0 +1,10 @@
+node_modules
+dist
+out
+.DS_Store
+*.log*
+.env
+AuthKey_XX93T2PALT.p8
+beau-gunderson.pfx
+mac-signing-certificate.p12
+.VSCodeCounter

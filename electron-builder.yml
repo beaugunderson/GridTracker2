@@ -1,0 +1,59 @@
+appId: org.gridtracker.GridTracker2
+productName: GridTracker2
+directories:
+  buildResources: build
+files:
+  - '!**/.vscode/*'
+  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+asar: true
+win:
+  executableName: GridTracker2
+  target:
+    - target: nsis
+      arch:
+        - x64
+        - ia32
+nsis:
+  artifactName: ${name}-${version}-setup.${ext}
+  shortcutName: ${productName}
+  uninstallDisplayName: ${productName}
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  oneClick: true
+mac:
+  entitlementsInherit: build/entitlements.mac.plist
+  extendInfo:
+    - NSDocumentsFolderUsageDescription: GridTracker requests access to the user's Documents folder.
+    - NSDownloadsFolderUsageDescription: GridTracker requests access to the user's Downloads folder.
+    - NSHumanReadableCopyright: Copyright (c) 2024 GridTracker.org
+    - NSLocalNetworkUsageDescription: GridTracker needs access to the local network to talk to WSJT-X
+    - NSMicrophoneUsageDescription: GridTracker requests access to the device's microphone.
+  notarize: true
+  target:
+    - target: dmg
+      arch:
+        - universal
+dmg:
+  artifactName: ${name}-${version}.${ext}
+linux:
+  target:
+    - deb
+    - rpm
+    - tar.gz
+    - AppImage
+    #- flatpak broke in arm ... will fix later
+    - pacman
+    - apk
+    # freebsd # These aren't true FreeBSD builds, it's a Lin AMD64 binary in FreeBSD wrapper which isn't BSD legal
+    # requires building on a linux machine or a multipass.run account
+    #- snap
+  maintainer: gridtracker.org
+  category: Utility
+  artifactName: ${name}-${version}-${arch}.${ext}
+flatpak:
+  runtimeVersion: 23.08
+npmRebuild: false
+publish:
+  provider: generic
+  url: https://download2.gridtracker.org

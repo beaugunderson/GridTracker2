@@ -1,0 +1,427 @@
+variables:
+  APT_CACHE_DIR: $CI_PROJECT_DIR/.cache/apt
+  DL_SERVER_ADDRESS: ""
+  DL_SERVER_USER: gitlab
+  DL_SERVER_PASS: ""
+  PACKAGE_REGISTRY_URL: '${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${APPNAME}/${VERSION}'
+  PACKAGE_REGISTRY_URL_YML: '${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${APPNAME}'
+
+  # nothing in this file will be allowed to run automatically except for:
+  # 1. merge requests // MR should validate linting at the least
+  # 2. manual tagging // maybe not anymore with Electron
+  # 3. committing to the default branch // this is the typical release behavior for Electron
+
+include:
+  - template: "Workflows/MergeRequest-Pipelines.gitlab-ci.yml"
+  - template: "Security/Dependency-Scanning.gitlab-ci.yml"
+  - template: "Security/Secret-Detection.gitlab-ci.yml"
+  - template: "Security/SAST.gitlab-ci.yml"
+
+stages:
+  - test
+  - build
+  - upload
+  - release
+
+win:build:
+  stage: build
+  image: electronuserland/builder:wine
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/(v|test_|win_).*/'
+  artifacts:
+    reports:
+      dotenv: build.env
+    name: '$CI_COMMIT_REF_SLUG'
+    paths:
+      - '$CI_PROJECT_DIR/dist/*.*'
+    when: on_success
+  cache:
+    paths:
+      - .cache/
+      - node_modules/
+  before_script:
+    - npm install
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+  script:
+    - export VERSION=$(node -e "console.log(require('./package.json').version)")
+    - echo "VERSION=$VERSION" >> build.env
+    - export APPNAME=$(node -e "console.log(require('./package.json').name)")
+    - echo "APPNAME=$APPNAME" >> build.env
+    - echo "${APPNAME}-${VERSION}"
+    - npm run build:win
+    - ls dist
+
+
+mac:build:
+  tags:
+    - saas-macos-medium-m1
+  stage: build
+  image: macos-14-xcode-15
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/(v|test_|mac_).*/'
+  artifacts:
+    reports:
+      dotenv: build.env
+    name: '$CI_COMMIT_REF_SLUG'
+    paths:
+      - '$CI_PROJECT_DIR/dist/*.*'
+    when: on_success
+  cache:
+    paths:
+      - .cache/
+      - node_modules/
+  before_script:
+    - npm install
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+  script:
+    - export VERSION=$(node -e "console.log(require('./package.json').version)")
+    - echo "VERSION=$VERSION" >> build.env
+    - export APPNAME=$(node -e "console.log(require('./package.json').name)")
+    - echo "APPNAME=$APPNAME" >> build.env
+    - echo "${APPNAME}-${VERSION}"
+    - npm run build:mac
+    - ls dist
+
+
+lin:build:
+  stage: build
+  image: electronuserland/builder
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/(v|test_|lin_).*/'
+  artifacts:
+    reports:
+      dotenv: build.env
+    name: '$CI_COMMIT_REF_SLUG'
+    paths:
+      - '$CI_PROJECT_DIR/dist/*.*'
+    when: on_success
+  cache:
+    paths:
+      - .cache/
+      - node_modules/
+  before_script:
+    - npm install
+    - apt update -y && apt install flatpak flatpak-builder -y
+    - flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
+  script:
+    - export VERSION=$(node -e "console.log(require('./package.json').version)")
+    - echo "VERSION=$VERSION" >> build.env
+    - export APPNAME=$(node -e "console.log(require('./package.json').name)")
+    - echo "APPNAME=$APPNAME" >> build.env
+    - echo "${APPNAME}-${VERSION}"
+    - npm run build:linux
+    - ls dist
+          
+arm64:build:
+  stage: build
+  tags:
+   - saas-linux-medium-arm64
+  image: arm64v8/fedora:40
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/(v|test_|lin_|arm_).*/'
+  artifacts:
+    reports:
+      dotenv: build.env
+    name: '$CI_COMMIT_REF_SLUG'
+    paths:
+      - '$CI_PROJECT_DIR/dist/*.*'
+    when: on_success
+  cache:
+    paths:
+      - .cache/
+      - node_modules/
+  before_script:
+    - dnf install gcc elfutils flatpak flatpak-builder make pacman ruby-devel rubygems rpm-build npm -y
+    - npm install
+    - gem install fpm
+    - flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    - flatpak install flathub org.freedesktop.Platform/aarch64/23.08 -y
+    - flatpak info --show-commit --user org.freedesktop.Platform/aarch64/23.08
+  script:
+    - export VERSION=$(node -e "console.log(require('./package.json').version)")
+    - echo "VERSION=$VERSION" >> build.env
+    - export APPNAME=$(node -e "console.log(require('./package.json').name)")
+    - echo "APPNAME=$APPNAME" >> build.env
+    - echo "${APPNAME}-${VERSION}"
+    - export USE_SYSTEM_FPM=true
+    - export FLATPAK_USER_DIR=/home/$USER/.local/share/flatpak
+    - export XDG_RUNTIME_DIR=/run/user/$(id -u)
+    - npm install
+    #- export DEBUG=electron-builder,flatpak # uncomment this line to enable debugging
+    #- export DEBUG="electron-builder,@malept/flatpak-bundler"
+    - npm run build:arm64
+    - ls dist
+      
+arm32:build:
+  stage: build
+  tags:
+   - saas-linux-medium-arm64
+  image: arm64v8/fedora:40
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/(v|test_|lin_|arm_).*/'
+  artifacts:
+    reports:
+      dotenv: build.env
+    name: '$CI_COMMIT_REF_SLUG'
+    paths:
+      - '$CI_PROJECT_DIR/dist/*.*'
+    when: on_success
+  cache:
+    paths:
+      - .cache/
+      - node_modules/
+  before_script:
+    - dnf install gcc elfutils flatpak flatpak-builder make pacman ruby-devel rubygems rpm-build npm -y
+    - npm install
+    - gem install fpm
+    - flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    - flatpak install flathub org.freedesktop.Platform/aarch64/23.08 -y
+    - flatpak info --show-commit --user org.freedesktop.Platform/aarch64/23.08
+  script:
+    - export VERSION=$(node -e "console.log(require('./package.json').version)")
+    - echo "VERSION=$VERSION" >> build.env
+    - export APPNAME=$(node -e "console.log(require('./package.json').name)")
+    - echo "APPNAME=$APPNAME" >> build.env
+    - echo "${APPNAME}-${VERSION}"
+    - export USE_SYSTEM_FPM=true
+    - export FLATPAK_USER_DIR=/home/$USER/.local/share/flatpak
+    - export XDG_RUNTIME_DIR=/run/user/$(id -u)
+    - npm install
+    #- export DEBUG=electron-builder,flatpak # uncomment this line to enable debugging
+    #- export DEBUG="electron-builder,@malept/flatpak-bundler"
+    - npm run build:arm32
+    - ls dist
+      
+win:upload:
+  stage: upload
+  image: fedora:40
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/(v|test_|win_).*/'
+  needs:
+    - job: win:build
+      artifacts: true
+  script:
+    #- source build.env
+    - echo "${APPNAME}-${VERSION}"
+    - |
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-setup.exe" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-setup.exe"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/latest.yml" "${PACKAGE_REGISTRY_URL_YML}/latest.yml"
+      echo "${PACKAGE_REGISTRY_URL_YML}/latest.yml"
+
+mac:upload:
+  stage: upload
+  image: fedora:40
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/(v|test_|mac_).*/'
+  needs:
+    - job: mac:build
+      artifacts: true
+  script:
+    #- source build.env
+    - echo "${APPNAME}-${VERSION}"
+    - |
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}.dmg" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}.dmg"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/latest-mac.yml" "${PACKAGE_REGISTRY_URL_YML}/latest-mac.yml"
+      echo "${PACKAGE_REGISTRY_URL_YML}/latest-mac.yml"
+
+lin:upload:
+  stage: upload
+  image: fedora:40
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/(v|test_|lin_).*/'
+  needs:
+    - job: lin:build
+      artifacts: true
+  script:
+    #- source build.env
+    - echo "${APPNAME}-${VERSION}"
+    # putting this commented flatpak thing here since can't comment in multiline and these don't like single line
+    # curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-x86_64.flatpak" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x86_64.flatpak" 
+    - |
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-amd64.deb" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-amd64.deb"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-x64.apk" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x64.apk"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-x86_64.AppImage" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x86_64.AppImage"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-x64.pacman" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x64.pacman"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-x64.tar.gz" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x64.tar.gz"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-x86_64.rpm" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x86_64.rpm"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/latest-linux.yml" "${PACKAGE_REGISTRY_URL_YML}/latest-linux.yml"
+      echo "${PACKAGE_REGISTRY_URL_YML}/latest-linux-x64.yml"
+
+arm:upload:
+  stage: upload
+  image: fedora:40
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/(v|test_|lin_).*/'
+  needs:
+    - job: arm64:build
+      artifacts: true
+    - job: arm32:build
+      artifacts: true
+  script:
+    #- source build.env
+    - echo "${APPNAME}-${VERSION}"
+    # putting this commented flatpak thing here since can't comment in multiline and these don't like single line
+    # curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-x86_64.flatpak" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x86_64.flatpak" 
+    - |
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-arm64.deb" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-arm64.deb"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-armv7l.deb" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-armv7l.deb"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-arm64.apk" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-arm64.apk"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-armv7l.apk" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-armv7l.apk"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-arm64.AppImage" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-arm64.AppImage"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-armv7l.AppImage" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-armv7l.AppImage"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-aarch64.pacman" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-arm64.pacman"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-armv7l.pacman" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-armv7l.pacman"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-arm64.tar.gz" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-arm64.tar.gz"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-armv7l.tar.gz" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-armv7l.tar.gz"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-aarch64.rpm" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-aarch64.rpm"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-armv7l.rpm" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-armv7l.rpm"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/latest-linux-arm.yml" "${PACKAGE_REGISTRY_URL_YML}/latest-linux-arm.yml"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/latest-linux-arm64.yml" "${PACKAGE_REGISTRY_URL_YML}/latest-linux-arm64.yml"
+      echo "${PACKAGE_REGISTRY_URL_YML}/latest-linux-arm32.yml"
+      echo "${PACKAGE_REGISTRY_URL_YML}/latest-linux-arm64.yml"
+
+upload-gtserv:
+  image: fedora:40
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/v.*/'
+  needs:
+    - job: win:build
+      artifacts: true
+    - job: mac:build
+      artifacts: true
+    - job: lin:build
+      artifacts: true
+    - job: arm32:build
+      artifacts: true
+    - job: arm64:build
+      artifacts: true
+    - job: win:upload
+      artifacts: true
+    - job: mac:upload
+      artifacts: true
+    - job: lin:upload
+      artifacts: true
+    - job: arm:upload
+      artifacts: true
+  stage: release
+  before_script:
+    - dnf install curl-minimal ncurses openssh-clients which -y
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+    - chmod 700 .secure_files/gt_serv.key
+    - mkdir -p ~/.ssh
+    - touch ~/.ssh/known_hosts
+    - eval $(ssh-agent)
+    - ssh-add .secure_files/gt_serv.key
+    - ssh-keyscan ${GT_SERV_ADDRESS} >> ~/.ssh/known_hosts
+  script:
+    - echo ${APPNAME}-${VERSION}
+    - scp -r dist/* ${GT_SERV_USER}@${GT_SERV_ADDRESS}:~/gt2_download/
+
+auto-release-main:
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/v.*/'
+  needs:
+    - job: win:build
+      artifacts: true
+    - job: mac:build
+      artifacts: true
+    - job: lin:build
+      artifacts: true
+    - job: arm32:build
+      artifacts: true
+    - job: arm64:build
+      artifacts: true
+    - job: win:upload
+      artifacts: true
+    - job: mac:upload
+      artifacts: true
+    - job: lin:upload
+      artifacts: true
+    - job: arm:upload
+      artifacts: true
+  stage: release
+  release:
+    tag_name: $CI_COMMIT_TAG
+    name: Release $APPNAME $VERSION
+    description: Created using the release-cli. $CI_COMMIT_TITLE
+    ref: $CI_COMMIT_SHA
+    assets:
+      links:
+        - name: Windows $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-setup.exe
+          link_type: package
+        - name: Windows $APPNAME $VERSION Latest
+          url: ${PACKAGE_REGISTRY_URL_YML}/latest.yml
+          link_type: other
+        - name: MacOS $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}.dmg
+          link_type: package
+        - name: MacOS $APPNAME $VERSION Latest
+          url: ${PACKAGE_REGISTRY_URL_YML}/latest-mac.yml
+          link_type: other
+        - name: Linux x64 tar.gz $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x64.tar.gz
+          link_type: package
+        - name: Linux amrv7l tar.gz $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-armv7l.tar.gz
+          link_type: package
+        - name: Linux arm64 tar.gz $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-arm64.tar.gz
+          link_type: package
+        - name: Linux x86_64 AppImage $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x86_64.AppImage
+          link_type: package
+        - name: Linux armv7l AppImage $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-armv7l.AppImage
+          link_type: package
+        - name: Linux arm64 AppImage $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-arm64.AppImage
+          link_type: package
+        - name: Linux amd64 Debian $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-amd64.deb
+          link_type: package
+        - name: Linux armv7l Debian $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-armv7l.deb
+          link_type: package
+        - name: Linux arm64 Debian $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-arm64.deb
+          link_type: package
+        - name: Linux x86_64 RPM $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x86_64.rpm
+          link_type: package
+        - name: Linux armv7l $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-armv7l.rpm
+          link_type: package
+        - name: Linux aarch64 RPM $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-aarch64.rpm
+          link_type: package
+        - name: Linux x64 PACMAN $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x64.pacman
+          link_type: package
+        - name: Linux armv7l PACMAN $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-armv7l.pacman
+          link_type: package
+        - name: Linux aarch64 PACMAN $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-aarch64.pacman
+          link_type: package
+        - name: Linux x64 APK $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x64.apk
+          link_type: package
+        - name: Linux armv7l APK $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-armv7l.apk
+          link_type: package
+        - name: Linux arm64 APK $APPNAME $VERSION
+          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-arm64.apk
+          link_type: package
+        - name: Linux $APPNAME $VERSION x64 Latest
+          url: ${PACKAGE_REGISTRY_URL}/latest-linux.yml
+          link_type: other
+        - name: Linux $APPNAME $VERSION armv7l Latest
+          url: ${PACKAGE_REGISTRY_URL}/latest-linux-arm.yml
+          link_type: other
+        - name: Linux $APPNAME $VERSION arm64 Latest
+          url: ${PACKAGE_REGISTRY_URL}/latest-linux-arm64.yml
+          link_type: other
+  script:
+    - echo "Release for $CI_COMMIT_TAG"

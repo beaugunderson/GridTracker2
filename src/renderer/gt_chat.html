@@ -1,0 +1,745 @@
+<!--
+    This file is part of GridTracker.
+
+    GridTracker is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 3 of the License.
+
+    GridTracker is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GridTracker.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<html xmlns="http://www.w3.org/1999/xhtml" style="height: 100%; width: 100%">
+  <head>
+    <title>Off-Air Message Service (OAMS)</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="./lib/style.css" />
+    <link rel="stylesheet" href="./lib/chat.css" />
+    <script src="./lib/first.js"></script>
+    <script src="./lib/protos.js" type="text/javascript"></script>
+    <script src="./lib/third-party.js" type="text/javascript"></script>
+    <script type="text/javascript">
+   
+      var g_knownSources = {};
+      g_knownSources.GT = "GridTracker";
+      g_knownSources.L4 = "Log4OM";
+
+      document.addEventListener("dragover", function (event)
+      {
+        event.preventDefault();
+      });
+
+      document.addEventListener("drop", function (event)
+      {
+        event.preventDefault();
+      });
+
+      function timeNowSec()
+      {
+        return parseInt(Date.now() / 1000);
+      }
+
+      function scrollDown(objDiv)
+      {
+        objDiv.scrollTop = objDiv.scrollHeight;
+      }
+
+      function scrollUp(objDiv)
+      {
+        objDiv.scrollTop = 0;
+      }
+
+      function htmlEntities(str)
+      {
+        return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      }
+
+
+      document.addEventListener("keydown", handleEnter, false);
+      document.addEventListener("keyup", handleKey, false);
+
+      function handleEnter(event)
+      {
+        if (event.key == "Enter")
+        {
+          event.preventDefault();
+          return false;
+        }
+        return true;
+      }
+
+      function handleKey(event)
+      {
+        if (event.key == "Enter")
+        {
+          // Do work
+          var msg = messageInput.value.trim();
+          if (msg.length > 0 && g_currentId != 0 && g_currentId in window.opener.GT.gtFlagPins && window.opener.GT.gtFlagPins[g_currentId].canmsg == true) 
+          {
+            var worker = "";
+            // No message history, so lets clear the div
+            if (!(g_currentId in window.opener.GT.gtMessages)) messageTextDiv.innerHTML = "";
+
+            if (g_currentId in window.opener.GT.gtSentAwayToCid)
+            {
+              var thisMsg = "Returned from away.";
+              window.opener.gtSendMessage(thisMsg, g_currentId);
+              worker = makeViewMessage("self", window.opener.GT.appSettings.myCall, thisMsg);
+              messageTextDiv.innerHTML += worker;
+              delete window.opener.GT.gtSentAwayToCid[g_currentId];
+            }
+            if (window.opener.GT.msgSettings.msgAwaySelect == 1)
+            {
+              window.opener.msgAwaySelect.value = 0;
+              window.opener.newMessageSetting(window.opener.msgAwaySelect);
+            }
+            window.opener.gtSendMessage(msg, g_currentId);
+            worker = makeViewMessage("self", window.opener.GT.appSettings.myCall, htmlEntities(msg));
+            messageTextDiv.innerHTML += worker;
+            scrollDown(messageTextDiv);
+          }
+          messageInput.value = "";
+        }
+      }
+
+      function init()
+      {
+        window.opener.GT.chatWindowInitialized = true;
+        Resize();
+        showAllCallsigns();
+      }
+
+      var g_viewBand = 0;
+
+      function toggleBand()
+      {
+        g_viewBand ^= 1;
+        showAllCallsigns();
+      }
+
+      var g_viewMode = 0;
+
+      function toggleMode()
+      {
+        g_viewMode ^= 1;
+        showAllCallsigns();
+      }
+
+      function openIdCid(from)
+      {
+        if (from.currentTarget.id in window.opener.GT.gtFlagPins)
+        {
+          openId(from.currentTarget.id);
+        }
+        else 
+        {
+          var node = document.getElementById(from.currentTarget.id);
+          if (node)
+          {
+            allCallDiv.removeChild(node);
+          }
+        }
+      }
+
+      function openLookupCid(from)
+      {
+        from.preventDefault();
+
+        if (from.currentTarget.id in window.opener.GT.gtFlagPins)
+        {
+          doLookup(window.opener.GT.gtFlagPins[from.currentTarget.id].call);
+        }
+        else 
+        {
+          var node = document.getElementById(from.currentTarget.id);
+          if (node)
+          {
+            allCallDiv.removeChild(node);
+          }
+        }
+      }
+
+      function onHoverCid(from) 
+      {
+        var cid = from.currentTarget.id;
+        if (cid in window.opener.GT.gtFlagPins)
+        {
+          from.currentTarget.title = window.opener.GT.gtFlagPins[cid].band + " , " + window.opener.GT.gtFlagPins[cid].mode + " , " + window.opener.GT.dxccToAltName[window.opener.GT.gtFlagPins[cid].dxcc];
+        }
+        else
+        {
+          var node = document.getElementById(cid);
+          if (node)
+          {
+            allCallDiv.removeChild(node);
+          }
+        }
+      }
+
+      function insertAfter(newNode, referenceNode)
+      {
+        referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+      }
+
+      function makeCallsignRow(callObj, show)
+      {
+        var isNewObj = false;
+        var obj = document.getElementById(callObj.cid);
+        if (obj && obj.fCall != callObj.fCall)
+        {
+          // callsign changed
+          allCallDiv.removeChild(obj);
+          obj = null;
+        }
+        if (!obj) 
+        {
+          isNewObj = true; 
+          var low = 0;
+          var mid = 0;
+          var target = null;
+          var high = allCallDiv.childElementCount;
+
+          var newDiv = document.createElement("div");
+          newDiv.id =  callObj.cid;
+          newDiv.fCall = callObj.fCall;
+          newDiv.onmouseenter = onHoverCid;
+          newDiv.style.cursor = "pointer";
+          newDiv.style.display = show ? "" : "none";
+          newDiv.onclick = openIdCid;
+          newDiv.oncontextmenu = openLookupCid;
+         
+          var worker = "<div id='"+callObj.cid +"CALL' style='clear:both;' class='"+ (callObj.live == false ? "rosterOff" : "rosterOn") + "'>" + callObj.fCall;
+          if (callObj.dxcc > 0 && callObj.dxcc in window.opener.GT.dxccInfo)
+          {
+            worker += "<img src='img/flags/16/" + window.opener.GT.dxccInfo[callObj.dxcc].flag +"' style='float:right;'>";
+          }
+          worker += "</div>";
+          newDiv.innerHTML = worker;
+
+          while (low < high) 
+          {
+              mid = (low + high) >>> 1;
+              if (allCallDiv.childNodes[mid].fCall < callObj.fCall) 
+              {
+                low = mid + 1;
+              }
+              else
+              {
+                high = mid;
+              }
+              target = allCallDiv.childNodes[low];
+          }
+
+          allCallDiv.insertBefore(newDiv, target);
+        } 
+        else 
+        {
+          var callDiv = document.getElementById(callObj.cid + "CALL");
+          if (callDiv)
+          {
+            callDiv.className = (callObj.live == false ? "rosterOff" : "rosterOn");
+          }
+          obj.style.display = show ? "" : "none";
+        }
+        return isNewObj;
+      }
+
+      function updateCallsign(id)
+      {
+        if (id in window.opener.GT.gtFlagPins)
+        {
+          var obj = window.opener.GT.gtFlagPins[id];
+          if (obj.call != "" && obj.call != "NOCALL") 
+          {
+            var show = true;
+            try {
+              if (searchBox.value.length > 0 && !obj.call.match(searchBox.value))
+              {
+                show = false;
+              }
+            }
+            catch (e) {}
+
+            if (g_viewBand > 0 && window.opener.GT.appSettings.myBand != obj.band) show = false;
+
+            if (g_viewMode > 0 && window.opener.GT.appSettings.myMode != obj.mode) show = false;
+
+            if (obj.canmsg == false) show = false;
+
+            makeCallsignRow(obj, show);
+
+            if (obj.cid == g_currentId && messageInput.disabled == true && obj.live == true)
+            {
+              messageTextDiv.innerHTML += makeViewMessage("system", "GT", "Session resumed", null);
+              messageInput.value = "";
+              scrollDown(messageTextDiv);
+              messageInput.disabled = false;
+            }
+          }
+          if (id == g_currentId)
+          {
+            updateBar(g_currentId);
+          }
+
+        }
+        else
+        {
+          var node = document.getElementById(id);
+          if (node)
+          {
+            allCallDiv.removeChild(node);
+          }
+        }
+        updateCount();
+      }
+
+      function updateCount()
+      {
+        var count = 0;
+        if(allCallDiv.childElementCount > 0)
+        {
+          for (var x = allCallDiv.childNodes.length-1; x > -1;  x--)
+          {
+            if (allCallDiv.childNodes[x].style.display != "none")
+            {
+              count++;
+            }
+          }
+        }
+        userCount.innerHTML = count;
+      }
+
+      function removeAllChildNodes(parent) 
+      {
+        while (parent.firstChild) 
+        {
+          parent.removeChild(parent.firstChild);
+        }
+      }
+
+      function showAllCallsigns(justSearching = false)
+      {
+        allCallDiv.style.display = "none";
+        if (justSearching == false)
+        {
+          removeAllChildNodes(allCallDiv);
+        }
+
+        for (const x in window.opener.GT.gtFlagPins)
+        {
+          var obj = window.opener.GT.gtFlagPins[x];
+          if (obj.call != "" && obj.call != "NOCALL") 
+          {
+            var show = true;
+            try {
+              if (searchBox.value.length > 0 && !obj.call.match(searchBox.value))
+              {
+                show = false;
+              }
+            }
+            catch (e) {}
+
+            if (g_viewBand > 0 && window.opener.GT.appSettings.myBand != obj.band) show = false;
+
+            if (g_viewMode > 0 && window.opener.GT.appSettings.myMode != obj.mode) show = false;
+
+            if (obj.canmsg == false) show = false;
+
+            makeCallsignRow(obj, show);
+
+            if (obj.cid == g_currentId && messageInput.disabled == true && obj.live == true)
+            {
+              messageTextDiv.innerHTML += makeViewMessage("system", "GT", "Session resumed", null);
+              messageInput.value = "";
+              scrollDown(messageTextDiv);
+              messageInput.disabled = false;
+            }
+          }
+        }
+        
+        updateBar(g_currentId);
+        updateCount();
+
+        if (g_viewBand)
+        {
+          viewBand.innerHTML = window.opener.GT.appSettings.myBand;
+        }
+        else 
+        {
+          viewBand.innerHTML = "All";
+        }
+
+        if (g_viewMode)
+        {
+          viewMode.innerHTML = window.opener.GT.appSettings.myMode;
+        }
+        else
+        {
+          viewMode.innerHTML = "All";
+        }
+
+        allCallDiv.style.display = "";
+
+        messagesRedraw();
+      }
+
+      function messagesRedraw()
+      {
+        showAllMessages();
+        Resize();
+      }
+
+      function showAllMessages()
+      {
+        activeCallsignsDiv.innerHTML = "<font color='gray'>no message history</font>";
+        if (Object.keys(window.opener.GT.gtMessages).length > 0)
+        {
+          var worker = "";
+          for (const key in window.opener.GT.gtMessages)
+          {
+            if (key in window.opener.GT.gtFlagPins)
+            {
+              worker += "<tr style='cursor:pointer;vertical-align:bottom;'><td align=left onclick=\"openId('" + key + "');\">";
+              if (key in window.opener.GT.gtUnread)
+              {
+                worker += "🔥";
+              }
+              else
+              {
+                worker += "💬";
+              }
+
+              worker += "</td><td align=left style='color:cyan;' onclick=\"openId('" + key + "');\" >" + formatCallsign(window.opener.GT.gtFlagPins[key].call) + "</td>";
+              worker += "<td align=right title='Clear Messages' style='padding-bottom:2px' onclick=\"clearMessage('" + key + "');\"  >❌</td></tr>";
+            }
+          }
+          if (worker.length > 0)
+          {
+            activeCallsignsDiv.innerHTML = "<table style='width:100%;'>" + worker + "</table>";
+          }
+        }
+      }
+
+      function clearMessage(what)
+      {
+        try
+        {
+          if (what in window.opener.GT.gtMessages) delete window.opener.GT.gtMessages[what];
+          if (what in window.opener.GT.gtUnread) delete window.opener.GT.gtUnread[what];
+        } 
+        catch (e) {}
+
+        if (what == g_currentId)
+        {
+          g_currentId = "";
+          openId(what);
+        }
+        messagesRedraw();
+      }
+
+      function updateEverything()
+      {
+        showAllCallsigns();
+      }
+
+      var g_currentId = 0;
+
+      var regex = /[^\u0000-\u00ff]/; // Small performance gain from pre-compiling the regex
+      function containsDoubleByte(str)
+      {
+        if (!str.length) return false;
+        if (str.charCodeAt(0) > 255) return true;
+        return regex.test(str);
+      }
+
+      function makeViewMessage(className, who, msg, when)
+      {
+        var who = "<text class='" + className + "'>" + formatCallsign(who) + "</text>";
+        var time = "<text class='when'>" + window.opener.userTimeString(when) + "</text>";
+        var worker = who + " " + time + "</br>";
+        var msgTextClass = containsDoubleByte(msg) ? "msgTextUnicode" : "msgText";
+        worker += "<text class='" + msgTextClass + "' >" + msg.linkify() + "</text><br/>";
+        return worker;
+      }
+
+      function newChatMessage(id, jsmesg)
+      {
+        if (id == g_currentId) {
+          var worker = makeViewMessage("them", window.opener.GT.gtFlagPins[id].call, jsmesg.msg, jsmesg.when);
+          if (id in window.opener.GT.gtUnread) delete window.opener.GT.gtUnread[id];
+          messageTextDiv.innerHTML += worker;
+          scrollDown(messageTextDiv);
+          return document.hasFocus();
+        }
+        return false;
+      }
+
+      function closeMessageArea()
+      {
+        messageAreaDiv.style.display = "none";
+        g_currentId = 0;
+      }
+
+      function notifyNoChat(id)
+      {
+        if (id == g_currentId)
+        {
+          messageTextDiv.innerHTML += makeViewMessage("system", "GT", "Session ended", null);
+          messageInput.value = "...this session is no longer available...";
+          scrollDown(messageTextDiv);
+          messageInput.disabled = true;
+        }
+      }
+
+      function updateBar(id)
+      {
+        if (id == 0) return;
+
+        if (id in window.opener.GT.gtFlagPins)
+        {
+          callsign.innerHTML = formatCallsign(window.opener.GT.gtFlagPins[id].call);
+          country.innerHTML = window.opener.GT.dxccToAltName[window.opener.GT.gtFlagPins[id].dxcc];
+          grid.innerHTML = window.opener.GT.gtFlagPins[id].grid;
+          band.innerHTML = window.opener.GT.gtFlagPins[id].band;
+          mode.innerHTML = window.opener.GT.gtFlagPins[id].mode;
+          appSource.innerHTML = window.opener.GT.gtFlagPins[id].src in g_knownSources ? g_knownSources[window.opener.GT.gtFlagPins[id].src] : window.opener.GT.gtFlagPins[id].src;
+        }
+      }
+
+      function openId(id)
+      {
+        updateBar(id);
+        // already displayed?
+        if (id == g_currentId && messageAreaDiv.style.display == "inline-block") return;
+
+        if (!(id in window.opener.GT.gtFlagPins)) return;
+
+        var worker = "";
+        if (id in window.opener.GT.gtMessages && window.opener.GT.gtMessages[id].history.length > 0)
+        {
+          for (msg in window.opener.GT.gtMessages[id].history)
+          {
+            if ("call" in window.opener.GT.gtMessages[id].history[msg])
+              worker += makeViewMessage(
+                "them",
+                window.opener.GT.gtFlagPins[id].call,
+                window.opener.GT.gtMessages[id].history[msg].msg,
+                window.opener.GT.gtMessages[id].history[msg].when
+              );
+            else
+              worker += makeViewMessage(
+                "self",
+                window.opener.GT.appSettings.myCall,
+                window.opener.GT.gtMessages[id].history[msg].msg,
+                window.opener.GT.gtMessages[id].history[msg].when
+              );
+          }
+          if (id in window.opener.GT.gtUnread)
+          {
+            delete window.opener.GT.gtUnread[id];
+            updateCallsign(id);
+            showAllMessages();
+          }
+        }
+        messageTextDiv.innerHTML = worker;
+        g_currentId = id;
+        messageAreaDiv.style.display = "inline-block";
+
+        if (window.opener.GT.gtFlagPins[id].live == false)
+        {
+          notifyNoChat(id);
+        } else {
+          messageInput.disabled = false;
+          messageInput.value = "";
+        }
+        scrollDown(messageTextDiv);
+        Resize();
+      }
+
+      if (!String.linkify)
+      {
+        String.prototype.linkify = function ()
+        {
+          // http://, https://, ftp://
+          var urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gim;
+
+          // www. sans http:// or https://
+          var pseudoUrlPattern = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+
+          // Email addresses
+          var emailAddressPattern = /[\w.]+@[a-zA-Z_-]+?(?:\.[a-zA-Z]{2,6})+/gim;
+
+          return this.replace(urlPattern, '<a style="color:cyan" target="_blank" href="$&">$&</a>')
+            .replace(pseudoUrlPattern, '$1<a style="color:cyan" target="_blank" href="http://$2">$2</a>')
+            .replace(emailAddressPattern, '<a style="color:orange" target="_blank" href="mailto:$&">$&</a>');
+        };
+      }
+
+      function Resize()
+      {
+        var height = window.innerHeight;
+        var width = window.innerWidth;
+
+        width -= allCallsignsDiv.offsetWidth;
+        width -= 6;
+
+        height -= messageInfoDiv.offsetHeight;
+        height -= messageInputDiv.offsetHeight;
+        height -= 19;
+
+        messageAreaDiv.style.width = width + "px";
+        messageInputDiv.style.width = width + "px";
+        messageTextDiv.style.height = height + "px";
+
+        allCallsignsDiv.style.bottom = activeCallsignsDiv.clientHeight + 8 + "px";
+      }
+
+      function KeepUpper(inputText)
+      {
+        if (inputText.value.length > 0)
+        {
+          inputText.value = inputText.value.toUpperCase();
+          clearSearch.style.display = "block";
+        } else {
+          clearSearch.style.display = "none";
+        }
+        showAllCallsigns(true);
+      }
+
+      function doLookup(what)
+      {
+        if (typeof what == "string") window.opener.startLookup(what, "");
+      }
+    </script>
+  </head>
+  <body onLoad="init();" style="height: 100%; width: 100%" onresize="Resize();">
+    <div id="wrapperDiv">
+      <div
+        id="messageAreaDiv"
+        style="
+          position: fixed;
+          left: 2px;
+          top: 2px;
+          display: none;
+          text-align: left;
+          overflow-wrap: break-word;
+          white-space: normal;
+        "
+      >
+        <div id="messageInfoDiv" class="boxDisplay" style="overflow: hidden;">
+          <text id="callsign"></text> / <text id="country"></text> / <text id="grid"></text> / <text id="band"></text> / <text id="mode"></text> / <text id="appSource"></text> 
+        </div>
+        <div id="messageTextDiv" class="boxDisplay" style="overflow: auto; white-space: pre-wrap;user-select: text"></div>
+        <div id="messageInputDiv" style="position: fixed; bottom: 3px">
+          <textarea disabled="true" id="messageInput" maxlength="500" rows="2" value="" class="roundBorder"></textarea>
+        </div>
+      </div>
+      <div
+        class="boxDisplay"
+        style="
+          top: 2px;
+          right: 2px;
+          position: fixed;
+          vertical-align: top;
+          display: inline-block;
+          overflow: none;
+          width: 132px;
+        "
+      >
+        <div style="display: inline-block; cursor: pointer" onclick="toggleBand()">
+          <font data-i18n="chat.filter.band" color="lightgreen">Band: </font>
+          <font id="viewBand" color="yellow">All</font>
+        </div>
+        <div style="display: inline-block; cursor: pointer" onclick="toggleMode()">
+          <font data-i18n="chat.filter.mode" color="orange">Mode: </font>
+          <font id="viewMode" color="yellow">All</font>
+        </div>
+      </div>
+
+      <img
+        id="clearSearch"
+        title="Clear Search"
+        onclick='searchBox.value="";KeepUpper(searchBox);'
+        src="img/trash_24x48.png"
+        style="display: none; top: 30px; right: 114px; position: absolute; width: 30px; cursor: pointer"
+      />
+      <input
+        id="searchBox"
+        type="text"
+        title="Call Search"
+        class="inputTextValue"
+        style="
+          top: 26px;
+          right: 45px;
+          position: absolute;
+          vertical-align: top;
+          display: inline-block;
+          overflow: auto;
+          overflow-x: hidden;
+          width: 75px;
+          background-color: green;
+          color: yellow;
+        "
+        maxlength="100"
+        oninput="KeepUpper(this);"
+      />
+      <div
+        id="userCount"
+        class="roundBorderValue"
+        style="
+          top: 30px;
+          right: 3px;
+          position: absolute;
+          vertical-align: top;
+          overflow: hidden;
+          width: 40px;
+          margin: 0px;
+          padding: 0px;
+          text-overflow: ellipsis;
+        "
+        title="Station Count"
+      >
+        0
+      </div>
+
+      <div
+        id="allCallsignsDiv"
+        class="boxDisplay"
+        style="
+          top: 48px;
+          right: 2px;
+          bottom: 5px;
+          position: fixed;
+          vertical-align: top;
+          display: inline-block;
+          overflow: auto;
+          overflow-x: hidden;
+          width: 132px;
+        "
+      >
+        <div style="width: 100%" id="allCallDiv"></div>
+      </div>
+      <div
+        id="activeCallsignsDiv"
+        class="boxDisplay"
+        style="
+          bottom: 2px;
+          right: 2px;
+          position: fixed;
+          vertical-align: top;
+          display: inline-block;
+          overflow: auto;
+          overflow-x: hidden;
+          width: 132px;
+          max-height: 60px;
+        "
+      >
+        <font color="gray">no message history</font>
+      </div>
+    </div>
+  </body>
+</html>
