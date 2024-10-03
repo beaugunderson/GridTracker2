@@ -387,7 +387,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </table>
       </div>
       <div id="buttonsDiv" style="margin-top:1px;margin-left: 1px; display:grid;gap:0px;grid-template-columns: 1fr 1fr 1fr 1fr 1fr;grid-template-rows: auto;">
-        <div id="projectionButton" class="iconButton" onclick="changeMapProjection();" title="Toggle AEQD">
+        <div id="projectionButton" class="iconButton" onclick="changeMapProjection();" title="Toggle AEQD" data-i18n="buttons.AEQD.hover" >
           <img id="projectionImg" src="img/aeqd.png" class="buttonImg" />
         </div>
         <div id="callRosterButton" class="iconButton" onclick="openCallRosterWindow();" title="Open Call Roster">
@@ -1055,7 +1055,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                   <tr>
                     <td>
                       <input id="homeQTHInput" type="text" class="inputTextValue" maxlength="8" size="8"
-                        oninput="{ if ( ValidateGridsquare(this,null) ) { setCenterGridsquare(); }}" />
+                        oninput="{ if ( ValidateGridsquare(this,null) ) { saveCenterGridsquare(); }}" />
                     </td>
                   </tr>
                 </table>

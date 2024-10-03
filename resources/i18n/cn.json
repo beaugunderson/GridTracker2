@@ -18,6 +18,7 @@
     "documents.Div2": "没有存档目录, GridTracker将无法继续.",
     "documents.Div3": "请选择一个目录, 以便GridTracker可以存储重要文件.",
     "legend.title": "图例",
+    "buttons.AEQD.hover" : "切换方位等距投影",
     "legend.QSO.hover": "您曾经通联的电台网格",
     "legend.QSO.label": "通联",
     "legend.QSL.hover": "您曾经通过并确认的电台网格",

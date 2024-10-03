@@ -763,7 +763,7 @@ GT.getEngineWasRunning = false;
 
 function gtChatStateMachine()
 {
-  if (GT.appSettings.gtShareEnable == true && GT.mapSettings.offlineMode == false)
+  if (GT.appSettings.gtShareEnable == true && GT.mapSettings.offlineMode == false && GT.appSettings.myCall.length > 2 && GT.appSettings.myCall != "NOCALL")
   {
     var now = timeNowSec();
     GT.gtStateToFunction[GT.gtState]();

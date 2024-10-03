@@ -17,6 +17,7 @@
     "documents.Div1": "您的存檔目錄<div id='searchedDocFolder'></div> 未找到。",
     "documents.Div2": "沒有存檔目錄, GridTracker將無法繼續。",
     "documents.Div3": "請選擇一個目錄, 以便GridTracker可以存儲重要檔案。",
+    "buttons.AEQD.hover" : "切換方位等距投影",
     "legend.title": "圖例",
     "legend.QSO.hover": "您曾經通過的電臺網格",
     "legend.QSO.label": "通聯",

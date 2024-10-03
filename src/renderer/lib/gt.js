@@ -327,6 +327,10 @@ function saveAndCloseApp(shouldRestart = false)
   }
 
   saveGridTrackerSettings();
+  if (shouldRestart == true)
+  {
+    electron.ipcRenderer.sendSync("restartGridTracker2");
+  }
 }
 
 function clearAndReload()
@@ -3368,10 +3372,12 @@ function qthToBox(iQTH, iDEcallsign, iCQ, locked, DE, band, wspr, hash, fromLive
       rect.rectangle.liveHash[hash] = 1;
       rect.rectangle.pin.liveHash[hash] = 1;
     }
-    if (locked && !rect.rectangle.locked) rect.rectangle.locked = locked;
+    rect.rectangle.locked = rect.rectangle.locked | locked;
     if (rect.rectangle.locked)
     {
+      boxColor = GT.legendColors.QTH + GT.gridAlpha;
       borderColor = "#000000FF";
+      borderOpacity = 1;
     }
     if (myDEbox) borderWeight = 1;
     if (rect.rectangle.size == 6)
@@ -4187,19 +4193,41 @@ GT.mapSourceTypes = {
 
 function initAEQDprojection()
 {
+  if (ol.proj.proj4.isRegistered())
+  {
+    ol.proj.proj4.unregister();
+    // This is a hack because OpenLayers sucks
+    // I patched ol.js to insert the function below
+    // Tb.proj.addProjections=Ji,
+    // +++ Tb.proj.deleteProjection=function(i){delete ii[i],delete oi[i]},
+    // Tb.proj.clearAllProjections=function(){ni(),ai()}
+    delete ol.proj.deleteProjection("AEQD");
+    proj4.defs("AEQD", '+');
+  }
+ 
   proj4.defs("AEQD", '+proj=aeqd +lat_0=' + GT.myLat + ' +lon_0=' + GT.myLon + ' +x_0=0 +y_0=0 +a=6371000 +b=6371000 +units=m');
   ol.proj.proj4.register(proj4);
-
-  // Not needed
-  //const aeqd = ol.proj.get("AEQD");
-  //var maxdist = 6371000 * 3.14159265;
-  //aeqd.setExtent([-maxdist, -maxdist, maxdist, maxdist]);
 }
 
-function changeMapProjection()
+function tryRecenterAEQD()
 {
-  // save the current map view
-  mapMemory(6, true, true);
+  // Only if we're AEQD
+  if (GT.mapSettings.projection == "AEQD")
+  {
+    // we fake a change
+    GT.mapSettings.projection = "EPSG:3857";
+    changeMapProjection(false);
+    centerOn(GT.appSettings.myGrid);
+  }
+}
+
+function changeMapProjection(honorMemory = true)
+{
+  if (honorMemory)
+  {
+    // save the current map view
+    mapMemory(6, true, true);
+  }
 
   // remove flights
   removePaths();
@@ -4219,8 +4247,11 @@ function changeMapProjection()
 
   renderMap();
 
-  // load the current map view
-  mapMemory(6, false);
+  if (honorMemory)
+  {
+    // load the current map view
+    mapMemory(6, false);
+  }
 
   drawAllGrids();
   displayPredLayer();
@@ -4901,16 +4932,11 @@ function liveHash(call, band, mode)
 
 function setHomeGridsquare()
 {
-  GT.appSettings.centerGridsquare = GT.appSettings.myGrid;
-  if (GT.appSettings.centerGridsquare.length > 0)
-  {
-    homeQTHInput.value = GT.appSettings.centerGridsquare;
-  }
-  var hash = GT.appSettings.myCall;
+  let hash = GT.appSettings.myGrid;
 
   qthToBox(GT.appSettings.myGrid, GT.appSettings.myCall, false, true, "", GT.appSettings.myBand, null, hash, false);
 
-  var push = false;
+  let push = false;
 
   if (!(hash in GT.liveCallsigns))
   {
@@ -5161,8 +5187,6 @@ function handleWsjtxNotSupported(newMessage) { }
 GT.lastBand = "";
 GT.lastMode = "";
 
-GT.lastRawGrid = "AA00AA";
-
 GT.weAreDecoding = false;
 GT.localDXcall = "";
 
@@ -5355,12 +5379,13 @@ function handleWsjtxStatus(newMessage)
     GT.appSettings.myRawCall = newMessage.DEcall.trim();
     GT.appSettings.myRawGrid = newMessage.DEgrid.trim().substr(0, 6);
 
-    var LL = squareToCenter(GT.appSettings.myRawGrid);
-    GT.mapSettings.latitude = GT.myLat = LL.a;
-    GT.mapSettings.longitude = GT.myLon = LL.o;
-    if (GT.appSettings.myRawGrid != GT.lastRawGrid)
+    if (GT.appSettings.myRawGrid != GT.appSettings.myGrid)
     {
-      GT.lastRawGrid = GT.appSettings.myRawGrid;
+      let LL = squareToCenter(GT.appSettings.myRawGrid);
+      GT.mapSettings.latitude = GT.myLat = LL.a;
+      GT.mapSettings.longitude = GT.myLon = LL.o;
+      tryUpdateQTH(GT.appSettings.myRawGrid);
+      nodeTimers.setTimeout(tryRecenterAEQD, 32);
     }
 
     dxCallBoxDiv.className = "DXCallBox";
@@ -5432,9 +5457,8 @@ function handleWsjtxStatus(newMessage)
     }
 
     GT.appSettings.myCall = newMessage.DEcall;
-    GT.appSettings.myGrid = newMessage.DEgrid.trim().substr(0, 6);
-    if (GT.appSettings.myGrid.length > 0) setHomeGridsquare();
-    if (GT.appSettings.myGrid.length > 0) GT.appSettings.centerGridsquare = GT.appSettings.myGrid;
+ 
+
 
     if (newMessage.Decoding == 1)
     {
@@ -6432,11 +6456,10 @@ function centerOn(grid)
 
 function setCenterQTH()
 {
-  if (homeQTHInput.value.length >= 4)
+  if (GT.appSettings.myGrid.length >= 4)
   {
-    GT.appSettings.centerGridsquare = homeQTHInput.value;
     // Grab home QTH Gridsquare from Center QTH
-    var LL = squareToLatLong(homeQTHInput.value);
+    var LL = squareToLatLong(GT.appSettings.myGrid);
 
     GT.map
       .getView()
@@ -6447,11 +6470,37 @@ function setCenterQTH()
         ], GT.mapSettings.projection)
       );
   }
-  else
+
+}
+
+function saveCenterGridsquare()
+{
+  let LL = squareToCenter(homeQTHInput.value);
+  GT.mapSettings.latitude = GT.myLat = LL.a;
+  GT.mapSettings.longitude = GT.myLon = LL.o;
+  tryUpdateQTH(homeQTHInput.value);
+  tryRecenterAEQD();
+}
+
+function tryUpdateQTH(grid)
+{
+  if (grid != GT.appSettings.myGrid)
   {
-    homeQTHInput.value = "";
+    let hash = GT.appSettings.myGrid;
+    if (hash in GT.liveGrids)
+    {
+      GT.liveGrids[hash].rectangle.locked = false;
+      delete GT.liveGrids[hash].rectangle.liveHash[hash];
+      delete GT.liveCallsigns[hash];
+    }
+
+    homeQTHInput.value = GT.appSettings.myGrid = GT.appSettings.myRawGrid = grid;
+
+    setHomeGridsquare();
+    redrawGrids();
   }
 }
+
 function setCenterGridsquare()
 {
   if (GT.mapMemory[6].zoom != -1)
@@ -9816,6 +9865,7 @@ function getIniFromApp(appName)
     {
       appData = appData.replace(basename, "Local");
     }
+
     wsjtxCfgPath = path.join(appData, appName, appName + ".ini");
     logPath = path.join(appData, appName, "wsjtx_log.adi" );
   }
@@ -9975,7 +10025,7 @@ function updateBasedOnIni()
     if (which != null)
     {
       GT.appSettings.myCall = which.MyCall;
-      GT.appSettings.myGrid = which.MyGrid;
+      GT.appSettings.myGrid = GT.appSettings.myRawGrid = which.MyGrid;
       GT.lastBand = GT.appSettings.myBand;
       GT.lastMode = GT.appSettings.myMode;
       GT.wsjtxLogPath = which.LogPath;
@@ -9998,11 +10048,6 @@ function updateBasedOnIni()
         GT.appSettings.wsjtIP = which.ip;
       }
     }
-  }
-
-  if (GT.appSettings.myGrid.length > 0)
-  {
-    setHomeGridsquare();
   }
 }
 
@@ -10936,12 +10981,6 @@ function updateAcks(buffer)
   }
 }
 
-function onExitAppToGoWebsite()
-{
-  window.open("https://gridtracker.org/", "_blank");
-  saveAndCloseApp();
-}
-
 function mailThem(address)
 {
   window.open("mailto:" + address, "_blank");
@@ -11151,6 +11190,12 @@ function loadMapSettings()
   setMapColors();
   setNightMapColors();
 
+  if (GT.appSettings.myGrid.length > 3)
+  {
+    let LL = squareToCenter(GT.appSettings.myGrid);
+    GT.mapSettings.latitude = GT.myLat = LL.a;
+    GT.mapSettings.longitude = GT.myLon = LL.o;
+  }
 }
 
 function changeDistanceUnit()
@@ -11791,15 +11836,14 @@ function startupButtonsAndInputs()
     gtGridViewMode.value = GT.appSettings.gridViewMode;
     graylineImg.src = GT.GraylineImageArray[GT.appSettings.graylineImgSrc];
     gtFlagImg.src = GT.gtFlagImageArray[GT.appSettings.gtFlagImgSrc % 2];
-    gtShareFlagImg.src =
-      GT.gtShareFlagImageArray[GT.appSettings.gtShareEnable == false ? 0 : 1];
+    gtShareFlagImg.src = GT.gtShareFlagImageArray[GT.appSettings.gtShareEnable == false ? 0 : 1];
 
     alertMuteImg.src = GT.alertImageArray[GT.audioSettings.alertMute];
     modeImg.src = GT.maidenheadModeImageArray[GT.appSettings.sixWideMode];
 
-    if (GT.appSettings.centerGridsquare.length > 0)
+    if (GT.appSettings.myGrid.length > 0)
     {
-      homeQTHInput.value = GT.appSettings.centerGridsquare.substr(0, 6);
+      homeQTHInput.value = GT.appSettings.myGrid.substr(0, 6);
       if (ValidateGridsquare(homeQTHInput, null)) setCenterGridsquare();
     }
     ValidateCallsign(alertValueInput, null);

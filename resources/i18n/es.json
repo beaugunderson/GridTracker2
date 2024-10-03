@@ -16,6 +16,7 @@
   "documents.Div1": "Tu carpeta de documentos <div id='searchedDocFolder'></div> no pudo ser encontrada.",
   "documents.Div2": "GridTracker no puede continuar sin ella.",
   "documents.Div3": "Por favor selecciona un directorio para que GridTracker pueda almacenar sus archivos.",
+  "buttons.AEQD.hover" : "Habilitar proyección equidistante azimutal",
   "legend.title": "Leyenda",
   "legend.QSO.hover": "Grids con estaciones que has contactado",
   "legend.QSO.label": "QSO",

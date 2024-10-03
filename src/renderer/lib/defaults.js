@@ -34,7 +34,6 @@ const validSettings = [
 ];
 
 const def_appSettings = {
-  centerGridsquare: "",
   chatUUID: "",
   clearOnCQ: true,
   crScript: 0,

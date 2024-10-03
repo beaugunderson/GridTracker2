@@ -16,6 +16,7 @@
     "documents.Div1": "Your Documents folder <div id='searchedDocFolder'></div> could not be located.",
     "documents.Div2": "GridTracker can not continue without it.",
     "documents.Div3": "Please select a directory so that GridTracker can store important files.",
+    "buttons.AEQD.hover" : "Toggle azimuthal equidistant projection",
     "legend.title": "Legend",
     "legend.QSO.hover": "Grids with worked station(s) by you",
     "legend.QSO.label": "QSO",

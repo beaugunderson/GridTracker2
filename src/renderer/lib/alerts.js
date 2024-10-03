@@ -792,31 +792,22 @@ function alertTypeChanged()
   addError.innerHTML = "";
   if (alertTypeSelect.value == 0 || alertTypeSelect.value == 5)
   {
-    alertValueSelect.innerHTML = "";
-    alertValueSelect.innerHTML =
-      "<input id=\"alertValueInput\" type=\"text\" class=\"inputTextValue\" maxlength=\"12\"  size=\"5\" oninput=\"ValidateCallsign(this,null);\" / >";
+    alertValueSelect.innerHTML ="<input id=\"alertValueInput\" type=\"text\" class=\"inputTextValue\" maxlength=\"12\"  size=\"5\" oninput=\"ValidateCallsign(this,null);\" / >";
     ValidateCallsign(alertValueInput, null);
   }
   else if (alertTypeSelect.value == 2)
   {
-    alertValueSelect.innerHTML = "";
-    alertValueSelect.innerHTML =
-      "<input id=\"alertValueInput\" type=\"text\" class=\"inputTextValue\"  maxlength=\"6\" size=\"3\" oninput=\"ValidateGridsquareOnly4(this,null);\" / >";
+    alertValueSelect.innerHTML = "<input id=\"alertValueInput\" type=\"text\" class=\"inputTextValue\"  maxlength=\"6\" size=\"3\" oninput=\"ValidateGridsquareOnly4(this,null);\" / >";
     ValidateGridsquareOnly4(alertValueInput, null);
   }
   else if (alertTypeSelect.value == 4)
   {
-    alertValueSelect.innerHTML =
-      "<input id=\"alertValueInput\" disabled=\"true\" type=\"text\" class=\"inputTextValue\" value=\"" +
-      GT.appSettings.myCall +
-      "\" maxlength=\"12\"  size=\"5\" oninput=\"ValidateCallsign(this,null);\" / >";
+    alertValueSelect.innerHTML = "<input id=\"alertValueInput\" disabled=\"true\" type=\"text\" class=\"inputTextValue\" value=\"" + GT.appSettings.myCall + "\" maxlength=\"12\"  size=\"5\" oninput=\"ValidateCallsign(this,null);\" / >";
     ValidateCallsign(alertValueInput, null);
   }
   else if (alertTypeSelect.value == 6)
   {
-    alertValueSelect.innerHTML = "";
-    alertValueSelect.innerHTML =
-      "<input id=\"alertValueInput\" type=\"text\" class=\"inputTextValue\" size=\"12\" value=\"^\" oninput=\"ValidateText(this);\" / >";
+    alertValueSelect.innerHTML = "<input id=\"alertValueInput\" type=\"text\" class=\"inputTextValue\" size=\"12\" value=\"^\" oninput=\"ValidateText(this);\" / >";
     ValidateText(alertValueInput);
   }
 }

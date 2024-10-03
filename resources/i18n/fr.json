@@ -16,6 +16,7 @@
     "documents.Div1": "Votre dossier Documents <div id='searchedDocFolder'></div> n'a pas pu être localisé.",
     "documents.Div2": "GridTracker ne peut pas continuer sans lui.",
     "documents.Div3": "Veuillez sélectionner un répertoire pour que GridTracker puisse stocker les fichiers importants.",
+    "buttons.AEQD.hover" : "Basculer la projection azimutale équidistante",
     "legend.title": "Légende",
     "legend.QSO.hover": "Grilles avec station(s) travaillée(s) par vous",
     "legend.QSO.label": "QSO",

@@ -16,6 +16,7 @@
     "documents.Div1": "Dein Dokumente-Verzechnis <div id='searchedDocFolder'></div> konnte nicht gefunden werden.",
     "documents.Div2": "GridTracker kann ohne nicht starten.",
     "documents.Div3": "Bitte ein anderes Verzeichnis auswählen, damit GridTracker seine Dateien abspeichern kann.",
+    "buttons.AEQD.hover" : "Azimutale äquidistante Projektion umschalten",
     "legend.title": "Legende",
     "legend.QSO.hover": "Locatorfelder mit von dir gearbeiteten Stationen",
     "legend.QSO.label": "QSO",

@@ -1477,7 +1477,9 @@ function oldSendToLogger()
     report += valueToAdiField("MY_GRIDSQUARE", newMessage.Mygrid);
   }
   else if (GT.appSettings.myGrid.length > 1)
-  { report += valueToAdiField("MY_GRIDSQUARE", GT.appSettings.myGrid); }
+  {
+    report += valueToAdiField("MY_GRIDSQUARE", GT.appSettings.myGrid);
+  }
 
   report += "<EOR>";
 
@@ -1526,20 +1528,12 @@ function sendToLogger(ADIF)
     record.TX_PWR = String(parseInt(record.TX_PWR));
   }
 
-  if (
-    (!("STATION_CALLSIGN" in record) ||
-      record.STATION_CALLSIGN.length == 0) &&
-    GT.appSettings.myCall != "NOCALL" &&
-    GT.appSettings.myCall.length > 0
-  )
+  if ((!("STATION_CALLSIGN" in record) || record.STATION_CALLSIGN.length == 0) && GT.appSettings.myCall != "NOCALL" && GT.appSettings.myCall.length > 0)
   {
     record.STATION_CALLSIGN = GT.appSettings.myCall;
   }
 
-  if (
-    (!("MY_GRIDSQUARE" in record) || record.MY_GRIDSQUARE.length == 0) &&
-    GT.appSettings.myGrid.length > 1
-  )
+  if ((!("MY_GRIDSQUARE" in record) || record.MY_GRIDSQUARE.length == 0) && GT.appSettings.myGrid.length > 1)
   {
     record.MY_GRIDSQUARE = GT.appSettings.myGrid;
   }
