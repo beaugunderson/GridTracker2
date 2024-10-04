@@ -918,7 +918,7 @@ function downloadCtyDat()
   bigctyUpdatedTd.innerHTML = "<b><i>Checking...</i></b>";
   bigctyDetailsTd.innerHTML = "";
   getBuffer(
-    "https://storage.googleapis.com/gt_app/ctydatver.json?cb=" + Date.now(),
+    "https://storage.googleapis.com/gt_app/ctydatver.json",
     processCtyDatVer,
     null,
     "https",
@@ -940,7 +940,7 @@ function processCtyDatVer(buffer)
       {
         bigctyUpdatedTd.innerHTML = "<b><i>Downloading...</i></b>";
         getBuffer(
-          "https://storage.googleapis.com/gt_app/ctydat.json?cb=" + Date.now(),
+          "https://storage.googleapis.com/gt_app/ctydat.json",
           processCtyDat,
           null,
           "https",
