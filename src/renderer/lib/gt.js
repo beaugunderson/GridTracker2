@@ -10552,7 +10552,7 @@ function selectElementContents(el)
 
 function loadMaidenHeadData()
 {
-  GT.dxccInfo = require(path.join(GT.GTappData, "mh-root-prefixed.json"));
+  GT.dxccInfo = require(GT.mhRootPath);
 
   for (var key in GT.dxccInfo)
   {
@@ -11952,8 +11952,6 @@ function postInit()
   {
     alert("!Init Failed Section!: " + section + "\nPlease report failed section");
   }
-
-  bigctyDiv.style.display = "inline-block";
 
   buttonPanelInit();
   displayMouseTrack();
@@ -14062,6 +14060,7 @@ function mediaCheck()
   GT.GTappData = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Ginternal");
   GT.appData = path.join(electron.ipcRenderer.sendSync("getPath", "userData"), "Documents");
 
+  GT.mhRootPath = path.join(GT.GTappData, "mh-root-prefixed.json");
   GT.scriptDir = path.join(GT.appData, "scripts");
 
   try

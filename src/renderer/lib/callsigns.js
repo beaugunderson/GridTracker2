@@ -898,8 +898,13 @@ function lookupKnownCallsign(object)
   }
 }
 
+GT.downloadingCtyDat = false;
+GT.restartRequired = false;
+
 function downloadCtyDat()
 {
+  if (GT.downloadingCtyDat == true || GT.restartRequired == true) return;
+  GT.downloadingCtyDat = true;
   ctyDatStatus.innerHTML = "<b><i>Downloading...</i></b>";
   getBuffer(
     "https://storage.googleapis.com/gt_app/ctydat.json?cb=" + Date.now(),
@@ -912,126 +917,156 @@ function downloadCtyDat()
 
 function processCtyDat(buffer)
 {
-  // fixme
-  /*
-  var data = String(buffer);
-  ctyDatStatus.innerHTML = "Update: " + data.length + " bytes read";
+  GT.downloadingCtyDat = false;
+  let data = String(buffer);
   try
   {
-    var ctydata = JSON.parse(data);
-    var file = "./data/mh-root-prefixed.json";
-    if (fs.existsSync(file))
-    {
-      var dxccInfo = JSON.parse(fs.readFileSync(file, "UTF-8"));
-      for (const key in dxccInfo)
-      {
-        dxccInfo[key].ituzone = null;
-        dxccInfo[key].cqzone = null;
-        dxccInfo[key].prefixITU = {};
-        dxccInfo[key].prefixCQ = {};
-        dxccInfo[key].directITU = {};
-        dxccInfo[key].directCQ = {};
-
-        if (key in ctydata)
-        {
-          dxccInfo[key].cqzone = padNumber(Number(ctydata[key].cqzone), 2);
-          dxccInfo[key].ituzone = padNumber(Number(ctydata[key].ituzone), 2);
-
-          // Skip Guantanamo Bay, hand crafted with love
-          if (key != "105")
-          {
-            dxccInfo[key].prefix = [];
-            dxccInfo[key].direct = [];
-
-            var arr = ctydata[key].prefix.substr(0, ctydata[key].prefix.length - 1).split(" ");
-            for (const x in arr)
-            {
-              var test = arr[x];
-              var direct = false;
-              var cq = null;
-              var itu = null;
-              
-              if (test.charAt(0) == "=")
-              {
-                direct = true;
-                test = test.substr(1);
-              }
-              var cqTest = test.match(/\((.*)\)/);
-              if (cqTest)
-              {
-                cq = padNumber(Number(cqTest[1]), 2);
-              }
-              var ituTest = test.match(/\[(.*)\]/);
-              if (ituTest)
-              {
-                itu = padNumber(Number(ituTest[1]), 2);
-              }
+    let ctydata = JSON.parse(data);
     
-              var i = test.indexOf("(");
-              if (i > -1)
-              {
-                test = test.substr(0, i);
-              }
-              i = test.indexOf("[");
-              if (i > -1)
-              {
-                test = test.substr(0, i);
-              }
-              i = test.indexOf("<");
-              if (i > -1)
-              {
-                test = test.substr(0, i);
-              }
-              i = test.indexOf("{");
-              if (i > -1)
-              {
-                test = test.substr(0, i);
-              }
-              i = test.indexOf("~");
-              if (i > -1)
-              {
-                test = test.substr(0, i);
-              }
-              
-              if (direct)
-              {
-                dxccInfo[key].direct.push(test);
-                if (cq)
-                {
-                  dxccInfo[key].directCQ[test] = cq;
-                }
-                if (itu)
-                {
-                  dxccInfo[key].directITU[test] = itu;
-                }
-              }
-              else
-              {
-                dxccInfo[key].prefix.push(test);
-                if (cq)
-                {
-                  dxccInfo[key].prefixCQ[test] = cq;
-                }
-                if (itu)
-                {
-                  dxccInfo[key].prefixITU[test] = itu;
-                }
-              }
-            }
-            dxccInfo[key].prefix = uniqueArrayFromArray(dxccInfo[key].prefix);
-            dxccInfo[key].prefix.sort();
-            dxccInfo[key].direct = uniqueArrayFromArray(dxccInfo[key].direct);
-            dxccInfo[key].direct.sort();
-          }
+    if (fs.existsSync(GT.mhRootPath))
+    {
+      let stats = fs.statSync(GT.mhRootPath)
+      let fileSize = stats.size;
+
+      let dxccInfo = JSON.parse(fs.readFileSync(GT.mhRootPath, "UTF-8"));
+
+      if (291 in dxccInfo && 291 in ctydata)
+      {
+        updateDxccInfo(dxccInfo, ctydata);
+
+        fs.writeFileSync(GT.mhRootPath, JSON.stringify(dxccInfo));
+        stats = fs.statSync(GT.mhRootPath);
+
+        if (fileSize != stats.size)
+        {
+          ctyButtonDiv.style.display = "none";
+          ctyDatStatus.innerHTML = "Update: " + data.length + " bytes read";
+          ctyDatFinal.innerHTML = "<div class='button' onclick='saveAndCloseApp(true)'>Restart Required</div>";
+          GT.restartRequired;
+        }
+        else
+        {
+          ctyDatStatus.innerHTML = "No updates";
+          ctyDatFinal.innerHTML = "";
         }
       }
-      fs.writeFileSync(file, JSON.stringify(dxccInfo, null, 2));
-      ctyDatFinal.innerHTML = file + " updated!";
+      else
+      {
+        ctyDatStatus.innerHTML = "Corrupt!";
+      }
     }
+    
   }
   catch (e)
   {
+    ctyDatStatus.innerHTML = "Error!";
     console.log(e);
   }
-    */
+}
+
+
+function updateDxccInfo(dxccInfo, ctydata)
+{
+  for (const key in dxccInfo)
+  {
+    dxccInfo[key].ituzone = null;
+    dxccInfo[key].cqzone = null;
+    dxccInfo[key].prefixITU = {};
+    dxccInfo[key].prefixCQ = {};
+    dxccInfo[key].directITU = {};
+    dxccInfo[key].directCQ = {};
+
+    if (key in ctydata)
+    {
+      dxccInfo[key].cqzone = padNumber(Number(ctydata[key].cqzone), 2);
+      dxccInfo[key].ituzone = padNumber(Number(ctydata[key].ituzone), 2);
+
+      // Skip Guantanamo Bay, hand crafted with love
+      if (key != "105")
+      {
+        dxccInfo[key].prefix = [];
+        dxccInfo[key].direct = [];
+
+        let arr = ctydata[key].prefix.substr(0, ctydata[key].prefix.length - 1).split(" ");
+        for (const x in arr)
+        {
+          let test = arr[x];
+          let direct = false;
+          let cq = null;
+          let itu = null;
+          
+          if (test.charAt(0) == "=")
+          {
+            direct = true;
+            test = test.substr(1);
+          }
+          let cqTest = test.match(/\((.*)\)/);
+          if (cqTest)
+          {
+            cq = padNumber(Number(cqTest[1]), 2);
+          }
+          let ituTest = test.match(/\[(.*)\]/);
+          if (ituTest)
+          {
+            itu = padNumber(Number(ituTest[1]), 2);
+          }
+
+          let i = test.indexOf("(");
+          if (i > -1)
+          {
+            test = test.substr(0, i);
+          }
+          i = test.indexOf("[");
+          if (i > -1)
+          {
+            test = test.substr(0, i);
+          }
+          i = test.indexOf("<");
+          if (i > -1)
+          {
+            test = test.substr(0, i);
+          }
+          i = test.indexOf("{");
+          if (i > -1)
+          {
+            test = test.substr(0, i);
+          }
+          i = test.indexOf("~");
+          if (i > -1)
+          {
+            test = test.substr(0, i);
+          }
+          
+          if (direct)
+          {
+            dxccInfo[key].direct.push(test);
+            if (cq)
+            {
+              dxccInfo[key].directCQ[test] = cq;
+            }
+            if (itu)
+            {
+              dxccInfo[key].directITU[test] = itu;
+            }
+          }
+          else
+          {
+            dxccInfo[key].prefix.push(test);
+            if (cq)
+            {
+              dxccInfo[key].prefixCQ[test] = cq;
+            }
+            if (itu)
+            {
+              dxccInfo[key].prefixITU[test] = itu;
+            }
+          }
+        }
+        dxccInfo[key].prefix = uniqueArrayFromArray(dxccInfo[key].prefix);
+        dxccInfo[key].prefix.sort();
+        dxccInfo[key].direct = uniqueArrayFromArray(dxccInfo[key].direct);
+        dxccInfo[key].direct.sort();
+      }
+    }
+  }
 }

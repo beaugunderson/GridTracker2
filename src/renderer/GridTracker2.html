@@ -1115,6 +1115,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 </table>
               </div>
             </td>
+            <td>
+              <div id="bigctyDiv" class="mapItem" style="display: flex;align-items: center;" >
+                <div id="ctyButtonDiv" class="button" onclick="downloadCtyDat()">Update BIGCTY</div><br/>
+                <div id="ctyDatStatus"></div><br/>
+                <div id="ctyDatFinal"></div>
+             </div>
+            </td>
           </tr>
         </table>
         <table align="center">
@@ -1301,11 +1308,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </table>
       </div>
       <br />
-          <div id="bigctyDiv" class="mapItem" style="display:none;" >
-             <div class="button" onclick="downloadCtyDat()">Update BIGCTY</div>
-             <div id="ctyDatStatus"></div>
-             <div id="ctyDatFinal"></div>
-          </div>
       <div id="callsignDatabaseDiv" class="mapItem">
         <table align="center" class="darkTable">
           <tr>
