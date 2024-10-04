@@ -957,6 +957,7 @@ function processCtyDatVer(buffer)
   catch (e)
   {
     GT.downloadingCtyDat = false;
+    bigctyUpdatedTd.innerHTML = "Version check";
     bigctyDetailsTd.innerHTML = "Error!";
     console.log(e);
   }
@@ -1000,7 +1001,6 @@ function processCtyDat(buffer)
     console.log(e);
   }
 }
-
 
 function updateDxccInfo(dxccInfo, ctydata)
 {

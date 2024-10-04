@@ -1,12 +1,11 @@
 Some but not all things to complete before first official test release:
 
-1) Add Callsign next to Grid in Settings -> General
-    Include "(X) Locked" button with title "Prevent WSJT-X from changing" for both callsign and Grid
-    Allow the user to edit and save to appSettings on change for both callsign and grid, honor Locked
+done - 1) Settings -> General
+    Allow the user to edit and save to appSettings on changegrid
 
-2) Live updating of mh-root-prefixed.json, already copied to appData at startup, need to finish the job
+done - 2) Live updating of mh-root-prefixed.json, already copied to appData at startup, need to finish the job
 
-3) Consistently move QTH grid by WSJT-X instance, if Grid changed, recenter "AEQD" if current view is the same as the instance. Only honor Grid and Callsign changes from the First instance, and new instances heard via ( wsjt-x status ) messages do not trigger a home qth change or re-center. Honor "locked" status, if locked  no update to map or settings.
+done - 3) Consistently move QTH grid by WSJT-X update, if Grid changed, recenter if "AEQD" is showing.
 
 4) In anticipation of MQTT permission, create a new "Spots" tab in settings. 
     Move "OAMS" -> Spotting to "Spots" tab
