@@ -436,6 +436,8 @@ GT.pushPinMode = false;
 GT.pskBandActivityTimerHandle = null;
 GT.wsjtxLogPath = "";
 GT.dxccInfo = {};
+GT.dxccVersion = 0;
+GT.newDxccVersion = 0;
 GT.prefixToMap = {};
 GT.directCallToDXCC = {};
 GT.directCallToCQzone = {};
@@ -485,6 +487,7 @@ GT.screenY = 0;
 
 GT.appData = "";
 GT.GTappData = "";
+GT.mhRootPath = "";
 GT.scriptDir = "";
 GT.qsoLogFile = "";
 GT.clublogLogFile = "";
@@ -4564,7 +4567,7 @@ function renderMap()
   dayNight.init(GT.map);
   if (GT.appSettings.graylineImgSrc == 1 || GT.useTransform == true)
   {
-    dayNight.hide();
+    //dayNight.hide();
   }
   else
   {
@@ -10554,6 +10557,13 @@ function loadMaidenHeadData()
 {
   GT.dxccInfo = require(GT.mhRootPath);
 
+  if ("version" in GT.dxccInfo[0])
+  {
+    GT.dxccVersion = String(GT.dxccInfo[0].version);
+
+    updateLookupsBigCtyUI();
+  }
+
   for (var key in GT.dxccInfo)
   {
     GT.dxccToAltName[GT.dxccInfo[key].dxcc] = GT.dxccInfo[key].name;
@@ -11959,6 +11969,8 @@ function postInit()
   projectionImg.style.filter = GT.mapSettings.projection == "AEQD" ? "" : "grayscale(1)";
 
   nodeTimers.setInterval(removeFlightPathsAndDimSquares, 2000);
+  nodeTimers.setInterval(downloadCtyDat, 86400000);  // Every 24 hours
+  nodeTimers.setTimeout(downloadCtyDat, 300000); // In 5 minutes, when the dust settles
 }
 
 GT.defaultButtons = [];
@@ -14058,9 +14070,9 @@ function is_dir(path)
 function mediaCheck()
 {
   GT.GTappData = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Ginternal");
+  GT.mhRootPath = path.join(GT.GTappData, "mh-root-prefixed.json");
   GT.appData = path.join(electron.ipcRenderer.sendSync("getPath", "userData"), "Documents");
 
-  GT.mhRootPath = path.join(GT.GTappData, "mh-root-prefixed.json");
   GT.scriptDir = path.join(GT.appData, "scripts");
 
   try

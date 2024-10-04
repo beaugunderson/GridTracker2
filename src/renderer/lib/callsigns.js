@@ -898,21 +898,68 @@ function lookupKnownCallsign(object)
   }
 }
 
+function updateLookupsBigCtyUI()
+{
+  const year = parseInt(GT.dxccVersion.substring(0,4));
+  const month = parseInt(GT.dxccVersion.substring(4,6)) - 1;
+  const day = parseInt(GT.dxccVersion.substring(6,8));
+
+  let date = new Date(year, month, day);
+  bigctyUpdatedTd.innerHTML = userTimeString(date.getTime());
+}
+
 GT.downloadingCtyDat = false;
 GT.restartRequired = false;
 
 function downloadCtyDat()
 {
-  if (GT.downloadingCtyDat == true || GT.restartRequired == true) return;
+  if (GT.mapSettings.offlineMode == true || GT.downloadingCtyDat == true) return;
   GT.downloadingCtyDat = true;
-  ctyDatStatus.innerHTML = "<b><i>Downloading...</i></b>";
+  bigctyUpdatedTd.innerHTML = "<b><i>Checking...</i></b>";
+  bigctyDetailsTd.innerHTML = "";
   getBuffer(
-    "https://storage.googleapis.com/gt_app/ctydat.json?cb=" + Date.now(),
-    processCtyDat,
+    "https://storage.googleapis.com/gt_app/ctydatver.json?cb=" + Date.now(),
+    processCtyDatVer,
     null,
     "https",
     443
   );
+}
+
+function processCtyDatVer(buffer)
+{
+  let data = String(buffer);
+  try
+  {
+    let ctydatver = JSON.parse(data);
+    if (ctydatver && "version" in ctydatver)
+    {
+      GT.newDxccVersion = String(ctydatver.version);
+
+      if (GT.newDxccVersion != GT.dxccVersion)
+      {
+        bigctyUpdatedTd.innerHTML = "<b><i>Downloading...</i></b>";
+        getBuffer(
+          "https://storage.googleapis.com/gt_app/ctydat.json?cb=" + Date.now(),
+          processCtyDat,
+          null,
+          "https",
+          443
+        );
+      }
+      else
+      {
+        updateLookupsBigCtyUI();
+        GT.downloadingCtyDat = false;
+      }
+    }
+  }
+  catch (e)
+  {
+    GT.downloadingCtyDat = false;
+    bigctyDetailsTd.innerHTML = "Error!";
+    console.log(e);
+  }
 }
 
 function processCtyDat(buffer)
@@ -925,41 +972,31 @@ function processCtyDat(buffer)
     
     if (fs.existsSync(GT.mhRootPath))
     {
-      let stats = fs.statSync(GT.mhRootPath)
-      let fileSize = stats.size;
-
       let dxccInfo = JSON.parse(fs.readFileSync(GT.mhRootPath, "UTF-8"));
 
       if (291 in dxccInfo && 291 in ctydata)
       {
         updateDxccInfo(dxccInfo, ctydata);
 
-        fs.writeFileSync(GT.mhRootPath, JSON.stringify(dxccInfo));
-        stats = fs.statSync(GT.mhRootPath);
+        dxccInfo[0].version = GT.newDxccVersion;
 
-        if (fileSize != stats.size)
-        {
-          ctyButtonDiv.style.display = "none";
-          ctyDatStatus.innerHTML = "Update: " + data.length + " bytes read";
-          ctyDatFinal.innerHTML = "<div class='button' onclick='saveAndCloseApp(true)'>Restart Required</div>";
-          GT.restartRequired;
-        }
-        else
-        {
-          ctyDatStatus.innerHTML = "No updates";
-          ctyDatFinal.innerHTML = "";
-        }
+        fs.writeFileSync(GT.mhRootPath, JSON.stringify(dxccInfo));
+
+        bigctyUpdatedTd.innerHTML = "<div style='color:cyan;font-weight:bold'>" + I18N("gt.NewVersion.Release") + "</div>";
+        bigctyDetailsTd.innerHTML = "<div class='button' onclick='saveAndCloseApp(true)'>Restart</div>";
       }
       else
       {
-        ctyDatStatus.innerHTML = "Corrupt!";
+        bigctyUpdatedTd.innerHTML = "Invalid data";
+        bigctyDetailsTd.innerHTML = "Corrupt!";
       }
     }
     
   }
   catch (e)
   {
-    ctyDatStatus.innerHTML = "Error!";
+    bigctyUpdatedTd.innerHTML = "Failed to parse";
+    bigctyDetailsTd.innerHTML = "Error!";
     console.log(e);
   }
 }

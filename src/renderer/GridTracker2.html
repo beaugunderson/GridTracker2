@@ -833,8 +833,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td>Shift-Key</td>
           </tr>
           <tr>
-            <td>K</td>
-            <td align="left">Capture Screenshot</td>
+            <td></td>
+            <td align="left"></td>
             <td></td>
             <td>F9</td>
             <td align="left">Recall Map Position 5</td>
@@ -1115,13 +1115,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 </table>
               </div>
             </td>
-            <td>
-              <div id="bigctyDiv" class="mapItem" style="display: flex;align-items: center;" >
-                <div id="ctyButtonDiv" class="button" onclick="downloadCtyDat()">Update BIGCTY</div><br/>
-                <div id="ctyDatStatus"></div><br/>
-                <div id="ctyDatFinal"></div>
-             </div>
-            </td>
           </tr>
         </table>
         <table align="center">
@@ -1317,9 +1310,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <th data-i18n="settings.lookup.Databases.header">Database</th>
             <th data-i18n="settings.lookup.Enabled.header">Enabled</th>
             <th data-i18n="settings.lookup.LastDwnld.header">Last Download</th>
-            <th data-i18n="settings.lookup.Count.header">Count</th>
+            <th data-i18n="gt.lookup.details">Details</th>
           </tr>
           <tr>
+            <td>Big CTY</td>
+            <td></td>
+            <td id="bigctyUpdatedTd">Never</td>
+            <td id="bigctyDetailsTd"></td>
+          </tr>
             <td data-i18n="settings.lookup.db.ULS">US Callsigns</td>
             <td>
               <input type="checkbox" id="ulsUseEnable" onclick="ulsValuesChanged();" />

@@ -10,7 +10,6 @@ const singleInstanceLock = app.requestSingleInstanceLock();
 
 const isMac = process.platform === 'darwin';
 
-const FIVE_MINUTES = 60 * 1000 * 5;
 
 if (!singleInstanceLock) {
   app.quit();
@@ -270,12 +269,8 @@ app.whenReady().then(() => {
     autoUpdater.forceDevUpdateConfig = true;
   }
 
-  // wait for five minutes to do the auto update to give GT enough time to
-  // download logs, etc.
-  setTimeout(() => {
-    autoUpdater.checkForUpdatesAndNotify();
-  }, FIVE_MINUTES);
-
+  autoUpdater.checkForUpdatesAndNotify();
+  
   // Inital screen count
   displayHandler.initialScreenCount = screen.getAllDisplays().length;
 

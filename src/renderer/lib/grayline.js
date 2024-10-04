@@ -31,13 +31,12 @@
 
   class Terminator
   {
-    constructor(options = { resolution: 1 })
+    constructor(options = { })
     {
       this.options = options;
       this.version = "0.1.0";
       this._R2D = 180 / Math.PI;
       this._D2R = Math.PI / 180;
-      // this.options.resolution = options.resolution || this.options.resolution;
       // this.options.time = options.time;
       var latLngs = this._compute(this.options.time);
       return this._toGeoJSON(latLngs);
@@ -74,7 +73,6 @@
         }
       };
       return feature;
-      // geoJson.geometry.coordinates[0].unshift([[180, -85], [180, 85], [-180, 85], [-180, -85]]);
     }
 
     _sunEclipticPosition(julianDay)
@@ -231,26 +229,26 @@
       var julianDay = julian(today);
       var gst = GMST(julianDay);
       var latLng = [];
-      var startMinus = -360;
+      var startMinus = -180;
 
       var sunEclPos = this._sunEclipticPosition(julianDay);
       var eclObliq = this._eclipticObliquity(julianDay);
       var sunEqPos = this._sunEquatorialPosition(sunEclPos.lambda, eclObliq);
-      for (var i = 0; i <= 720 * this.options.resolution; i++)
+      for (var i = 0; i <= 360; i++)
       {
-        var lng = startMinus + i / this.options.resolution;
+        var lng = startMinus + i;
         var ha = this._hourAngle(lng, sunEqPos, gst);
         latLng[i + 1] = [this._latitude(ha, sunEqPos), lng];
       }
       if (sunEqPos.delta < 0)
       {
         latLng[0] = [90, startMinus];
-        latLng[latLng.length] = [90, 360];
+        latLng[latLng.length] = [90, 180];
       }
       else
       {
         latLng[0] = [-90, startMinus];
-        latLng[latLng.length] = [-90, 360];
+        latLng[latLng.length] = [-90, 180];
       }
       return latLng;
     }
