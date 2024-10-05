@@ -11,7 +11,7 @@ done - 3) Consistently move QTH grid by WSJT-X update, if Grid changed, recenter
     Move "OAMS" -> Spotting to "Spots" tab
     If we do get permission to use MQTT, remove "refresh" logic from spotting
 
-5) Settings -> General -> Export and Import settings should open a dialog to prompt where to read from and where to write to "GT_settings.json"
+done - 5) Settings -> General -> Export and Import settings should open a dialog to prompt where to read from and where to write to "GridTracker2_settings.json"
     no more automatic reading/writing from/to a static location
 
 6) Call Roster -> Settings -> Export/Import "Watchers and Ignore lists" -> File Dialog prompt -> Save as pretty print json. "GT_watchers_and_ignores.json"

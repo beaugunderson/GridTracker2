@@ -932,16 +932,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               <table align="center">
                 <tr>
                   <td>
-                    <div data-i18n="settings.general.ClearAllSettings.label" class="button"
-                      onclick="if ( imSureCheck.checked ) { clearAndReload(); }">
-                      Clear All Settings!
-                    </div>
+                    <div data-i18n="settings.general.ExportSettings.label" class="button" id="exportSettingsButton">
+                      Export Settings</div>
                   </td>
                 </tr>
                 <tr>
                   <td>
-                    <label data-i18n="settings.general.ClearSettingSure.label" for="imSureCheck">Yes, I'm sure!</label>
-                    <input type="checkbox" id="imSureCheck" title="Must be checked to enable clearing of settings" />
+                    <div data-i18n="settings.general.ImportSettings.label" 
+                      id="importSettingsButton" class="button" id="importSettingsButton">
+                      Import Settings
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td id="importSettingsInfo">
                   </td>
                 </tr>
               </table>
@@ -956,21 +960,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               <table align="center">
                 <tr>
                   <td>
-                    <div data-i18n="settings.general.ExportSettings.label" class="button" onclick="exportSettings();">
-                      Export Settings</div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <div data-i18n="settings.general.ImportSettings.label" 
-                      id="importSettingsButton" class="button" onclick="importSettings();">
-                      Import Settings
+                    <div data-i18n="settings.general.ClearAllSettings.label" class="button"
+                      onclick="if ( imSureCheck.checked ) { clearAndReload(); }">
+                      Clear All Settings!
                     </div>
                   </td>
                 </tr>
                 <tr>
                   <td>
-                    <font id="importSettingsFile"></font>
+                    <label data-i18n="settings.general.ClearSettingSure.label" for="imSureCheck">Yes, I'm sure!</label>
+                    <input type="checkbox" id="imSureCheck" title="Must be checked to enable clearing of settings" />
                   </td>
                 </tr>
               </table>

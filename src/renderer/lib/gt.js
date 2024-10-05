@@ -6611,54 +6611,35 @@ function changelookupOnTx()
   GT.appSettings.lookupCloseLog = lookupCloseLog.checked;
 }
 
-function exportSettings()
+function importSettings(contents)
 {
-  saveAllSettings();
-  var filename = GT.appData + GT.dirSeperator + "gt_settings.json";
-  var toWrite = JSON.stringify(GT.localStorage);
-  fs.writeFileSync(filename, toWrite);
-
-  checkForSettings();
-}
-
-function checkForSettings()
-{
-  var filename = GT.appData + GT.dirSeperator + "gt_settings.json";
-  if (fs.existsSync(filename))
-  {
-    importSettingsButton.style.display = "";
-    importSettingsFile.style.display = "";
-    importSettingsFile.innerHTML = filename;
-  }
-  else
-  {
-    importSettingsButton.style.display = "none";
-    importSettingsFile.style.display = "none";
-  }
-}
-
-function importSettings()
-{
-  checkForSettings();
-
-  var filename = GT.appData + GT.dirSeperator + "gt_settings.json";
-  if (fs.existsSync(filename))
-  {
-    var data = require(filename);
-    if (typeof data.appSettings != "undefined")
+  try {
+    let data = JSON.parse(contents);
+    if (data && "appSettings" in data && "currentVersion" in data)
     {
-      GT.localStorage = {};
-      for (var key in data)
+      if (Number(data.currentVersion.substring(0,7)) < 2241005 )
       {
-        GT.localStorage[key] = data[key];
+        importSettingsInfo.innerHTML = "<font style='color:orange;font-weight:bold'>Incompatible Version!</font>";
       }
-      saveGridTrackerSettings();
-      electron.ipcRenderer.sendSync("restartGridTracker2");
+      else
+      {
+        GT.localStorage = {};
+        for (var key in data)
+        {
+          GT.localStorage[key] = data[key];
+        }
+        saveGridTrackerSettings();
+        electron.ipcRenderer.sendSync("restartGridTracker2");
+      }
     }
     else
     {
-      importSettingsFile.innerHTML = "<font style='color:red'>Settings File Corrupt!</font>";
+      importSettingsInfo.innerHTML = "<font style='color:orange;font-weight:bold'>File Corrupt!</font>";
     }
+  }
+  catch (e)
+  {
+    importSettingsInfo.innerHTML = "<font style='color:orange;font-weight:bold'>File Corrupt!</font>";
   }
 }
 
@@ -12053,8 +12034,6 @@ function postInit()
     drawAllGrids();
     section = "Spots";
     redrawSpots();
-    section = "SettingsExportCheck";
-    checkForSettings();
     section = "UDPListenerForward";
     updateForwardListener();
     section = "LastTraffic";
@@ -12111,6 +12090,62 @@ function postInit()
   nodeTimers.setInterval(removeFlightPathsAndDimSquares, 2000);
   nodeTimers.setInterval(downloadCtyDat, 86400000);  // Every 24 hours
   nodeTimers.setTimeout(downloadCtyDat, 300000); // In 5 minutes, when the dust settles
+
+  exportSettingsButton.addEventListener('click', async function(){
+    saveAllSettings();
+    try {
+      const blob = new Blob([JSON.stringify(GT.localStorage, null,2)], { type: 'application/json'});
+      
+      const pickerOptions = {
+        suggestedName: "GridTracker2_settings.json",
+        startIn: "desktop",
+        types: [
+          {
+            description: "GridTracker2 Settings",
+            accept: {
+              "application/json": [".json"]
+            },
+          },
+        ],
+      };
+      const fileHandle = await window.showSaveFilePicker(pickerOptions);
+      const writableFileStream = await fileHandle.createWritable();
+      await writableFileStream.write(blob);
+      await writableFileStream.close();
+    }
+    catch (e)
+    {
+      // user aborted or file permission issue
+    }
+  });
+
+  GT.importFileHandle = null;
+  importSettingsButton.addEventListener('click', async () => {
+    try
+    {
+      const pickerOptions = {
+        types: [
+          {
+            description: "GridTracker2 Settings",
+            accept: {
+              "application/json": [".json"],
+            },
+          },
+        ],
+        startIn: "desktop",
+        excludeAcceptAllOption: true,
+        multiple: false,
+      };
+
+      [GT.importFileHandle] = await window.showOpenFilePicker(pickerOptions);
+      let file = await GT.importFileHandle.getFile();
+      importSettings(await file.text());
+    }
+    catch (e)
+    {
+      // user aborted or file permission issue
+    }
+  });
 }
 
 GT.defaultButtons = [];
@@ -12371,12 +12406,6 @@ function refreshI18NStrings()
   {
     if (item[2].length > 0) item[1] = I18N(item[2]);
   })
-}
-
-function directoryInput(what)
-{
-  GT.appSettings.savedAppData = what.files[0].path;
-  init();
 }
 
 function endStartup()
