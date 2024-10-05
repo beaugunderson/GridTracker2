@@ -971,9 +971,9 @@ function processCtyDat(buffer)
   {
     let ctydata = JSON.parse(data);
     
-    if (fs.existsSync(GT.mhRootPath))
+    if (fs.existsSync(GT.dxccInfoPath))
     {
-      let dxccInfo = JSON.parse(fs.readFileSync(GT.mhRootPath, "UTF-8"));
+      let dxccInfo = JSON.parse(fs.readFileSync(GT.dxccInfoPath));
 
       if (291 in dxccInfo && 291 in ctydata)
       {
@@ -981,10 +981,22 @@ function processCtyDat(buffer)
 
         dxccInfo[0].version = GT.newDxccVersion;
 
-        fs.writeFileSync(GT.mhRootPath, JSON.stringify(dxccInfo));
-
-        bigctyUpdatedTd.innerHTML = "<div style='color:cyan;font-weight:bold'>" + I18N("gt.NewVersion.Release") + "</div>";
-        bigctyDetailsTd.innerHTML = "<div class='button' onclick='saveAndCloseApp(true)'>Restart</div>";
+        let toWrite = JSON.stringify(dxccInfo);
+        fs.writeFileSync(GT.tempDxccInfoPath, toWrite);
+        let stats = fs.statSync(GT.tempDxccInfoPath);
+        if (stats.size == toWrite.length)
+        {
+          fs.unlinkSync(GT.dxccInfoPath);
+          fs.renameSync(GT.tempDxccInfoPath, GT.dxccInfoPath);
+ 
+          bigctyUpdatedTd.innerHTML = "<div style='color:cyan;font-weight:bold'>" + I18N("gt.NewVersion.Release") + "</div>";
+          bigctyDetailsTd.innerHTML = "<div class='button' onclick='saveAndCloseApp(true)'>Restart</div>";
+        }
+        else
+        {
+          bigctyUpdatedTd.innerHTML = "<div style='color:orange;font-weight:bold'>" + stats.size + " : " + toWrite.length + "</div>";
+          bigctyDetailsTd.innerHTML = "Mismatch!";
+        }
       }
       else
       {

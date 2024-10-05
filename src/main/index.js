@@ -123,11 +123,11 @@ if (!fs.existsSync(gtInternalPath)) {
 }
 
 // We will allow updating of this by the user, copy existing into Ginternal
-let mhRootPath = join(gtInternalPath, 'mh-root-prefixed.json');
-if (!fs.existsSync(mhRootPath)) {
+let dxccInfoPath = join(gtInternalPath, 'dxcc-info.json');
+if (!fs.existsSync(dxccInfoPath)) {
   fs.copyFileSync(
-    join(asarResourcesPath, 'data/mh-root-prefixed.json'),
-    mhRootPath,
+    join(asarResourcesPath, 'data/dxcc-info.json'),
+    dxccInfoPath,
     fs.constants.COPYFILE_EXCL,
   );
 }

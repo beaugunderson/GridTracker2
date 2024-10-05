@@ -487,7 +487,8 @@ GT.screenY = 0;
 
 GT.appData = "";
 GT.GTappData = "";
-GT.mhRootPath = "";
+GT.dxccInfoPath = "";
+GT.tempDxccInfoPath = "";
 GT.scriptDir = "";
 GT.qsoLogFile = "";
 GT.clublogLogFile = "";
@@ -4567,7 +4568,7 @@ function renderMap()
   dayNight.init(GT.map);
   if (GT.appSettings.graylineImgSrc == 1 || GT.useTransform == true)
   {
-    //dayNight.hide();
+    dayNight.hide();
   }
   else
   {
@@ -10555,7 +10556,7 @@ function selectElementContents(el)
 
 function loadMaidenHeadData()
 {
-  GT.dxccInfo = require(GT.mhRootPath);
+  GT.dxccInfo = require(GT.dxccInfoPath);
 
   if ("version" in GT.dxccInfo[0])
   {
@@ -14070,7 +14071,9 @@ function is_dir(path)
 function mediaCheck()
 {
   GT.GTappData = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Ginternal");
-  GT.mhRootPath = path.join(GT.GTappData, "mh-root-prefixed.json");
+  GT.dxccInfoPath = path.join(GT.GTappData, "dxcc-info.json");
+  GT.tempDxccInfoPath = path.join(GT.GTappData, "dxcc-info-update.json");
+  
   GT.appData = path.join(electron.ipcRenderer.sendSync("getPath", "userData"), "Documents");
 
   GT.scriptDir = path.join(GT.appData, "scripts");
