@@ -403,6 +403,7 @@ GT.myQsoCalls = {};
 GT.myQsoGrids = {};
 GT.QSLcount = 0;
 GT.QSOcount = 0;
+GT.rowsFiltered = 0;
 GT.ignoreMessages = 0;
 GT.lastTimeSinceMessageInSeconds = timeNowSec();
 GT.loadQSOs = false;
@@ -2131,11 +2132,7 @@ GT.helpShow = false;
 function toggleHelp()
 {
   GT.helpShow = !GT.helpShow;
-  if (GT.helpShow == true)
-  {
-    helpDiv.style.display = "block";
-  }
-  else helpDiv.style.display = "none";
+  helpDiv.style.display = (GT.helpShow) ? "block" : "none";
 }
 
 function onMyKeyUp(event) { }
@@ -3790,6 +3787,15 @@ function updateCountStats()
   qsoCount.innerHTML = GT.QSOcount;
   qslCount.innerHTML = GT.QSLcount;
 
+  if (GT.rowsFiltered > 0)
+  {
+    rowsFilteredTr.style.display = "";
+  }
+  else
+  {
+    rowsFilteredTr.style.display = "none";
+  }
+
   countryCount.innerHTML = Object.keys(GT.dxccCount).length;
 
   if (Object.keys(GT.QSOhash).length > 0)
@@ -3956,6 +3962,7 @@ function clearQSOcallback(clearFiles, nextFunc)
   GT.myQsoGrids = {};
   GT.QSLcount = 0;
   GT.QSOcount = 0;
+  GT.rowsFiltered = 0;
   setTrophyOverlay(GT.currentOverlay);
 
   updateRosterWorked();
@@ -8009,6 +8016,14 @@ function openInfoTab(evt, tabName, callFunc, callObj)
   }
 }
 
+function openLogbookSettings()
+{
+  openSettingsTab(logbut, 'logbookSettingsDiv');
+  helpDiv.style.display = "none";
+  GT.helpShow = false;
+  rootSettingsDiv.style.display = "inline-block";
+}
+
 function openSettingsTab(evt, tabName)
 {
   // Declare all variables
@@ -10545,6 +10560,16 @@ function workingDateChanged()
     workingDateValue.value = "1970-01-01";
   }
 
+  if (workingTimeValue.value == "00:00" && workingDateValue.value == "1970-01-01")
+  {
+    workingDateEnableTd.style.display = "none";
+    workingDateEnable.checked = GT.appSettings.workingDateEnable = false;
+  }
+  else
+  {
+    workingDateEnableTd.style.display = "";
+  }
+
   var fields = workingDateValue.value.split("-");
   var time = workingTimeValue.value.split(":");
 
@@ -10558,48 +10583,70 @@ function workingDateChanged()
       0
     ) / 1000;
   displayWorkingDate();
-  if (GT.appSettings.workingDateEnable)
-  {
-    applyCallsignsAndDateDiv.style.display = "";
-  }
+
+  applyCallsignsAndDateDiv.style.display = "";
 }
 
 function displayWorkingDate()
 {
   var date = new Date(GT.appSettings.workingDate * 1000);
+  workingDateValue.value = date.getUTCFullYear() + "-" + ("0" + ((date.getUTCMonth() + 1))).slice(-2) + "-" + ("0" + date.getUTCDate()).slice(-2);
+  workingTimeValue.value = ("0" + date.getUTCHours()).slice(-2) + ":" + ("0" + date.getUTCMinutes()).slice(-2);
   workingDateString.innerHTML = dateToString(date);
 }
 
 function workingCallsignsChanged(ele)
 {
-  let tempWorkingCallsigns = {};
-  let callsigns = ele.value.split(",");
-  for (let call in callsigns)
+  let valid = ValidateCallsigns(ele); 
+  if (valid)
   {
-    tempWorkingCallsigns[callsigns[call]] = true;
+    let tempWorkingCallsigns = {};
+    let callsigns = ele.value.split(",");
+    for (let call in callsigns)
+    {
+      tempWorkingCallsigns[callsigns[call]] = true;
+    }
+    if (callsigns.length > 0)
+    {
+      workingCallsignEnableTd.style.display = "";
+      GT.appSettings.workingCallsigns = Object.assign({}, tempWorkingCallsigns);
+      if (GT.appSettings.workingCallsignEnable) { applyCallsignsAndDateDiv.style.display = ""; }
+    }
   }
-  if (callsigns.length > 0)
+  else
   {
-    GT.appSettings.workingCallsigns = Object.assign({}, tempWorkingCallsigns);
-    if (GT.appSettings.workingCallsignEnable) { applyCallsignsAndDateDiv.style.display = ""; }
+    GT.appSettings.workingCallsigns = {};
+    workingCallsignEnable.checked = GT.appSettings.workingCallsignEnable = false;
+    workingCallsignEnableTd.style.display = "none";
   }
-  else applyCallsignsAndDateDiv.style.display = "none";
+  applyCallsignsAndDateDiv.style.display = "";
 }
 
 function workingGridsChanged(ele)
 {
-  let tempWorkingGrids = {};
-  let grids = ele.value.split(",");
-  for (let grid in grids)
+  let valid = ValidateGrids(ele); 
+  if (valid)
   {
-    tempWorkingGrids[grids[grid]] = true;
+    let tempWorkingGrids = {};
+    let grids = ele.value.split(",");
+    for (let grid in grids)
+    {
+      tempWorkingGrids[grids[grid]] = true;
+    }
+    if (grids.length > 0)
+    {
+      workingGridEnableTd.style.display = "";
+      GT.appSettings.workingGrids = Object.assign({}, tempWorkingGrids);
+      if (GT.appSettings.workingGridEnable) { applyCallsignsAndDateDiv.style.display = ""; }
+    }
   }
-  if (grids.length > 0)
+  else
   {
-    GT.appSettings.workingGrids = Object.assign({}, tempWorkingGrids);
-    if (GT.appSettings.workingGridEnable) { applyCallsignsAndDateDiv.style.display = ""; }
+    GT.appSettings.workingGrids = {};
+    workingGridEnable.checked = GT.appSettings.workingGridEnable = false;
+    workingGridEnableTd.style.display = "none";
   }
-  else applyCallsignsAndDateDiv.style.display = "none";
+  applyCallsignsAndDateDiv.style.display = "";
 }
 
 function applyCallsignsAndDates()
@@ -11787,6 +11834,11 @@ function loadAdifSettings()
   qslAuthority.value = GT.appSettings.qslAuthority;
   qsoItemsPerPageTd.innerHTML = qsoItemsPerPageValue.value = GT.appSettings.qsoItemsPerPage;
 
+  if (Object.keys(GT.appSettings.workingCallsigns).length == 0)
+  {
+    GT.appSettings.workingCallsignEnable = false;
+    workingCallsignEnableTd.style.display = "none";
+  }
   workingCallsignEnable.checked = GT.appSettings.workingCallsignEnable;
   workingCallsignsValue.value = Object.keys(
     GT.appSettings.workingCallsigns
@@ -11794,12 +11846,24 @@ function loadAdifSettings()
 
   ValidateCallsigns(workingCallsignsValue);
 
+  if (Object.keys(GT.appSettings.workingGrids).length == 0)
+  {
+    GT.appSettings.workingGridEnable = false;
+    workingGridEnableTd.style.display = "none";
+  }
+
   workingGridEnable.checked = GT.appSettings.workingGridEnable;
   workingGridsValue.value = Object.keys(
     GT.appSettings.workingGrids
   ).join(",");
 
   ValidateGrids(workingGridsValue);
+
+  if (GT.appSettings.workingDate == 0)
+  {
+    GT.appSettings.workingDateEnable = false;
+    workingDateEnableTd.style.display = "none";
+  }
 
   workingDateEnable.checked = GT.appSettings.workingDateEnable;
   displayWorkingDate();
@@ -14209,7 +14273,7 @@ function mediaCheck()
   GT.QSOhash = {};
   GT.QSLcount = 0;
   GT.QSOcount = 0;
-
+  GT.rowsFiltered = 0;
 
   try
   {

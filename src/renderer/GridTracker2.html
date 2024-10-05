@@ -248,7 +248,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               <div id="qslCount">0</div>
             </td>
           </tr>
-
+          <tr id="rowsFilteredTr">
+            <td colspan=4 style="cursor: pointer; background-color: #000; color: orange;" class="roundBorderValue" 
+              onclick="openLogbookSettings()"
+              title="ADIF Log records have been filtered based on your settings" align="center">
+              Log Entries Filtered
+            </td>
+          </tr>
           <tr>
             <td colspan="2">
               <div data-i18n="quickLoad.clearLive.label" class="button" onclick="clearLive();"
@@ -1273,7 +1279,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               <td data-i18n="settings.logbook.callsigns.label">Working Callsign(s)</td>
             </tr>
             <tr>
-              <td>
+              <td id="workingCallsignEnableTd" >
                 <label data-i18n="settings.logbook.callsigns.enable" for="workingCallsignEnable">Enable?</label>
                 <input title="Enable Filtering" type="checkbox" id="workingCallsignEnable"
                   onclick="workingCallsignEnableChanged(this);" />
@@ -1284,7 +1290,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 <label data-i18n="settings.logbook.callsigns.callsigns" for="workingCallsignsValue">Callsign(s)</label>
                 <input id="workingCallsignsValue" type="text" class="inputTextValue" size="15"
                   onkeypress="return validCallsignsKeys(event.charCode);"
-                  oninput="if ( ValidateCallsigns(this) ) workingCallsignsChanged(this);" />
+                  oninput="workingCallsignsChanged(this);" />
               </td>
             </tr>
             <tr>
@@ -1299,7 +1305,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td>Working Grid(s)</td>
           </tr>
           <tr>
-            <td>
+            <td id="workingGridEnableTd">
               <label for="workingGridEnable">Enable?</label>
               <input title="Enable Filtering" type="checkbox" id="workingGridEnable"
                 onclick="workingGridEnableChanged(this);" />
@@ -1310,7 +1316,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               <label  for="workingGridsValue">Grid(s)</label>
               <input id="workingGridsValue" type="text" class="inputTextValue" size="15"
                 onkeypress="return validGridKeys(event.charCode);"
-                oninput="if ( ValidateGrids(this) ) workingGridsChanged(this);" />
+                oninput="workingGridsChanged(this);" />
             </td>
           </tr>
           <tr>
@@ -1325,7 +1331,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               <td data-i18n="settings.logbook.date.label"><b>Working Date</b></td>
             </tr>
             <tr>
-              <td>
+              <td id="workingDateEnableTd">
                 <label data-i18n="settings.logbook.date.enable" for="workingDateEnable">Enable?</label>
                 <input title="Enable Filtering" type="checkbox" id="workingDateEnable"
                   onclick="workingDateEnableChanged(this);" />

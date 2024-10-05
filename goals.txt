@@ -30,11 +30,11 @@ done - 9)  HotKey refactor .. All non-F1-F12 keys need to be behind "ctrlKey" co
     Modify "Print" button to take the "tableDiv" without color and open in a new "temp" window with a print dialog, instead of taking the user to the way outdated print.html at gridtracker.org
     Modify the "version" at the top of the list to reflect the current version, include "GridTracker2" in the printable
 
-10) Users are using "Settings -> Logbook" "Working Callsigns/Grids/Date" without understanding what they do exactly.
-    When these features are enabled. Add 1 new Blue box counter under "Rx CallS (XXX )  QSL (XXX)" 
-    QSO Entries Ignored (XXX), Hover "Logbook entries ignored by Settings -> Logbook".. onClick : open Settings -> Logbook
+done - 10) Users are using "Settings -> Logbook" "Working Callsigns/Grids/Date" without understanding what they do exactly.
+    When these features are enabled. Add 1 new Blue box counter under "Rx Call (XXX )  QSL (XXX)" 
+    QSO Entries Ignored, Hover "Logbook entries ignored by Settings -> Logbook".. onClick : open Settings -> Logbook
 
-11) Settings -> Logbook .. do not allow "enable?" if fields are empty or working data is jan-1-1970 (epoch 0)
+done - 11) Settings -> Logbook .. do not allow "enable?" if fields are empty or working data is jan-1-1970 (epoch 0)
 
 12) I want to lock down file usage and locations soon, I may abandon AppData\GT2\Documents all together and just use Ginternal ...  Local File(s) should ignore adds for GInternal files as well as WSJT-X log since we're going to add WSJT-X as the first entry in Settings -> Logging .. uptil now it's been automatic and "magic box" style.
 ie: if a local file add matches the path of the WSJT-X entry, don't add , and if the wsjt-x isn't set to "startup" , check-it.

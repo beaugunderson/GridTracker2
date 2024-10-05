@@ -86,6 +86,7 @@ function onAdiLoadComplete(task)
   var liveLog = task.liveLog;
   var confirmed = false;
   var rows = 0;
+  let rowsFiltered = 0;
   var lastHash = null;
   var validAdifFile = true;
   var eQSLfile = false;
@@ -153,6 +154,7 @@ function onAdiLoadComplete(task)
         if (GT.appSettings.workingCallsignEnable && !(finalDEcall in GT.appSettings.workingCallsigns))
         {
           // not in the working callsigns, move to next
+          rowsFiltered++;
           continue;
         }
 
@@ -177,6 +179,7 @@ function onAdiLoadComplete(task)
         if (GT.appSettings.workingDateEnable && finalTime < GT.appSettings.workingDate)
         {
           // Not after our working date
+          rowsFiltered++;
           continue;
         }
 
@@ -188,6 +191,7 @@ function onAdiLoadComplete(task)
           if (GT.appSettings.workingGridEnable && !(finalMyGrid in GT.appSettings.workingGrids))
           {
             // not in the working grids, move to next
+            rowsFiltered++;
             continue;
           }
         }
@@ -388,11 +392,21 @@ function onAdiLoadComplete(task)
   }
 
   // Cam from a live event, we handly differently
-  if (liveLog == true && rows == 1 && lastHash != null && confirmed == false)
+  if (liveLog == true)
   {
-    var returnTask = {};
-    returnTask.type = "parsedLive";
-    returnTask.details = GT.QSOhash[lastHash];
+    if (rows == 1 && lastHash != null && confirmed == false)
+    {
+      var returnTask = {};
+      returnTask.type = "parsedLive";
+      returnTask.details = GT.QSOhash[lastHash];
+    }
+    else
+    {
+      var returnTask = {};
+      returnTask.type = "filteredLive";
+      returnTask.rows = rows;
+      returnTask.rowsFiltered = rowsFiltered;
+    }
   }
   else
   {
@@ -404,6 +418,7 @@ function onAdiLoadComplete(task)
     returnTask.lotw_qso = task.lotw_qso;
     returnTask.lotw_qsl = task.lotw_qsl;
     returnTask.lotwTimestampUpdated = lotwTimestampUpdated;
+    returnTask.rowsFiltered = rowsFiltered;
     returnTask.nextFunc = task.nextFunc;
   }
 

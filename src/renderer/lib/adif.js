@@ -77,6 +77,7 @@ GT.adifWorkerCallbacks = {
   loaded: initAdifComplete,
   parsed: adifParseComplete,
   parsedLive: adifParseLiveComplete,
+  filteredLive: adifFilteredLiveComplete,
   cleared: clearComplete
 };
 
@@ -178,10 +179,17 @@ function adifParseLiveComplete(task)
   applyQSOs(null);
 }
 
+function adifFilteredLiveComplete(task)
+{
+  GT.adifLogCount--;
+  GT.rowsFiltered += task.rowsFiltered;
+}
+
 function adifParseComplete(task)
 {
   GT.adifLogCount--;
   GT.QSOhash = task.QSOhash;
+  GT.rowsFiltered += task.rowsFiltered;
 
   GT.myQsoCalls = { ...GT.myQsoCalls, ...task.myQsoCalls };
   GT.myQsoGrids = { ...GT.myQsoGrids, ...task.myQsoGrids };
