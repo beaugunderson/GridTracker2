@@ -401,7 +401,7 @@ GT.colorBands = [
   "23cm",
   "13cm",
   "9cm",
-  "5cm",
+  "6cm",
   "3cm",
   "1.2cm",
   "6mm",
@@ -531,7 +531,7 @@ GT.pskColors["33cm"] = "ff8c90";
 GT.pskColors["23cm"] = "5AB8C7";
 GT.pskColors["13cm"] = "ff7540";
 GT.pskColors["9cm"] = "b77ac7";
-GT.pskColors["5cm"] = "b77ac7";
+GT.pskColors["6cm"] = "b77ac7";
 GT.pskColors["3cm"] = "696969";
 GT.pskColors["1.2cm"] = "b77ac7";
 GT.pskColors["6mm"] = "b77ac7";

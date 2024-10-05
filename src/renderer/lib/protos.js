@@ -84,7 +84,7 @@ function formatBand(freq)
   else if (newFreq >= 2300 && newFreq <= 2450) return "13cm";
   else if (newFreq >= 2300 && newFreq <= 2450) return "13cm";
   else if (newFreq >= 3300 && newFreq <= 3500) return "9cm";
-  else if (newFreq >= 5650 && newFreq <= 5925) return "5cm";
+  else if (newFreq >= 5650 && newFreq <= 5925) return "6cm";
   else if (newFreq >= 10000 && newFreq <= 10500) return "3cm";
   else if (newFreq >= 24000 && newFreq <= 24250) return "1.2cm";
   else if (newFreq >= 47000 && newFreq <= 47200) return "6mm";
