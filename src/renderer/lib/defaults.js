@@ -17,7 +17,6 @@ const validSettings = [
   "blockedITUz",
   "callsignLookups",
   "classicAlerts",
-  "classicAlertsVersion",
   "currentVersion",
   "dxkLogSettings",
   "log4OMSettings",
@@ -353,4 +352,77 @@ const def_mapMemory = {
   zoom: -1,
   LoLa: [0, 0],
   bearing: 0
-}
+};
+
+const def_classicAlerts = {
+  huntRoster: false,
+  huntRosterNotify: 1,
+  huntRosterNotifyWord: "New hit",
+  huntRosterNotifyMedia: "none",
+  huntCallsign: false,
+  huntGrid: false,
+  huntDXCC: false,
+  huntCQz: false,
+  huntITUz: false,
+  huntStates: false,
+  huntCallsignNeed: "worked",
+  huntGridNeed: "confirmed",
+  huntDXCCNeed: "confirmed",
+  huntCQzNeed: "confirmed",
+  huntITUzNeed: "confirmed",
+  huntStatesNeed: "confirmed",
+  huntCallsignNotify: "1",
+  huntGridNotify: "1",
+  huntDXCCNotify: "1",
+  huntCQzNotify: "1",
+  huntITUzNotify: "1",
+  huntStatesNotify: "1",
+  huntCallsignNotifyWord: "Wanted Call",
+  huntGridNotifyWord: "Wanted Grid",
+  huntDXCCNotifyWord: "Wanted DXCC",
+  huntCQzNotifyWord: "Wanted CQ Zone",
+  huntITUzNotifyWord: "Wanted I-T-U Zone",
+  huntStatesNotifyWord: "Wanted State",
+  huntCallsignNotifyMedia: "none",
+  huntGridNotifyMedia: "none",
+  huntDXCCNotifyMedia: "none",
+  huntCQzNotifyMedia: "none",
+  huntITUzNotifyMedia: "none",
+  huntStatesNotifyMedia: "none"
+};
+
+const def_alertSettings = {
+  requireGrid: true,
+  wantMaxDT: false,
+  wantMinDB: false,
+  wantMinFreq: false,
+  wantMaxFreq: false,
+  maxDT: 0.5,
+  minDb: -24,
+  minFreq: 400,
+  maxFreq: 3500,
+  noMyDxcc: false,
+  onlyMyDxcc: false,
+  noRoundUp: false,
+  onlyRoundUp: false,
+  cqOnly: true,
+  usesLoTW: false,
+  useseQSL: false,
+  reference: 0,
+  logEventMedia: "Ping-coin.mp3"
+};
+
+const def_alerts = {
+  popup: {
+    value: "QRZ",
+    type: "4",
+    notify: "2",
+    repeat: "2",
+    filename: "",
+    shortname: "",
+    lastMessage: "",
+    lastTime: 0,
+    fired: 0,
+    needAck: 0
+  }
+};

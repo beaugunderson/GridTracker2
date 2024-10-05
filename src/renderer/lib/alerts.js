@@ -10,131 +10,12 @@ GT.alertSettings = Object();
 
 function loadAlerts()
 {
-  if (typeof GT.localStorage.classicAlertsVersion == "undefined")
-  {
-    GT.classicAlerts = {
-      huntCallsign: false,
-      huntGrid: false,
-      huntDXCC: false,
-      huntCQz: false,
-      huntITUz: false,
-      huntStates: false,
-      huntCallsignNeed: "worked",
-      huntGridNeed: "confirmed",
-      huntDXCCNeed: "confirmed",
-      huntCQzNeed: "confirmed",
-      huntITUzNeed: "confirmed",
-      huntStatesNeed: "confirmed",
-      huntCallsignNotify: "1",
-      huntGridNotify: "1",
-      huntDXCCNotify: "1",
-      huntCQzNotify: "1",
-      huntITUzNotify: "1",
-      huntStatesNotify: "1",
-      huntCallsignNotifyWord: "Wanted Call",
-      huntGridNotifyWord: "Wanted Grid",
-      huntDXCCNotifyWord: "Wanted DXCC",
-      huntCQzNotifyWord: "Wanted CQ Zone",
-      huntITUzNotifyWord: "Wanted I-T-U Zone",
-      huntStatesNotifyWord: "Wanted State",
-      huntCallsignNotifyMedia: "none",
-      huntGridNotifyMedia: "none",
-      huntDXCCNotifyMedia: "none",
-      huntCQzNotifyMedia: "none",
-      huntITUzNotifyMedia: "none",
-      huntStatesNotifyMedia: "none"
-    };
-    GT.localStorage.classicAlerts = JSON.stringify(GT.classicAlerts);
 
-    GT.alertSettings = Object();
-    GT.alertSettings.requireGrid = true;
-    GT.alertSettings.wantMaxDT = false;
-    GT.alertSettings.wantMinDB = false;
-    GT.alertSettings.wantMinFreq = false;
-    GT.alertSettings.wantMaxFreq = false;
-    GT.alertSettings.maxDT = 0.5;
-    GT.alertSettings.minDb = -24;
-    GT.alertSettings.minFreq = 400;
-    GT.alertSettings.maxFreq = 3500;
-    GT.alertSettings.noMyDxcc = false;
-    GT.alertSettings.onlyMyDxcc = false;
-    GT.alertSettings.noRoundUp = false;
-    GT.alertSettings.onlyRoundUp = false;
-    GT.alertSettings.cqOnly = true;
-    GT.alertSettings.usesLoTW = false;
-    GT.alertSettings.useseQSL = false;
-    GT.alertSettings.reference = 0;
-    GT.alertSettings.logEventMedia = "Ping-coin.mp3";
-
-    GT.localStorage.alertSettings = JSON.stringify(GT.alertSettings);
-    GT.localStorage.classicAlertsVersion = gtVersion;
-  }
-  else
-  {
-    GT.classicAlerts = JSON.parse(GT.localStorage.classicAlerts);
-    GT.alertSettings = JSON.parse(GT.localStorage.alertSettings);
-  }
-
-  if (typeof GT.alertSettings.reference == "undefined")
-  {
-    GT.alertSettings.reference = 0;
-
-    GT.localStorage.alertSettings = JSON.stringify(GT.alertSettings);
-  }
-
-  if (typeof GT.alertSettings.logEventMedia == "undefined")
-  {
-    GT.alertSettings.logEventMedia = "Ping-coin.mp3";
-    GT.localStorage.alertSettings = JSON.stringify(GT.alertSettings);
-  }
-
-  if (typeof GT.classicAlerts.huntRoster == "undefined")
-  {
-    GT.classicAlerts.huntRoster = false;
-    GT.classicAlerts.huntRosterNotify = 1;
-    GT.classicAlerts.huntRosterNotifyWord = "New hit";
-    GT.classicAlerts.huntRosterNotifyMedia = "none";
-
-    GT.localStorage.classicAlerts = JSON.stringify(GT.classicAlerts);
-  }
+  GT.classicAlerts = loadDefaultsAndMerge("classicAlerts", def_classicAlerts);
+  GT.alertSettings = loadDefaultsAndMerge("alertSettings", def_alertSettings);
+  GT.alerts = loadDefaultsAndMerge("savedAlerts", def_alerts);
 
   loadClassicAlertView();
-
-  if (typeof GT.localStorage.savedAlerts == "undefined")
-  {
-    GT.alerts = {
-      popup: {
-        value: "QRZ",
-        type: "4",
-        notify: "2",
-        repeat: "2",
-        filename: "",
-        shortname: "",
-        lastMessage: "",
-        lastTime: 0,
-        fired: 0,
-        needAck: 0
-      }
-    };
-
-    saveAlerts();
-  }
-  else
-  {
-    GT.alerts = JSON.parse(GT.localStorage.savedAlerts);
-    for (var key in GT.alerts)
-    {
-      if (
-        GT.alerts[key].type != 0 &&
-        GT.alerts[key].type != 2 &&
-        GT.alerts[key].type != 4 &&
-        GT.alerts[key].type != 5 &&
-        GT.alerts[key].type != 6
-      )
-      { delete GT.alerts[key]; }
-      if (GT.alerts[key].repeat == 3) delete GT.alerts[key];
-    }
-  }
 
   wantGrid.checked = GT.alertSettings.requireGrid;
 
@@ -292,6 +173,8 @@ function saveAudioSettings()
 function saveAlerts()
 {
   GT.localStorage.savedAlerts = JSON.stringify(GT.alerts);
+  GT.localStorage.classicAlerts = JSON.stringify(GT.classicAlerts);
+  GT.localStorage.alertSettings = JSON.stringify(GT.alertSettings);
 }
 
 GT.testAudioTimer = null;

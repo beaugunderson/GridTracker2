@@ -100,13 +100,6 @@ function loadAllSettings()
   GT.legendColors = loadDefaultsAndMerge("legendColors", def_legendColors);
   GT.audioSettings = loadDefaultsAndMerge("audioSettings", def_audioSettings);
   GT.adifLogSettings = loadDefaultsAndMerge("adifLogSettings", def_adifLogSettings);
-  if (typeof GT.adifLogSettings.lastFetch.lotw_qso == "string")
-  {
-    // covnert to int!
-    GT.adifLogSettings.lastFetch.lotw_qso = Date.parse(dateToISO8601(GT.adifLogSettings.lastFetch.lotw_qso, "Z"));
-    GT.adifLogSettings.lastFetch.lotw_qsl = Date.parse(dateToISO8601(GT.adifLogSettings.lastFetch.lotw_qsl, "Z"));
-    saveAdifSettings();
-  }
   GT.msgSettings = loadDefaultsAndMerge("msgSettings", def_msgSettings);
   GT.receptionSettings = loadDefaultsAndMerge("receptionSettings", def_receptionSettings);
   GT.N1MMSettings = loadDefaultsAndMerge("N1MMSettings", def_N1MMSettings);
@@ -154,13 +147,13 @@ GT.currentOverlay = GT.mapSettings.trophyOverlay;
 
 function loadDefaultsAndMerge(key, def)
 {
-  var settings = {};
+  let settings = {};
   if (key in GT.localStorage)
   {
     settings = JSON.parse(GT.localStorage[key]);
   }
-  var merged = deepmerge(def, settings);
-  for (var x in merged)
+  let merged = deepmerge(def, settings);
+  for (const x in merged)
   {
     if (!(x in def))
     {
@@ -173,7 +166,7 @@ function loadDefaultsAndMerge(key, def)
 
 function loadArrayIfExists(key)
 {
-  var data = [];
+  let data = [];
   if (key in GT.localStorage)
   {
     data = JSON.parse(GT.localStorage[key]);
@@ -183,7 +176,7 @@ function loadArrayIfExists(key)
 
 function loadObjectIfExists(key)
 {
-  var data = {};
+  let data = {};
   if (key in GT.localStorage)
   {
     data = JSON.parse(GT.localStorage[key]);
@@ -194,6 +187,7 @@ function loadObjectIfExists(key)
 function saveAppSettings()
 {
   GT.localStorage.appSettings = JSON.stringify(GT.appSettings);
+  GT.localStorage.bandActivity = JSON.stringify(GT.bandActivity);
 }
 
 function saveMapSettings()
@@ -211,13 +205,9 @@ function saveAdifSettings()
   GT.localStorage.adifLogSettings = JSON.stringify(GT.adifLogSettings);
 }
 
-function saveStartupLogs()
-{
-  GT.localStorage.startupLogs = JSON.stringify(GT.startupLogs);
-}
-
 function saveLogSettings()
 {
+  GT.localStorage.startupLogs = JSON.stringify(GT.startupLogs);
   GT.localStorage.adifLogSettings = JSON.stringify(GT.adifLogSettings);
   GT.localStorage.N1MMSettings = JSON.stringify(GT.N1MMSettings);
   GT.localStorage.log4OMSettings = JSON.stringify(GT.log4OMSettings);
@@ -232,22 +222,26 @@ function saveAllSettings()
 {
   try
   {
-    saveAppSettings();
-    saveAudioSettings();
-    saveAdifSettings();
-    saveLogSettings();
-
-    mapMemory(6, true, true);
-    GT.mapSettings.zoom = GT.map.getView().getZoom() / 0.333;
-    saveMapSettings();
-
-    saveLegendColors();
-    saveCallsignSettings();
-
     if (GT.rosterInitialized)
     {
       GT.callRosterWindowHandle.window.writeRosterSettings();
     }
+
+    if (GT.map)
+    {
+      mapMemory(6, true, true);
+      GT.mapSettings.zoom = GT.map.getView().getZoom() / 0.333;
+    }
+
+    saveAppSettings();
+    saveMapSettings();
+    saveAudioSettings();
+    saveAdifSettings();
+    saveLegendColors();
+    saveCallsignSettings();
+    saveLogSettings();
+    saveAlerts();
+
   }
   catch (e)
   {
@@ -258,6 +252,8 @@ function saveAllSettings()
 function saveAndCloseApp(shouldRestart = false)
 {
   GT.closing = true;
+  saveAllSettings();
+  saveGridTrackerSettings();
   saveReceptionReports();
 
   try
@@ -276,13 +272,6 @@ function saveAndCloseApp(shouldRestart = false)
   catch (e)
   {
     console.error(e);
-  }
-
-  if (GT.map)
-  {
-    mapMemory(6, true, true);
-    GT.mapSettings.zoom = GT.map.getView().getZoom() / 0.333;
-    saveMapSettings();
   }
 
   if (GT.wsjtUdpServer != null)
@@ -313,20 +302,6 @@ function saveAndCloseApp(shouldRestart = false)
     }
   }
 
-  saveAppSettings();
-  saveAudioSettings();
-  saveAdifSettings();
-  saveMapSettings();
-  saveLegendColors();
-  saveCallsignSettings();
-  saveLogSettings();
-
-  if (GT.rosterInitialized)
-  {
-    GT.callRosterWindowHandle.window.writeRosterSettings();
-  }
-
-  saveGridTrackerSettings();
   if (shouldRestart == true)
   {
     electron.ipcRenderer.sendSync("restartGridTracker2");
@@ -1965,20 +1940,15 @@ function mapMemory(x, save, internal = false)
 
 GT.hotKeys = {};
 
-function registerHotKey(name, key, func, param1 = null, param2 = null, extKey = null)
+function registerHotKey(name, key, func, param1 = null, param2 = null, extKey = null, prefix4param2 = null)
 {
-  if (key in GT.hotKeys)
-  {
-    alert("Key already defined ( " + key + " )");
-    return;
-  }
-
   GT.hotKeys[key] = {};
   GT.hotKeys[key].name = name;
   GT.hotKeys[key].func = func;
   GT.hotKeys[key].param1 = param1;
   GT.hotKeys[key].param2 = param2;
   GT.hotKeys[key].extKey = extKey;
+  GT.hotKeys[key].prefix4param2 = prefix4param2;
 }
 
 function registerHotKeys()
@@ -2019,15 +1989,22 @@ function registerHotKeys()
   registerHotKey("Center Map on QTH Grid", "KeyZ", setCenterQTH, null, null, "ctrlKey");
   registerHotKey("Toggle Call Roster Scripts", "Minus", toggleCRScript, null, null, "shiftKey");
 
-  registerHotKey("Map Memory 1", "F5", mapMemory, 0, "shiftKey");
-  registerHotKey("Map Memory 2", "F6", mapMemory, 1, "shiftKey");
-  registerHotKey("Map Memory 3", "F7", mapMemory, 2, "shiftKey");
-  registerHotKey("Map Memory 4", "F8", mapMemory, 3, "shiftKey");
-  registerHotKey("Map Memory 5", "F9", mapMemory, 4, "shiftKey");
-  registerHotKey("Map Memory 6", "F10", mapMemory, 5, "shiftKey");
+  registerHotKey("Map Memory 1", "F5", mapMemory, 0, "shiftKey", null, "Save");
+  registerHotKey("Map Memory 2", "F6", mapMemory, 1, "shiftKey", null, "Save");
+  registerHotKey("Map Memory 3", "F7", mapMemory, 2, "shiftKey", null, "Save");
+  registerHotKey("Map Memory 4", "F8", mapMemory, 3, "shiftKey", null, "Save");
+  registerHotKey("Map Memory 5", "F9", mapMemory, 4, "shiftKey", null, "Save");
+  registerHotKey("Map Memory 6", "F10", mapMemory, 5, "shiftKey", null, "Save");
   registerHotKey("Toggle Fullscreen", "F11", toggleFullscreen);
   registerHotKey("Toggle Sidebar Panel", "F12", toggleMenu);
   registerHotKey("Hot Key List (This List)", "F1", toggleHelp);
+
+  generatePrintTable();
+}
+
+function generatePrintTable()
+{
+
 }
 
 function toggleMoon()
@@ -12239,7 +12216,7 @@ function startupEngine()
     main.style.display = "block";
     GT.map.updateSize();
 
-    setTimeout(endStartup, 250);
+    setTimeout(endStartup, 500);
   }
 }
 
@@ -15022,17 +14999,7 @@ function saveGridTrackerSettings()
   let filename = path.join(GT.GTappData, "settings.json");
   try
   {
-    const orderedSettings = Object.keys(GT.localStorage).sort(Intl.Collator().compare).reduce(
-      (obj, key) =>
-      {
-        obj[key] = GT.localStorage[key];
-        return obj;
-      },
-      {}
-    );
-
-    fs.writeFileSync(filename, JSON.stringify(orderedSettings, null, 2));
-
+    fs.writeFileSync(filename, JSON.stringify(GT.localStorage, null, 2));
   }
   catch (e)
   {
