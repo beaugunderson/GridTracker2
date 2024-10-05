@@ -970,17 +970,13 @@ function processCtyDat(buffer)
   try
   {
     let ctydata = JSON.parse(data);
-    
     if (fs.existsSync(GT.dxccInfoPath))
     {
       let dxccInfo = JSON.parse(fs.readFileSync(GT.dxccInfoPath));
-
       if (291 in dxccInfo && 291 in ctydata)
       {
         updateDxccInfo(dxccInfo, ctydata);
-
         dxccInfo[0].version = GT.newDxccVersion;
-
         let toWrite = JSON.stringify(dxccInfo);
         fs.writeFileSync(GT.tempDxccInfoPath, toWrite);
         let stats = fs.statSync(GT.tempDxccInfoPath);
@@ -988,7 +984,6 @@ function processCtyDat(buffer)
         {
           fs.unlinkSync(GT.dxccInfoPath);
           fs.renameSync(GT.tempDxccInfoPath, GT.dxccInfoPath);
- 
           bigctyUpdatedTd.innerHTML = "<div style='color:cyan;font-weight:bold'>" + I18N("gt.NewVersion.Release") + "</div>";
           bigctyDetailsTd.innerHTML = "<div class='button' onclick='saveAndCloseApp(true)'>Restart</div>";
         }
@@ -1004,7 +999,6 @@ function processCtyDat(buffer)
         bigctyDetailsTd.innerHTML = "Corrupt!";
       }
     }
-    
   }
   catch (e)
   {

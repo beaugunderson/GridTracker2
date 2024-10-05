@@ -4248,7 +4248,6 @@ function changeMapProjection(honorMemory = true)
   }
 
   delete GT.map;
-
   renderMap();
 
   if (honorMemory)
@@ -5683,7 +5682,7 @@ function fitViewBetweenPoints(points, maxZoom = 20)
   var feature = new ol.Feature({ geometry: line });
   if (GT.useTransform)
   {
-    rect.getGeometry().transform("EPSG:3857", GT.mapSettings.projection);
+    feature.getGeometry().transform("EPSG:3857", GT.mapSettings.projection);
   }
   var extent = feature.getGeometry().getExtent();
 
