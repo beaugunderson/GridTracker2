@@ -776,7 +776,6 @@ a {
 table.darkTable {
   border-collapse: collapse;
   border: 1px solid #888;
-  background-color: black;
   text-align: center;
 }
 table.darkTable td,
@@ -987,4 +986,23 @@ input[type="color"]::-webkit-color-swatch {
 }
 .ol-touch .rotate-north {
   top: 60px;
+}
+
+.flexButton {
+  border-radius: 4px;
+  cursor: pointer;
+  border-width: 1px;
+  border-color: #999;
+  border-style: outset;
+  color: #eee;
+  transition: border-style;
+  vertical-align: middle;
+  padding: 2px;
+  padding-bottom: 1px;
+  text-align: center;
+  width: fit-content;
+}
+
+.flexButton:hover {
+  border-color: #fff;
 }

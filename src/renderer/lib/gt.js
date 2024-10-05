@@ -1880,34 +1880,46 @@ function onMyKeyDown(event)
   {
     if (event.code in GT.hotKeys)
     {
-      if (typeof GT.hotKeys[event.code].param1 != "undefined")
+      if (GT.hotKeys[event.code].extKey != null && GT.hotKeys[event.code].extKey in event && event[GT.hotKeys[event.code].extKey] == false)
+      {
+        return;
+      }
+      if (GT.hotKeys[event.code].param1 != null)
       {
         var param2 = null;
-        if (typeof GT.hotKeys[event.code].param2 != "undefined")
+        if (GT.hotKeys[event.code].param2 != null)
         {
-          if (typeof event[GT.hotKeys[event.code].param2] != "undefined") { param2 = event[GT.hotKeys[event.code].param2]; }
+          if (GT.hotKeys[event.code].param2 in event) { param2 = event[GT.hotKeys[event.code].param2]; }
         }
         GT.hotKeys[event.code].func(GT.hotKeys[event.code].param1, param2);
+        event.preventDefault();
       }
       else
       {
-        if (event.ctrlKey == false) GT.hotKeys[event.code].func();
+        GT.hotKeys[event.code].func();
+        event.preventDefault();
       }
     }
     else if (event.key in GT.hotKeys)
     {
-      if (typeof GT.hotKeys[event.key].param1 != "undefined")
+      if (GT.hotKeys[event.key].extKey != null && GT.hotKeys[event.key].extKey in event && event[GT.hotKeys[event.key].extKey] == false)
+      {
+        return;
+      }
+      if (GT.hotKeys[event.key].param1 != null)
       {
         var param2 = null;
-        if (typeof GT.hotKeys[event.key].param2 != "undefined")
+        if (GT.hotKeys[event.key].param2 != null)
         {
-          if (typeof event[GT.hotKeys[event.key].param2] != "undefined") { param2 = event[GT.hotKeys[event.key].param2]; }
+          if (GT.hotKeys[event.key].param2 in event) { param2 = event[GT.hotKeys[event.key].param2]; }
         }
         GT.hotKeys[event.key].func(GT.hotKeys[event.key].param1, param2);
+        event.preventDefault();
       }
       else
       {
-        if (event.ctrlKey == false) GT.hotKeys[event.key].func();
+        GT.hotKeys[event.key].func();
+        event.preventDefault();
       }
     }
   }
@@ -1953,63 +1965,69 @@ function mapMemory(x, save, internal = false)
 
 GT.hotKeys = {};
 
-function registerHotKey(key, func, param1, param2)
+function registerHotKey(name, key, func, param1 = null, param2 = null, extKey = null)
 {
+  if (key in GT.hotKeys)
+  {
+    alert("Key already defined ( " + key + " )");
+    return;
+  }
+
   GT.hotKeys[key] = {};
+  GT.hotKeys[key].name = name;
   GT.hotKeys[key].func = func;
   GT.hotKeys[key].param1 = param1;
   GT.hotKeys[key].param2 = param2;
+  GT.hotKeys[key].extKey = extKey;
 }
 
 function registerHotKeys()
 {
-  registerHotKey("1", setTrophyOverlay, 0);
-  registerHotKey("2", setTrophyOverlay, 1);
-  registerHotKey("3", setTrophyOverlay, 2);
-  registerHotKey("4", setTrophyOverlay, 3);
-  registerHotKey("5", setTrophyOverlay, 4);
-  registerHotKey("6", setTrophyOverlay, 5);
-  registerHotKey("7", setTrophyOverlay, 6);
-  registerHotKey("8", setTrophyOverlay, 7);
-  registerHotKey("9", setTrophyOverlay, 8);
-  registerHotKey("0", toggleNexrad);
-  registerHotKey("Equal", cycleTrophyOverlay);
+  registerHotKey("Show Grid Map Layer", "1", setTrophyOverlay, 0);
+  registerHotKey("Show CQ Zones Award Layer", "2", setTrophyOverlay, 1);
+  registerHotKey("Show ITU Zones Award Layer", "3", setTrophyOverlay, 2);
+  registerHotKey("Show WAC Award Layer", "4", setTrophyOverlay, 3);
+  registerHotKey("Show WAS Award Layer", "5", setTrophyOverlay, 4);
+  registerHotKey("Show DXCC Award Layer", "6", setTrophyOverlay, 5);
+  registerHotKey("Show US Counties Award Layer", "7", setTrophyOverlay, 6);
+  registerHotKey("Show US48 Grids Award Layer", "8", setTrophyOverlay, 7);
+  registerHotKey("Show CA Provinces Award Layer", "9", setTrophyOverlay, 8);
+  registerHotKey("Toggle US Radar Overlay", "0", toggleNexrad);
+  registerHotKey("Cycle Award Layers", "Equal", cycleTrophyOverlay);
 
-  registerHotKey("KeyA", toggleAnimate);
-  registerHotKey("KeyB", toggleAllGrids);
-  registerHotKey("KeyC", showConditionsBox);
-  registerHotKey("KeyD", toggleMoon);
-  registerHotKey("KeyE", toggleMoonTrack);
-  registerHotKey("KeyF", toggleSpotPaths);
-  registerHotKey("KeyG", toggleGtMap);
-  registerHotKey("KeyH", toggleTimezones);
-  registerHotKey("KeyI", showRootInfoBox);
+  registerHotKey("Toggle Active Path Animation", "KeyA", toggleAnimate, null, null, "ctrlKey");
+  registerHotKey("Toggle All Grid Overlay", "KeyB", toggleAllGrids, null, null, "ctrlKey");
+  registerHotKey("Open Conditions Windows", "KeyC", showConditionsBox, null, null, "ctrlKey");
+  registerHotKey("Toggle Moon Tracking", "KeyD", toggleMoon, null, null, "ctrlKey");
+  registerHotKey("Toggle 24h Moon Trajectory", "KeyE", toggleMoonTrack, null, null, "ctrlKey");
+  registerHotKey("Toggle Spot Paths", "KeyF", toggleSpotPaths, null, null, "ctrlKey");
+  registerHotKey("Toggle GridTracker Users", "KeyG", toggleGtMap, null, null, "ctrlKey");
+  registerHotKey("Toggle Timezone Overlay", "KeyH", toggleTimezones, null, null, "ctrlKey");
+  registerHotKey("Open Statistics Window", "KeyI", showRootInfoBox, null, null, "ctrlKey");
 
-  registerHotKey("KeyL", adifLoadDialog);
-  registerHotKey("KeyM", toggleAlertMute);
-  registerHotKey("KeyN", toggleEarth);
-  registerHotKey("KeyO", cycleSpotsView);
-  registerHotKey("KeyP", togglePushPinMode);
-  registerHotKey("KeyQ", cycleGridView);
-  registerHotKey("KeyR", openCallRosterWindow);
-  registerHotKey("KeyS", showSettingsBox);
-  registerHotKey("KeyT", toggleSpotOverGrids);
-  registerHotKey("KeyU", toggleMergeOverlay);
-  registerHotKey("KeyW", toggleGridMode);
-  registerHotKey("KeyX", toggleMouseTrack);
-  registerHotKey("KeyZ", setCenterQTH);
-  registerHotKey("Minus", toggleCRScript);
+  registerHotKey("Open ADIF file", "KeyL", adifLoadDialog, null, null, "ctrlKey");
+  registerHotKey("Toggle Audio Mute", "KeyM", toggleAlertMute, null, null, "ctrlKey");
+  registerHotKey("Toggle Grayline", "KeyN", toggleEarth, null, null, "ctrlKey");
+  registerHotKey("Cycle Spot View", "KeyO", cycleSpotsView, null, null, "ctrlKey");
+  registerHotKey("Toggle Grid/PushPin Mode", "KeyP", togglePushPinMode, null, null, "ctrlKey");
+  registerHotKey("Cycle Logbook/Live View", "KeyQ", cycleGridView, null, null, "ctrlKey");
+  registerHotKey("Open Call Roster Window", "KeyR", openCallRosterWindow, null, null, "ctrlKey");
+  registerHotKey("Open Settings", "KeyS", showSettingsBox, null, null, "ctrlKey");
+  registerHotKey("Toggle RX Spots over Grids", "KeyT", toggleSpotOverGrids, null, null, "ctrlKey");
+  registerHotKey("Toggle Award Layer Merge", "KeyU", toggleMergeOverlay, null, null, "ctrlKey");
+  registerHotKey("Toggle Map Position Info", "KeyX", toggleMouseTrack, null, null, "ctrlKey");
+  registerHotKey("Center Map on QTH Grid", "KeyZ", setCenterQTH, null, null, "ctrlKey");
+  registerHotKey("Toggle Call Roster Scripts", "Minus", toggleCRScript, null, null, "shiftKey");
 
-  registerHotKey("F5", mapMemory, 0, "shiftKey");
-  registerHotKey("F6", mapMemory, 1, "shiftKey");
-  registerHotKey("F7", mapMemory, 2, "shiftKey");
-  registerHotKey("F8", mapMemory, 3, "shiftKey");
-  registerHotKey("F9", mapMemory, 4, "shiftKey");
-  registerHotKey("F10", mapMemory, 5, "shiftKey");
-  registerHotKey("F11", toggleFullscreen);
-  registerHotKey("F12", toggleMenu);
-  registerHotKey("F1", toggleHelp);
-  registerHotKey("?", toggleHelp);
+  registerHotKey("Map Memory 1", "F5", mapMemory, 0, "shiftKey");
+  registerHotKey("Map Memory 2", "F6", mapMemory, 1, "shiftKey");
+  registerHotKey("Map Memory 3", "F7", mapMemory, 2, "shiftKey");
+  registerHotKey("Map Memory 4", "F8", mapMemory, 3, "shiftKey");
+  registerHotKey("Map Memory 5", "F9", mapMemory, 4, "shiftKey");
+  registerHotKey("Map Memory 6", "F10", mapMemory, 5, "shiftKey");
+  registerHotKey("Toggle Fullscreen", "F11", toggleFullscreen);
+  registerHotKey("Toggle Sidebar Panel", "F12", toggleMenu);
+  registerHotKey("Hot Key List (This List)", "F1", toggleHelp);
 }
 
 function toggleMoon()
@@ -12221,7 +12239,7 @@ function startupEngine()
     main.style.display = "block";
     GT.map.updateSize();
 
-    setTimeout(endStartup, 500);
+    setTimeout(endStartup, 250);
   }
 }
 
