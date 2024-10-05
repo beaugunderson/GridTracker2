@@ -12097,7 +12097,7 @@ function postInit()
       const blob = new Blob([JSON.stringify(GT.localStorage, null,2)], { type: 'application/json'});
       
       const pickerOptions = {
-        suggestedName: "GridTracker2_settings.json",
+        suggestedName: "GridTracker2 Settings.json",
         startIn: "desktop",
         types: [
           {
