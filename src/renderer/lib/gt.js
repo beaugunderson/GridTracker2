@@ -14054,20 +14054,6 @@ function startGenMessages(call, grid, instance = null)
   setCallAndGrid(call, grid, instance);
 }
 
-function is_dir(path)
-{
-  try
-  {
-    var stat = fs.lstatSync(path);
-    return stat.isDirectory();
-  }
-  catch (e)
-  {
-    // lstatSync throws an error if path doesn't exist, which isn't an error so don't send it to console
-    return false;
-  }
-}
-
 function mediaCheck()
 {
   GT.GTappData = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Ginternal");
