@@ -225,7 +225,20 @@ function createMainWindow() {
   });
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
-    if (details.frameName in allowedWindows) {
+    if (details.frameName == "printHotKeys")
+    {
+      let options = {
+        show: false,
+        // for macOS
+        tabbingIdentifier: details.frameName,
+        // for Windows
+        title: details.frameName,
+        webPreferences: {
+          autoHideMenuBar: true,
+        }
+      }
+      return { action: 'allow', overrideBrowserWindowOptions: options };
+    } else if (details.frameName in allowedWindows) {
       let options = {
         ...allowedWindows[details.frameName].options,
         ...allowedWindows[details.frameName].static,
