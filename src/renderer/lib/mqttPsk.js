@@ -34,8 +34,8 @@ function openPskMqtt()
     GT.pskMqttClient = mqtt.connect(GT.pskMqttUrl, {
         clientId,
         clean: true,
-        connectTimeout: 10000,
-        reconnectPeriod: 60000,
+        connectTimeout: 30000,
+        reconnectPeriod: 90000,
     });
 
     GT.pskMqttClient.on('connect', () => {

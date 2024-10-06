@@ -300,6 +300,8 @@ function saveAndCloseApp(shouldRestart = false)
     }
   }
 
+  closePskMqtt();
+  
   if (shouldRestart == true)
   {
     electron.ipcRenderer.sendSync("restartGridTracker2");

@@ -218,7 +218,7 @@ const def_msgSettings = {
 
 const def_receptionSettings = {
   viewHistoryTimeSec: 900,
-  viewPaths: false,
+  viewPaths: true,
   pathColor: -1,
   pathNightColor: 361,
   spotWidth: 0.8,
