@@ -301,7 +301,7 @@ function saveAndCloseApp(shouldRestart = false)
   }
 
   closePskMqtt();
-  
+
   if (shouldRestart == true)
   {
     electron.ipcRenderer.sendSync("restartGridTracker2");
@@ -4416,7 +4416,7 @@ function initMap()
     }
     for (const key in GT.maps)
     {
-      GT.maps[key].attributions = "&copy; <a href='https://gridtracker.org' target='_blank'>GridTracker2</a> " + GT.maps[key].attributions;
+      GT.maps[key].attributions = "&copy; <a href='https://gridtracker.org' target='_blank'>GridTracker.org</a> " + GT.maps[key].attributions;
       if (GT.maps[key].sourceType == "Group")
       {
         ProcessGroupMapSource(key);
@@ -4477,7 +4477,6 @@ function initMap()
   }
 
   mapDiv.addEventListener("pointermove", mapMoveEvent);
-
   mapDiv.addEventListener("mouseleave", mapLoseFocus, false);
   mapDiv.addEventListener("contextmenu", function (event)
   {
