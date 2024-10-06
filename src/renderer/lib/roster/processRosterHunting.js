@@ -822,11 +822,31 @@ function buildWatcher(watcher)
 {
   if (watcher.regex)
   {
-    watcher.test = new RegExp(watcher.text, "gi");
+    try
+    {
+      watcher.test = new RegExp(watcher.text, "gi");
+    }
+    catch (e)
+    {
+      watcher.watch = false;
+      watcher.test = null;
+      watcher.error = true;
+      wantRenderWatchersTab();
+    }
   }
   else
   {
-    watcher.test = new RegExp("^" + watcher.text + "$", "gi");
+    try
+    {
+      watcher.test = new RegExp("^" + watcher.text + "$", "gi");
+    }
+    catch (e)
+    {
+      watcher.watch = false;
+      watcher.test = null;
+      watcher.error = true;
+      wantRenderWatchersTab();
+    }
   }
 
   if (watcher.type == "Callsign")
@@ -878,19 +898,28 @@ function processWatchers(callObj)
         continue;
       }
       watcher.test = watcher.test || buildWatcher(watcher);
-      try
+      if (watcher.test)
       {
-        if (callObj[watcher.source].match(watcher.test))
+        try
         {
-          callObj.reason.push("watcher");
-          callObj.hunting.watcher = "hunted";
-          callObj.watcherKey = key;
-          let htmlPrevent = htmlEntities(callObj[watcher.source]);
-          callObj[watcher.html] = htmlPrevent.replace(watcher.test, (x, y) => `<span class='regexMatch'>${x}</span>`);
-          return true;
+          if (callObj[watcher.source].match(watcher.test))
+          {
+            callObj.reason.push("watcher");
+            callObj.hunting.watcher = "hunted";
+            callObj.watcherKey = key;
+            let htmlPrevent = htmlEntities(callObj[watcher.source]);
+            callObj[watcher.html] = htmlPrevent.replace(watcher.test, (x, y) => `<span class='regexMatch'>${x}</span>`);
+            return true;
+          }
+        }
+        catch (e)
+        {
+          watcher.test = null;
+          watcher.watch = false;
+          watcher.error = true;
+          wantRenderWatchersTab();
         }
       }
-      catch (e) {}
     }
   }
   return false;

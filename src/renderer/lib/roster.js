@@ -261,23 +261,6 @@ function loadSettings()
 
 function fixLegacySettings()
 {
-  // Not sure why, but Paul Traina added this settings cleanup in August 2020.
-  if ("GT" in CR.rosterSettings.columns) delete CR.rosterSettings.columns.GT;
-
-  // In January 2022, we refactored roster column sorting
-  if (CR.rosterSettings.lastSortIndex)
-  {
-    CR.rosterSettings.sortColumn = LEGACY_COLUMN_SORT_ID[CR.rosterSettings.lastSortIndex] || "Age";
-    delete CR.rosterSettings.lastSortIndex;
-  }
-
-  // In January 2022, we refactored roster column sorting
-  if (CR.rosterSettings.lastSortReverse)
-  {
-    CR.rosterSettings.sortReverse = CR.rosterSettings.lastSortReverse;
-    delete CR.rosterSettings.lastSortReverse;
-  }
-
   // In January 2022, we added a `columnOrder` setting, which we need to ensure always includes all columns
   CR.rosterSettings.columnOrder = validateRosterColumnOrder(CR.rosterSettings.columnOrder);
 }
@@ -1593,6 +1576,8 @@ function init()
   loadRosterI18n();
 
   setRosterTop();
+
+  setWatcherFileSelectors();
 }
 
 function toggleShowControls()
@@ -3305,6 +3290,7 @@ function newWatcherEntry()
   entry.endTime = Date.now();
   entry.endTime -= (entry.endTime % 86400000);
   entry.autoDelete = false;
+  entry.error = false;
 
   return entry;
 }
@@ -3921,4 +3907,85 @@ function clearRestOfMenus()
   });
 
   CR.GridMenu.append(item);
+}
+
+function setWatcherFileSelectors()
+{
+  exportWatchers.addEventListener('click', async function(){
+    for (let key in CR.rosterSettings.watchers)
+    {
+      CR.rosterSettings.watchers[key].test = null;
+    }
+    let watcher = JSON.stringify(CR.rosterSettings.watchers, null,2);
+    try {
+      const blob = new Blob([watcher], { type: 'application/json'});
+      const pickerOptions = {
+        suggestedName: "Watcher Settings.json",
+        startIn: "desktop",
+        types: [
+          {
+            description: "Watcher Settings",
+            accept: {
+              "application/json": [".json"]
+            },
+          },
+        ],
+      };
+      const fileHandle = await window.showSaveFilePicker(pickerOptions);
+      const writableFileStream = await fileHandle.createWritable();
+      await writableFileStream.write(blob);
+      await writableFileStream.close();
+    }
+    catch (e)
+    {
+      // user aborted or file permission issue
+    }
+  });
+
+  CR.importFileHandle = null;
+  importWatchers.addEventListener('click', async () => {
+    let section = null;
+    try
+    {
+      const pickerOptions = {
+        types: [
+          {
+            description: "Watcher Settings",
+            accept: {
+              "application/json": [".json"],
+            },
+          },
+        ],
+        startIn: "desktop",
+        excludeAcceptAllOption: true,
+        multiple: false,
+      };
+
+      [CR.importFileHandle] = await window.showOpenFilePicker(pickerOptions);
+      section = "Reading";
+      let file = await CR.importFileHandle.getFile();
+      let content = await file.text();
+      section = "Parsing";
+      let json = JSON.parse(content);
+      importWatcherSettings(json);
+      openWatcher();
+    }
+    catch (e)
+    {
+      // user aborted or file permission issue or json parse
+      if (section != null)
+      {
+        alert("Error " + section);
+      }
+    }
+  });
+}
+
+function importWatcherSettings(json)
+{
+  for (let key in json)
+  {
+    json[key].test = null;
+  }
+  CR.watchers = CR.rosterSettings.watchers = structuredClone(json);
 }
