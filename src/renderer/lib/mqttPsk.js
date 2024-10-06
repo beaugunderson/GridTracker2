@@ -24,8 +24,9 @@ function openPskMqtt()
 
     if (GT.appSettings.myCall == null || GT.appSettings.myCall == "NOCALL" || GT.appSettings.myCall == "") return;
 
-    const clientId = `GT2_${GT.appSettings.myCall}_${GT.appSettings.myGrid}`;
-    const topic = `pskr/filter/v2/+/+/${GT.appSettings.myCall}/#`;
+    const dottedCallsign = GT.appSettings.myCall.replaceAll("/", ".");
+    const clientId = `GT2_${dottedCallsign}_${GT.appSettings.myGrid}`;
+    const topic = `pskr/filter/v2/+/+/${dottedCallsign}/#`;
 
     console.log("ID: ", clientId);
     console.log("Topic: ", topic);

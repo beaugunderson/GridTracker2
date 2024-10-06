@@ -14427,9 +14427,10 @@ function addNewMqttPskSpot(json)
     GT.redrawSpotsTimeout = null;
   }
 
+  let call = json.rc.replaceAll(".", "/");
   let report;
   json.rl = json.rl.substring(0, 6);
-  let hash = json.rc + json.md + json.b;
+  let hash = call + json.md + json.b;
 
   if (hash in GT.receptionReports.spots)
   {
@@ -14438,7 +14439,7 @@ function addNewMqttPskSpot(json)
   else
   {
     report = GT.receptionReports.spots[hash] = {};
-    report.call = json.rc;
+    report.call = call;
     report.band = json.b;
     report.grid = json.rl;
     report.mode = json.md;
