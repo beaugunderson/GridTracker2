@@ -217,8 +217,6 @@ const def_msgSettings = {
 };
 
 const def_receptionSettings = {
-  lastSequenceNumber: "0", // Treat as a string, it's friggin big
-  lastDownloadTimeSec: 0,
   viewHistoryTimeSec: 900,
   viewPaths: false,
   pathColor: -1,

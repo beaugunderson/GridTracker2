@@ -7,7 +7,7 @@ done - 2) Live updating of mh-root-prefixed.json, already copied to appData at s
 
 done - 3) Consistently move QTH grid by WSJT-X update, if Grid changed, recenter if "AEQD" is showing.
 
-4) In anticipation of MQTT permission, create a new "Spots" tab in settings. 
+code done - pending permission 4) In anticipation of MQTT permission, create a new "Spots" tab in settings. 
     Move "OAMS" -> Spotting to "Spots" tab
     If we do get permission to use MQTT, remove "refresh" logic from spotting
 

@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <script src="./lib/pota.js" type="text/javascript"></script>
   <script src="./lib/services/pstrotator.js" type="text/javascript"></script>
   <script src="./lib/gt.js" type="text/javascript"></script>
+  <script src="./lib/mqttPsk.js" type="text/javascript"></script>
 </head>
 
 <body id="mainBody" onload="startupApplication();">
@@ -80,8 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       class="spotsDivEnd">
       <table align="center">
         <tr>
-          <td id="spotCountDiv">Spots: 0</td>
-          <td id="spotRefreshDiv">Refresh: -</td>
+          <td colspane="2" id="spotCountDiv">Spots: 0</td>
         </tr>
         <tr>
           <td colspan="2" align="center" id="spotHistoryTimeTd"></td>

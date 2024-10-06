@@ -69,8 +69,6 @@ GT.audioSettings = {};
 GT.speechAvailable = false;
 GT.receptionSettings = {};
 GT.receptionReports = {
-  lastDownloadTimeSec: 0,
-  lastSequenceNumber: "0",
   spots: {}
 };
 GT.N1MMSettings = {};
@@ -800,6 +798,7 @@ function toggleOffline()
     {
       openLookupWindow(false);
     }
+    openPskMqtt();
   }
   else
   {
@@ -826,6 +825,7 @@ function toggleOffline()
     offlineMapSelect.style.display = "";
     offlineMapNightSelect.style.display = "";
     setGtShareButtons();
+    closePskMqtt();
   }
   displayNexrad();
   displayPredLayer();
@@ -1316,7 +1316,7 @@ function createSpotTipTable(toolElement)
       if ("source" in report)
       {
         let color = (report.source == "O" ? "cyan;font-size: larger" : "orange");
-        let fullSource = (report.source == "O" ? "OAMS Realtime Network" : "PSK-Reporter");
+        let fullSource = (report.source == "O" ? "OAMS Realtime Network" : report.source == "M" ? "PSK-MQTT" : "PSK-Reporter");
         worker += "<tr><td>Source</td><td style='color:" + color + ";'>" + fullSource + "</font></td>";
       }
       worker += "</table>";
@@ -4050,8 +4050,6 @@ function displayTime()
     GT.nightTime = dayNight.refresh();
     moonLayer.refresh();
   }
-
-  pskSpotCheck(GT.timeNow);
 
   if (GT.currentNightState != GT.nightTime)
   {
@@ -14368,159 +14366,33 @@ function loadReceptionReports()
 {
   try
   {
-    var clear = true;
     if (fs.existsSync(GT.GTappData + "spots.json"))
     {
       GT.receptionReports = require(GT.GTappData + "spots.json");
-      if (timeNowSec() - GT.receptionReports.lastDownloadTimeSec <= 86400) { clear = false; }
-    }
-
-    if (clear == true)
-    {
-      GT.receptionReports = {
-        lastDownloadTimeSec: 0,
-        lastSequenceNumber: "0",
-        spots: {}
-      };
     }
   }
   catch (e)
   {
     GT.receptionReports = {
-      lastDownloadTimeSec: 0,
-      lastSequenceNumber: "0",
       spots: {}
     };
   }
 }
 
-function pskSpotCheck(timeSec)
-{
-  if (GT.mapSettings.offlineMode == true) return;
-
-  if (GT.appSettings.myCall == null || GT.appSettings.myCall == "NOCALL" || GT.appSettings.myCall == "") return;
-
-  if (
-    (GT.spotView > 0 || GT.rosterSpot) &&
-    (GT.receptionReports.lastDownloadTimeSec < GT.lastTrasmissionTimeSec) &&
-    (
-      timeSec - GT.receptionReports.lastDownloadTimeSec > PSKREPORTER_INTERVAL_IN_SECONDS ||
-      GT.receptionReports.lastDownloadTimeSec > timeSec
-    )
-  )
-  {
-    GT.receptionReports.lastDownloadTimeSec = timeSec;
-    GT.localStorage.receptionSettings = JSON.stringify(GT.receptionSettings);
-    spotRefreshDiv.innerHTML = "…refreshing…";
-    getBuffer(
-      `https://retrieve.pskreporter.info/query?rronly=1&lastseqno=${GT.receptionReports.lastSequenceNumber}` +
-      `&senderCallsign=${encodeURIComponent(GT.appSettings.myRawCall)}` +
-      `&appcontact=${encodeURIComponent(`GT-${gtVersionStr}`)}`,
-      pskSpotResults,
-      null,
-      "https",
-      443
-    );
-  }
-  else if (GT.spotView > 0)
-  {
-    if (
-      GT.lastTrasmissionTimeSec < GT.receptionReports.lastDownloadTimeSec &&
-      (timeSec - GT.receptionReports.lastDownloadTimeSec) > PSKREPORTER_INTERVAL_IN_SECONDS
-    )
-    {
-      spotRefreshDiv.innerHTML = "No recent TX";
-    }
-    else
-    {
-      spotRefreshDiv.innerHTML =
-        "Refresh: " +
-        toDHMS(Number(PSKREPORTER_INTERVAL_IN_SECONDS - (timeSec - GT.receptionReports.lastDownloadTimeSec)));
-    }
-  }
-}
-
-function pskSpotResults(buffer, flag)
-{
-  var oParser = new DOMParser();
-  var oDOM = oParser.parseFromString(buffer, "text/xml");
-  var result = "";
-  if (oDOM != null)
-  {
-    var json = XML2jsobj(oDOM.documentElement);
-    if ("lastSequenceNumber" in json)
-    {
-      GT.receptionReports.lastSequenceNumber = json.lastSequenceNumber.value;
-
-      if ("receptionReport" in json)
-      {
-        for (const key in json.receptionReport)
-        {
-          if (typeof json.receptionReport[key].frequency != "undefined" && typeof json.receptionReport[key].sNR != "undefined")
-          {
-            var report;
-            var call = json.receptionReport[key].receiverCallsign;
-            var mode = json.receptionReport[key].mode;
-            var grid = json.receptionReport[key].receiverLocator.substr(0, 6);
-            if (grid.length < 4) { continue; }
-            var band = formatBand(Number(parseInt(json.receptionReport[key].frequency) / 1000000));
-            var hash = call + mode + band;
-
-            if (hash in GT.receptionReports.spots)
-            {
-              report = GT.receptionReports.spots[hash];
-              if (parseInt(json.receptionReport[key].flowStartSeconds) < report.when) { continue; }
-            }
-            else
-            {
-              report = GT.receptionReports.spots[hash] = {};
-              report.call = call;
-              report.band = band;
-              report.grid = grid.toUpperCase();
-              report.mode = mode;
-            }
-            if (typeof json.receptionReport[key].receiverCallsign != "undefined")
-            {
-              report.dxcc = callsignToDxcc(json.receptionReport[key].receiverCallsign);
-            }
-            else report.dxcc = -1;
-            report.when = parseInt(json.receptionReport[key].flowStartSeconds);
-            report.snr = json.receptionReport[key].sNR;
-            report.freq = parseInt(json.receptionReport[key].frequency);
-
-            var SNR = parseInt((parseInt(report.snr) + 25) * 9);
-            if (SNR > 255) SNR = 255;
-            if (SNR < 0) SNR = 0;
-            report.color = SNR;
-            report.source = "P";
-          }
-        }
-      }
-    }
-  }
-
-  GT.receptionReports.lastDownloadTimeSec = timeNowSec();
-
-  GT.localStorage.receptionSettings = JSON.stringify(GT.receptionSettings);
-
-  redrawSpots();
-  if (GT.rosterSpot) goProcessRoster();
-}
-
-GT.oamsSpotTimeout = null;
+GT.redrawSpotsTimeout = null;
 
 function addNewOAMSSpot(cid, db, frequency, band, mode)
 {
-  if (GT.oamsSpotTimeout !== null)
+  if (GT.redrawSpotsTimeout !== null)
   {
-    nodeTimers.clearTimeout(GT.oamsSpotTimeout);
-    GT.oamsSpotTimeout = null;
+    nodeTimers.clearTimeout(GT.redrawSpotsTimeout);
+    GT.redrawSpotsTimeout = null;
   }
 
-  var report;
-  var call = GT.gtFlagPins[cid].call;
-  var grid = GT.gtFlagPins[cid].grid.substr(0, 6);
-  var hash = call + mode + band;
+  let report;
+  let call = GT.gtFlagPins[cid].call;
+  let grid = GT.gtFlagPins[cid].grid.substr(0, 6);
+  let hash = call + mode + band;
 
   if (hash in GT.receptionReports.spots)
   {
@@ -14539,13 +14411,46 @@ function addNewOAMSSpot(cid, db, frequency, band, mode)
   report.when = timeNowSec();
   report.snr = Number(db);
   report.freq = frequency;
-
-  var SNR = parseInt((parseInt(report.snr) + 25) * 9);
-  if (SNR > 255) SNR = 255;
-  if (SNR < 0) SNR = 0;
-  report.color = SNR;
+  report.color = clamp(parseInt((parseInt(report.snr) + 25) * 9), 0, 255);
   report.source = "O";
-  GT.oamsSpotTimeout = nodeTimers.setTimeout(redrawSpots, 250);
+  GT.redrawSpotsTimeout = nodeTimers.setTimeout(redrawSpots, 250);
+}
+
+function addNewMqttPskSpot(json)
+{
+  if (json.rl == null || json.rl.length < 4) return;
+  // json.rc, json.rl, json.ra, json.rp, json.f, json.b, json.md, json.t
+  // call, grid, dxcc, snr, frequency, band, mode, when
+  if (GT.redrawSpotsTimeout !== null)
+  {
+    nodeTimers.clearTimeout(GT.redrawSpotsTimeout);
+    GT.redrawSpotsTimeout = null;
+  }
+
+  let report;
+  json.rl = json.rl.substring(0, 6);
+  let hash = json.rc + json.md + json.b;
+
+  if (hash in GT.receptionReports.spots)
+  {
+    report = GT.receptionReports.spots[hash];
+  }
+  else
+  {
+    report = GT.receptionReports.spots[hash] = {};
+    report.call = json.rc;
+    report.band = json.b;
+    report.grid = json.rl;
+    report.mode = json.md;
+  }
+
+  report.dxcc = json.ra;
+  report.when = json.t;
+  report.snr = Number(json.rp);
+  report.freq = json.f;
+  report.color = clamp(parseInt((parseInt(report.snr) + 25) * 9), 0, 255);
+  report.source = "M";
+  GT.redrawSpotsTimeout = nodeTimers.setTimeout(redrawSpots, 250);
 }
 
 function spotFeature(center)
@@ -14891,7 +14796,6 @@ function updateSpotView(leaveCount = true)
     }
 
     spotsDiv.style.display = "block";
-    if (leaveCount == false) spotRefreshDiv.innerHTML = "&nbsp;";
   }
   else
   {
@@ -14900,8 +14804,9 @@ function updateSpotView(leaveCount = true)
     GT.layerVectors.pskHop.setVisible(false);
     GT.layerVectors.pskHeat.setVisible(false);
     spotsDiv.style.display = "none";
-    spotRefreshDiv.innerHTML = "&nbsp;";
   }
+
+  openPskMqtt();
 }
 
 function gotoDonate()
