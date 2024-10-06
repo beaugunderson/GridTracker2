@@ -864,7 +864,9 @@ function setVisual()
   {
     onlyHitsDiv.style.display = "none";
     HuntModeControls.style.display = "none";
+    huntingMatrixDiv.style.display = "none";
     AwardTrackerControls.style.display = "";
+    AwardWantedList.style.display = "";
     updateAwardList();
   }
   else
@@ -878,6 +880,7 @@ function setVisual()
     }
 
     AwardTrackerControls.style.display = "none";
+    AwardWantedList.style.display = "none";
     HuntModeControls.style.display = "";
 
     closeAwardPopup();

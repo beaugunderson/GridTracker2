@@ -22,8 +22,6 @@ done - 8) Remove "Callsigns" option .. we are only going to support "Wanted"
     This means the Callsign "new" and "new+unconfirmed" options are going away
         this includes "Hunting" section that allows for singly entity hunting and related Html/code
 
-    we ARE keeping "Award Tracker" in the logbook dropdown, don't break it :)
-
 done - 9)  HotKey refactor .. All non-F1-F12 keys need to be behind "ctrlKey" condition, those with "shiftKey" condition remain as they are.
     It's really easy to accidentally start typing with GT in focus and get GT into a weird state, we will make it a deliberate effort to change a GT setting with the keyboard.
     Generate the "F1" "Hot Key List" programmatically, modify registerHotKey() to accept i18n labels, then apply those lables when creating the hotKey eg "controlPanel.Timezone.hover"
