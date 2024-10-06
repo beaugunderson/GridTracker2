@@ -5,12 +5,12 @@
 // var CR is in screen.js
 CR.developerMode = false;
 CR.callRoster = {};
-CR.blockedCalls = {};
+CR.ignoredCalls = {};
 CR.ignoredCQ = {};
-CR.blockedDxcc = {};
-CR.blockedGrid = {};
-CR.blockedCQz = {};
-CR.blockedITUz = {};
+CR.ignoredDxcc = {};
+CR.ignoredGrid = {};
+CR.ignoredCQz = {};
+CR.ignoredITUz = {};
 CR.scriptReport = {};
 CR.modes = {};
 CR.modes_phone = {};
@@ -194,32 +194,32 @@ if (!("awardTracker" in GT.localStorage))
 
 CR.awardTracker = JSON.parse(GT.localStorage.awardTracker);
 
-if ("blockedCalls" in  GT.localStorage)
+if ("ignoredCalls" in  GT.localStorage)
 {
-  CR.blockedCalls = JSON.parse(GT.localStorage.blockedCalls);
-  CR.blockedDxcc = JSON.parse(GT.localStorage.blockedDxcc);
-  CR.blockedGrid = JSON.parse(GT.localStorage.blockedGrid);
-  CR.blockedCQz = JSON.parse(GT.localStorage.blockedCQz);
-  CR.blockedITUz = JSON.parse(GT.localStorage.blockedITUz);
+  CR.ignoredCalls = JSON.parse(GT.localStorage.ignoredCalls);
+  CR.ignoredDxcc = JSON.parse(GT.localStorage.ignoredDxcc);
+  CR.ignoredGrid = JSON.parse(GT.localStorage.ignoredGrid);
+  CR.ignoredCQz = JSON.parse(GT.localStorage.ignoredCQz);
+  CR.ignoredITUz = JSON.parse(GT.localStorage.ignoredITUz);
   CR.ignoredCQ = JSON.parse(GT.localStorage.ignoredCQ);
 }
 else
 {
-  GT.localStorage.blockedCalls = "{}";
-  GT.localStorage.blockedDxcc = "{}";
-  GT.localStorage.blockedGrid = "{}";
-  GT.localStorage.blockedCQz = "{}";
-  GT.localStorage.blockedITUz = "{}";
+  GT.localStorage.ignoredCalls = "{}";
+  GT.localStorage.ignoredDxcc = "{}";
+  GT.localStorage.ignoredGrid = "{}";
+  GT.localStorage.ignoredCQz = "{}";
+  GT.localStorage.ignoredITUz = "{}";
   GT.localStorage.ignoredCQ = "{}";
 }
 
 function storeBlocks(render = true)
 {
-  GT.localStorage.blockedCalls = JSON.stringify(CR.blockedCalls);
-  GT.localStorage.blockedDxcc = JSON.stringify(CR.blockedDxcc);
-  GT.localStorage.blockedGrid = JSON.stringify(CR.blockedGrid);
-  GT.localStorage.blockedCQz = JSON.stringify(CR.blockedCQz);
-  GT.localStorage.blockedITUz = JSON.stringify(CR.blockedITUz);
+  GT.localStorage.ignoredCalls = JSON.stringify(CR.ignoredCalls);
+  GT.localStorage.ignoredDxcc = JSON.stringify(CR.ignoredDxcc);
+  GT.localStorage.ignoredGrid = JSON.stringify(CR.ignoredGrid);
+  GT.localStorage.ignoredCQz = JSON.stringify(CR.ignoredCQz);
+  GT.localStorage.ignoredITUz = JSON.stringify(CR.ignoredITUz);
   GT.localStorage.ignoredCQ = JSON.stringify(CR.ignoredCQ);
   if (render)
   {
@@ -1178,28 +1178,28 @@ function updateWorked()
 
 function deleteCallsignIgnore(key)
 {
-  delete CR.blockedCalls[key];
+  delete CR.ignoredCalls[key];
   storeBlocks();
   viewRoster();
 }
 
 function ignoreCallsign(callsign)
 {
-  CR.blockedCalls[callsign] = true;
+  CR.ignoredCalls[callsign] = true;
   storeBlocks();
   viewRoster();
 }
 
 function ignoreDxcc(dxcc)
 {
-  CR.blockedDxcc[dxcc] = true;
+  CR.ignoredDxcc[dxcc] = true;
   storeBlocks();
   viewRoster();
 }
 
 function ignoreGrid(grid)
 {
-  CR.blockedGrid[grid] = true;
+  CR.ignoredGrid[grid] = true;
   storeBlocks();
   viewRoster();
 }
@@ -1221,28 +1221,28 @@ function ignoreCQ(cq, dxcc)
 
 function ignoreCQz(cqz)
 {
-  CR.blockedCQz[cqz] = true;
+  CR.ignoredCQz[cqz] = true;
   storeBlocks();
   viewRoster();
 }
 
 function ignoreITUz(ituz)
 {
-  CR.blockedITUz[ituz] = true;
+  CR.ignoredITUz[ituz] = true;
   storeBlocks();
   viewRoster();
 }
 
 function deleteDxccIgnore(key)
 {
-  delete CR.blockedDxcc[key];
+  delete CR.ignoredDxcc[key];
   storeBlocks();
   viewRoster();
 }
 
 function deleteGridIgnore(key)
 {
-  delete CR.blockedGrid[key];
+  delete CR.ignoredGrid[key];
   storeBlocks();
   viewRoster();
 }
@@ -1256,35 +1256,35 @@ function deleteCQIgnore(key)
 
 function deleteCQzIgnore(key)
 {
-  delete CR.blockedCQz[key];
+  delete CR.ignoredCQz[key];
   storeBlocks();
   viewRoster();
 }
 
 function deleteITUzIgnore(key)
 {
-  delete CR.blockedITUz[key];
+  delete CR.ignoredITUz[key];
   storeBlocks();
   viewRoster();
 }
 
 function clearAllCallsignIgnores()
 {
-  CR.blockedCalls = Object();
+  CR.ignoredCalls = Object();
   storeBlocks();
   viewRoster();
 }
 
 function clearAllDxccIgnores()
 {
-  CR.blockedDxcc = Object();
+  CR.ignoredDxcc = Object();
   storeBlocks();
   viewRoster();
 }
 
 function clearAllGridIgnores()
 {
-  CR.blockedGrid = Object();
+  CR.ignoredGrid = Object();
   storeBlocks();
   viewRoster();
 }
@@ -1298,14 +1298,14 @@ function clearAllCQIgnores()
 
 function clearAllCQzIgnores()
 {
-  CR.blockedCQz = Object();
+  CR.ignoredCQz = Object();
   storeBlocks();
   viewRoster();
 }
 
 function clearAllITUzIgnores()
 {
-  CR.blockedITUz = Object();
+  CR.ignoredITUz = Object();
   storeBlocks();
   viewRoster();
 }
@@ -1349,11 +1349,11 @@ function renderIgnoresTab()
 {
   let worker = "";
   let clearString = "<th>none</th>";
-  if (Object.keys(CR.blockedCalls).length > 0)
+  if (Object.keys(CR.ignoredCalls).length > 0)
   {
     clearString = "<th style='cursor:pointer;' onclick='clearAllCallsignIgnores()'>Clear All</th>";
     worker += "<div class='ignoresTables'><table class='darkTable' align=center><tr><th align=left>Callsigns</th>" + clearString + "</tr>";
-    Object.keys(CR.blockedCalls)
+    Object.keys(CR.ignoredCalls)
       .sort()
       .forEach(function (key, i)
       {
@@ -1379,11 +1379,11 @@ function renderIgnoresTab()
     worker += "</table></div>";
   }
 
-  if (Object.keys(CR.blockedDxcc).length > 0)
+  if (Object.keys(CR.ignoredDxcc).length > 0)
   {
     clearString = "<th style='cursor:pointer;' onclick='clearAllDxccIgnores()'>Clear All</th>";
     worker += "<div class='ignoresTables'><table class='darkTable' align=center><tr><th align=left>DXCC</th>" + clearString + "</tr>";
-    Object.keys(CR.blockedDxcc)
+    Object.keys(CR.ignoredDxcc)
       .sort()
       .forEach(function (key, i)
       {
@@ -1392,11 +1392,11 @@ function renderIgnoresTab()
     worker += "</table></div>";
   }
 
-  if (Object.keys(CR.blockedGrid).length > 0)
+  if (Object.keys(CR.ignoredGrid).length > 0)
   {
     clearString = "<th style='cursor:pointer;' onclick='clearAllGridIgnores()'>Clear All</th>";
     worker += "<div class='ignoresTables'><table class='darkTable' align=center><tr><th align=left>Grid</th>" + clearString + "</tr>";
-    Object.keys(CR.blockedGrid)
+    Object.keys(CR.ignoredGrid)
       .sort()
       .forEach(function (key, i)
       {
@@ -1405,11 +1405,11 @@ function renderIgnoresTab()
     worker += "</table></div>";
   }
 
-  if (Object.keys(CR.blockedCQz).length > 0)
+  if (Object.keys(CR.ignoredCQz).length > 0)
   {
     clearString = "<th style='cursor:pointer;' onclick='clearAllCQzIgnores()'>Clear All</th>";
     worker += "<div class='ignoresTables' ><table class='darkTable' align=center><tr><th align=left>CQ Zones</th>" + clearString + "</tr>";
-    Object.keys(CR.blockedCQz)
+    Object.keys(CR.ignoredCQz)
       .sort()
       .forEach(function (key, i)
       {
@@ -1418,11 +1418,11 @@ function renderIgnoresTab()
     worker += "</table></div>";
   }
 
-  if (Object.keys(CR.blockedITUz).length > 0)
+  if (Object.keys(CR.ignoredITUz).length > 0)
   {
     clearString = "<th style='cursor:pointer;' onclick='clearAllITUzIgnores()'>Clear All</th>";
     worker += "<div class='ignoresTables'><table class='darkTable' align=center><tr><th align=left>ITU Zones</th>" + clearString + "</tr>";
-    Object.keys(CR.blockedITUz)
+    Object.keys(CR.ignoredITUz)
       .sort()
       .forEach(function (key, i)
       {

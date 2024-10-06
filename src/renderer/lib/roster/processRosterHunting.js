@@ -57,7 +57,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         // If they are not ignored or we're in a QSO with them, let it through
 
         // TODO: This is here because it's after the filtering stage
-        if ((!(entry.DEcall in CR.blockedCalls) && !(callObj.dxcc in CR.blockedDxcc) && !(callObj.grid in CR.blockedGrid)) ||
+        if ((!(entry.DEcall in CR.ignoredCalls) && !(callObj.dxcc in CR.ignoredDxcc) && !(callObj.grid in CR.ignoredGrid)) ||
           window.opener.GT.instances[callObj.instance].status.DXcall == entry.DEcall)
         {
           entry.tx = true;

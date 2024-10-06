@@ -74,7 +74,7 @@ function processRosterFiltering(callRoster, rosterSettings)
       entry.tx = false;
       continue;
     }
-    if (call in CR.blockedCalls)
+    if (call in CR.ignoredCalls)
     {
       entry.tx = false;
       continue;
@@ -84,22 +84,22 @@ function processRosterFiltering(callRoster, rosterSettings)
       entry.tx = false;
       continue;
     }
-    if (callObj.ituz in CR.blockedITUz)
+    if (callObj.ituz in CR.ignoredITUz)
     {
       entry.tx = false;
       continue;
     }
-    if (callObj.cqz in CR.blockedCQz)
+    if (callObj.cqz in CR.ignoredCQz)
     {
       entry.tx = false;
       continue;
     }
-    if (callObj.dxcc in CR.blockedDxcc)
+    if (callObj.dxcc in CR.ignoredDxcc)
     {
       entry.tx = false;
       continue;
     }
-    if (callObj.grid in CR.blockedGrid)
+    if (callObj.grid in CR.ignoredGrid)
     {
       entry.tx = false;
       continue;
