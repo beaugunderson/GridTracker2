@@ -57,10 +57,6 @@ function renderRoster(callRoster, rosterSettings)
   // dealing with spots
   if (CR.rosterSettings.columns.Spot == true) onlySpotDiv.style.display = "";
   else onlySpotDiv.style.display = "none";
-
-  // callmode (all or only new)
-  if (rosterSettings.callMode == "all") allOnlyNewDiv.style.display = "";
-  else allOnlyNewDiv.style.display = "none";
   
   // Show the roster count in the window title
 

@@ -924,3 +924,8 @@ function alertChatMessage()
   }
   GT.lastChatMsgAlert = timeNowSec();
 }
+
+function oamsCanMsg()
+{
+  return (GT.mapSettings.offlineMode == false && GT.appSettings.gtShareEnable == true && GT.appSettings.gtMsgEnable == true);
+}

@@ -8,7 +8,6 @@ const validSettings = [
   "audioSettings",
   "awardTracker",
   "bandActivity",
-  "blockedCQ",
   "ignoredCQ",
   "blockedCalls",
   "blockedGrid",

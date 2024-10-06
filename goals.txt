@@ -16,9 +16,9 @@ done - 5) Settings -> General -> Export and Import settings should open a dialog
 
 6) Call Roster -> Settings -> Export/Import "Watchers and Ignore lists" -> File Dialog prompt -> Save as pretty print json. "GT_watchers_and_ignores.json"
 
-7) Call Roster -> Move " /Only Wanted" from "Callsign" drop down, and put as first option in "Exceptions"
+done - 7) Call Roster -> Move " /Only Wanted" from "Callsign" drop down, and put as first option in "Exceptions"
 
-8) Remove "Callsigns" option .. we are only going to support "Wanted"
+done - 8) Remove "Callsigns" option .. we are only going to support "Wanted"
     This means the Callsign "new" and "new+unconfirmed" options are going away
         this includes "Hunting" section that allows for singly entity hunting and related Html/code
 

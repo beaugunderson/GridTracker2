@@ -25,18 +25,7 @@ function sendAlerts(callRoster, rosterSettings)
     delete CR.scriptReport[call].qso;
     delete CR.scriptReport[call].instance;
 
-    if (rosterSettings.callMode != "all")
-    {
-      CR.scriptReport[call].shouldAlert = true;
-      CR.scriptReport[call].reason.push(CR.rosterSettings.hunting);
-    }
-
-    if (callObj.alerted == false && rosterSettings.callMode == "all" && callObj.shouldAlert == true)
-    {
-      callObj.alerted = true;
-      shouldAlert++;
-    }
-    else if (callObj.alerted == false && rosterSettings.callMode != "all")
+    if (callObj.alerted == false && callObj.shouldAlert == true)
     {
       callObj.alerted = true;
       shouldAlert++;

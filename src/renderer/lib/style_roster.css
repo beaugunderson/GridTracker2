@@ -246,12 +246,6 @@ body.roster {
   }
 }
 
-@media (max-width: 800px) {
-  #RosterControls.normal #CallsignsControls {
-    display: none;
-  }
-}
-
 @media (max-width: 600px) {
   #RosterControls.normal #LogbookControls {
     display: none;

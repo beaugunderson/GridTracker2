@@ -530,7 +530,7 @@
   "roster.controls.callsigns.worked": "Nuevos",
   "roster.controls.callsigns.confirmed": "Nuevos + No Confirm.",
   "roster.controls.callsigns.all": "Todo el Tráfico",
-  "roster.controls.callsigns.hits": "Todo + Buscados",
+  "roster.controls.callsigns.hits": "Solo buscados",
   "roster.controls.hunting.label": "Caza",
   "roster.controls.hunting.callsign": "Indicativo",
   "roster.controls.hunting.grid": "Grid",

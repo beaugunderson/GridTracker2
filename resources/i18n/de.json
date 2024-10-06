@@ -537,7 +537,7 @@
     "roster.controls.callsigns.worked": "Neu",
     "roster.controls.callsigns.confirmed": "Neu+Unbestätigt",
     "roster.controls.callsigns.all": "Alles",
-    "roster.controls.callsigns.hits": "Alles/Nur gesuchte",
+    "roster.controls.callsigns.hits": "Nur gesuchte",
     "roster.controls.hunting.label": "Gesucht",
     "roster.controls.hunting.callsign": "Rufzeichen",
     "roster.controls.hunting.grid": "Locator",

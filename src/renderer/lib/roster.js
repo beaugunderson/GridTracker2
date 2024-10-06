@@ -6,7 +6,6 @@
 CR.developerMode = false;
 CR.callRoster = {};
 CR.blockedCalls = {};
-CR.blockedCQ = {};
 CR.ignoredCQ = {};
 CR.blockedDxcc = {};
 CR.blockedGrid = {};
@@ -15,10 +14,6 @@ CR.blockedITUz = {};
 CR.scriptReport = {};
 CR.modes = {};
 CR.modes_phone = {};
-CR.currentUSCallsigns = null;
-CR.currentUSState = "";
-CR.currentDXCCs = -1;
-CR.callsignManifest = null;
 CR.rosterSettings = {};
 CR.day = 0;
 CR.dayAsString = "0";
@@ -61,8 +56,7 @@ CR.rosterFocus = false;
 CR.watchers = null;
 
 CR.defaultSettings = {
-  callsign: "all",
-  hunting: "dxcc",
+  onlyHits: false,
   huntNeed: "confirmed",
   requireGrid: false,
   animateCQGT: true,
@@ -191,7 +185,7 @@ document.addEventListener("drop", function (event)
 
 window.addEventListener("message", receiveMessage, false);
 
-if (typeof GT.localStorage.awardTracker == "undefined")
+if (!("awardTracker" in GT.localStorage))
 {
   GT.localStorage.awardTracker = "{}";
   CR.rosterSettings = {};
@@ -200,35 +194,14 @@ if (typeof GT.localStorage.awardTracker == "undefined")
 
 CR.awardTracker = JSON.parse(GT.localStorage.awardTracker);
 
-// These two need to stay here because of an old bug.
-if (typeof GT.localStorage.blockedCQz == "undefined")
-{
-  GT.localStorage.blockedCQz = "{}";
-}
-
-if (typeof GT.localStorage.blockedCQ == "undefined")
-{
-  GT.localStorage.blockedCQ = "{}";
-}
-
-if (typeof GT.localStorage.blockedITUz == "undefined")
-{
-  GT.localStorage.blockedITUz = "{}";
-}
-
-if (typeof GT.localStorage.blockedGrid == "undefined")
-{
-  GT.localStorage.blockedGrid = "{}";
-}
-
-if (typeof GT.localStorage.blockedCalls != "undefined")
+if ("blockedCalls" in  GT.localStorage)
 {
   CR.blockedCalls = JSON.parse(GT.localStorage.blockedCalls);
-  CR.blockedCQ = JSON.parse(GT.localStorage.blockedCQ);
   CR.blockedDxcc = JSON.parse(GT.localStorage.blockedDxcc);
   CR.blockedGrid = JSON.parse(GT.localStorage.blockedGrid);
   CR.blockedCQz = JSON.parse(GT.localStorage.blockedCQz);
   CR.blockedITUz = JSON.parse(GT.localStorage.blockedITUz);
+  CR.ignoredCQ = JSON.parse(GT.localStorage.ignoredCQ);
 }
 else
 {
@@ -240,44 +213,14 @@ else
   GT.localStorage.ignoredCQ = "{}";
 }
 
-if (typeof GT.localStorage.ignoredCQ == "undefined")
-{
-  // CR.blockedCQ is deprecated, we don't clear it, we copy it
-  // This is protection against them rolling back to a previous version 
-  // where keys are "CQ POTA from CountryString"
-  let shouldStore = false;
-  for (let key in CR.blockedCQ)
-  {
-    let test = key.split(" from ");
-    if (test.length == 2)
-    {
-      if (test[1] == "All")
-      {
-        CR.ignoredCQ[test[0]] = true;
-      }
-      else
-      {
-        CR.ignoredCQ[test[0] + ":" + window.opener.GT.altNameToDXCC[test[1]]] = true;
-      }
-
-      shouldStore = true;
-    }
-  }
-  if (shouldStore) storeBlocks(false);
-}
-else
-{
-  CR.ignoredCQ = JSON.parse(GT.localStorage.ignoredCQ);
-}
-
 function storeBlocks(render = true)
 {
   GT.localStorage.blockedCalls = JSON.stringify(CR.blockedCalls);
-  GT.localStorage.ignoredCQ = JSON.stringify(CR.ignoredCQ);
   GT.localStorage.blockedDxcc = JSON.stringify(CR.blockedDxcc);
   GT.localStorage.blockedGrid = JSON.stringify(CR.blockedGrid);
   GT.localStorage.blockedCQz = JSON.stringify(CR.blockedCQz);
   GT.localStorage.blockedITUz = JSON.stringify(CR.blockedITUz);
+  GT.localStorage.ignoredCQ = JSON.stringify(CR.ignoredCQ);
   if (render)
   {
     renderIgnoresTab();
@@ -896,8 +839,6 @@ function toggleMoreControls()
 function setVisual()
 {
   huntNeed.style.display = "none";
-  stateSelect.style.display = "none";
-  DxccSingleSelect.style.display = "none";
 
   if (CR.rosterSettings.controls)
   {
@@ -921,8 +862,8 @@ function setVisual()
   // Award Hunter
   if (referenceNeed.value == LOGBOOK_AWARD_TRACKER)
   {
+    onlyHitsDiv.style.display = "none";
     HuntModeControls.style.display = "none";
-    CallsignsControls.style.display = "none";
     AwardTrackerControls.style.display = "";
     updateAwardList();
   }
@@ -938,84 +879,18 @@ function setVisual()
 
     AwardTrackerControls.style.display = "none";
     HuntModeControls.style.display = "";
-    huntMode.style.display = "";
-    CallsignsControls.style.display = "";
+
     closeAwardPopup();
-    if (callsignNeed.value == "all" || callsignNeed.value == "hits")
-    {
-      huntingMatrixDiv.style.display = "";
-      huntNeed.style.display = "";
-      huntMode.style.display = "none";
-    }
-    else
-    {
-      huntingMatrixDiv.style.display = "none";
-      huntMode.style.display = "";
 
-      if (huntMode.value != "callsign" && huntMode.value != "usstate" && huntMode.value != "dxccs")
-      {
-        huntNeed.style.display = "";
-      }
-      if (huntMode.value == "usstate")
-      {
-        stateSelect.style.display = "";
-      }
-      if (huntMode.value == "usstates")
-      {
-        huntNeed.style.display = "";
-      }
-      if (huntMode.value == "dxccs")
-      {
-        DxccSingleSelect.style.display = "";
-      }
-    }
+    huntingMatrixDiv.style.display = "";
+    huntNeed.style.display = "";
+    onlyHitsDiv.style.display = "";
   }
 
-  if (window.opener.GT.callsignLookups.lotwUseEnable == true)
-  {
-    usesLoTWDiv.style.display = "";
-  }
-  else
-  {
-    usesLoTWDiv.style.display = "none";
-  }
-
-  if (window.opener.GT.callsignLookups.eqslUseEnable == true)
-  {
-    useseQSLDiv.style.display = "";
-  }
-  else
-  {
-    useseQSLDiv.style.display = "none";
-  }
-
-  if (window.opener.GT.callsignLookups.oqrsUseEnable == true)
-  {
-    usesOQRSDiv.style.display = "";
-  }
-  else
-  {
-    usesOQRSDiv.style.display = "none";
-  }
-
-  if (CR.rosterSettings.columns.Spot == true)
-  {
-    onlySpotDiv.style.display = "";
-  }
-  else
-  {
-    onlySpotDiv.style.display = "none";
-  }
-
-  if (CR.rosterSettings.callsign == "all" || CR.rosterSettings.callsign == "hits")
-  {
-    allOnlyNewDiv.style.display = "";
-  }
-  else
-  {
-    allOnlyNewDiv.style.display = "none";
-  }
-
+  usesLoTWDiv.style.display = (window.opener.GT.callsignLookups.lotwUseEnable == true) ? "" : "none";
+  useseQSLDiv.style.display = (window.opener.GT.callsignLookups.eqslUseEnable == true) ? "" : "none";
+  usesOQRSDiv.style.display = (window.opener.GT.callsignLookups.oqrsUseEnable == true) ? "" : "none";
+  onlySpotDiv.style.display = (CR.rosterSettings.columns.Spot == true) ? "" : "none";
   rosterBody.style.display = "block";
 
   resize();
@@ -1053,8 +928,6 @@ function wantedChanged(element)
 
 function valuesChanged()
 {
-  CR.rosterSettings.callsign = callsignNeed.value;
-  CR.rosterSettings.hunting = huntMode.value;
   CR.rosterSettings.huntNeed = huntNeed.value;
   CR.rosterSettings.requireGrid = wantGrid.checked;
 
@@ -1071,6 +944,7 @@ function valuesChanged()
   CR.rosterSettings.maxLoTW = maxLoTW.value;
   maxLoTWView.innerHTML = CR.rosterSettings.maxLoTW < 27 ? toYM(Number(CR.rosterSettings.maxLoTW)) : "<b>&infin;</b>";
   CR.rosterSettings.maxLoTW = maxLoTW.value;
+  CR.rosterSettings.onlyHits = onlyHits.checked;
   CR.rosterSettings.cqOnly = cqOnly.checked;
   CR.rosterSettings.noMyDxcc = noMyDxcc.checked;
   CR.rosterSettings.onlyMyDxcc = onlyMyDxcc.checked;
@@ -1146,108 +1020,6 @@ function resetFilters()
   loadFilterSettings();
 }
 
-function getBuffer(file_url, callback, flag, mode, port, cookie)
-{
-  let http = require(mode);
-  let fileBuffer = null;
-  let options = null;
-  if (cookie != null)
-  {
-    options = {
-      host: NodeURL.parse(file_url).host, // eslint-disable-line node/no-deprecated-api
-      port: port,
-      path: NodeURL.parse(file_url).path, // eslint-disable-line node/no-deprecated-api
-      headers: {
-        Cookie: cookie
-      }
-    };
-  }
-  else
-  {
-    options = {
-      host: NodeURL.parse(file_url).host, // eslint-disable-line node/no-deprecated-api
-      port: port,
-      path: NodeURL.parse(file_url).path // eslint-disable-line node/no-deprecated-api
-    };
-  }
-  http.get(options, function (res)
-  {
-    // let fsize = res.headers["content-length"];
-    let cookies = null;
-    if (typeof res.headers["set-cookie"] != "undefined")
-    { cookies = res.headers["set-cookie"]; }
-    res
-      .on("data", function (data)
-      {
-        if (fileBuffer == null) fileBuffer = data;
-        else fileBuffer += data;
-      })
-      .on("end", function ()
-      {
-        if (typeof callback == "function")
-        {
-          // Call it, since we have confirmed it is callable
-          callback(fileBuffer, flag, cookies);
-        }
-      })
-      .on("error", function () {});
-  });
-}
-
-function callsignResult(buffer, flag)
-{
-  let rawData = JSON.parse(buffer);
-  CR.currentUSState = flag;
-
-  CR.currentUSCallsigns = Object();
-  for (const key in rawData.c) CR.currentUSCallsigns[rawData.c[key]] = true;
-
-  viewRoster();
-}
-
-function stateChangedValue(what)
-{
-  if (CR.currentUSState != stateSelect.value && stateSelect.value != "")
-  {
-    CR.currentUSState = stateSelect.value;
-
-    if (window.opener.GT.mapSettings.offlineMode == false)
-    {
-      let callState = CR.currentUSState.replace("CN-", "");
-      getBuffer(
-        "https://storage.googleapis.com/gt_app/callsigns/" + callState + ".callsigns.json",
-        callsignResult,
-        CR.currentUSState,
-        "http",
-        80
-      );
-    }
-    else
-    {
-      viewRoster();
-      CR.currentUSState = "";
-      CR.currentUSCallsigns = null;
-      stateSelect.value = "";
-
-      return;
-    }
-  }
-
-  if (stateSelect.value == "")
-  {
-    CR.currentUSState = "";
-    CR.currentUSCallsigns = null;
-
-    viewRoster();
-  }
-}
-
-function DXCCsChangedValue(what)
-{
-  CR.currentDXCCs = DxccSingleSelect.value;
-  viewRoster();
-}
-
 function initSelectors()
 {
   for (const column in ROSTER_COLUMNS)
@@ -1278,13 +1050,11 @@ function initSelectors()
       let option = document.createElement("option");
       option.value = key;
       option.text = window.opener.GT.dxccToAltName[key] + " (" + window.opener.GT.dxccInfo[key].pp + ")";
-      DxccSingleSelect.appendChild(option);
       // Note: do not use cloneNode on elements/nodes that have ids
       ignoreCqDxccSelect.appendChild(option.cloneNode(true));
       ignoreDxccSelect.appendChild(option.cloneNode(true));
     }
   }
-  DxccSingleSelect.oninput = DXCCsChangedValue;
 
   items = Object.keys(window.opener.GT.cqZones).sort();
   for (const i in items)
@@ -1391,29 +1161,6 @@ function addNewIgnore()
   {
     ignoreITUz(ignoreItuzSelect.value);
   }
-}
-
-function manifestResult(buffer, flag)
-{
-  CR.callsignManifest = JSON.parse(buffer);
-  let newSelect = document.getElementById("stateSelect");
-
-  for (const key in CR.callsignManifest.cnt)
-  {
-    let option = document.createElement("option");
-    if (window.opener.GT.enums[key])
-    {
-      option.value = key;
-      option.text = window.opener.GT.enums[key];
-    }
-    else
-    {
-      option.value = "CN-" + key;
-      option.text = window.opener.GT.enums["CN-" + key];
-    }
-    newSelect.appendChild(option);
-  }
-  newSelect.oninput = stateChangedValue;
 }
 
 function receiveMessage(event) {}
@@ -1834,18 +1581,7 @@ function init()
   // addAllAwards();
 
   window.addEventListener("message", receiveMessage, false);
-  
 
-  if (window.opener.GT.mapSettings.offlineMode == false)
-  {
-    getBuffer(
-      "https://storage.googleapis.com/gt_app/callsigns/manifest.json",
-      manifestResult,
-      null,
-      "http",
-      80
-    );
-  }
   loadSettings();
   loadFilterSettings();
   updateInstances();
@@ -1863,7 +1599,7 @@ function toggleShowControls()
   setVisual();
 }
 
-// From i18n.js
+// called from i18n.js
 function addControls()
 {
   WANTED_LABELS = {
@@ -1897,8 +1633,6 @@ function addControls()
   createCompactMenuShow();
   clearRestOfMenus();
 
-  callsignNeed.value = CR.rosterSettings.callsign;
-  huntMode.value = CR.rosterSettings.hunting;
   huntNeed.value = CR.rosterSettings.huntNeed;
   wantGrid.checked = CR.rosterSettings.requireGrid;
 
@@ -1916,6 +1650,7 @@ function addControls()
   maxLoTW.value = CR.rosterSettings.maxLoTW;
   maxLoTWView.innerHTML = maxLoTW.value < 27 ? toYM(Number(maxLoTW.value)) : "<b>&infin;</b>";
 
+  onlyHits.checked = CR.rosterSettings.onlyHits;
   cqOnly.checked = CR.rosterSettings.cqOnly;
   noMyDxcc.checked = CR.rosterSettings.noMyDxcc;
   onlyMyDxcc.checked = CR.rosterSettings.onlyMyDxcc;

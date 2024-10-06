@@ -458,42 +458,13 @@
             </select>
           </div>
 
-          <div id="CallsignsControls">
-            <label data-i18n="roster.controls.callsigns.label" for="callsignNeed">Callsigns</label>
-            <select id="callsignNeed" onchange="valuesChanged();">
-              <option data-i18n="roster.controls.callsigns.worked" value="worked">New</option>
-              <option data-i18n="roster.controls.callsigns.confirmed" value="confirmed">New+Unconfirmed</option>
-              <option data-i18n="roster.controls.callsigns.all" value="all">All Traffic</option>
-              <option data-i18n="roster.controls.callsigns.hits" value="hits">All Traffic/Only Wanted</option>
-            </select>
-          </div>
-
           <div id="HuntModeControls">
-            <label data-i18n="roster.controls.hunting.label" for="huntMode">Hunting</label>
-            <select id="huntMode" onchange="valuesChanged();" value="callsign">
-              <option data-i18n="roster.controls.hunting.callsign" value="callsign">Callsign</option>
-              <option data-i18n="roster.controls.hunting.grid" value="grid">Grid</option>
-              <option data-i18n="roster.controls.hunting.dxcc" value="dxcc">DXCC</option>
-              <option data-i18n="roster.controls.hunting.dxccSingle" value="dxccs">DXCC (Single)</option>
-              <option data-i18n="roster.controls.hunting.cqZone" value="cq">CQ Zone</option>
-              <option data-i18n="roster.controls.hunting.ituZone" value="itu">ITU Zone</option>
-              <option data-i18n="roster.controls.hunting.usStates" value="usstates">US States (WAS)</option>
-              <option data-i18n="roster.controls.hunting.usState" value="usstate">US State (Single)</option>
-              <option  data-i18n="roster.controls.hunting.wpx"value="wpx">Prefix (WPX)</option>
-            </select>
+            <label data-i18n="roster.controls.hunting.label" for="huntNeed">Hunting</label>
 
             <select id="huntNeed" onchange="valuesChanged();">
               <option data-i18n="roster.controls.huntNeed.worked" value="worked">New</option>
               <option data-i18n="roster.controls.huntNeed.confirmed" value="confirmed">New+Unconfirmed</option>
               <option data-i18n="roster.controls.huntNeed.mixed" value="mixed">Mixed</option>
-            </select>
-
-            <select id="stateSelect" onchange="valuesChanged();">
-              <option data-i18n="roster.controls.huntState.label"value="" selected="true">Select Territory</option>
-            </select>
-
-            <select id="DxccSingleSelect" onchange="valuesChanged();"">
-              <option data-i18n="roster.controls.huntDXCC.label" value="-1" selected="true">Select DXCC</option>
             </select>
           </div>
 
@@ -598,6 +569,10 @@
           <div  id="exceptionDiv" class="secondaryControlGroup" >
             <h3 data-i18n="roster.exceptions.label">Exceptions</h3>
             <div class="columns">
+              <div id="onlyHitsDiv">
+                <input type="checkbox" id="onlyHits" onchange="valuesChanged();" />
+              <label data-i18n="roster.controls.callsigns.hits" for="onlyHits">Only Wanted</label>
+              </div>
               <div>
                 <input type="checkbox" id="cqOnly" onchange="valuesChanged();" />
               <label data-i18n="roster.secondary.exceptions.cqOnly" for="cqOnly">CQ Only</label>
@@ -605,6 +580,10 @@
               <div>
                 <input type="checkbox" id="wantRRCQ" onchange="valuesChanged();" />
                 <label data-i18n="roster.secondary.exceptions.wantRRCQ" for="wantRRCQ">RR73 as CQ</label>
+              </div>
+              <div id="allOnlyNewDiv">
+                <input type="checkbox" id="allOnlyNew" onchange="valuesChanged();" />
+                <label data-i18n="roster.secondary.exceptions.allOnlyNew" for="allOnlyNew">New Calls</label>
               </div>
               <div>
                 <input type="checkbox" id="wantGrid" onchange="valuesChanged();" />
@@ -619,11 +598,6 @@
                 <label data-i18n="roster.secondary.exceptions.onlyMyDXCC" for="onlyMyDxcc">Only My DXCC</label>
               </div>   
 
-   
-            <div id="allOnlyNewDiv">
-              <input type="checkbox" id="allOnlyNew" onchange="valuesChanged();" />
-              <label data-i18n="roster.secondary.exceptions.allOnlyNew" for="allOnlyNew">New Calls</label>
-            </div>
              <div id="onlySpotDiv">
               <input type="checkbox" id="onlySpot" onchange="valuesChanged();" />
               <label data-i18n="roster.secondary.exceptions.spottedMe" for="onlySpot">Spotted Me</label>

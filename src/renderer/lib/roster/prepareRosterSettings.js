@@ -3,32 +3,20 @@ function prepareRosterSettings()
   let rosterSettings = {
     bands: {},
     modes: {},
-    callMode: CR.rosterSettings.callsign,
-    onlyHits: false,
+    onlyHits: CR.rosterSettings.onlyHits,
     isAwardTracker: false,
     now: timeNowSec()
   }
 
-  if (rosterSettings.callMode == "hits")
-  {
-    rosterSettings.callMode = "all"
-    rosterSettings.onlyHits = true;
-  }
   if (referenceNeed.value == LOGBOOK_AWARD_TRACKER)
   {
-    rosterSettings.callMode = "all";
     rosterSettings.onlyHits = false;
     rosterSettings.isAwardTracker = true;
     CR.rosterSettings.huntNeed = huntNeed.value = "confirmed";
   }
-  // this appears to be determine if we should show the OAMS column
-  // if the user is not in offline mode and has OAMS enabled, this could
-  // be it's own function maybe?
-  rosterSettings.canMsg =
-    window.opener.GT.mapSettings.offlineMode == false &&
-    window.opener.GT.appSettings.gtShareEnable == true &&
-    window.opener.GT.appSettings.gtMsgEnable == true;
 
+  rosterSettings.canMsg = window.opener.oamsCanMsg();
+  
   if (CR.rosterSettings.huntNeed == "mixed")
   {
     rosterSettings.huntIndex = CR.tracker.confirmed;

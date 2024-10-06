@@ -530,7 +530,7 @@
     "roster.controls.callsigns.worked": "Nuovo",
     "roster.controls.callsigns.confirmed": "Nuovo+non confermato",
     "roster.controls.callsigns.all": "Tutto il traffico",
-    "roster.controls.callsigns.hits": "Tutto/ solo ricercato",
+    "roster.controls.callsigns.hits": "Solo ricercato",
     "roster.controls.hunting.label": "Caccia",
     "roster.controls.hunting.callsign": "Nominativo",
     "roster.controls.hunting.grid": "Locatore",

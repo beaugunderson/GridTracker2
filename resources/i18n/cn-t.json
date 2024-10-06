@@ -531,7 +531,7 @@
     "roster.controls.callsigns.worked": "新的",
     "roster.controls.callsigns.confirmed": "新的+未確認的",
     "roster.controls.callsigns.all": "所有通聯",
-    "roster.controls.callsigns.hits": "所有通聯/僅限想要的",
+    "roster.controls.callsigns.hits": "僅限想要的",
     "roster.controls.hunting.label": "追尋",
     "roster.controls.hunting.callsign": "呼號",
     "roster.controls.hunting.grid": "網格",

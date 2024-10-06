@@ -115,9 +115,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
       let callConf, gridConf, callingConf, dxccConf, stateConf, cntyConf, contConf, potaConf, cqzConf, ituzConf, wpxConf;
 
       callBg = gridBg = callingBg = dxccBg = stateBg = cntyBg = contBg = potaBg = cqzBg = ituzBg = wpxBg = gtBg = row;
-
-      callConf = gridConf = callingConf = dxccConf = stateConf = cntyConf = contConf = potaConf = cqzConf = ituzConf = wpxConf =
-        "";
+      callConf = gridConf = callingConf = dxccConf = stateConf = cntyConf = contConf = potaConf = cqzConf = ituzConf = wpxConf = "";
 
       let cntyPointer = (callObj.cnty && callObj.qual == false) ? "cursor: pointer;" : "";
       let didWork = false;
@@ -162,13 +160,11 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         callObj.gt = 0;
       }
 
-      // We only do hunt highlighting when showing all entries
-      // This means "Callsigns: All Traffic", "Callsigns: All Traffic/Only Wanted"
-      // There is no highlighting in other modes
-      if (rosterSettings.callMode == "all")
+    
+      // Just All Traffic and Awards now, yay!
       {
         // Skip when "only new calls"
-        // Questions: Move to the first loop? Why only skip new calls in "all traffic" and not other modes?
+        // Questions: Move to the first loop? 
         if (allOnlyNew.checked == true && didWork && callObj.qrz == false)
         {
           entry.tx = false;
