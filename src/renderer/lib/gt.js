@@ -11963,6 +11963,7 @@ function startupButtonsAndInputs()
     udpForwardEnable.checked = GT.appSettings.wsjtForwardUdpEnable;
     multicastEnable.checked = GT.appSettings.multicast;
 
+    GT.appSettings.gridViewMode = clamp(GT.appSettings.gridViewMode, 1, 3);
     gtGridViewMode.value = GT.appSettings.gridViewMode;
     graylineImg.src = GT.GraylineImageArray[GT.appSettings.graylineImgSrc];
     gtFlagImg.src = GT.gtFlagImageArray[GT.appSettings.gtFlagImgSrc % 2];
