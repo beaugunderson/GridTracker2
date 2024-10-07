@@ -12476,8 +12476,8 @@ function updateForwardListener()
   GT.forwardUdpServer.on("message", function (originalMessage, remote)
   {
     // Decode enough to get the rig-name, so we know who to send to
-    var message = Object.assign({}, originalMessage);
-    var newMessage = {};
+    let message = originalMessage.slice();
+    let newMessage = {};
     newMessage.magic_key = decodeQUINT32(message);
     message = message.slice(GT.qtToSplice);
     if (newMessage.magic_key == 0xadbccbda)
@@ -12489,14 +12489,13 @@ function updateForwardListener()
       newMessage.Id = decodeQUTF8(message);
       message = message.slice(GT.qtToSplice);
 
-      var instanceId = newMessage.Id;
-      if (instanceId in GT.instances)
+      if (newMessage.Id in GT.instances)
       {
         wsjtUdpMessage(
           originalMessage,
           originalMessage.length,
-          GT.instances[instanceId].remote.port,
-          GT.instances[instanceId].remote.address
+          GT.instances[newMessage.Id].remote.port,
+          GT.instances[newMessage.Id].remote.address
         );
       }
     }
