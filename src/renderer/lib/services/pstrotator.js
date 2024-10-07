@@ -12,31 +12,15 @@ GT.pstrotatorSettings = {};
 
 function pstrotatorServiceChanged()
 {
-  if (GT.pstrotatorSettings.enabled != pstrotatorCheckBox.checked)
-  {
-    // This setting toggles the presence of a contextual menu item in the roster,
-    // which is constructed only during roster initialization.
-    //
-    // So when this setting is changed, we need to reload the entire roster window.
-    //
-    GT.pstrotatorSettings.enable = pstrotatorCheckBox.checked;
-    if (GT.rosterInitialized)
-    {
-      try
-      {
-        GT.callRosterWindowHandle.window.location.reload();
-      }
-      catch (e)
-      {
-        console.error(e);
-      }
-    }
-  }
-
+  GT.pstrotatorSettings.enable = pstrotatorCheckBox.checked;
   GT.pstrotatorSettings.ip = pstrotatorIpInput.value;
   GT.pstrotatorSettings.port = pstrotatorPortInput.value;
 
   saveLogSettings();
+  if (GT.rosterInitialized)
+  {
+    GT.callRosterWindowHandle.window.setPstrotatorEnable(GT.pstrotatorSettings.enable);
+  }
 }
 
 function aimRotator(info)

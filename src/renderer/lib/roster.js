@@ -22,8 +22,10 @@ CR.menuShow = null;
 CR.columnMenu = null;
 CR.columnMembers = {};
 CR.callMenu = null;
+CR.callMenuRotator = null;
+CR.callingMenu = null;
+CR.callingMenuRotator = null;
 CR.ageMenu = null;
-CR.callingMenuS = null;
 CR.compactMenuHide = null;
 CR.compactMenuShow = null;
 CR.menuItemForMoveLeftColumn = null;
@@ -33,9 +35,11 @@ CR.targetHash = "";
 CR.dxccMenu = null;
 CR.targetDxcc = -1;
 CR.CQMenu = null;
+CR.CQzMenu = null;
 CR.GridMenu = null;
 CR.MsgMenu = null;
 CR.targetCQ = "";
+CR.targetCQz = null;
 CR.timerInterval = null;
 CR.awards = {};
 CR.awardTypes = {};
@@ -3625,25 +3629,23 @@ function clearRestOfMenus()
 
   CR.callMenu.append(item);
 
+  // Saved for later user
+  CR.callMenuRotator = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.AimRotator"),
+    visible: window.opener.GT.pstrotatorSettings.enable,
+    click: function ()
+    {
+      let target = CR.callRoster[CR.targetHash]
+      window.opener.aimRotator(target, "");
+    }
+  });
+
+  CR.callMenu.append(CR.callMenuRotator);
+
   item = new MenuItem({ type: "separator" });
   CR.callMenu.append(item);
-
-  if (window.opener.GT.pstrotatorSettings.enable)
-  {
-    item = new MenuItem({
-      type: "normal",
-      label: I18N("roster.menu.AimRotator"),
-      click: function ()
-      {
-        let target = CR.callRoster[CR.targetHash]
-        window.opener.aimRotator(target, "");
-      }
-    });
-    CR.callMenu.append(item);
-
-    item = new MenuItem({ type: "separator" });
-    CR.callMenu.append(item);
-  }
+ 
 
   item = new MenuItem({
     type: "normal",
@@ -3702,22 +3704,17 @@ function clearRestOfMenus()
 
   CR.callingMenu.append(item);
 
-  item = new MenuItem({ type: "separator" });
-  CR.callingMenu.append(item);
-
-  if (window.opener.GT.pstrotatorSettings.enable)
-  {
-    item = new MenuItem({
-      type: "normal",
-      label: I18N("roster.menu.AimRotator"),
-      click: function ()
-      {
-        let target = CR.callRoster[CR.targetHash]
-        window.opener.aimRotator(target, "");
-      }
-    });
-    CR.callingMenu.append(item);
-  }
+  CR.callingMenuRotator = new MenuItem({
+    type: "normal",
+    label: I18N("roster.menu.AimRotator"),
+    visible: window.opener.GT.pstrotatorSettings.enable,
+    click: function ()
+    {
+      let target = CR.callRoster[CR.targetHash]
+      window.opener.aimRotator(target, "");
+    }
+  });
+  CR.callingMenu.append(CR.callingMenuRotator);
 
   CR.columnMenu = new Menu();
 
@@ -3922,6 +3919,11 @@ function clearRestOfMenus()
   });
 
   CR.GridMenu.append(item);
+}
+
+function setPstrotatorEnable(enabled)
+{
+  CR.callingMenuRotator.visible = CR.callMenuRotator.visible = enabled;
 }
 
 function setWatcherFileSelectors()
