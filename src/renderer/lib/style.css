@@ -542,23 +542,10 @@ input[type="range"] {
 }
 
 input[type="checkbox"] {
-  border: 2px solid #fff;
-  -webkit-appearance: none;
-  cursor: pointer;
-  background-color: Black;
-  outline: none;
-  -webkit-border-radius: 6px;
-
-  margin-top: 4px;
-  margin-bottom: -2px;
-  height: 15px;
-  width: 15px;
-}
-
-input[type="checkbox"]:checked {
-  -webkit-appearance: none;
-  border: 2px solid green;
-  background-color: lightgreen;
+  appearance: checkbox !important;
+  margin: 0;
+  vertical-align: middle;
+  position: relative;
 }
 
 input[type="range"]::-webkit-slider-runnable-track {
@@ -580,7 +567,6 @@ input[type="range"]::-webkit-slider-thumb {
   width: 14px;
   -webkit-border-radius: 25%;
   background: goldenrod;
-
   margin-top: -6px;
 }
 
