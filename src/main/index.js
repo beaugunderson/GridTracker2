@@ -221,6 +221,7 @@ function createMainWindow() {
       nodeIntegration: true,
       nodeIntegrationInWorker: true,
       sandbox: false,
+      devTools: !app.isPackaged,
     },
   });
 
@@ -235,6 +236,7 @@ function createMainWindow() {
         title: details.frameName,
         webPreferences: {
           autoHideMenuBar: true,
+          devTools: !app.isPackaged,
         }
       }
       return { action: 'allow', overrideBrowserWindowOptions: options };
@@ -256,6 +258,7 @@ function createMainWindow() {
           nodeIntegrationInWorker: true,
           preload: join(__dirname, '../preload/index.js'),
           sandbox: false,
+          devTools: !app.isPackaged,
         },
       };
 
