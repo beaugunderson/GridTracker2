@@ -16,11 +16,18 @@ win:
         - ia32
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
-  shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
   createStartMenuShortcut: true
-  oneClick: true
+  menuCategory: ${productName}
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: false
+  selectPerMachineByDefault: false
+  packElevateHelper: true
+  allowElevation: true
+  license: LICENSE
+  preCompressedFileExtensions: [".png", ".mp3"]
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:

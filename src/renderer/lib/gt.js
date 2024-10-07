@@ -253,24 +253,6 @@ function saveAndCloseApp(shouldRestart = false)
   saveAllSettings();
   saveReceptionReports();
 
-  try
-  {
-    var data = {};
-
-    data.version = gtVersion;
-    data.tracker = GT.tracker;
-    data.myQsoGrids = GT.myQsoGrids;
-    data.myQsoCalls = GT.myQsoCalls;
-    data.g_QSOhash = GT.QSOhash;
-
-    fs.writeFileSync(GT.GTappData + "internal_qso.json", JSON.stringify(data));
-
-  }
-  catch (e)
-  {
-    console.error(e);
-  }
-
   if (GT.wsjtUdpServer != null)
   {
     try
@@ -14247,35 +14229,6 @@ function mediaCheck()
   GT.QSLcount = 0;
   GT.QSOcount = 0;
   GT.rowsFiltered = 0;
-
-  try
-  {
-    let fileExists = fs.existsSync(GT.GTappData + "internal_qso.json");
-    if (fileExists == true && GT.startVersion > 1240831)
-    {
-      var data = require(GT.GTappData + "internal_qso.json");
-      GT.tracker = data.tracker;
-      GT.myQsoGrids = data.myQsoGrids;
-      GT.myQsoCalls = data.myQsoCalls;
-      GT.QSOhash = data.g_QSOhash;
-
-      for (const i in GT.QSOhash)
-      {
-        GT.QSOcount++;
-        if (GT.QSOhash[i].confirmed) GT.QSLcount++;
-      }
-      fs.unlinkSync(GT.GTappData + "internal_qso.json");
-    }
-    else if (fileExists == true)
-    {
-      fs.unlinkSync(GT.GTappData + "internal_qso.json");
-    }
-
-    loadReceptionReports();
-  }
-  catch (e)
-  {
-  }
 }
 
 function newOption(value, text)
