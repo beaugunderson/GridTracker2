@@ -109,3 +109,8 @@ table {
 tr:hover td {
     box-shadow: inset 0px 11px 6px -8px #888, inset 0px -11px 6px -8px #888;
 }
+
+:root {
+    accent-color: #4ab9f8;
+    color-scheme: light;
+}
