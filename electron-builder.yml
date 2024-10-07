@@ -16,10 +16,11 @@ win:
         - ia32
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
-  uninstallDisplayName: ${productName}
+  shortcutName: GridTracker2
+  uninstallDisplayName: GridTracker2
   createDesktopShortcut: always
   createStartMenuShortcut: true
-  menuCategory: ${productName}
+  menuCategory: GridTracker2
   oneClick: false
   perMachine: false
   allowToChangeInstallationDirectory: false
