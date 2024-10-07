@@ -328,7 +328,6 @@ window.addEventListener("beforeunload", function ()
   saveAndCloseApp();
 });
 
-GT.wsjtxProcessRunning = false;
 GT.wsjtxIni = null;
 GT.setNewUdpPortTimeoutHandle = null;
 GT.map = null;
@@ -7870,12 +7869,10 @@ function showSettingsBox()
 {
   if (rootSettingsDiv.style.display == "inline-block")
   {
-    updateRunningProcesses();
     rootSettingsDiv.style.display = "none";
   }
   else
   {
-    updateRunningProcesses();
     helpDiv.style.display = "none";
     GT.helpShow = false;
     rootSettingsDiv.style.display = "inline-block";
@@ -10016,70 +10013,19 @@ function getIniFromApp(appName)
       }
     }
   }
-  else
-  {
-    result = null;
-  }
+
   return result;
-}
-
-function checkRunningProcesses()
-{
-  var child_process = require("child_process");
-  var list = GT.platform == "windows" ? child_process.execFileSync("tasklist.exe") : child_process.execFileSync("ps", ["-aef"]);
-
-  GT.wsjtxProcessRunning = list.indexOf("wsjtx") > -1;
-}
-
-function updateRunningProcesses()
-{
-  try
-  {
-    checkRunningProcesses();
-  }
-  catch (e)
-  {
-    GT.wsjtxProcessRunning = false;
-  }
-  runningAppsDiv.innerHTML = "WSJT-X ";
-  if (GT.wsjtxProcessRunning == true) runningAppsDiv.innerHTML += " - up - ";
-  else runningAppsDiv.innerHTML += " - ? - ";
-  GT.wsjtxIni = getIniFromApp("WSJT-X");
-  if (GT.wsjtxIni && GT.wsjtxIni.port > -1)
-  {
-    runningAppsDiv.innerHTML += "<b>(" + GT.wsjtxIni.ip + " / " + GT.wsjtxIni.port + ")</b> ";
-  }
-  else runningAppsDiv.innerHTML += "<b>(?)</b> ";
 }
 
 function updateBasedOnIni()
 {
-  var which = null;
-  var count = 0;
-  if (GT.wsjtxProcessRunning)
-  {
-    count++;
-  }
+  var which = GT.wsjtxIni = getIniFromApp("WSJT-X");
 
   // UdpPortNotSet
-  if (GT.appSettings.wsjtUdpPort == 0 && count < 2)
+  if (GT.appSettings.wsjtUdpPort == 0 && which.port > -1)
   {
-    if (GT.wsjtxProcessRunning || count == 1)
-    {
-      which = GT.wsjtxIni;
-    }
-
-    if (which != null && which.port > -1)
-    {
-      GT.appSettings.wsjtUdpPort = which.port;
-      GT.appSettings.wsjtIP = which.ip;
-    }
-
-    if (which == null)
-    {
-      GT.appSettings.wsjtUdpPort = 2237;
-      GT.appSettings.wsjtIP = "127.0.0.1";
-    }
+    GT.appSettings.wsjtUdpPort = which.port;
+    GT.appSettings.wsjtIP = which.ip;
 
     if (ipToInt(GT.appSettings.wsjtIP) >= ipToInt("224.0.0.0") && ipToInt(GT.appSettings.wsjtIP) < ipToInt("240.0.0.0"))
     {
@@ -10090,36 +10036,35 @@ function updateBasedOnIni()
       GT.appSettings.multicast = false;
     }
   }
-  // Which INI do we load?
-  if (GT.appSettings.wsjtUdpPort > 0)
+ 
+  if (GT.appSettings.wsjtUdpPort == 0)
   {
-    which = GT.wsjtxIni;
+    GT.appSettings.wsjtUdpPort = 2237;
+    GT.appSettings.wsjtIP = "127.0.0.1";
+    GT.appSettings.multicast = false;
+  }
+  // Which INI do we load?
+  if (GT.appSettings.wsjtUdpPort > 0 && which.MyCall != "NOCALL")
+  {
+    GT.appSettings.myCall = which.MyCall;
+    GT.appSettings.myGrid = GT.appSettings.myRawGrid = which.MyGrid;
+    GT.lastBand = GT.appSettings.myBand;
+    GT.lastMode = GT.appSettings.myMode;
+    GT.wsjtxLogPath = which.LogPath;
 
-    if (which != null)
-    {
-      GT.appSettings.myCall = which.MyCall;
-      GT.appSettings.myGrid = GT.appSettings.myRawGrid = which.MyGrid;
-      GT.lastBand = GT.appSettings.myBand;
-      GT.lastMode = GT.appSettings.myMode;
-      GT.wsjtxLogPath = which.LogPath;
-    }
-
-    if (which != null && which.BroadcastToN1MM == true && GT.N1MMSettings.enable == true)
+    if (which.BroadcastToN1MM == true && GT.N1MMSettings.enable == true)
     {
       if (which.N1MMServer == GT.N1MMSettings.ip && which.N1MMServerPort == GT.N1MMSettings.port)
       {
         buttonN1MMCheckBox.checked = GT.N1MMSettings.enable = false;
         GT.localStorage.N1MMSettings = JSON.stringify(GT.N1MMSettings);
-        alert(which.appName + " N1MM Logger+ is enabled with same settings, disabled GridTracker N1MM logger");
+        alert(which.appName + " N1MM Logger+ is enabled in WSJT-X with same settings, disabled GridTracker N1MM logger");
       }
     }
 
-    if (which != null)
+    if (GT.appSettings.wsjtIP == "")
     {
-      if (GT.appSettings.wsjtIP == "")
-      {
-        GT.appSettings.wsjtIP = which.ip;
-      }
+      GT.appSettings.wsjtIP = which.ip;
     }
   }
 }
@@ -12351,7 +12296,6 @@ GT.startupTable = [
   [loadMsgSettings, "Loaded Messaging Settings", "gt.startupTable.msgSettings"],
   [setFileSelectors, "Set File Selectors", "gt.startupTable.fileSelectors"],
   [loadMaidenHeadData, "Loaded Maidenhead Dataset", "gt.startupTable.maidenheadData"],
-  [updateRunningProcesses, "Updated Running Processes", "gt.startupTable.updateProcesses"],
   [updateBasedOnIni, "Updated from WSJT-X", "gt.startupTable.updateINI"],
   [loadAdifSettings, "Loaded ADIF Settings", "gt.startupTable.loadADIF"],
   [startupButtonsAndInputs, "Buttons and Inputs Initialized", "gt.startupTable.initButtons"],
