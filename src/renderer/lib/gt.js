@@ -239,7 +239,7 @@ function saveAllSettings()
     saveCallsignSettings();
     saveLogSettings();
     saveAlerts();
-
+    saveGridTrackerSettings();
   }
   catch (e)
   {
@@ -251,7 +251,6 @@ function saveAndCloseApp(shouldRestart = false)
 {
   GT.closing = true;
   saveAllSettings();
-  saveGridTrackerSettings();
   saveReceptionReports();
 
   try
@@ -12087,7 +12086,8 @@ function postInit()
 
   projectionImg.style.filter = GT.mapSettings.projection == "AEQD" ? "" : "grayscale(1)";
 
-  nodeTimers.setInterval(removeFlightPathsAndDimSquares, 2000);
+  nodeTimers.setInterval(saveAllSettings, 900000); // Every 10 minutes, save our settings as a safety
+  nodeTimers.setInterval(removeFlightPathsAndDimSquares, 2000); // Every 2 seconds
   nodeTimers.setInterval(downloadCtyDat, 86400000);  // Every 24 hours
   nodeTimers.setTimeout(downloadCtyDat, 300000); // In 5 minutes, when the dust settles
 
