@@ -43,8 +43,6 @@ var GT = {};
 // CallRoster object
 var CR = {};
 
-var s_title = null;
-
 // Look for our own settings file, if not, we'll rely on GT.localStorage being accurate
 if (document.title.substring(0, 12).trim() == "GridTracker2")
 {
