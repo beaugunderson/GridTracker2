@@ -3237,6 +3237,21 @@ function watcherOnText()
       watcherText.value = watcherText.value.toUpperCase().replace(/[^A-Z0-9/]+/g, "");
     }
   }
+  else
+  {
+    let originalValue = watcherText.value;
+    try {
+      "ABC123".match(watcherText.value);
+    }
+    catch (e)
+    {
+      // Error in user entered regex
+      watcherText.value = "";
+      watcherTextValidate(true);
+      watcherText.value = originalValue;
+      return;
+    }
+  }
   watcherTextValidate(testCallsign);
 }
 
@@ -3244,7 +3259,7 @@ function watcherTextValidate(testCallsign = false)
 {
   if (watcherText.value.length == 0)
   {
-    watcherText.style.color = "#000";
+    watcherText.style.color = "#FFF";
     watcherText.style.backgroundColor = "red";
     return false;
   }
