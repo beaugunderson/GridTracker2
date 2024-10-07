@@ -541,14 +541,14 @@ function ValidateQrzApi(inputText)
     else
     {
       inputText.style.color = "white";
-      inputText.style.backgroundColor = "red";
+      inputText.style.backgroundColor = "orange";
       return false;
     }
   }
   else
   {
     inputText.style.color = "white";
-    inputText.style.backgroundColor = "red";
+    inputText.style.backgroundColor = "orange";
 
     return false;
   }
@@ -565,7 +565,7 @@ function ValidateText(inputText)
   else
   {
     inputText.style.color = "white";
-    inputText.style.backgroundColor = "red";
+    inputText.style.backgroundColor = "orange";
     return false;
   }
 }
@@ -747,7 +747,7 @@ GT.tqslFileSelector.onchange = function ()
     }
     else
     {
-      tqslFileDiv.style.backgroundColor = "red";
+      tqslFileDiv.style.backgroundColor = "orange";
     }
 
     tqslFileDiv.innerHTML = "<b>" + start_and_end(this.files[0].path) + "</b>";
@@ -1028,7 +1028,7 @@ function setAdifStartup(checkbox)
   }
   else
   {
-    tqslFileDiv.style.backgroundColor = "red";
+    tqslFileDiv.style.backgroundColor = "orange";
   }
   tqslFileDiv.innerHTML =
     "<b>" + start_and_end(GT.trustedQslSettings.binaryFile) + "</b>";
@@ -2186,7 +2186,7 @@ function CloudlogTestApiKey(buffer, flag)
         if (rights[0].childNodes[0].nodeValue == "r")
         {
           CloudlogTestResult.innerHTML = "Read Only!";
-          CloudlogTestResult.style.backgroundColor = "red";
+          CloudlogTestResult.style.backgroundColor = "orange";
         }
         else if (rights[0].childNodes[0].nodeValue == "rw")
         {
@@ -2201,7 +2201,7 @@ function CloudlogTestApiKey(buffer, flag)
         {
           message = xmlDoc.getElementsByTagName("message");
           CloudlogTestResult.innerHTML = "Error: " + message[0].childNodes[0].nodeValue;
-          CloudlogTestResult.style.backgroundColor = "red";
+          CloudlogTestResult.style.backgroundColor = "orange";
         }
       }
     }

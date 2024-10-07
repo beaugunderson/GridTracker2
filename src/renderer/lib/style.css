@@ -14,6 +14,11 @@ html, body {
   display: block;
 }
 
+:root {
+  accent-color: #4ab9f8;
+  color-scheme: dark;
+}
+
 @media print {
   .printHotKeyDiv {
     background-color: white;
@@ -546,6 +551,7 @@ input[type="checkbox"] {
   margin: 0;
   vertical-align: middle;
   position: relative;
+
 }
 
 input[type="range"]::-webkit-slider-runnable-track {

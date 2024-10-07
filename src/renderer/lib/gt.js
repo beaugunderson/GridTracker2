@@ -4032,7 +4032,7 @@ function displayTime()
     }
     else if (since > 121)
     {
-      secondsAgoMsg.style.backgroundColor = "red";
+      secondsAgoMsg.style.backgroundColor = "orange";
       secondsAgoMsg.style.color = "#000";
     }
     else
@@ -5633,8 +5633,8 @@ function handleWsjtxStatus(newMessage)
     }
     else
     {
-      txrxdec.style.backgroundColor = "Red";
-      txrxdec.style.borderColor = "Orange";
+      txrxdec.style.backgroundColor = "red";
+      txrxdec.style.borderColor = "orange";
       txrxdec.innerHTML = "TRANSMIT";
       GT.layerSources.transmit.clear();
       GT.transmitFlightPath = null;
@@ -10278,7 +10278,7 @@ function ValidateGridsquareOnly4(inputText, validDiv)
     else
     {
       inputText.style.color = "#FFF";
-      inputText.style.backgroundColor = "red";
+      inputText.style.backgroundColor = "orange";
       if (validDiv) validDiv.innerHTML = "Invalid!";
       return false;
     }
@@ -10327,7 +10327,7 @@ function ValidateGridsquare(inputText, validDiv)
     else
     {
       inputText.style.color = "#FFF";
-      inputText.style.backgroundColor = "red";
+      inputText.style.backgroundColor = "orange";
       if (validDiv) validDiv.innerHTML = "Invalid!";
       return false;
     }
@@ -10335,7 +10335,7 @@ function ValidateGridsquare(inputText, validDiv)
   else
   {
     inputText.style.color = "#FFF";
-    inputText.style.backgroundColor = "red";
+    inputText.style.backgroundColor = "orange";
     if (validDiv) validDiv.innerHTML = "Invalid!";
     return false;
   }
@@ -10380,21 +10380,21 @@ function ValidateMulticast(inputText)
       else
       {
         inputText.style.color = "#FFF";
-        inputText.style.backgroundColor = "red";
+        inputText.style.backgroundColor = "orange";
         return false;
       }
     }
     else
     {
       inputText.style.color = "#FFF";
-      inputText.style.backgroundColor = "red";
+      inputText.style.backgroundColor = "orange";
       return false;
     }
   }
   else
   {
     inputText.style.color = "#FFF";
-    inputText.style.backgroundColor = "red";
+    inputText.style.backgroundColor = "orange";
     return false;
   }
 }
@@ -10413,7 +10413,7 @@ function ValidateIPaddress(inputText, checkBox)
     else
     {
       inputText.style.color = "#FFF";
-      inputText.style.backgroundColor = "red";
+      inputText.style.backgroundColor = "orange";
       if (checkBox) checkBox.checked = false;
       return false;
     }
@@ -10421,7 +10421,7 @@ function ValidateIPaddress(inputText, checkBox)
   else
   {
     inputText.style.color = "#FFF";
-    inputText.style.backgroundColor = "red";
+    inputText.style.backgroundColor = "orange";
     if (checkBox) checkBox.checked = false;
     return false;
   }
@@ -10435,7 +10435,7 @@ function ValidatePort(inputText, checkBox, callBackCheck)
     if (callBackCheck && !callBackCheck(value))
     {
       inputText.style.color = "#FFF";
-      inputText.style.backgroundColor = "red";
+      inputText.style.backgroundColor = "orange";
       if (checkBox) checkBox.checked = false;
       return false;
     }
@@ -10449,7 +10449,7 @@ function ValidatePort(inputText, checkBox, callBackCheck)
   else
   {
     inputText.style.color = "#FFF";
-    inputText.style.backgroundColor = "red";
+    inputText.style.backgroundColor = "orange";
     if (checkBox) checkBox.checked = false;
     return false;
   }

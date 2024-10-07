@@ -34,7 +34,7 @@ td {
 input[type="checkbox"] {
   appearance: checkbox !important;
   margin: 0;
-  margin-top: -1px;
+  margin-top: 0px;
   margin-right: 1px;
   vertical-align: top;
   position: relative;
@@ -661,11 +661,6 @@ p {
 
 .break {
   flex-basis: 100%;
-}
-
-:root {
-  accent-color: #4ab9f8;
-  color-scheme: dark;
 }
 
 .columnEditView {

@@ -521,8 +521,8 @@ function processStatus(newMessage)
   }
   else
   {
-    txrxdec.style.backgroundColor = "Red";
-    txrxdec.style.borderColor = "Orange";
+    txrxdec.style.backgroundColor = "red";
+    txrxdec.style.borderColor = "orange";
     txrxdec.innerHTML = "TRANSMIT";
   }
 }
@@ -3172,7 +3172,7 @@ function watcherNameValidate()
   if (watcherName.value.length == 0 || (watcherName.value in CR.watchers && watcherName.value != CR.watcherEditKey))
   {
     watcherName.style.color = "#000";
-    watcherName.style.backgroundColor = "red";
+    watcherName.style.backgroundColor = "orange";
     return false;
   }
   else
@@ -3260,7 +3260,7 @@ function watcherTextValidate(testCallsign = false)
   if (watcherText.value.length == 0)
   {
     watcherText.style.color = "#FFF";
-    watcherText.style.backgroundColor = "red";
+    watcherText.style.backgroundColor = "orange";
     return false;
   }
   else
