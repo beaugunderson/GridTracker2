@@ -13,38 +13,12 @@
 // How Can One Convert From Lat/Long to Grid Square
 // http://ham.stackexchange.com/questions/221/how-can-one-convert-from-lat-long-to-grid-square
 //
-function latLonToGridSquare(param1,param2, width = 4){
-  let lat=-100.0;
-  let lon=0.0;
-  let adjLat,adjLon,GLat,GLon,nLat,nLon,gLat,gLon,rLat,rLon;
-  let U = 'ABCDEFGHIJKLMNOPQRSTUVWX';
 
-  // support Chris Veness 2002-2012 LatLon library and
-  // other objects with lat/lon properties
-  // properties could be getter functions, numbers, or strings
-  function toNum(x){
-    if (typeof(x) == 'number') return x;
-    if (typeof(x) == 'string') return parseFloat(x);
-    if (typeof(x) == 'function') return parseFloat(x());
-    throw "HamGridSquare -- toNum -- can not convert input: "+x;
-  }
-  if (typeof(param1)=='object'){
-    if (param1.length == 2){
-      lat = toNum(param1[0]);
-      lon = toNum(param1[1]);
-    } else if (('lat' in param1) && ('lon' in param1)){
-      lat = toNum(param1.lat);
-      lon = toNum(param1.lon);
-    } else if (('latitude' in param1) && ('longitude' in param1)){
-      lat = toNum(param1.latitude);
-      lon = toNum(param1.longitude);
-    } else {
-      throw "HamGridSquare -- can not convert object -- "+param1;
-    }
-  } else {
-    lat = toNum(param1);
-    lon = toNum(param2);
-  }
+const MH_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWX";
+function latLonToGridSquare(lat, lon, width = 4)
+{
+  let adjLat,adjLon,GLat,GLon,nLat,nLon,gLat,gLon,rLat,rLon;
+  
   if (isNaN(lat)) throw "lat is NaN";
   if (isNaN(lon)) throw "lon is NaN";
   if (Math.abs(lat) == 90.0) throw "grid g_grids invalid at N/S poles";
@@ -53,7 +27,7 @@ function latLonToGridSquare(param1,param2, width = 4){
   {
 	  if ( lon > 180 )
 	  {
-			var temp = lon + 360;
+			let temp = lon + 360;
 			temp = temp % 360;
 			lon = temp - 360;
 	  }
@@ -65,8 +39,8 @@ function latLonToGridSquare(param1,param2, width = 4){
   }
   adjLat = lat + 90;
   adjLon = lon + 180;
-  GLat = U[Math.trunc(adjLat/10)];
-  GLon = U[Math.trunc(adjLon/20)];
+  GLat = MH_CHARS[Math.trunc(adjLat/10)];
+  GLon = MH_CHARS[Math.trunc(adjLon/20)];
   nLat = ''+Math.trunc(adjLat % 10);
   nLon = ''+Math.trunc((adjLon/2) % 10);
   
@@ -78,13 +52,13 @@ function latLonToGridSquare(param1,param2, width = 4){
   {
     rLat = (adjLat - Math.trunc(adjLat)) * 60;
     rLon = (adjLon - 2*Math.trunc(adjLon/2)) *60;
-    gLat = U[Math.trunc(rLat/2.5)];
-    gLon = U[Math.trunc(rLon/5)];
+    gLat = MH_CHARS[Math.trunc(rLat/2.5)];
+    gLon = MH_CHARS[Math.trunc(rLon/5)];
     return GLon+GLat+nLon+nLat+gLon+gLat;
   }
 }
 
-var MyCircle = {
+const MyCircle = {
 
     validateRadius: function(unit) {
         var r = {'M': 6371009, 'KM': 6371.009, 'MI': 3958.761, 'NM': 3440.070, 'YD': 6967420, 'FT': 20902260, 'DG':57.2958};
@@ -144,7 +118,6 @@ if (typeof module != 'undefined' && module.exports) {
 } else {
     window['MyCircle'] = MyCircle;
 }
-
 
 /**
  * XML2jsobj v1.0
@@ -275,7 +248,7 @@ function flightFeature(line, opts, layer, canAnimate) {
 
 	var dash = [];
 	var dashOff = 0;
-	if ( canAnimate == true && GT.mapSettings.animate == true )
+	if ( canAnimate == true && GT.settings.map.animate == true )
 	{
 		dash = GT.flightPathLineDash;
 		dashOff = GT.flightPathTotal - GT.flightPathOffset;
@@ -285,7 +258,7 @@ function flightFeature(line, opts, layer, canAnimate) {
 
   if (GT.useTransform)
   {
-    featureArrow.getGeometry().transform("EPSG:3857", GT.mapSettings.projection);
+    featureArrow.getGeometry().transform("EPSG:3857", GT.settings.map.projection);
   }
 
 	line = new ol.geom.LineString(line);
@@ -293,7 +266,7 @@ function flightFeature(line, opts, layer, canAnimate) {
 
   if (GT.useTransform)
   {
-    feature.getGeometry().transform("EPSG:3857", GT.mapSettings.projection);
+    feature.getGeometry().transform("EPSG:3857", GT.settings.map.projection);
   }
 
 	feature.setStyle(new ol.style.Style({
@@ -446,8 +419,6 @@ function subLunar (t)
 	return data;
 }
 
-
-
 function doRAconvert(lg, la, ras, decs) {
 
   jd=datetojd();
@@ -517,78 +488,6 @@ function convert(ra, dec, lmst,lat) {
 
 	return data;
 }
-
-function isMergeableObject(val) {
-    var nonNullObject = val && typeof val == 'object'
-
-    return nonNullObject
-        && Object.prototype.toString.call(val) !== '[object RegExp]'
-        && Object.prototype.toString.call(val) !== '[object Date]'
-}
-
-function emptyTarget(val) {
-    return Array.isArray(val) ? [] : {}
-}
-
-function cloneIfNecessary(value, optionsArgument) {
-    var clone = optionsArgument && optionsArgument.clone == true
-    return (clone && isMergeableObject(value)) ? deepmerge(emptyTarget(value), value, optionsArgument) : value
-}
-
-function defaultArrayMerge(target, source, optionsArgument) {
-    var destination = target.slice()
-    source.forEach(function(e, i) {
-        if (typeof destination[i] == 'undefined') {
-            destination[i] = cloneIfNecessary(e, optionsArgument)
-        } else if (isMergeableObject(e)) {
-            destination[i] = deepmerge(target[i], e, optionsArgument)
-        } else if (target.indexOf(e) == -1) {
-            destination.push(cloneIfNecessary(e, optionsArgument))
-        }
-    })
-    return destination
-}
-
-function mergeObject(target, source, optionsArgument) {
-    var destination = {}
-    if (isMergeableObject(target)) {
-        Object.keys(target).forEach(function (key) {
-            destination[key] = cloneIfNecessary(target[key], optionsArgument)
-        })
-    }
-    Object.keys(source).forEach(function (key) {
-        if (!isMergeableObject(source[key]) || !target[key]) {
-            destination[key] = cloneIfNecessary(source[key], optionsArgument)
-        } else {
-            destination[key] = deepmerge(target[key], source[key], optionsArgument)
-        }
-    })
-    return destination
-}
-
-function deepmerge(target, source, optionsArgument) {
-    var array = Array.isArray(source);
-    var options = optionsArgument || { arrayMerge: defaultArrayMerge }
-    var arrayMerge = options.arrayMerge || defaultArrayMerge
-
-    if (array) {
-        return Array.isArray(target) ? arrayMerge(target, source, optionsArgument) : cloneIfNecessary(source, optionsArgument)
-    } else {
-        return mergeObject(target, source, optionsArgument)
-    }
-}
-
-deepmerge.all = function deepmergeAll(array, optionsArgument) {
-    if (!Array.isArray(array) || array.length < 2) {
-        throw new Error('first argument should be an array with at least two elements')
-    }
-
-    // we are sure there are at least 2 values, so it is safe to have no initial value
-    return array.reduce(function(prev, next) {
-        return deepmerge(prev, next, optionsArgument)
-    })
-}
-
 
 // https://stackoverflow.com/questions/3942878/how-to-decide-font-color-in-white-or-black-depending-on-background-color
 function pickTextColorBasedOnBgColorAdvanced(bgColor, lightColor, darkColor) {

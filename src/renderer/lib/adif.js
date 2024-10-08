@@ -144,9 +144,9 @@ function onAdiLoadComplete(rawAdiBuffer, nextFunc = null, liveLog = false)
 
   var task = {};
   task.type = "parse";
-  task.appSettings = GT.appSettings;
-  task.lotw_qso = GT.adifLogSettings.lastFetch.lotw_qso;
-  task.lotw_qsl = GT.adifLogSettings.lastFetch.lotw_qsl;
+  task.appSettings = GT.settings.app;
+  task.lotw_qso = GT.settings.adifLog.lastFetch.lotw_qso;
+  task.lotw_qsl = GT.settings.adifLog.lastFetch.lotw_qsl;
   task.liveLog = liveLog;
 
   task.nextFunc = nextFunc;
@@ -196,8 +196,8 @@ function adifParseComplete(task)
 
   if (task.lotwTimestampUpdated == true)
   {
-    GT.adifLogSettings.lastFetch.lotw_qso = parseInt(Math.max(task.lotw_qso, GT.adifLogSettings.lastFetch.lotw_qso));
-    GT.adifLogSettings.lastFetch.lotw_qsl = parseInt(Math.max(task.lotw_qsl, GT.adifLogSettings.lastFetch.lotw_qsl));
+    GT.settings.adifLog.lastFetch.lotw_qso = parseInt(Math.max(task.lotw_qso, GT.settings.adifLog.lastFetch.lotw_qso));
+    GT.settings.adifLog.lastFetch.lotw_qsl = parseInt(Math.max(task.lotw_qsl, GT.settings.adifLog.lastFetch.lotw_qsl));
     saveLogSettings();
   }
 
@@ -406,7 +406,7 @@ function grabLOtWLog(test)
 
 function grabLoTWQSO()
 {
-  var qsoDate = new Date(GT.adifLogSettings.lastFetch.lotw_qso);
+  var qsoDate = new Date(GT.settings.adifLog.lastFetch.lotw_qso);
   var qsoDateAsString = getUTCStringForLoTW(qsoDate);
 
   if (GT.isGettingLOTW == false)
@@ -418,7 +418,7 @@ function grabLoTWQSO()
       lotwLogin.value +
       "&password=" +
       encodeURIComponent(lotwPassword.value) +
-      ((GT.appSettings.workingGridEnable == true) ? "&qso_mydetail=yes" : "") +
+      ((GT.settings.app.workingGridEnable == true) ? "&qso_mydetail=yes" : "") +
       "&qso_query=1&qso_qsl=no&qso_qsldetail=yes&qso_withown=yes" +
       lastQSLDateString,
       lotwCallback,
@@ -434,7 +434,7 @@ function grabLoTWQSO()
 
 function grabLoTWQSL()
 {
-  var qsoDate = new Date(GT.adifLogSettings.lastFetch.lotw_qsl);
+  var qsoDate = new Date(GT.settings.adifLog.lastFetch.lotw_qsl);
   var qsoDateAsString = getUTCStringForLoTW(qsoDate);
 
   // Don't grab if the last QSL was less than 5 minutes ago
@@ -446,7 +446,7 @@ function grabLoTWQSL()
       lotwLogin.value +
       "&password=" +
       encodeURIComponent(lotwPassword.value) +
-      ((GT.appSettings.workingGridEnable == true) ? "&qso_mydetail=yes" : "") +
+      ((GT.settings.app.workingGridEnable == true) ? "&qso_mydetail=yes" : "") +
       "&qso_query=1&qso_qsl=yes&qso_qsldetail=yes&qso_withown=yes" +
       lastQSLDateString,
       lotwCallback,
@@ -572,7 +572,7 @@ function ValidateText(inputText)
 
 function adifMenuCheckBoxChanged(what)
 {
-  GT.adifLogSettings.menu[what.id] = what.checked;
+  GT.settings.adifLog.menu[what.id] = what.checked;
   var menuItem = what.id + "Div";
   if (what.checked == true)
   {
@@ -583,22 +583,20 @@ function adifMenuCheckBoxChanged(what)
     document.getElementById(menuItem).style.display = "none";
   }
 
-  GT.localStorage.adifLogSettings = JSON.stringify(GT.adifLogSettings);
 
   if (what == buttonAdifCheckBox) setAdifStartup(loadAdifCheckBox);
 }
 
 function adifStartupCheckBoxChanged(what)
 {
-  GT.adifLogSettings.startup[what.id] = what.checked;
-  GT.localStorage.adifLogSettings = JSON.stringify(GT.adifLogSettings);
+  GT.settings.adifLog.startup[what.id] = what.checked;
 
   if (what == loadAdifCheckBox) setAdifStartup(loadAdifCheckBox);
 }
 
 function adifLogQsoCheckBoxChanged(what)
 {
-  GT.adifLogSettings.qsolog[what.id] = what.checked;
+  GT.settings.adifLog.qsolog[what.id] = what.checked;
   if (what.id == "logLOTWqsoCheckBox")
   {
     if (what.checked == true)
@@ -612,12 +610,12 @@ function adifLogQsoCheckBoxChanged(what)
       trustedTestButton.style.display = "none";
     }
   }
-  GT.localStorage.adifLogSettings = JSON.stringify(GT.adifLogSettings);
+
 }
 
 function adifNicknameCheckBoxChanged(what)
 {
-  GT.adifLogSettings.nickname[what.id] = what.checked;
+  GT.settings.adifLog.nickname[what.id] = what.checked;
   if (what.id == "nicknameeQSLCheckBox")
   {
     if (what.checked == true)
@@ -629,14 +627,14 @@ function adifNicknameCheckBoxChanged(what)
       eQSLNickname.style.display = "none";
     }
   }
-  GT.localStorage.adifLogSettings = JSON.stringify(GT.adifLogSettings);
+
 }
 
 function adifTextValueChange(what)
 {
   what.value = what.value.trim();
-  GT.adifLogSettings.text[what.id] = what.value;
-  GT.localStorage.adifLogSettings = JSON.stringify(GT.adifLogSettings);
+  GT.settings.adifLog.text[what.id] = what.value;
+
 }
 
 GT.fileSelector = document.createElement("input");
@@ -657,9 +655,9 @@ function addLogToStartupList(fileObject, selector = null)
 
   fs.readFile(fileObject.path, "utf-8", handleAdifLoad);
   
-  for (var i in GT.startupLogs)
+  for (var i in GT.settings.startupLogs)
   {
-    if (fileObject.path == GT.startupLogs[i].file)
+    if (fileObject.path == GT.settings.startupLogs[i].file)
     {
       addLastTraffic("<font color='white'>Dupe</font> <font color='orange'>" + fileObject.name + "</font>");
       return;
@@ -669,8 +667,7 @@ function addLogToStartupList(fileObject, selector = null)
   var newObject = Object();
   newObject.name = fileObject.name;
   newObject.file = fileObject.path;
-  GT.startupLogs.push(newObject);
-  GT.localStorage.startupLogs = JSON.stringify(GT.startupLogs);
+  GT.settings.startupLogs.push(newObject);
 
   setAdifStartup(loadAdifCheckBox);
 
@@ -730,18 +727,18 @@ GT.tqslFileSelector.onchange = function ()
 {
   if (this.files && this.files[0])
   {
-    GT.trustedQslSettings.binaryFile = this.files[0].path;
+    GT.settings.trustedQsl.binaryFile = this.files[0].path;
     if (
-      fs.existsSync(GT.trustedQslSettings.binaryFile) &&
-      (GT.trustedQslSettings.binaryFile.endsWith("tqsl.exe") ||
-        GT.trustedQslSettings.binaryFile.endsWith("tqsl"))
+      fs.existsSync(GT.settings.trustedQsl.binaryFile) &&
+      (GT.settings.trustedQsl.binaryFile.endsWith("tqsl.exe") ||
+        GT.settings.trustedQsl.binaryFile.endsWith("tqsl"))
     )
     {
-      GT.trustedQslSettings.binaryFileValid = true;
+      GT.settings.trustedQsl.binaryFileValid = true;
     }
-    else GT.trustedQslSettings.binaryFileValid = false;
+    else GT.settings.trustedQsl.binaryFileValid = false;
 
-    if (GT.trustedQslSettings.binaryFileValid == true)
+    if (GT.settings.trustedQsl.binaryFileValid == true)
     {
       tqslFileDiv.style.backgroundColor = "blue";
     }
@@ -751,7 +748,6 @@ GT.tqslFileSelector.onchange = function ()
     }
 
     tqslFileDiv.innerHTML = "<b>" + start_and_end(this.files[0].path) + "</b>";
-    GT.localStorage.trustedQslSettings = JSON.stringify(GT.trustedQslSettings);
   }
 };
 
@@ -778,16 +774,16 @@ function loadLoTWLogFile()
   }
   else
   {
-    if (GT.appSettings.workingDateEnable == true && GT.appSettings.workingDate > 0)
+    if (GT.settings.app.workingDateEnable == true && GT.settings.app.workingDate > 0)
     {
-      GT.adifLogSettings.lastFetch.lotw_qso = GT.appSettings.workingDate * 1000;
-      GT.adifLogSettings.lastFetch.lotw_qsl = GT.appSettings.workingDate * 1000;
+      GT.settings.adifLog.lastFetch.lotw_qso = GT.settings.app.workingDate * 1000;
+      GT.settings.adifLog.lastFetch.lotw_qsl = GT.settings.app.workingDate * 1000;
     }
     else
     {
       // We have no history, so our dates are not valid any more
-      GT.adifLogSettings.lastFetch.lotw_qso = 0;
-      GT.adifLogSettings.lastFetch.lotw_qsl = 0;
+      GT.settings.adifLog.lastFetch.lotw_qso = 0;
+      GT.settings.adifLog.lastFetch.lotw_qsl = 0;
     }
     grabLoTWQSO();
   }
@@ -805,31 +801,31 @@ function findTrustedQSLPaths()
 {
   var base = null;
 
-  if (GT.trustedQslSettings.stationFileValid == true)
+  if (GT.settings.trustedQsl.stationFileValid == true)
   {
     // double check the presence of the station_data;
-    if (!fs.existsSync(GT.trustedQslSettings.stationFile))
+    if (!fs.existsSync(GT.settings.trustedQsl.stationFile))
     {
-      GT.trustedQslSettings.stationFileValid = false;
+      GT.settings.trustedQsl.stationFileValid = false;
     }
   }
-  if (GT.trustedQslSettings.stationFileValid == false)
+  if (GT.settings.trustedQsl.stationFileValid == false)
   {
     if (GT.platform == "windows")
     {
       base = process.env.APPDATA + "\\TrustedQSL\\station_data";
       if (fs.existsSync(base))
       {
-        GT.trustedQslSettings.stationFile = base;
-        GT.trustedQslSettings.stationFileValid = true;
+        GT.settings.trustedQsl.stationFile = base;
+        GT.settings.trustedQsl.stationFileValid = true;
       }
       else
       {
         base = process.env.LOCALAPPDATA + "\\TrustedQSL\\station_data";
         if (fs.existsSync(base))
         {
-          GT.trustedQslSettings.stationFile = base;
-          GT.trustedQslSettings.stationFileValid = true;
+          GT.settings.trustedQsl.stationFile = base;
+          GT.settings.trustedQsl.stationFileValid = true;
         }
       }
     }
@@ -838,12 +834,12 @@ function findTrustedQSLPaths()
       base = process.env.HOME + "/.tqsl/station_data";
       if (fs.existsSync(base))
       {
-        GT.trustedQslSettings.stationFile = base;
-        GT.trustedQslSettings.stationFileValid = true;
+        GT.settings.trustedQsl.stationFile = base;
+        GT.settings.trustedQsl.stationFileValid = true;
       }
     }
   }
-  if (GT.trustedQslSettings.stationFileValid == true)
+  if (GT.settings.trustedQsl.stationFileValid == true)
   {
     var validate = false;
     var option = document.createElement("option");
@@ -851,7 +847,7 @@ function findTrustedQSLPaths()
     option.text = "Select a Station";
     lotwStation.appendChild(option);
 
-    var buffer = fs.readFileSync(GT.trustedQslSettings.stationFile, "UTF-8");
+    var buffer = fs.readFileSync(GT.settings.trustedQsl.stationFile, "UTF-8");
     parser = new DOMParser();
     xmlDoc = parser.parseFromString(buffer, "text/xml");
     var x = xmlDoc.getElementsByTagName("StationData");
@@ -860,7 +856,7 @@ function findTrustedQSLPaths()
       option = document.createElement("option");
       option.value = x[i].getAttribute("name");
       option.text = x[i].getAttribute("name");
-      if (option.value == GT.adifLogSettings.text.lotwStation)
+      if (option.value == GT.settings.adifLog.text.lotwStation)
       {
         option.selected = true;
         validate = true;
@@ -873,23 +869,23 @@ function findTrustedQSLPaths()
     }
   }
 
-  if (GT.trustedQslSettings.binaryFileValid == true)
+  if (GT.settings.trustedQsl.binaryFileValid == true)
   {
     // double check the presence of the TrustedQSL binary;
-    if (!fs.existsSync(GT.trustedQslSettings.binaryFile))
+    if (!fs.existsSync(GT.settings.trustedQsl.binaryFile))
     {
-      GT.trustedQslSettings.binaryFileValid = false;
+      GT.settings.trustedQsl.binaryFileValid = false;
     }
   }
-  if (GT.trustedQslSettings.binaryFileValid == false || GT.platform == "mac")
+  if (GT.settings.trustedQsl.binaryFileValid == false || GT.platform == "mac")
   {
     if (GT.platform == "windows")
     {
       base = process.env["ProgramFiles(x86)"] + "\\TrustedQSL\\tqsl.exe";
       if (fs.existsSync(base))
       {
-        GT.trustedQslSettings.binaryFile = base;
-        GT.trustedQslSettings.binaryFileValid = true;
+        GT.settings.trustedQsl.binaryFile = base;
+        GT.settings.trustedQsl.binaryFileValid = true;
       }
     }
     else if (GT.platform == "mac")
@@ -897,8 +893,8 @@ function findTrustedQSLPaths()
       base = "/Applications/TrustedQSL/tqsl.app/Contents/MacOS/tqsl";
       if (fs.existsSync(base))
       {
-        GT.trustedQslSettings.binaryFile = base;
-        GT.trustedQslSettings.binaryFileValid = true;
+        GT.settings.trustedQsl.binaryFile = base;
+        GT.settings.trustedQsl.binaryFileValid = true;
       }
       else
       {
@@ -907,8 +903,8 @@ function findTrustedQSLPaths()
           "/Applications/TrustedQSL/tqsl.app/Contents/MacOS/tqsl";
         if (fs.existsSync(base))
         {
-          GT.trustedQslSettings.binaryFile = base;
-          GT.trustedQslSettings.binaryFileValid = true;
+          GT.settings.trustedQsl.binaryFile = base;
+          GT.settings.trustedQsl.binaryFileValid = true;
         }
         else
         {
@@ -916,16 +912,16 @@ function findTrustedQSLPaths()
             process.env.HOME + "/Applications/tqsl.app/Contents/MacOS/tqsl";
           if (fs.existsSync(base))
           {
-            GT.trustedQslSettings.binaryFile = base;
-            GT.trustedQslSettings.binaryFileValid = true;
+            GT.settings.trustedQsl.binaryFile = base;
+            GT.settings.trustedQsl.binaryFileValid = true;
           }
           else
           {
             base = "/Applications/tqsl.app/Contents/MacOS/tqsl";
             if (fs.existsSync(base))
             {
-              GT.trustedQslSettings.binaryFile = base;
-              GT.trustedQslSettings.binaryFileValid = true;
+              GT.settings.trustedQsl.binaryFile = base;
+              GT.settings.trustedQsl.binaryFileValid = true;
             }
             else
             {
@@ -934,8 +930,8 @@ function findTrustedQSLPaths()
                 "/Desktop/TrustedQSL/tqsl.app/Contents/MacOS/tqsl";
               if (fs.existsSync(base))
               {
-                GT.trustedQslSettings.binaryFile = base;
-                GT.trustedQslSettings.binaryFileValid = true;
+                GT.settings.trustedQsl.binaryFile = base;
+                GT.settings.trustedQsl.binaryFileValid = true;
               }
               else
               {
@@ -944,8 +940,8 @@ function findTrustedQSLPaths()
                   "/Applications/Ham Radio/tqsl.app/Contents/MacOS/tqsl";
                 if (fs.existsSync(base))
                 {
-                  GT.trustedQslSettings.binaryFile = base;
-                  GT.trustedQslSettings.binaryFileValid = true;
+                  GT.settings.trustedQsl.binaryFile = base;
+                  GT.settings.trustedQsl.binaryFileValid = true;
                 }
               }
             }
@@ -958,32 +954,31 @@ function findTrustedQSLPaths()
       base = "/usr/bin/tqsl";
       if (fs.existsSync(base))
       {
-        GT.trustedQslSettings.binaryFile = base;
-        GT.trustedQslSettings.binaryFileValid = true;
+        GT.settings.trustedQsl.binaryFile = base;
+        GT.settings.trustedQsl.binaryFileValid = true;
       }
       else
       {
         base = "/usr/local/bin/tqsl";
         if (fs.existsSync(base))
         {
-          GT.trustedQslSettings.binaryFile = base;
-          GT.trustedQslSettings.binaryFileValid = true;
+          GT.settings.trustedQsl.binaryFile = base;
+          GT.settings.trustedQsl.binaryFileValid = true;
         }
       }
     }
   }
-  GT.localStorage.trustedQslSettings = JSON.stringify(GT.trustedQslSettings);
 }
 
 function startupAdifLoadFunction()
 {
-  for (var i in GT.startupLogs)
+  for (var i in GT.settings.startupLogs)
   {
     try
     {
-      if (fs.existsSync(GT.startupLogs[i].file))
+      if (fs.existsSync(GT.settings.startupLogs[i].file))
       {
-        fs.readFile(GT.startupLogs[i].file, "utf-8", handleAdifLoad);
+        fs.readFile(GT.settings.startupLogs[i].file, "utf-8", handleAdifLoad);
       }
     }
     catch (e) {}
@@ -1010,19 +1005,19 @@ function handleAdifLoadLocalLoTW(err, data)
 
 function setAdifStartup(checkbox)
 {
-  if (GT.trustedQslSettings.binaryFile == null)
-  { GT.trustedQslSettings.binaryFile = ""; }
+  if (GT.settings.trustedQsl.binaryFile == null)
+  { GT.settings.trustedQsl.binaryFile = ""; }
 
   if (
-    GT.trustedQslSettings.binaryFile.endsWith("tqsl.exe") ||
-    GT.trustedQslSettings.binaryFile.endsWith("tqsl")
+    GT.settings.trustedQsl.binaryFile.endsWith("tqsl.exe") ||
+    GT.settings.trustedQsl.binaryFile.endsWith("tqsl")
   )
   {
-    GT.trustedQslSettings.binaryFileValid = true;
+    GT.settings.trustedQsl.binaryFileValid = true;
   }
-  else GT.trustedQslSettings.binaryFileValid = false;
+  else GT.settings.trustedQsl.binaryFileValid = false;
 
-  if (GT.trustedQslSettings.binaryFileValid == true)
+  if (GT.settings.trustedQsl.binaryFileValid == true)
   {
     tqslFileDiv.style.backgroundColor = "blue";
   }
@@ -1031,20 +1026,20 @@ function setAdifStartup(checkbox)
     tqslFileDiv.style.backgroundColor = "orange";
   }
   tqslFileDiv.innerHTML =
-    "<b>" + start_and_end(GT.trustedQslSettings.binaryFile) + "</b>";
+    "<b>" + start_and_end(GT.settings.trustedQsl.binaryFile) + "</b>";
 
   if (buttonAdifCheckBox.checked || loadAdifCheckBox.checked)
   {
     var worker = "";
-    if (GT.startupLogs.length > 0)
+    if (GT.settings.startupLogs.length > 0)
     {
       worker += "<table class='darkTable'>";
-      for (var i in GT.startupLogs)
+      for (var i in GT.settings.startupLogs)
       {
         worker += "<tr title='" +
-          GT.startupLogs[i].file +
+          GT.settings.startupLogs[i].file +
           "'><td>" +
-          GT.startupLogs[i].name +
+          GT.settings.startupLogs[i].name +
           "</td><td onclick='removeStartupLog(" +
           i +
           ")'><img src='img/trash_24x48.png' style='height:17px;margin:-1px;margin-bottom:-3px;padding:0px;cursor:pointer'></td></tr>";
@@ -1071,25 +1066,25 @@ function setAdifStartup(checkbox)
 
 function removeStartupLog(i)
 {
-  if (i in GT.startupLogs)
+  if (i in GT.settings.startupLogs)
   {
-    GT.startupLogs.splice(i, 1);
-    GT.localStorage.startupLogs = JSON.stringify(GT.startupLogs);
+    GT.settings.startupLogs.splice(i, 1);
+
     setAdifStartup(loadAdifCheckBox);
   }
 }
 
 function startupAdifLoadCheck()
 {
-  logEventMedia.value = GT.alertSettings.logEventMedia;
+  logEventMedia.value = GT.settings.alerts.logEventMedia;
  
   loadWsjtLogFile();
 
   if (loadGTCheckBox.checked == true) loadGtQSOLogFile();
 
-  if (loadAdifCheckBox.checked == true && GT.startupLogs.length > 0) startupAdifLoadFunction();
+  if (loadAdifCheckBox.checked == true && GT.settings.startupLogs.length > 0) startupAdifLoadFunction();
 
-  if (GT.mapSettings.offlineMode == false)
+  if (GT.settings.map.offlineMode == false)
   {
     if (loadLOTWCheckBox.checked == true) grabLOtWLog(false);
 
@@ -1477,16 +1472,16 @@ function oldSendToLogger()
   {
     report += valueToAdiField("STATION_CALLSIGN", newMessage.Mycall);
   }
-  else if (GT.appSettings.myCall != "NOCALL" && GT.appSettings.myCall.length > 0)
-  { report += valueToAdiField("STATION_CALLSIGN", GT.appSettings.myCall); }
+  else if (GT.settings.app.myCall != "NOCALL" && GT.settings.app.myCall.length > 0)
+  { report += valueToAdiField("STATION_CALLSIGN", GT.settings.app.myCall); }
 
   if (newMessage.Mygrid.length > 0)
   {
     report += valueToAdiField("MY_GRIDSQUARE", newMessage.Mygrid);
   }
-  else if (GT.appSettings.myGrid.length > 1)
+  else if (GT.settings.app.myGrid.length > 1)
   {
-    report += valueToAdiField("MY_GRIDSQUARE", GT.appSettings.myGrid);
+    report += valueToAdiField("MY_GRIDSQUARE", GT.settings.app.myGrid);
   }
 
   report += "<EOR>";
@@ -1523,7 +1518,7 @@ function sendToLogger(ADIF)
     record.GRIDSQUARE = GT.liveCallsigns[localHash].grid.substr(0, 4);
   }
 
-  if (GT.appSettings.potaEnabled == 1 && localHash in GT.liveCallsigns && GT.liveCallsigns[localHash].pota)
+  if (GT.settings.app.potaEnabled == 1 && localHash in GT.liveCallsigns && GT.liveCallsigns[localHash].pota)
   {
     if (GT.liveCallsigns[localHash].pota != "?-????")
     {
@@ -1536,14 +1531,14 @@ function sendToLogger(ADIF)
     record.TX_PWR = String(parseInt(record.TX_PWR));
   }
 
-  if ((!("STATION_CALLSIGN" in record) || record.STATION_CALLSIGN.length == 0) && GT.appSettings.myCall != "NOCALL" && GT.appSettings.myCall.length > 0)
+  if ((!("STATION_CALLSIGN" in record) || record.STATION_CALLSIGN.length == 0) && GT.settings.app.myCall != "NOCALL" && GT.settings.app.myCall.length > 0)
   {
-    record.STATION_CALLSIGN = GT.appSettings.myCall;
+    record.STATION_CALLSIGN = GT.settings.app.myCall;
   }
 
-  if ((!("MY_GRIDSQUARE" in record) || record.MY_GRIDSQUARE.length == 0) && GT.appSettings.myGrid.length > 1)
+  if ((!("MY_GRIDSQUARE" in record) || record.MY_GRIDSQUARE.length == 0) && GT.settings.app.myGrid.length > 1)
   {
-    record.MY_GRIDSQUARE = GT.appSettings.myGrid;
+    record.MY_GRIDSQUARE = GT.settings.app.myGrid;
   }
 
   if (!("DXCC" in record))
@@ -1559,7 +1554,7 @@ function sendToLogger(ADIF)
     record.COUNTRY = GT.dxccToADIFName[Number(record.DXCC)];
   }
 
-  if (GT.appSettings.lookupMerge == true && record.CALL in GT.lookupCache)
+  if (GT.settings.app.lookupMerge == true && record.CALL in GT.lookupCache)
   {
     var lookup = GT.lookupCache[record.CALL];
     for (var key in lookup)
@@ -1576,7 +1571,7 @@ function sendToLogger(ADIF)
         record.GRIDSQUARE = lookup.grid;
       }
     }
-    if (GT.appSettings.lookupMissingGrid && "grid" in lookup && (!("GRIDSQUARE" in record) || record.GRIDSQUARE.length == 0))
+    if (GT.settings.app.lookupMissingGrid && "grid" in lookup && (!("GRIDSQUARE" in record) || record.GRIDSQUARE.length == 0))
     {
       record.GRIDSQUARE = lookup.grid;
     }
@@ -1625,30 +1620,30 @@ function finishSendingReport(record, localMode)
   {
     GT.lastReport = report;
     
-    if (GT.appSettings.potaEnabled == 1 && "POTA_REF" in record)
+    if (GT.settings.app.potaEnabled == 1 && "POTA_REF" in record)
     {
       reportPotaQSO(record);
       addLastTraffic("<font style='color:white'>Spotted to POTA</font>");
     }
 
-    if (GT.N1MMSettings.enable == true && GT.N1MMSettings.port > 1024 && GT.N1MMSettings.ip.length > 4)
+    if (GT.settings.N1MM.enable == true && GT.settings.N1MM.port > 1024 && GT.settings.N1MM.ip.length > 4)
     {
       sendUdpMessage(
         report,
         report.length,
-        parseInt(GT.N1MMSettings.port),
-        GT.N1MMSettings.ip
+        parseInt(GT.settings.N1MM.port),
+        GT.settings.N1MM.ip
       );
       addLastTraffic("<font style='color:white'>Logged to N1MM</font>");
     }
 
-    if (GT.log4OMSettings.enable == true && GT.log4OMSettings.port > 1024 && GT.log4OMSettings.ip.length > 4)
+    if (GT.settings.log4OM.enable == true && GT.settings.log4OM.port > 1024 && GT.settings.log4OM.ip.length > 4)
     {
       sendUdpMessage(
         "ADD " + report,
         report.length + 4,
-        parseInt(GT.log4OMSettings.port),
-        GT.log4OMSettings.ip
+        parseInt(GT.settings.log4OM.port),
+        GT.settings.log4OM.ip
       );
       addLastTraffic("<font style='color:white'>Logged to Log4OM</font>");
     }
@@ -1714,11 +1709,11 @@ function finishSendingReport(record, localMode)
       addLastTraffic("<font style='color:red'>Exception Cloudlog Log</font>");
     }
 
-    if (GT.acLogSettings.enable == true && GT.acLogSettings.port > 0 && GT.acLogSettings.ip.length > 4)
+    if (GT.settings.acLog.enable == true && GT.settings.acLog.port > 0 && GT.settings.acLog.ip.length > 4)
     {
       try
       {
-        sendACLogMessage(record, GT.acLogSettings.port, GT.acLogSettings.ip);
+        sendACLogMessage(record, GT.settings.acLog.port, GT.settings.acLog.ip);
         addLastTraffic("<font style='color:white'>Logged to N3FJP</font>");
       }
       catch (e)
@@ -1727,7 +1722,7 @@ function finishSendingReport(record, localMode)
       }
     }
 
-    if (GT.dxkLogSettings.enable == true && GT.dxkLogSettings.port > 0 && GT.dxkLogSettings.ip.length > 4)
+    if (GT.settings.dxkLog.enable == true && GT.settings.dxkLog.port > 0 && GT.settings.dxkLog.ip.length > 4)
     {
       try
       {
@@ -1749,7 +1744,7 @@ function finishSendingReport(record, localMode)
         }
         DXreport += "<EOR>";
 
-        sendDXKeeperLogMessage(DXreport, GT.dxkLogSettings.port, GT.dxkLogSettings.ip);
+        sendDXKeeperLogMessage(DXreport, GT.settings.dxkLog.port, GT.settings.dxkLog.ip);
         addLastTraffic("<font style='color:white'>Logged to DXKeeper</font>");
       }
       catch (e)
@@ -1758,11 +1753,11 @@ function finishSendingReport(record, localMode)
       }
     }
 
-    if (GT.HRDLogbookLogSettings.enable == true && GT.HRDLogbookLogSettings.port > 0 && GT.HRDLogbookLogSettings.ip.length > 4)
+    if (GT.settings.HRDLogbookLog.enable == true && GT.settings.HRDLogbookLog.port > 0 && GT.settings.HRDLogbookLog.ip.length > 4)
     {
       try
       {
-        sendHRDLogbookEntry(record, GT.HRDLogbookLogSettings.port, GT.HRDLogbookLogSettings.ip);
+        sendHRDLogbookEntry(record, GT.settings.HRDLogbookLog.port, GT.settings.HRDLogbookLog.ip);
         addLastTraffic("<font style='color:white'>Logged to HRD Logbook</font>");
       }
       catch (e)
@@ -1910,7 +1905,7 @@ function eqslCallback(buffer, flag)
 
 function eQSLTest(test)
 {
-  if (GT.mapSettings.offlineMode == true) return;
+  if (GT.settings.map.offlineMode == true) return;
 
   eQSLTestResult.innerHTML = "Testing";
 
@@ -1928,7 +1923,7 @@ function eQSLTest(test)
 
 function sendeQSLEntry(report)
 {
-  if (GT.mapSettings.offlineMode == true) return;
+  if (GT.settings.map.offlineMode == true) return;
 
   var pid = "GridTracker";
   var pver = String(gtVersion);
@@ -1949,7 +1944,7 @@ function sendeQSLEntry(report)
 
 function testTrustedQSL(test)
 {
-  if (GT.mapSettings.offlineMode == true)
+  if (GT.settings.map.offlineMode == true)
   {
     lotwTestResult.innerHTML = "Currently<br/>offline";
     return;
@@ -1957,8 +1952,8 @@ function testTrustedQSL(test)
 
   if (
     logLOTWqsoCheckBox.checked == true &&
-    GT.trustedQslSettings.binaryFileValid == true &&
-    GT.trustedQslSettings.stationFileValid == true &&
+    GT.settings.trustedQsl.binaryFileValid == true &&
+    GT.settings.trustedQsl.stationFileValid == true &&
     lotwStation.value.length > 0
   )
   {
@@ -1970,7 +1965,7 @@ function testTrustedQSL(test)
     options.push("-v");
 
     child_process.execFile(
-      GT.trustedQslSettings.binaryFile,
+      GT.settings.trustedQsl.binaryFile,
       options,
       (error, stdout, stderr) =>
       {
@@ -1985,9 +1980,9 @@ function testTrustedQSL(test)
   else
   {
     var worker = "";
-    if (GT.trustedQslSettings.binaryFileValid == false)
+    if (GT.settings.trustedQsl.binaryFileValid == false)
     { worker += "Invalid tqsl executable<br/>"; }
-    if (GT.trustedQslSettings.stationFileValid == false)
+    if (GT.settings.trustedQsl.stationFileValid == false)
     { worker += "TrustQSL not installed<br/>"; }
     if (!ValidateText(lotwTrusted)) worker += "TQSL Password missing<br/>";
     if (!ValidateText(lotwStation)) worker += "Select Station<br/>";
@@ -1998,16 +1993,16 @@ GT.trustTempPath = "";
 
 function sendLotwLogEntry(report)
 {
-  if (GT.mapSettings.offlineMode == true) return;
+  if (GT.settings.map.offlineMode == true) return;
 
   if (
     logLOTWqsoCheckBox.checked == true &&
-    GT.trustedQslSettings.binaryFileValid == true &&
-    GT.trustedQslSettings.stationFileValid == true &&
+    GT.settings.trustedQsl.binaryFileValid == true &&
+    GT.settings.trustedQsl.stationFileValid == true &&
     lotwStation.value.length > 0
   )
   {
-    var header = "Generated " + userTimeString(null) + " for " + GT.appSettings.myCall + "\r\n\r\n";
+    var header = "Generated " + userTimeString(null) + " for " + GT.settings.app.myCall + "\r\n\r\n";
     var pid = "GridTracker";
     var pver = String(gtVersion);
     header += "<PROGRAMID:" + pid.length + ">" + pid + "\r\n";
@@ -2036,7 +2031,7 @@ function sendLotwLogEntry(report)
     options.push(GT.trustTempPath);
 
     child_process.execFile(
-      GT.trustedQslSettings.binaryFile,
+      GT.settings.trustedQsl.binaryFile,
       options,
       (error, stdout, stderr) => // eslint-disable-line node/handle-callback-err
       {
@@ -2056,47 +2051,37 @@ function sendLotwLogEntry(report)
 
 function n1mmLoggerChanged()
 {
-  GT.N1MMSettings.enable = buttonN1MMCheckBox.checked;
-  GT.N1MMSettings.ip = N1MMIpInput.value;
-  GT.N1MMSettings.port = N1MMPortInput.value;
-
-  GT.localStorage.N1MMSettings = JSON.stringify(GT.N1MMSettings);
+  GT.settings.N1MM.enable = buttonN1MMCheckBox.checked;
+  GT.settings.N1MM.ip = N1MMIpInput.value;
+  GT.settings.N1MM.port = N1MMPortInput.value;
 }
 
 function log4OMLoggerChanged()
 {
-  GT.log4OMSettings.enable = buttonLog4OMCheckBox.checked;
-  GT.log4OMSettings.ip = log4OMIpInput.value;
-  GT.log4OMSettings.port = log4OMPortInput.value;
-
-  GT.localStorage.log4OMSettings = JSON.stringify(GT.log4OMSettings);
+  GT.settings.log4OM.enable = buttonLog4OMCheckBox.checked;
+  GT.settings.log4OM.ip = log4OMIpInput.value;
+  GT.settings.log4OM.port = log4OMPortInput.value;
 }
 
 function acLogLoggerChanged()
 {
-  GT.acLogSettings.enable = buttonacLogCheckBox.checked;
-  GT.acLogSettings.ip = acLogIpInput.value;
-  GT.acLogSettings.port = acLogPortInput.value;
-
-  GT.localStorage.acLogSettings = JSON.stringify(GT.acLogSettings);
+  GT.settings.acLog.enable = buttonacLogCheckBox.checked;
+  GT.settings.acLog.ip = acLogIpInput.value;
+  GT.settings.acLog.port = acLogPortInput.value;
 }
 
 function dxkLogLoggerChanged()
 {
-  GT.dxkLogSettings.enable = buttondxkLogCheckBox.checked;
-  GT.dxkLogSettings.ip = dxkLogIpInput.value;
-  GT.dxkLogSettings.port = dxkLogPortInput.value;
-
-  GT.localStorage.dxkLogSettings = JSON.stringify(GT.dxkLogSettings);
+  GT.settings.dxkLog.enable = buttondxkLogCheckBox.checked;
+  GT.settings.dxkLog.ip = dxkLogIpInput.value;
+  GT.settings.dxkLog.port = dxkLogPortInput.value;
 }
 
 function hrdLogbookLoggerChanged()
 {
-  GT.HRDLogbookLogSettings.enable = buttonHrdLogbookCheckBox.checked;
-  GT.HRDLogbookLogSettings.ip = hrdLogbookIpInput.value;
-  GT.HRDLogbookLogSettings.port = hrdLogbookPortInput.value;
-
-  GT.localStorage.HRDLogbookLogSettings = JSON.stringify(GT.HRDLogbookLogSettings);
+  GT.settings.HRDLogbookLog.enable = buttonHrdLogbookCheckBox.checked;
+  GT.settings.HRDLogbookLog.ip = hrdLogbookIpInput.value;
+  GT.settings.HRDLogbookLog.port = hrdLogbookPortInput.value;
 }
 
 function CloudUrlErrorCallback(
@@ -2230,7 +2215,7 @@ function CloudlogFillProfiles(buffer, flag)
         {
           opt.style.fontWeight = "bold";
         }
-        if (item.station_id == GT.adifLogSettings.text.CloudlogStationProfileID)
+        if (item.station_id == GT.settings.adifLog.text.CloudlogStationProfileID)
         {
           opt.style.color = "yellow";
           opt.style.backgroundColor = "green";
@@ -2347,7 +2332,7 @@ function postRetryErrorCallaback(
 
 function sendQrzLogEntry(report)
 {
-  if (GT.mapSettings.offlineMode == true) return;
+  if (GT.settings.map.offlineMode == true) return;
 
   if (logQRZqsoCheckBox.checked == true && ValidateQrzApi(qrzApiKey))
   {
@@ -2377,7 +2362,7 @@ function clubLogQsoResult(buffer, flag)
 
 function sendClubLogEntry(report)
 {
-  if (GT.mapSettings.offlineMode == true) return;
+  if (GT.settings.map.offlineMode == true) return;
 
   if (logClubqsoCheckBox.checked == true)
   {
@@ -2408,7 +2393,7 @@ function sendClubLogEntry(report)
 
 function sendCloudlogEntry(report)
 {
-  if (GT.mapSettings.offlineMode == true) return;
+  if (GT.settings.map.offlineMode == true) return;
 
   if (logCloudlogQSOCheckBox.checked == true)
   {
@@ -2452,7 +2437,7 @@ function hrdSendLogResult(buffer, flag)
 
 function sendHrdLogEntry(report)
 {
-  if (GT.mapSettings.offlineMode == true) return;
+  if (GT.settings.map.offlineMode == true) return;
 
   if (logHRDLOGqsoCheckBox.checked == true)
   {
@@ -2506,15 +2491,15 @@ function CloudLogValidateURL(shouldSaveIfChanged = false)
   CloudlogURL.value = CloudlogURL.value.replace("/index.php/api/qso", "")
   if (shouldSaveIfChanged == true && CloudlogURL.value != initialValue)
   {
-    GT.adifLogSettings.text.CloudlogURL = CloudlogURL.value;
+    GT.settings.adifLog.text.CloudlogURL = CloudlogURL.value;
     saveAdifSettings();
   }
 }
 
 function CloudLogProfileChanged(obj)
 {
-  GT.adifLogSettings.text.CloudlogStationProfileID = obj.options[obj.selectedIndex].value;
-  GT.adifLogSettings.text.CloudlogStationProfileName = obj.options[obj.selectedIndex].text;
+  GT.settings.adifLog.text.CloudlogStationProfileID = obj.options[obj.selectedIndex].value;
+  GT.settings.adifLog.text.CloudlogStationProfileName = obj.options[obj.selectedIndex].text;
   saveAdifSettings();
 }
 
@@ -2611,7 +2596,7 @@ function HamCQSendResult(buffer, flag)
 
 function sendHamCQEntry(report)
 {
-  if (GT.mapSettings.offlineMode == true) return;
+  if (GT.settings.map.offlineMode == true) return;
 
   if (logHamCQqsoCheckBox.checked == true)
   {
@@ -2972,7 +2957,7 @@ function grabPsk24()
 {
   if (GT.isGettingPsk == true) return;
 
-  if (GT.appSettings.myCall.length > 0 && GT.appSettings.myCall != "NOCALL")
+  if (GT.settings.app.myCall.length > 0 && GT.settings.app.myCall != "NOCALL")
   {
     var days = 1;
     if (pskImg.src == 1) days = 7;
@@ -2980,7 +2965,7 @@ function grabPsk24()
       "https://pskreporter.info/cgi-bin/pskdata.pl?adif=1&days=" +
         days +
         "&receiverCallsign=" +
-        GT.appSettings.myCall.toLowerCase(),
+        GT.settings.app.myCall.toLowerCase(),
       pskCallback,
       null,
       "https",
@@ -3054,7 +3039,7 @@ function parsePSKadif(adiBuffer)
       var finalDxcc = Number(findAdiField(activeAdifArray[x], "DXCC"));
       if (finalDxcc == 0)
       {
-        if (finalDXcall == GT.appSettings.myCall) finalDxcc = callsignToDxcc(finalDEcall);
+        if (finalDXcall == GT.settings.app.myCall) finalDxcc = callsignToDxcc(finalDEcall);
         else finalDxcc = callsignToDxcc(finalDXcall);
       }
 
@@ -3077,7 +3062,7 @@ function parsePSKadif(adiBuffer)
         validateGridFromString(finalGrid)
       )
       {
-        if (finalDXcall == GT.appSettings.myCall)
+        if (finalDXcall == GT.settings.app.myCall)
         {
           addLiveCallsign(
             finalMyGrid,
@@ -3099,7 +3084,7 @@ function parsePSKadif(adiBuffer)
             null
           );
         }
-        else if (finalDEcall == GT.appSettings.myCall)
+        else if (finalDEcall == GT.settings.app.myCall)
         {
           addLiveCallsign(
             finalGrid,

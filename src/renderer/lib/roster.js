@@ -139,7 +139,7 @@ CR.defaultSettings = {
     sepia: 0,
     huerotate: 0
   },
-  reference: 0,
+  reference: 4, // New users should start out Mixed Band & Mode to match GT Map View initial
   controls: true,
   controlsExtended: true,
   compact: false,
@@ -189,42 +189,42 @@ document.addEventListener("drop", function (event)
 
 window.addEventListener("message", receiveMessage, false);
 
-if (!("awardTracker" in GT.localStorage))
+if (!("awardTracker" in GT.settings))
 {
-  GT.localStorage.awardTracker = "{}";
+  GT.settings.awardTracker = {};
   CR.rosterSettings = {};
   writeRosterSettings();
 }
 
-CR.awardTracker = JSON.parse(GT.localStorage.awardTracker);
+CR.awardTracker = GT.settings.awardTracker;
 
-if ("ignoredCalls" in  GT.localStorage)
+if ("ignoredCalls" in  GT.settings)
 {
-  CR.ignoredCalls = JSON.parse(GT.localStorage.ignoredCalls);
-  CR.ignoredDxcc = JSON.parse(GT.localStorage.ignoredDxcc);
-  CR.ignoredGrid = JSON.parse(GT.localStorage.ignoredGrid);
-  CR.ignoredCQz = JSON.parse(GT.localStorage.ignoredCQz);
-  CR.ignoredITUz = JSON.parse(GT.localStorage.ignoredITUz);
-  CR.ignoredCQ = JSON.parse(GT.localStorage.ignoredCQ);
+  CR.ignoredCalls = GT.settings.ignoredCalls;
+  CR.ignoredDxcc = GT.settings.ignoredDxcc;
+  CR.ignoredGrid = GT.settings.ignoredGrid;
+  CR.ignoredCQz = GT.settings.ignoredCQz;
+  CR.ignoredITUz = GT.settings.ignoredITUz;
+  CR.ignoredCQ = GT.settings.ignoredCQ;
 }
 else
 {
-  GT.localStorage.ignoredCalls = "{}";
-  GT.localStorage.ignoredDxcc = "{}";
-  GT.localStorage.ignoredGrid = "{}";
-  GT.localStorage.ignoredCQz = "{}";
-  GT.localStorage.ignoredITUz = "{}";
-  GT.localStorage.ignoredCQ = "{}";
+  GT.settings.ignoredCalls = "{}";
+  GT.settings.ignoredDxcc = "{}";
+  GT.settings.ignoredGrid = "{}";
+  GT.settings.ignoredCQz = "{}";
+  GT.settings.ignoredITUz = "{}";
+  GT.settings.ignoredCQ = "{}";
 }
 
 function storeBlocks(render = true)
 {
-  GT.localStorage.ignoredCalls = JSON.stringify(CR.ignoredCalls);
-  GT.localStorage.ignoredDxcc = JSON.stringify(CR.ignoredDxcc);
-  GT.localStorage.ignoredGrid = JSON.stringify(CR.ignoredGrid);
-  GT.localStorage.ignoredCQz = JSON.stringify(CR.ignoredCQz);
-  GT.localStorage.ignoredITUz = JSON.stringify(CR.ignoredITUz);
-  GT.localStorage.ignoredCQ = JSON.stringify(CR.ignoredCQ);
+  GT.settings.ignoredCalls = CR.ignoredCalls;
+  GT.settings.ignoredDxcc = CR.ignoredDxcc;
+  GT.settings.ignoredGrid = CR.ignoredGrid;
+  GT.settings.ignoredCQz = CR.ignoredCQz;
+  GT.settings.ignoredITUz = CR.ignoredITUz;
+  GT.settings.ignoredCQ = CR.ignoredCQ;
   if (render)
   {
     renderIgnoresTab();
@@ -233,17 +233,17 @@ function storeBlocks(render = true)
 
 function storeAwardTracker()
 {
-  GT.localStorage.awardTracker = JSON.stringify(CR.awardTracker);
+  GT.settings.awardTracker = CR.awardTracker;
 }
 
 function loadSettings()
 {
   let readSettings = {};
-  if (typeof GT.localStorage.rosterSettings != "undefined")
+  if (typeof GT.settings.roster != "undefined")
   {
-    readSettings = JSON.parse(GT.localStorage.rosterSettings);
+    readSettings = GT.settings.roster;
   }
-  CR.rosterSettings = deepmerge(CR.defaultSettings, readSettings);
+  CR.rosterSettings = { ...CR.defaultSettings, ...readSettings };
 
   fixLegacySettings();
 
@@ -276,7 +276,7 @@ function writeRosterSettings()
     CR.rosterSettings.watchers[key].test = null;
   }
 
-  GT.localStorage.rosterSettings = JSON.stringify(CR.rosterSettings);
+  GT.settings.roster =  CR.rosterSettings;
 }
 
 function isKnownCallsignDXCC(dxcc)
@@ -414,7 +414,7 @@ function getSpotString(callObj)
   if (callObj.spot && callObj.spot.when > 0)
   {
     when = timeNowSec() - callObj.spot.when;
-    if (when <= window.opener.GT.receptionSettings.viewHistoryTimeSec)
+    if (when <= window.opener.GT.settings.reception.viewHistoryTimeSec)
     { result = toDHM(parseInt(when)); }
   }
   if (result != "&nbsp;") result += " / " + callObj.spot.snr;
@@ -877,9 +877,9 @@ function setVisual()
     onlyHitsDiv.style.display = "";
   }
 
-  usesLoTWDiv.style.display = (window.opener.GT.callsignLookups.lotwUseEnable == true) ? "" : "none";
-  useseQSLDiv.style.display = (window.opener.GT.callsignLookups.eqslUseEnable == true) ? "" : "none";
-  usesOQRSDiv.style.display = (window.opener.GT.callsignLookups.oqrsUseEnable == true) ? "" : "none";
+  usesLoTWDiv.style.display = (window.opener.GT.settings.callsignLookups.lotwUseEnable == true) ? "" : "none";
+  useseQSLDiv.style.display = (window.opener.GT.settings.callsignLookups.eqslUseEnable == true) ? "" : "none";
+  usesOQRSDiv.style.display = (window.opener.GT.settings.callsignLookups.oqrsUseEnable == true) ? "" : "none";
   onlySpotDiv.style.display = (CR.rosterSettings.columns.Spot == true) ? "" : "none";
   rosterBody.style.display = "block";
 
@@ -1478,9 +1478,9 @@ function renderColumnsTab()
   {
     let column = available[x];
     if (column == "Callsign") continue;
-    if (column == "eQSL" && window.opener.GT.callsignLookups.eqslUseEnable == false) continue;
-    if (column == "LoTW" && window.opener.GT.callsignLookups.lotwUseEnable == false) continue;
-    if (column == "OQRS" && window.opener.GT.callsignLookups.oqrsUseEnable == false) continue;
+    if (column == "eQSL" && window.opener.GT.settings.callsignLookups.eqslUseEnable == false) continue;
+    if (column == "LoTW" && window.opener.GT.settings.callsignLookups.lotwUseEnable == false) continue;
+    if (column == "OQRS" && window.opener.GT.settings.callsignLookups.oqrsUseEnable == false) continue;
 
     if (!(column in enabled))
     {
@@ -1560,6 +1560,9 @@ function resize()
 
 function init()
 {
+  
+  loadSettings();
+
   window.opener.GT.rosterInitialized = true;
 
   CR.callsignDatabaseDXCC = window.opener.GT.callsignDatabaseDXCC;
@@ -1572,7 +1575,6 @@ function init()
 
   window.addEventListener("message", receiveMessage, false);
 
-  loadSettings();
   loadFilterSettings();
   updateInstances();
 
@@ -3633,7 +3635,7 @@ function clearRestOfMenus()
   CR.callMenuRotator = new MenuItem({
     type: "normal",
     label: I18N("roster.menu.AimRotator"),
-    visible: window.opener.GT.pstrotatorSettings.enable,
+    visible: window.opener.GT.settings.pstrotator.enable,
     click: function ()
     {
       let target = CR.callRoster[CR.targetHash]
@@ -3707,7 +3709,7 @@ function clearRestOfMenus()
   CR.callingMenuRotator = new MenuItem({
     type: "normal",
     label: I18N("roster.menu.AimRotator"),
-    visible: window.opener.GT.pstrotatorSettings.enable,
+    visible: window.opener.GT.settings.pstrotator.enable,
     click: function ()
     {
       let target = CR.callRoster[CR.targetHash]
@@ -3924,85 +3926,4 @@ function clearRestOfMenus()
 function setPstrotatorEnable(enabled)
 {
   CR.callingMenuRotator.visible = CR.callMenuRotator.visible = enabled;
-}
-
-function setWatcherFileSelectors()
-{
-  exportWatchers.addEventListener('click', async function(){
-    for (let key in CR.rosterSettings.watchers)
-    {
-      CR.rosterSettings.watchers[key].test = null;
-    }
-    let watcher = JSON.stringify(CR.rosterSettings.watchers, null,2);
-    try {
-      const blob = new Blob([watcher], { type: 'application/json'});
-      const pickerOptions = {
-        suggestedName: "Watcher Settings.json",
-        startIn: "desktop",
-        types: [
-          {
-            description: "Watcher Settings",
-            accept: {
-              "application/json": [".json"]
-            },
-          },
-        ],
-      };
-      const fileHandle = await window.showSaveFilePicker(pickerOptions);
-      const writableFileStream = await fileHandle.createWritable();
-      await writableFileStream.write(blob);
-      await writableFileStream.close();
-    }
-    catch (e)
-    {
-      // user aborted or file permission issue
-    }
-  });
-
-  CR.importFileHandle = null;
-  importWatchers.addEventListener('click', async () => {
-    let section = null;
-    try
-    {
-      const pickerOptions = {
-        types: [
-          {
-            description: "Watcher Settings",
-            accept: {
-              "application/json": [".json"],
-            },
-          },
-        ],
-        startIn: "desktop",
-        excludeAcceptAllOption: true,
-        multiple: false,
-      };
-
-      [CR.importFileHandle] = await window.showOpenFilePicker(pickerOptions);
-      section = "Reading";
-      let file = await CR.importFileHandle.getFile();
-      let content = await file.text();
-      section = "Parsing";
-      let json = JSON.parse(content);
-      importWatcherSettings(json);
-      openWatcher();
-    }
-    catch (e)
-    {
-      // user aborted or file permission issue or json parse
-      if (section != null)
-      {
-        alert("Error " + section);
-      }
-    }
-  });
-}
-
-function importWatcherSettings(json)
-{
-  for (let key in json)
-  {
-    json[key].test = null;
-  }
-  CR.watchers = CR.rosterSettings.watchers = structuredClone(json);
 }

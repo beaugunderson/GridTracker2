@@ -386,7 +386,7 @@ const ROSTER_COLUMNS = {
   Spot: {
     compare: (a, b) =>
     {
-      let cutoff = timeNowSec() - window.opener.GT.receptionSettings.viewHistoryTimeSec;
+      let cutoff = timeNowSec() - window.opener.GT.settings.reception.viewHistoryTimeSec;
 
       if (a.callObj.spot.when <= cutoff) return -1;
       if (b.callObj.spot.when <= cutoff) return 1;

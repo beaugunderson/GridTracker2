@@ -28,7 +28,7 @@ function readLocaleFile(locale)
 
 function loadI18n()
 {
-  readLocaleFile(GT.appSettings.locale);
+  readLocaleFile(GT.settings.app.locale);
   refreshI18NStrings();
 }
 
@@ -79,20 +79,20 @@ function I18N(key)
 
 function changeLocale()
 {
-  GT.appSettings.locale = languageLocale.value;
-  renderI18n(GT.appSettings.locale);
+  GT.settings.app.locale = languageLocale.value;
+  renderI18n(GT.settings.app.locale);
   saveAndCloseApp(true);
 }
 
 function loadChildWindowI18n()
 {
-  readLocaleFile(window.opener.GT.appSettings.locale);
+  readLocaleFile(window.opener.GT.settings.app.locale);
   renderI18n();
 }
 
 function loadRosterI18n()
 {
-  readLocaleFile(window.opener.GT.appSettings.locale);
+  readLocaleFile(window.opener.GT.settings.app.locale);
   renderI18n();
   addControls();
 }

@@ -88,7 +88,7 @@ function gtConnectChat()
 
   GT.gtChatSocket.onmessage = function (evt)
   {
-    if (GT.appSettings.gtShareEnable == true)
+    if (GT.settings.app.gtShareEnable == true)
     {
       let jsmesg = false;
       try
@@ -144,7 +144,7 @@ function gtChatSendClose()
 {
   msg = Object();
   msg.type = "close";
-  msg.uuid = GT.appSettings.chatUUID;
+  msg.uuid = GT.settings.app.chatUUID;
 
   sendGtJson(JSON.stringify(msg));
 }
@@ -221,7 +221,7 @@ function gtStatusCheck()
 
 function sendGtJson(json, isUUIDrequest = false)
 {
-  if (GT.appSettings.gtShareEnable == true && GT.gtChatSocket != null)
+  if (GT.settings.app.gtShareEnable == true && GT.gtChatSocket != null)
   {
     if (GT.gtChatSocket.readyState == WebSocket.OPEN && (isUUIDrequest || GT.gtUuidValid))
     {
@@ -243,16 +243,16 @@ function gtChatSendStatus()
 {
   var msg = Object();
   msg.type = "status";
-  msg.uuid = GT.appSettings.chatUUID;
+  msg.uuid = GT.settings.app.chatUUID;
 
-  msg.call = GT.appSettings.myCall;
-  msg.grid = GT.appSettings.myRawGrid;
-  msg.freq = GT.appSettings.myRawFreq;
-  msg.mode = GT.appSettings.myMode;
-  msg.band = GT.appSettings.myBand;
+  msg.call = GT.settings.app.myCall;
+  msg.grid = GT.settings.app.myRawGrid;
+  msg.freq = GT.settings.app.myRawFreq;
+  msg.mode = GT.settings.app.myMode;
+  msg.band = GT.settings.app.myBand;
   msg.src = "GT";
-  msg.canmsg = GT.appSettings.gtMsgEnable;
-  msg.o = GT.appSettings.gtSpotEnable == true ? 1 : 0;
+  msg.canmsg = GT.settings.app.gtMsgEnable;
+  msg.o = GT.settings.app.gtSpotEnable == true ? 1 : 0;
   msg = JSON.stringify(msg);
 
   if (msg != GT.lastGtStatus)
@@ -266,7 +266,7 @@ function gtChatSendSpots(spotsObject, detailsObject)
 {
   let msg = Object();
   msg.type = "o";
-  msg.uuid = GT.appSettings.chatUUID;
+  msg.uuid = GT.settings.app.chatUUID;
   msg.o = spotsObject;
   msg.d = detailsObject;
 
@@ -277,17 +277,17 @@ function gtChatSendDecodes(instancesObject)
 {
   let msg = Object();
   msg.type = "d";
-  msg.uuid = GT.appSettings.chatUUID;
+  msg.uuid = GT.settings.app.chatUUID;
   msg.i = instancesObject;
   sendGtJson(JSON.stringify(msg));
 }
 
 function oamsBandActivityCheck()
 {
-  if (GT.appSettings.oamsBandActivity == true && GT.appSettings.myGrid.length >= 4)
+  if (GT.settings.app.oamsBandActivity == true && GT.settings.app.myGrid.length >= 4)
   {
-    let grid = GT.appSettings.myGrid.substring(0, 4).toUpperCase();
-    if (GT.appSettings.oamsBandActivityNeighbors == true)
+    let grid = GT.settings.app.myGrid.substring(0, 4).toUpperCase();
+    if (GT.settings.app.oamsBandActivityNeighbors == true)
     {
       gtChatSendBandActivityRequest(squareToNeighbors(grid));
     }
@@ -302,7 +302,7 @@ function gtChatSendBandActivityRequest(gridArray)
 {
   msg = Object();
   msg.type = "ba";
-  msg.uuid = GT.appSettings.chatUUID;
+  msg.uuid = GT.settings.app.chatUUID;
   msg.ga = gridArray;
   sendGtJson(JSON.stringify(msg));
 }
@@ -425,7 +425,7 @@ function gtChatGetList()
 {
   msg = Object();
   msg.type = "list";
-  msg.uuid = GT.appSettings.chatUUID;
+  msg.uuid = GT.settings.app.chatUUID;
 
   sendGtJson(JSON.stringify(msg));
 }
@@ -577,8 +577,8 @@ function sendSimplePushMessage(jsmesg)
 {
   const url = "https://api.simplepush.io/send";
   let data = {
-    key: GT.msgSettings.msgSimplepushApiKey,
-    title: "GT Chat - " + formatCallsign(GT.appSettings.myCall),
+    key: GT.settings.msg.msgSimplepushApiKey,
+    title: "GT Chat - " + formatCallsign(GT.settings.app.myCall),
     msg: formatCallsign(jsmesg.call) + ": " + jsmesg.msg
   };
   getPostBuffer(
@@ -596,10 +596,10 @@ function sendPushOverMessage(jsmesg, test = false)
 {
   const url = "https://api.pushover.net/1/messages.json";
   let data = {
-    user: GT.msgSettings.msgPushoverUserKey,
-    token: GT.msgSettings.msgPushoverToken,
+    user: GT.settings.msg.msgPushoverUserKey,
+    token: GT.settings.msg.msgPushoverToken,
     title:
-        "GT Chat - " + formatCallsign(GT.appSettings.myCall),
+        "GT Chat - " + formatCallsign(GT.settings.app.myCall),
     message: formatCallsign(jsmesg.call) + ": " + jsmesg.msg
   };
   getPostBuffer(
@@ -660,7 +660,7 @@ function PushoverReply(data, isTest)
 
 function gtChatMessage(jsmesg)
 {
-  if (GT.appSettings.gtMsgEnable == true)
+  if (GT.settings.app.gtMsgEnable == true)
   {
     var cid = jsmesg.cid;
     jsmesg.when = Date.now();
@@ -683,12 +683,12 @@ function gtChatMessage(jsmesg)
       if (newChatMessage(cid, jsmesg) == false)
       {
         // Only notify if you're not in active chat with them.
-        if (GT.msgSettings.msgSimplepush && GT.msgSettings.msgSimplepushChat && GT.msgSettings.msgSimplepushApiKey != null)
+        if (GT.settings.msg.msgSimplepush && GT.settings.msg.msgSimplepushChat && GT.settings.msg.msgSimplepushApiKey != null)
         {
           sendSimplePushMessage(jsmesg);
         }
-        if (GT.msgSettings.msgPushover && GT.msgSettings.msgPushoverChat && GT.msgSettings.msgPushoverUserKey != null &&
-            GT.msgSettings.msgPushoverToken != null)
+        if (GT.settings.msg.msgPushover && GT.settings.msg.msgPushoverChat && GT.settings.msg.msgPushoverUserKey != null &&
+            GT.settings.msg.msgPushoverToken != null)
         {
           sendPushOverMessage(jsmesg);
         }
@@ -696,11 +696,11 @@ function gtChatMessage(jsmesg)
         alertChatMessage();
       }
 
-      if (GT.msgSettings.msgAwaySelect == 1 && !(cid in GT.gtSentAwayToCid))
+      if (GT.settings.msg.msgAwaySelect == 1 && !(cid in GT.gtSentAwayToCid))
       {
         GT.gtSentAwayToCid[cid] = true;
         gtSendMessage(
-          "Away message [ " + GT.msgSettings.msgAwayText + " ]",
+          "Away message [ " + GT.settings.msg.msgAwayText + " ]",
           cid
         );
       }
@@ -712,7 +712,7 @@ function gtSendMessage(message, who)
 {
   msg = Object();
   msg.type = "mesg";
-  msg.uuid = GT.appSettings.chatUUID;
+  msg.uuid = GT.settings.app.chatUUID;
   msg.cid = who;
   msg.msg = new Buffer.from(message).toString("base64"); // eslint-disable-line new-cap
   sendGtJson(JSON.stringify(msg));
@@ -726,16 +726,16 @@ function gtChatSendUUID()
 {
   var msg = Object();
   msg.type = "uuid";
-  if (GT.appSettings.chatUUID != "")
+  if (GT.settings.app.chatUUID != "")
   {
-    msg.uuid = GT.appSettings.chatUUID;
+    msg.uuid = GT.settings.app.chatUUID;
   }
   else
   {
     msg.uuid = null;
   }
 
-  msg.call = GT.appSettings.myCall;
+  msg.call = GT.settings.app.myCall;
   msg.ver = "v" + gtVersionStr;
 
   sendGtJson(JSON.stringify(msg), true);
@@ -749,7 +749,7 @@ function gtWaitUUID()
 
 function gtChatSetUUID(jsmesg)
 {
-  GT.appSettings.chatUUID = jsmesg.uuid;
+  GT.settings.app.chatUUID = jsmesg.uuid;
   myChatId = jsmesg.id;
 
   GT.gtUuidValid = true;
@@ -763,7 +763,7 @@ GT.getEngineWasRunning = false;
 
 function gtChatStateMachine()
 {
-  if (GT.appSettings.gtShareEnable == true && GT.mapSettings.offlineMode == false && GT.appSettings.myCall.length > 2 && GT.appSettings.myCall != "NOCALL")
+  if (GT.settings.app.gtShareEnable == true && GT.settings.map.offlineMode == false && GT.settings.app.myCall.length > 2 && GT.settings.app.myCall != "NOCALL")
   {
     var now = timeNowSec();
     GT.gtStateToFunction[GT.gtState]();
@@ -774,9 +774,9 @@ function gtChatStateMachine()
     }
     else msgImg.style.webkitFilter = "";
 
-    if (GT.msgSettings.msgFrequencySelect > 0 && Object.keys(GT.gtUnread).length > 0)
+    if (GT.settings.msg.msgFrequencySelect > 0 && Object.keys(GT.gtUnread).length > 0)
     {
-      if (now - GT.lastChatMsgAlert > GT.msgSettings.msgFrequencySelect * 60)
+      if (now - GT.lastChatMsgAlert > GT.settings.msg.msgFrequencySelect * 60)
       {
         alertChatMessage();
       }
@@ -823,9 +823,9 @@ function gtChatSystemInit()
 
 function showGtFlags()
 {
-  if (GT.appSettings.gtFlagImgSrc > 0)
+  if (GT.settings.app.gtFlagImgSrc > 0)
   {
-    if (GT.mapSettings.offlineMode == false)
+    if (GT.settings.map.offlineMode == false)
     {
       redrawPins();
       GT.layerVectors.gtflags.setVisible(true);
@@ -845,11 +845,11 @@ function clearGtFlags()
 
 function toggleGtMap()
 {
-  GT.appSettings.gtFlagImgSrc += 1;
-  GT.appSettings.gtFlagImgSrc %= 2;
-  gtFlagImg.src = GT.gtFlagImageArray[GT.appSettings.gtFlagImgSrc];
-  if (GT.spotView > 0 && GT.receptionSettings.mergeSpots == false) return;
-  if (GT.appSettings.gtFlagImgSrc > 0)
+  GT.settings.app.gtFlagImgSrc += 1;
+  GT.settings.app.gtFlagImgSrc %= 2;
+  gtFlagImg.src = GT.gtFlagImageArray[GT.settings.app.gtFlagImgSrc];
+  if (GT.spotView > 0 && GT.settings.reception.mergeSpots == false) return;
+  if (GT.settings.app.gtFlagImgSrc > 0)
   {
     redrawPins();
     GT.layerVectors.gtflags.setVisible(true);
@@ -894,7 +894,7 @@ function updateChatWindow(id = null)
 function newChatMessage(id, jsmesg)
 {
   var hasFocus = false;
-  if (GT.msgSettings.msgActionSelect == 1) showMessaging();
+  if (GT.settings.msg.msgActionSelect == 1) showMessaging();
 
   if (GT.chatWindowInitialized)
   {
@@ -912,20 +912,20 @@ GT.lastChatMsgAlert = 0;
 
 function alertChatMessage()
 {
-  if (GT.msgSettings.msgAlertSelect == 1)
+  if (GT.settings.msg.msgAlertSelect == 1)
   {
     // Text to speech
-    speakAlertString(GT.msgSettings.msgAlertWord);
+    speakAlertString(GT.settings.msg.msgAlertWord);
   }
-  if (GT.msgSettings.msgAlertSelect == 2)
+  if (GT.settings.msg.msgAlertSelect == 2)
   {
     // Audible
-    playAlertMediaFile(GT.msgSettings.msgAlertMedia);
+    playAlertMediaFile(GT.settings.msg.msgAlertMedia);
   }
   GT.lastChatMsgAlert = timeNowSec();
 }
 
 function oamsCanMsg()
 {
-  return (GT.mapSettings.offlineMode == false && GT.appSettings.gtShareEnable == true && GT.appSettings.gtMsgEnable == true);
+  return (GT.settings.map.offlineMode == false && GT.settings.app.gtShareEnable == true && GT.settings.app.gtMsgEnable == true);
 }

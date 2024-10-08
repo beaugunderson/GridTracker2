@@ -43,10 +43,9 @@ var GT = {};
 // CallRoster object
 var CR = {};
 
-// Look for our own settings file, if not, we'll rely on GT.localStorage being accurate
 if (document.title.substring(0, 12).trim() == "GridTracker2")
 {
-  let filename = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Ginternal", "settings.json");
+  let filename = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Ginternal", "app-settings.json");
   try
   {
     if (fs.existsSync(filename))
@@ -54,29 +53,32 @@ if (document.title.substring(0, 12).trim() == "GridTracker2")
       let data = require(filename);
       if (data)
       {
-        GT.localStorage = data;
+        GT.settings = data;
       }
       else
       {
         // safety catch
-        GT.localStorage = {};
+        // In 2025 we remove importLegacy code -Tag
+        GT.settings = { importLegacy: true };
       }
     }
     else
     {
       // This should happen only once for new users
-      GT.localStorage = {};
+      // In 2025 we remove importLegacy code -Tag
+      GT.settings = { importLegacy: true };
     }
   }
   catch (e)
   {
-    GT.localStorage = {};
+    // In 2025 we remove importLegacy code -Tag
+    GT.settings = { importLegacy: true };
     console.log(e);
   }
 }
 else
 {
-  GT.localStorage = window.opener.GT.localStorage;
+  GT.settings = window.opener.GT.settings;
 }
 
 // Zoom Code Below

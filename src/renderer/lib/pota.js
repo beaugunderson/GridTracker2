@@ -73,7 +73,7 @@ function iconText(center, iconObj, zIndex, propName)
 
   if (GT.useTransform)
   {
-    feature.getGeometry().transform("EPSG:3857", GT.mapSettings.projection);
+    feature.getGeometry().transform("EPSG:3857", GT.settings.map.projection);
   }
 
   var iconStyle = new ol.style.Style({
@@ -87,15 +87,15 @@ function iconText(center, iconObj, zIndex, propName)
 
 function initPota()
 {
-  potaEnabled.checked = (GT.appSettings.potaEnabled == 1);
-  potaMenu.checked = GT.appSettings.potaShowMenu;
-  potaButton.style.display = (GT.appSettings.potaEnabled == 1 && GT.appSettings.potaShowMenu && GT.mapSettings.offlineMode == false) ? "" : "none";
-  potaImg.style.filter = GT.appSettings.potaMapEnabled ? "" : "grayscale(1)";
+  potaEnabled.checked = (GT.settings.app.potaEnabled == 1);
+  potaMenu.checked = GT.settings.app.potaShowMenu;
+  potaButton.style.display = (GT.settings.app.potaEnabled == 1 && GT.settings.app.potaShowMenu && GT.settings.map.offlineMode == false) ? "" : "none";
+  potaImg.style.filter = GT.settings.app.potaMapEnabled ? "" : "grayscale(1)";
 
   GT.layerSources.pota.clear();
   GT.pota.mapParks = {};
   
-  if (GT.appSettings.potaEnabled == 1)
+  if (GT.settings.app.potaEnabled == 1)
   {
     getPotaParks();
   }
@@ -103,9 +103,9 @@ function initPota()
 
 function changePotaEnable()
 {
-  GT.appSettings.potaEnabled = (potaEnabled.checked == true) ? 1 : 0;
-  potaButton.style.display = (GT.appSettings.potaEnabled == 1 && GT.appSettings.potaShowMenu && GT.mapSettings.offlineMode == false) ? "" : "none";
-  if (!GT.appSettings.potaEnabled)
+  GT.settings.app.potaEnabled = (potaEnabled.checked == true) ? 1 : 0;
+  potaButton.style.display = (GT.settings.app.potaEnabled == 1 && GT.settings.app.potaShowMenu && GT.settings.map.offlineMode == false) ? "" : "none";
+  if (!GT.settings.app.potaEnabled)
   {
     GT.layerSources.pota.clear();
   }
@@ -120,18 +120,18 @@ function changePotaEnable()
 
 function changePotaMenu()
 {
-  GT.appSettings.potaShowMenu = potaMenu.checked;
+  GT.settings.app.potaShowMenu = potaMenu.checked;
   
-  potaButton.style.display = (GT.appSettings.potaEnabled == 1 && GT.appSettings.potaShowMenu && GT.mapSettings.offlineMode == false) ? "" : "none";
-  potaImg.style.filter = GT.appSettings.potaMapEnabled ? "" : "grayscale(1)";
+  potaButton.style.display = (GT.settings.app.potaEnabled == 1 && GT.settings.app.potaShowMenu && GT.settings.map.offlineMode == false) ? "" : "none";
+  potaImg.style.filter = GT.settings.app.potaMapEnabled ? "" : "grayscale(1)";
   
   saveAppSettings();
 }
 
 function togglePotaMap()
 {
-  GT.appSettings.potaMapEnabled = !GT.appSettings.potaMapEnabled;
-  potaImg.style.filter = GT.appSettings.potaMapEnabled ? "" : "grayscale(1)";
+  GT.settings.app.potaMapEnabled = !GT.settings.app.potaMapEnabled;
+  potaImg.style.filter = GT.settings.app.potaMapEnabled ? "" : "grayscale(1)";
 
   saveAppSettings();
 
@@ -142,7 +142,7 @@ function redrawParks()
 {
   GT.layerSources.pota.clear();
 
-  if (GT.appSettings.potaEnabled == 1 && GT.appSettings.potaMapEnabled && GT.mapSettings.offlineMode == false)
+  if (GT.settings.app.potaEnabled == 1 && GT.settings.app.potaMapEnabled && GT.settings.map.offlineMode == false)
   {
     GT.pota.mapParks = {};
     makeParkFeatures();
@@ -206,7 +206,7 @@ function makeParkFeatures()
 
 function potaSpotFromDecode(callObj)
 {
-  if (GT.appSettings.myCall != "" && GT.appSettings.myCall != "NOCALL")
+  if (GT.settings.app.myCall != "" && GT.settings.app.myCall != "NOCALL")
   {
     var park = callObj.pota;
 
@@ -217,7 +217,7 @@ function potaSpotFromDecode(callObj)
       GT.pota.parkSpots[park][callObj.DEcall] = fillObjectFromTemplate(GT.pota.parkSpots[park][callObj.DEcall], newObj);
 
       // may or may not be on screen, so try
-      if (GT.appSettings.potaMapEnabled)
+      if (GT.settings.app.potaMapEnabled)
       {
         addParkSpotFeature(park, GT.pota.parkSpots[park][callObj.DEcall]);
       }
@@ -242,7 +242,7 @@ function potaSpotFromDecode(callObj)
       newObj.expire = newObj.spotTime + 300000;
       GT.pota.parkSpots[park][callObj.DEcall] = newObj;
 
-      if (GT.appSettings.potaMapEnabled)
+      if (GT.settings.app.potaMapEnabled)
       {
         addParkSpotFeature(park, GT.pota.parkSpots[park][callObj.DEcall]);
       }
@@ -341,8 +341,8 @@ function spotFromCallObj(callObj, park, inCount, rbnTime)
   var callSpot = {
     activator: callObj.DEcall,
     activatorGrid: callObj.grid,
-    spotter: GT.appSettings.myCall + "-#",
-    spotterGrid: GT.appSettings.myGrid,
+    spotter: GT.settings.app.myCall + "-#",
+    spotterGrid: GT.settings.app.myGrid,
     frequency: Number((GT.instances[callObj.instance].status.Frequency / 1000000).toFixed(3)),
     reference: park,
     mode: callObj.mode,
@@ -350,7 +350,7 @@ function spotFromCallObj(callObj, park, inCount, rbnTime)
     spotTime: Date.now(),
     source: "GT",
     count: inCount + 1,
-    comments: "GT " + callObj.RSTsent + " dB " + GT.appSettings.myGrid + " via " + GT.appSettings.myCall + "-#"
+    comments: "GT " + callObj.RSTsent + " dB " + GT.settings.app.myGrid + " via " + GT.settings.app.myCall + "-#"
   };
   return callSpot;
 }
@@ -402,7 +402,7 @@ function addParkSpotFeature(park, report)
 
 function processPotaParks(buffer)
 {
-  if (GT.appSettings.potaEnabled == 1)
+  if (GT.settings.app.potaEnabled == 1)
   {
     try
     {
@@ -444,7 +444,7 @@ function getPotaParks()
     GT.pota.spotsTimeout = null;
   }
 
-  if (GT.mapSettings.offlineMode == false && GT.appSettings.potaEnabled == 1)
+  if (GT.settings.map.offlineMode == false && GT.settings.app.potaEnabled == 1)
   {
     getBuffer(
       "https://storage.googleapis.com/gt_app/pota.json?cb=" + Date.now(),
@@ -484,7 +484,7 @@ function uniqueArrayFromArray(input)
 
 function processPotaSpots(buffer)
 {
-  if (GT.appSettings.potaEnabled == 1)
+  if (GT.settings.app.potaEnabled == 1)
   {
     try
     {
@@ -544,7 +544,7 @@ function getPotaSpots()
     GT.pota.spotsTimeout = null;
   }
 
-  if (GT.mapSettings.offlineMode == false && GT.appSettings.potaEnabled == 1)
+  if (GT.settings.map.offlineMode == false && GT.settings.app.potaEnabled == 1)
   {
     getBuffer(
       "https://api.pota.app/spot/activator",
@@ -560,7 +560,7 @@ function getPotaSpots()
 
 function processPotaSchedule(buffer)
 {
-  if (GT.appSettings.potaEnabled == 1)
+  if (GT.settings.app.potaEnabled == 1)
   {
     try
     {
@@ -618,7 +618,7 @@ function getPotaSchedule()
     GT.pota.scheduleTimeout = null;
   }
 
-  if (GT.mapSettings.offlineMode == false && GT.appSettings.potaEnabled == 1)
+  if (GT.settings.map.offlineMode == false && GT.settings.app.potaEnabled == 1)
   {
     getBuffer(
       "https://api.pota.app/activation",

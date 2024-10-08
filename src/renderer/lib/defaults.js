@@ -1,11 +1,11 @@
 const validSettings = [
-  "HRDLogbookLogSettings",
-  "N1MMSettings",
-  "acLogSettings",
-  "adifLogSettings",
-  "alertSettings",
-  "appSettings",
-  "audioSettings",
+  "HRDLogbookLog",
+  "N1MM",
+  "acLog",
+  "adifLog",
+  "alerts",
+  "app",
+  "audio",
   "awardTracker",
   "bandActivity",
   "ignoredCQ",
@@ -17,297 +17,367 @@ const validSettings = [
   "callsignLookups",
   "classicAlerts",
   "currentVersion",
-  "dxkLogSettings",
-  "log4OMSettings",
+  "dxkLog",
+  "log4OM",
   "mapMemory",
-  "mapSettings",
-  "msgSettings",
-  "receptionSettings",
-  "rosterSettings",
-  "savedAlerts",
+  "map",
+  "msg",
+  "reception",
+  "roster",
+  "customAlerts",
   "startupLogs",
-  "trustedQslSettings",
+  "trustedQsl",
   "legendColors",
-  "pstrotatorSettings"
+  "pstrotator",
+  "importLegacy",
+  "defaultsApplied"
 ];
 
-const def_appSettings = {
-  chatUUID: "",
-  clearOnCQ: true,
-  crScript: 0,
-  distanceUnit: "MI",
-  graylineImgSrc: 0,
-  gridViewMode: 3,
-  gridsquareDecayTime: 300,
-  gtBandFilter: "",
-  gtFlagImgSrc: 0,
-  gtModeFilter: "",
-  gtPropFilter: "mixed",
-  gtMsgEnable: true,
-  gtShareEnable: true,
-  gtSpotEnable: true,
-  loadAdifAtStartup: false,
-  locale: "en",
-  lookupLoginCq: "",
-  lookupLoginQrz: "",
-  lookupLoginQth: "",
-  lookupOnTx: false,
-  lookupCloseLog: false,
-  lookupMerge: true,
-  lookupMissingGrid: false,
-  lookupPasswordCq: "",
-  lookupPasswordQrz: "",
-  lookupPasswordQth: "",
-  lookupService: "CALLOOK",
-  lookupCallookPreferred: false,
-  moonPath: 0,
-  moonTrack: 0,
-  mouseTrack: 0,
-  multicast: false,
-  myBand: "OOB",
-  myGrid: "",
-  myCall: "NOCALL",
-  myMode: "",
-  myRawCall: "NOCALL",
-  myRawFreq: "",
-  myRawGrid: "",
-  oamsBandActivity: true,
-  oamsBandActivityNeighbors: false,
-  pathWidthWeight: 1.0,
-  potaEnabled: 1,
-  potaShowMenu: true,
-  potaMapEnabled: false,
-  pushPinMode: false,
-  qrzPathWidthWeight: 1.2,
-  sixWideMode: 0,
-  savedAppData: null,
-  soundCard: "default",
-  spotView: 0,
-  useLocalTime: 0,
-  wsjtForwardUdpEnable: false,
-  wsjtForwardUdpIp: "127.0.0.1",
-  wsjtForwardUdpPort: 2238,
-  wsjtIP: "",
-  wsjtUdpPort: 0,
-  workingCallsignEnable: false,
-  workingCallsigns: {},
-  workingGridEnable: false,
-  workingGrids: {},
-  workingDateEnable: false,
-  workingDate: 0,
-  qsoItemsPerPage: 100,
-  qslAuthority: "L",
-  collapsedMapViewFilters: false,
-  buttonPanelOrder: []
-};
-
-const def_mapSettings = {
-  animate: true,
-  animateSpeed: 4,
-  CQhilite: true,
-  predMode: 0,
-  predOpacity: 0.4,
-  fitQRZ: false,
-  focusRig: true,
-  gridAlpha: 136,
-  haltAllOnTx: true,
-  longitude: 0.0,
-  latitude: 0.0,
-  mapOpacity: 1,
-  mapIndex: "Mapnik by OpenStreetMap (Intl)",
-  offlineMapIndex: "Satellite by MapTiler (No Labels)(Offline)",
-  mergeOverlay: false,
-  mouseOver: true,
-  nightMapOpacity: 0.8,
-  nightMapEnable: false,
-  nightMapIndex: "Dark Gray by Esri (English)",
-  offlineNightMapIndex: "Toner by Stamen (No Labels)(Offline)",
-  nightPathColor: 361,
-  nightQrzPathColor: 1,
-  offlineMode: false,
-  pathColor: 0,
-  qrzDxccFallback: false,
-  qrzPathColor: 1,
-  graylineOpacity: 0.1,
-  splitQSL: true,
-  trafficDecode: true,
-  usNexrad: false,
-  timezonesEnable: 0,
-  showAllGrids: false,
-  trophyOverlay: 0,
-  zoom: 4,
-  mapTrans: 0.5,
-  apiKeys: {},
-  projection: "EPSG:3857"
-};
-
-const def_adifLogSettings = {
-  menu: {
-    buttonAdifCheckBox: false,
-    buttonClubCheckBox: false,
-    buttonLOTWCheckBox: false,
-    buttonQRZCheckBox: false,
-    buttonPsk24CheckBox: false
+const def_settings = {
+  defaultsApplied: true,
+  app: {
+    chatUUID: "",
+    clearOnCQ: true,
+    crScript: 0,
+    distanceUnit: "MI",
+    graylineImgSrc: 0,
+    gridViewMode: 3,
+    gridsquareDecayTime: 300,
+    gtBandFilter: "",
+    gtFlagImgSrc: 0,
+    gtModeFilter: "",
+    gtPropFilter: "mixed",
+    gtMsgEnable: true,
+    gtShareEnable: true,
+    gtSpotEnable: true,
+    loadAdifAtStartup: false,
+    locale: "en",
+    lookupLoginCq: "",
+    lookupLoginQrz: "",
+    lookupLoginQth: "",
+    lookupOnTx: false,
+    lookupCloseLog: false,
+    lookupMerge: true,
+    lookupMissingGrid: false,
+    lookupPasswordCq: "",
+    lookupPasswordQrz: "",
+    lookupPasswordQth: "",
+    lookupService: "CALLOOK",
+    lookupCallookPreferred: false,
+    moonPath: 0,
+    moonTrack: 0,
+    mouseTrack: 0,
+    multicast: false,
+    myBand: "OOB",
+    myGrid: "",
+    myCall: "NOCALL",
+    myMode: "",
+    myRawCall: "NOCALL",
+    myRawFreq: "",
+    myRawGrid: "",
+    oamsBandActivity: true,
+    oamsBandActivityNeighbors: false,
+    pathWidthWeight: 1.0,
+    potaEnabled: 1,
+    potaShowMenu: true,
+    potaMapEnabled: false,
+    pushPinMode: false,
+    qrzPathWidthWeight: 1.2,
+    sixWideMode: 0,
+    soundCard: "default",
+    spotView: 0,
+    useLocalTime: 0,
+    wsjtForwardUdpEnable: false,
+    wsjtForwardUdpIp: "127.0.0.1",
+    wsjtForwardUdpPort: 2238,
+    wsjtIP: "",
+    wsjtUdpPort: 0,
+    workingCallsignEnable: false,
+    workingCallsigns: {},
+    workingGridEnable: false,
+    workingGrids: {},
+    workingDateEnable: false,
+    workingDate: 0,
+    qsoItemsPerPage: 100,
+    qslAuthority: "L",
+    collapsedMapViewFilters: false,
+    buttonPanelOrder: []
   },
-  startup: {
-    loadAdifCheckBox: false,
-    loadPsk24CheckBox: false,
-    loadQRZCheckBox: false,
-    loadLOTWCheckBox: false,
-    loadClubCheckBox: false,
-    loadGTCheckBox: true
+  map: {
+    animate: true,
+    animateSpeed: 4,
+    CQhilite: true,
+    predMode: 0,
+    predOpacity: 0.4,
+    fitQRZ: false,
+    focusRig: true,
+    gridAlpha: 136,
+    haltAllOnTx: true,
+    longitude: 0.0,
+    latitude: 0.0,
+    mapOpacity: 1,
+    mapIndex: "Mapnik by OpenStreetMap (Intl)",
+    offlineMapIndex: "Satellite by MapTiler (No Labels)(Offline)",
+    mergeOverlay: false,
+    mouseOver: true,
+    nightMapOpacity: 0.8,
+    nightMapEnable: false,
+    nightMapIndex: "Dark Gray by Esri (English)",
+    offlineNightMapIndex: "Toner by Stamen (No Labels)(Offline)",
+    nightPathColor: 361,
+    nightQrzPathColor: 1,
+    offlineMode: false,
+    pathColor: 0,
+    qrzDxccFallback: false,
+    qrzPathColor: 1,
+    graylineOpacity: 0.1,
+    splitQSL: true,
+    trafficDecode: true,
+    usNexrad: false,
+    timezonesEnable: 0,
+    showAllGrids: false,
+    trophyOverlay: 0,
+    zoom: 4,
+    mapTrans: 0.5,
+    apiKeys: {},
+    projection: "EPSG:3857"
   },
-  qsolog: {
-    logQRZqsoCheckBox: false,
-    logGTqsoCheckBox: true,
-    logLOTWqsoCheckBox: false,
-    logHRDLOGqsoCheckBox: false,
-    logClubqsoCheckBox: false,
-    logCloudlogQSOCheckBox: false,
-    logeQSLQSOCheckBox: false,
-    logHamCQqsoCheckBox: false
+  adifLog: {
+    menu: {
+      buttonAdifCheckBox: false,
+      buttonClubCheckBox: false,
+      buttonLOTWCheckBox: false,
+      buttonQRZCheckBox: false,
+      buttonPsk24CheckBox: false
+    },
+    startup: {
+      loadAdifCheckBox: false,
+      loadPsk24CheckBox: false,
+      loadQRZCheckBox: false,
+      loadLOTWCheckBox: false,
+      loadClubCheckBox: false,
+      loadGTCheckBox: true
+    },
+    qsolog: {
+      logQRZqsoCheckBox: false,
+      logGTqsoCheckBox: true,
+      logLOTWqsoCheckBox: false,
+      logHRDLOGqsoCheckBox: false,
+      logClubqsoCheckBox: false,
+      logCloudlogQSOCheckBox: false,
+      logeQSLQSOCheckBox: false,
+      logHamCQqsoCheckBox: false
+    },
+    nickname: {
+      nicknameeQSLCheckBox: false
+    },
+    text: {
+      lotwLogin: "",
+      clubCall: "",
+      clubEmail: "",
+      clubPassword: "",
+      lotwPassword: "",
+      lotwTrusted: "",
+      lotwStation: "",
+      qrzApiKey: "",
+      HRDLOGCallsign: "",
+      HRDLOGUploadCode: "",
+      CloudlogURL: "http://127.0.0.1",
+      CloudlogAPI: "",
+      CloudlogStationProfileID: "1",
+      CloudlogStationProfileName: "",
+      eQSLUser: "",
+      eQSLPassword: "",
+      eQSLNickname: "",
+      HamCQApiKey: ""
+    },
+    downloads: {},
+    lastFetch: {
+      lotw_qso: 0,
+      lotw_qsl: 0
+    }
   },
-  nickname: {
-    nicknameeQSLCheckBox: false
+  msg: {
+    msgAlertSelect: 1,
+    msgAlertWord: "New chat message",
+    msgAlertMedia: "none",
+    msgFrequencySelect: 0,
+    msgActionSelect: 1,
+    msgAwaySelect: 0,
+    msgAwayText: "I am away from the shack at the moment",
+    msgSimplepush: false,
+    msgSimplepushApiKey: "",
+    msgSimplepushChat: true,
+    msgSimplepushRoster: false,
+    msgPushover: false,
+    msgPushoverUserKey: "",
+    msgPushoverToken: "",
+    msgPushoverChat: true,
+    msgPushoverRoster: false
   },
-  text: {
-    lotwLogin: "",
-    clubCall: "",
-    clubEmail: "",
-    clubPassword: "",
-    lotwPassword: "",
-    lotwTrusted: "",
-    lotwStation: "",
-    qrzApiKey: "",
-    HRDLOGCallsign: "",
-    HRDLOGUploadCode: "",
-    CloudlogURL: "http://127.0.0.1",
-    CloudlogAPI: "",
-    CloudlogStationProfileID: "1",
-    CloudlogStationProfileName: "",
-    eQSLUser: "",
-    eQSLPassword: "",
-    eQSLNickname: "",
-    HamCQApiKey: ""
+  reception: {
+    viewHistoryTimeSec: 900,
+    viewPaths: true,
+    pathColor: -1,
+    pathNightColor: 361,
+    spotWidth: 0.8,
+    mergeSpots: true
   },
-  downloads: {},
-  lastFetch: {
-    lotw_qso: 0,
-    lotw_qsl: 0
-  }
-};
-
-const def_msgSettings = {
-  msgAlertSelect: 1,
-  msgAlertWord: "New chat message",
-  msgAlertMedia: "none",
-  msgFrequencySelect: 0,
-  msgActionSelect: 1,
-  msgAwaySelect: 0,
-  msgAwayText: "I am away from the shack at the moment",
-  msgSimplepush: false,
-  msgSimplepushApiKey: "",
-  msgSimplepushChat: true,
-  msgSimplepushRoster: false,
-  msgPushover: false,
-  msgPushoverUserKey: "",
-  msgPushoverToken: "",
-  msgPushoverChat: true,
-  msgPushoverRoster: false
-};
-
-const def_receptionSettings = {
-  viewHistoryTimeSec: 900,
-  viewPaths: true,
-  pathColor: -1,
-  pathNightColor: 361,
-  spotWidth: 0.8,
-  mergeSpots: true
-};
-
-const def_N1MMSettings = {
-  enable: false,
-  port: 2333,
-  ip: "127.0.0.1"
-};
-
-const def_log4OMSettings = {
-  enable: false,
-  port: 2236,
-  ip: "127.0.0.1"
-};
-
-const def_dxkLogSettings = {
-  enable: false,
-  port: 52000,
-  ip: "127.0.0.1"
-};
-
-const def_HRDLogbookLogSettings = {
-  enable: false,
-  port: 7826,
-  ip: "127.0.0.1"
-};
-const def_acLogSettings = {
-  enable: false,
-  port: 1100,
-  ip: "127.0.0.1"
-};
-
-const def_trustedQslSettings = {
-  stationFile: "",
-  stationFileValid: false,
-  binaryFile: "",
-  binaryFileValid: false
-};
-
-const def_callsignLookups = {
-  lotwUseEnable: true,
-  lotwWeeklyEnable: true,
-  lotwLastUpdate: 0,
-  eqslUseEnable: true,
-  eqslWeeklyEnable: true,
-  eqslLastUpdate: 0,
-  ulsUseEnable: true,
-  ulsWeeklyEnable: true,
-  ulsLastUpdate: 0,
-  cacUseEnable: true,
-  cacWeeklyEnable: true,
-  cacLastUpdate: 0,
-  oqrsUseEnable: false,
-  oqrsWeeklyEnable: false,
-  oqrsLastUpdate: 0
-};
-
-const def_bandActivity = {
-  lastUpdate: {},
-  lines: {}
-};
-
-const def_legendColors = {
-  QSO: "#EEEE00",
-  QSL: "#EE0000",
-  QSX: "#1111EE",
-  CQ: "#00FF00",
-  CQDX: "#00FFFF",
-  QRZ: "#FFFF00",
-  QTH: "#FFA600"
-};
-
-const def_pstrotatorSettings = {
-  enable: false,
-  port: 12000,
-  ip: "127.0.0.1"
-};
-
-const def_audioSettings = {
-  alertMute: 0,
-  speechRate: 1,
-  speechPitch: 1,
-  speechVolume: 1,
-  speechVoice: 0,
-  speechPhonetics: true,
-  volume: 1
+  N1MM: {
+    enable: false,
+    port: 2333,
+    ip: "127.0.0.1"
+  },
+  log4OM: {
+    enable: false,
+    port: 2236,
+    ip: "127.0.0.1"
+  },
+  dxkLog: {
+    enable: false,
+    port: 52000,
+    ip: "127.0.0.1"
+  },
+  HRDLogbookLog: {
+    enable: false,
+    port: 7826,
+    ip: "127.0.0.1"
+  },
+  acLog: {
+    enable: false,
+    port: 1100,
+    ip: "127.0.0.1"
+  },
+  trustedQsl: {
+    stationFile: "",
+    stationFileValid: false,
+    binaryFile: "",
+    binaryFileValid: false
+  },
+  callsignLookups: {
+    lotwUseEnable: true,
+    lotwWeeklyEnable: true,
+    lotwLastUpdate: 0,
+    eqslUseEnable: true,
+    eqslWeeklyEnable: true,
+    eqslLastUpdate: 0,
+    ulsUseEnable: true,
+    ulsWeeklyEnable: true,
+    ulsLastUpdate: 0,
+    cacUseEnable: true,
+    cacWeeklyEnable: true,
+    cacLastUpdate: 0,
+    oqrsUseEnable: false,
+    oqrsWeeklyEnable: false,
+    oqrsLastUpdate: 0
+  },
+  bandActivity: {
+    lastUpdate: {},
+    lines: {}
+  },
+  legendColors: {
+    QSO: "#EEEE00",
+    QSL: "#EE0000",
+    QSX: "#1111EE",
+    CQ: "#00FF00",
+    CQDX: "#00FFFF",
+    QRZ: "#FFFF00",
+    QTH: "#FFA600"
+  },
+  pstrotator: {
+    enable: false,
+    port: 12000,
+    ip: "127.0.0.1"
+  },
+  audio: {
+    alertMute: 0,
+    speechRate: 1,
+    speechPitch: 1,
+    speechVolume: 1,
+    speechVoice: 0,
+    speechPhonetics: true,
+    volume: 1
+  },
+  classicAlerts: {
+    huntRoster: false,
+    huntRosterNotify: 1,
+    huntRosterNotifyWord: "New hit",
+    huntRosterNotifyMedia: "none",
+    huntCallsign: false,
+    huntGrid: false,
+    huntDXCC: false,
+    huntCQz: false,
+    huntITUz: false,
+    huntStates: false,
+    huntCallsignNeed: "worked",
+    huntGridNeed: "confirmed",
+    huntDXCCNeed: "confirmed",
+    huntCQzNeed: "confirmed",
+    huntITUzNeed: "confirmed",
+    huntStatesNeed: "confirmed",
+    huntCallsignNotify: "1",
+    huntGridNotify: "1",
+    huntDXCCNotify: "1",
+    huntCQzNotify: "1",
+    huntITUzNotify: "1",
+    huntStatesNotify: "1",
+    huntCallsignNotifyWord: "Wanted Call",
+    huntGridNotifyWord: "Wanted Grid",
+    huntDXCCNotifyWord: "Wanted DXCC",
+    huntCQzNotifyWord: "Wanted CQ Zone",
+    huntITUzNotifyWord: "Wanted I-T-U Zone",
+    huntStatesNotifyWord: "Wanted State",
+    huntCallsignNotifyMedia: "none",
+    huntGridNotifyMedia: "none",
+    huntDXCCNotifyMedia: "none",
+    huntCQzNotifyMedia: "none",
+    huntITUzNotifyMedia: "none",
+    huntStatesNotifyMedia: "none"
+  },
+  alerts: {
+    requireGrid: true,
+    wantMaxDT: false,
+    wantMinDB: false,
+    wantMinFreq: false,
+    wantMaxFreq: false,
+    maxDT: 0.5,
+    minDb: -24,
+    minFreq: 400,
+    maxFreq: 3500,
+    noMyDxcc: false,
+    onlyMyDxcc: false,
+    noRoundUp: false,
+    onlyRoundUp: false,
+    cqOnly: true,
+    usesLoTW: false,
+    useseQSL: false,
+    reference: 0,
+    logEventMedia: "Ping-coin.mp3"
+  },
+  customAlerts: {
+    popup: {
+      value: "QRZ",
+      type: "4",
+      notify: "2",
+      repeat: "2",
+      filename: "",
+      shortname: "",
+      lastMessage: "",
+      lastTime: 0,
+      fired: 0,
+      needAck: 0
+    }
+  },
+  mapMemory: [],
+  startupLogs: [],
+  awardTracker: {},
+  roster: {},
+  ignoredCQ: {},
+  ignoredCalls: {},
+  ignoredGrid: {},
+  ignoredDxcc: {},
+  ignoredCQz: {},
+  ignoredITUz: {}
 };
 
 const def_qso = {
@@ -351,75 +421,90 @@ const def_mapMemory = {
   bearing: 0
 };
 
-const def_classicAlerts = {
-  huntRoster: false,
-  huntRosterNotify: 1,
-  huntRosterNotifyWord: "New hit",
-  huntRosterNotifyMedia: "none",
-  huntCallsign: false,
-  huntGrid: false,
-  huntDXCC: false,
-  huntCQz: false,
-  huntITUz: false,
-  huntStates: false,
-  huntCallsignNeed: "worked",
-  huntGridNeed: "confirmed",
-  huntDXCCNeed: "confirmed",
-  huntCQzNeed: "confirmed",
-  huntITUzNeed: "confirmed",
-  huntStatesNeed: "confirmed",
-  huntCallsignNotify: "1",
-  huntGridNotify: "1",
-  huntDXCCNotify: "1",
-  huntCQzNotify: "1",
-  huntITUzNotify: "1",
-  huntStatesNotify: "1",
-  huntCallsignNotifyWord: "Wanted Call",
-  huntGridNotifyWord: "Wanted Grid",
-  huntDXCCNotifyWord: "Wanted DXCC",
-  huntCQzNotifyWord: "Wanted CQ Zone",
-  huntITUzNotifyWord: "Wanted I-T-U Zone",
-  huntStatesNotifyWord: "Wanted State",
-  huntCallsignNotifyMedia: "none",
-  huntGridNotifyMedia: "none",
-  huntDXCCNotifyMedia: "none",
-  huntCQzNotifyMedia: "none",
-  huntITUzNotifyMedia: "none",
-  huntStatesNotifyMedia: "none"
+const legacySettingsMapping = {
+  awardTracker: "awardTracker",
+  bandActivity: "bandActivity",
+  callsignLookups: "callsignLookups",
+  dxkLogSettings: "dxkLog",
+  HRDLogbookLogSettings: "HRDLogbookLog",
+  log4OMSettings: "log4OM",
+  mapSettings: "map",
+  msgSettings: "msg",
+  N1MMSettings: "N1MM",
+  pstrotatorSettings: "pstrotator",
+  rosterSettings: "roster",
+  savedAlerts: "customAlerts",
+  audioSettings: "audio",
+  acLogSettings: "acLog",
+  adifLogSettings: "adifLog",
+  ignoredCQ: "ignoredCQ",
+  blockedCalls: "ignoredCalls",
+  blockedGrid: "ignoredGrid",
+  blockedDxcc: "ignoredDxcc",
+  blockedCQz: "ignoredCQz",
+  blockedITUz: "ignoredITUz",
+  trustedQslSettings: "trustedQsl",
 };
 
-const def_alertSettings = {
-  requireGrid: true,
-  wantMaxDT: false,
-  wantMinDB: false,
-  wantMinFreq: false,
-  wantMaxFreq: false,
-  maxDT: 0.5,
-  minDb: -24,
-  minFreq: 400,
-  maxFreq: 3500,
-  noMyDxcc: false,
-  onlyMyDxcc: false,
-  noRoundUp: false,
-  onlyRoundUp: false,
-  cqOnly: true,
-  usesLoTW: false,
-  useseQSL: false,
-  reference: 0,
-  logEventMedia: "Ping-coin.mp3"
-};
+// TODO: Remove me in 2025
+function importLegacySettings()
+{
+  let legacySettingsPath = "";
+  let appData = electron.ipcRenderer.sendSync("getPath","appData");
 
-const def_alerts = {
-  popup: {
-    value: "QRZ",
-    type: "4",
-    notify: "2",
-    repeat: "2",
-    filename: "",
-    shortname: "",
-    lastMessage: "",
-    lastTime: 0,
-    fired: 0,
-    needAck: 0
+  if (GT.platform == "windows")
+  {
+    let basename = path.basename(appData);
+    if (basename != "Local")
+    {
+      appData = appData.replace(basename, "Local");
+    }
+    legacySettingsPath = path.join(appData, "GridTracker/User Data/Default/Ginternal/settings.json");
   }
-};
+  else if (GT.platform == "mac")
+  {
+    legacySettingsPath = path.join(process.env.HOME, "Library/Application Support/GridTracker/Default/Ginternal/settings.json");
+  }
+  else
+  {
+    legacySettingsPath = path.join(process.env.HOME, ".config/GridTracker/Default/Ginternal/settings.json");
+  }
+  if (fs.existsSync(legacySettingsPath))
+  {
+    try {
+      let legacyData = fs.readFileSync(legacySettingsPath, "UTF-8");
+      let json = JSON.parse(legacyData);
+      for (const key in legacySettingsMapping)
+      {
+        if (key in json && legacySettingsMapping[key] in GT.settings)
+        {
+          try {
+            let obj = JSON.parse(json[key]);
+            if (obj)
+            {
+              // Do a spread so we don't lose any new settings that came before
+              GT.settings[legacySettingsMapping[key]] = { ...GT.settings[legacySettingsMapping[key]], ...obj };
+            }
+            else
+            {
+              console.log("Nothing parse for legacy setting:", key);
+            }
+          }
+          catch (e)
+          {
+            console.log("Could not parse legacy setting:", key);
+          }
+
+        }
+        else
+        {
+          console.log("Missing mapping: ", key, legacySettingsMapping[key]);
+        }
+      }
+    }
+    catch (e)
+    {
+      console.log("failed to parse legacy settings")
+    }
+  }
+}

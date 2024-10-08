@@ -23,7 +23,7 @@ nsis:
   menuCategory: GridTracker2
   oneClick: false
   perMachine: false
-  allowToChangeInstallationDirectory: false
+  allowToChangeInstallationDirectory: true
   selectPerMachineByDefault: false
   packElevateHelper: true
   allowElevation: true

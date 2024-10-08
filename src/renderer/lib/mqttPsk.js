@@ -20,12 +20,12 @@ function openPskMqtt()
 
     if (GT.pskMqttClient != null) return;
 
-    if (GT.mapSettings.offlineMode == true) return;
+    if (GT.settings.map.offlineMode == true) return;
 
-    if (GT.appSettings.myCall == null || GT.appSettings.myCall == "NOCALL" || GT.appSettings.myCall == "") return;
+    if (GT.settings.app.myCall == null || GT.settings.app.myCall == "NOCALL" || GT.settings.app.myCall == "") return;
 
-    const dottedCallsign = GT.appSettings.myCall.replaceAll("/", ".");
-    const clientId = `GT2_${dottedCallsign}_${GT.appSettings.myGrid}`;
+    const dottedCallsign = GT.settings.app.myCall.replaceAll("/", ".");
+    const clientId = `GT2_${dottedCallsign}_${GT.settings.app.myGrid}`;
     const topic = `pskr/filter/v2/+/+/${dottedCallsign}/#`;
 
     console.log("ID: ", clientId);

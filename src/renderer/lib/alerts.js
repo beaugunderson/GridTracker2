@@ -1,101 +1,89 @@
 // GridTracker Copyright © 2024 GridTracker.org
 // All rights reserved.
 // See LICENSE for more information.
-
-GT.alerts = Object();
-GT.classicAlerts = Object();
-GT.phonetics = Object();
-GT.enums = Object();
-GT.alertSettings = Object();
+GT.phonetics = {};
+GT.enums = {};
 
 function loadAlerts()
 {
-
-  GT.classicAlerts = loadDefaultsAndMerge("classicAlerts", def_classicAlerts);
-  GT.alertSettings = loadDefaultsAndMerge("alertSettings", def_alertSettings);
-  GT.alerts = loadDefaultsAndMerge("savedAlerts", def_alerts);
-
   loadClassicAlertView();
 
-  wantGrid.checked = GT.alertSettings.requireGrid;
+  wantGrid.checked = GT.settings.alerts.requireGrid;
 
-  wantMaxDT.checked = GT.alertSettings.wantMaxDT;
-  wantMinDB.checked = GT.alertSettings.wantMinDB;
-  wantMinFreq.checked = GT.alertSettings.wantMinFreq;
-  wantMaxFreq.checked = GT.alertSettings.wantMaxFreq;
+  wantMaxDT.checked = GT.settings.alerts.wantMaxDT;
+  wantMinDB.checked = GT.settings.alerts.wantMinDB;
+  wantMinFreq.checked = GT.settings.alerts.wantMinFreq;
+  wantMaxFreq.checked = GT.settings.alerts.wantMaxFreq;
 
-  maxDTView.innerHTML = maxDT.value = GT.alertSettings.maxDT;
-  minDbView.innerHTML = minDb.value = GT.alertSettings.minDb;
-  minFreqView.innerHTML = minFreq.value = GT.alertSettings.minFreq;
-  maxFreqView.innerHTML = maxFreq.value = GT.alertSettings.maxFreq;
+  maxDTView.innerHTML = maxDT.value = GT.settings.alerts.maxDT;
+  minDbView.innerHTML = minDb.value = GT.settings.alerts.minDb;
+  minFreqView.innerHTML = minFreq.value = GT.settings.alerts.minFreq;
+  maxFreqView.innerHTML = maxFreq.value = GT.settings.alerts.maxFreq;
 
-  cqOnly.checked = GT.alertSettings.cqOnly;
-  noMyDxcc.checked = GT.alertSettings.noMyDxcc;
-  onlyMyDxcc.checked = GT.alertSettings.onlyMyDxcc;
-  noRoundUp.checked = GT.alertSettings.noRoundUp;
-  onlyRoundUp.checked = GT.alertSettings.onlyRoundUp;
-  usesLoTW.checked = GT.alertSettings.usesLoTW;
-  useseQSL.checked = GT.alertSettings.useseQSL;
+  cqOnly.checked = GT.settings.alerts.cqOnly;
+  noMyDxcc.checked = GT.settings.alerts.noMyDxcc;
+  onlyMyDxcc.checked = GT.settings.alerts.onlyMyDxcc;
+  noRoundUp.checked = GT.settings.alerts.noRoundUp;
+  onlyRoundUp.checked = GT.settings.alerts.onlyRoundUp;
+  usesLoTW.checked = GT.settings.alerts.usesLoTW;
+  useseQSL.checked = GT.settings.alerts.useseQSL;
 
-  referenceNeed.value = GT.alertSettings.reference;
-  logEventMedia.value = GT.alertSettings.logEventMedia;
+  referenceNeed.value = GT.settings.alerts.reference;
+  logEventMedia.value = GT.settings.alerts.logEventMedia;
   setAlertVisual();
 }
 
 function newLogEventSetting(obj)
 {
-  GT.alertSettings.logEventMedia = obj.value;
-  GT.localStorage.alertSettings = JSON.stringify(GT.alertSettings);
+  GT.settings.alerts.logEventMedia = obj.value;
 }
 
 function exceptionValuesChanged()
 {
   setAlertVisual();
 
-  GT.alertSettings.requireGrid = wantGrid.checked;
+  GT.settings.alerts.requireGrid = wantGrid.checked;
 
-  GT.alertSettings.wantMaxDT = wantMaxDT.checked;
-  GT.alertSettings.wantMinDB = wantMinDB.checked;
-  GT.alertSettings.wantMinFreq = wantMinFreq.checked;
-  GT.alertSettings.wantMaxFreq = wantMaxFreq.checked;
+  GT.settings.alerts.wantMaxDT = wantMaxDT.checked;
+  GT.settings.alerts.wantMinDB = wantMinDB.checked;
+  GT.settings.alerts.wantMinFreq = wantMinFreq.checked;
+  GT.settings.alerts.wantMaxFreq = wantMaxFreq.checked;
 
-  maxDTView.innerHTML = GT.alertSettings.maxDT = maxDT.value;
-  minDbView.innerHTML = GT.alertSettings.minDb = minDb.value;
-  minFreqView.innerHTML = GT.alertSettings.minFreq = minFreq.value;
-  maxFreqView.innerHTML = GT.alertSettings.maxFreq = maxFreq.value;
+  maxDTView.innerHTML = GT.settings.alerts.maxDT = maxDT.value;
+  minDbView.innerHTML = GT.settings.alerts.minDb = minDb.value;
+  minFreqView.innerHTML = GT.settings.alerts.minFreq = minFreq.value;
+  maxFreqView.innerHTML = GT.settings.alerts.maxFreq = maxFreq.value;
 
-  GT.alertSettings.cqOnly = cqOnly.checked;
-  GT.alertSettings.noMyDxcc = noMyDxcc.checked;
-  GT.alertSettings.onlyMyDxcc = onlyMyDxcc.checked;
-  GT.alertSettings.noRoundUp = noRoundUp.checked;
-  GT.alertSettings.onlyRoundUp = onlyRoundUp.checked;
-  GT.alertSettings.usesLoTW = usesLoTW.checked;
-  GT.alertSettings.useseQSL = useseQSL.checked;
+  GT.settings.alerts.cqOnly = cqOnly.checked;
+  GT.settings.alerts.noMyDxcc = noMyDxcc.checked;
+  GT.settings.alerts.onlyMyDxcc = onlyMyDxcc.checked;
+  GT.settings.alerts.noRoundUp = noRoundUp.checked;
+  GT.settings.alerts.onlyRoundUp = onlyRoundUp.checked;
+  GT.settings.alerts.usesLoTW = usesLoTW.checked;
+  GT.settings.alerts.useseQSL = useseQSL.checked;
 
-  GT.alertSettings.reference = referenceNeed.value;
-
-  GT.localStorage.alertSettings = JSON.stringify(GT.alertSettings);
+  GT.settings.alerts.reference = referenceNeed.value;
 }
 
 function hashMaker(band, mode)
 {
   // "Current Band & Mode"
-  if (GT.alertSettings.reference == 0) return band + mode;
+  if (GT.settings.alerts.reference == 0) return band + mode;
 
   // "Current Band, Any Mode"
-  if (GT.alertSettings.reference == 1) return band;
+  if (GT.settings.alerts.reference == 1) return band;
 
   // "Current Band, Any Digi Mode"
-  if (GT.alertSettings.reference == 2) return band + "dg";
+  if (GT.settings.alerts.reference == 2) return band + "dg";
 
   // "Current Mode, Any Band"
-  if (GT.alertSettings.reference == 3) return mode;
+  if (GT.settings.alerts.reference == 3) return mode;
 
   // "Any Band, Any Mode"
-  if (GT.alertSettings.reference == 4) return "";
+  if (GT.settings.alerts.reference == 4) return "";
 
   // "Any Band, Any Digit Mode"
-  if (GT.alertSettings.reference == 5) return "dg";
+  if (GT.settings.alerts.reference == 5) return "dg";
 }
 
 function setAlertVisual()
@@ -141,40 +129,37 @@ function setAlertVisual()
     maxFreqView.style.display = "none";
   }
 
-  if (GT.callsignLookups.lotwUseEnable == true)
+  if (GT.settings.callsignLookups.lotwUseEnable == true)
   { usesLoTWDiv.style.display = "block"; }
   else usesLoTWDiv.style.display = "none";
 
-  if (GT.callsignLookups.eqslUseEnable == true)
+  if (GT.settings.callsignLookups.eqslUseEnable == true)
   { useseQSLDiv.style.display = "block"; }
   else useseQSLDiv.style.display = "none";
 }
 
 function setAudioView()
 {
-  speechVolume.value = GT.audioSettings.speechVolume;
-  speechPitch.value = GT.audioSettings.speechPitch;
-  speechRate.value = GT.audioSettings.speechRate;
-  speechPhonetics.checked = GT.audioSettings.speechPhonetics;
+  speechVolume.value = GT.settings.audio.speechVolume;
+  speechPitch.value = GT.settings.audio.speechPitch;
+  speechRate.value = GT.settings.audio.speechRate;
+  speechPhonetics.checked = GT.settings.audio.speechPhonetics;
 
   speechVolumeTd.innerText = speechVolume.value;
   speechPitchTd.innerText = speechPitch.value;
   speechRateTd.innerText = speechRate.value;
 
-  audioVolume.value = GT.audioSettings.volume;
+  audioVolume.value = GT.settings.audio.volume;
   audioVolumeTd.innerText = parseInt(audioVolume.value * 100) + "%";
 }
 
 function saveAudioSettings()
 {
-  GT.localStorage.audioSettings = JSON.stringify(GT.audioSettings);
+
 }
 
 function saveAlerts()
 {
-  GT.localStorage.savedAlerts = JSON.stringify(GT.alerts);
-  GT.localStorage.classicAlerts = JSON.stringify(GT.classicAlerts);
-  GT.localStorage.alertSettings = JSON.stringify(GT.alertSettings);
 }
 
 GT.testAudioTimer = null;
@@ -183,7 +168,7 @@ function changeAudioValues()
 {
   if (GT.testAudioTimer) nodeTimers.clearTimeout(GT.testAudioTimer);
 
-  GT.audioSettings.volume = audioVolume.value;
+  GT.settings.audio.volume = audioVolume.value;
   audioVolumeTd.innerText = parseInt(audioVolume.value * 100) + "%";
 
   GT.testAudioTimer = nodeTimers.setTimeout(playTestFile, 200);
@@ -199,10 +184,10 @@ function changeSpeechValues()
 {
   window.speechSynthesis.cancel();
 
-  GT.audioSettings.speechVolume = speechVolume.value;
-  GT.audioSettings.speechPitch = speechPitch.value;
-  GT.audioSettings.speechRate = speechRate.value;
-  GT.audioSettings.speechPhonetics = speechPhonetics.checked;
+  GT.settings.audio.speechVolume = speechVolume.value;
+  GT.settings.audio.speechPitch = speechPitch.value;
+  GT.settings.audio.speechRate = speechRate.value;
+  GT.settings.audio.speechPhonetics = speechPhonetics.checked;
 
   speechVolumeTd.innerText = speechVolume.value;
   speechPitchTd.innerText = speechPitch.value;
@@ -264,7 +249,7 @@ function addAlert(value, type, notify, repeat, filename, shortname)
 {
   var newKey = unique(value + type + notify + repeat + filename);
 
-  if (!(newKey in GT.alerts))
+  if (!(newKey in GT.settings.customAlerts))
   {
     var alertItem = Object();
     alertItem.value = value;
@@ -277,7 +262,7 @@ function addAlert(value, type, notify, repeat, filename, shortname)
     alertItem.lastTime = 0;
     alertItem.fired = 0;
     alertItem.needAck = 0;
-    GT.alerts[newKey] = alertItem;
+    GT.settings.customAlerts[newKey] = alertItem;
 
     saveAlerts();
     return true;
@@ -287,23 +272,23 @@ function addAlert(value, type, notify, repeat, filename, shortname)
 
 function deleteAlert(key)
 {
-  delete GT.alerts[key];
+  delete GT.settings.customAlerts[key];
   saveAlerts();
   displayAlerts();
 }
 
 function resetAlert(key)
 {
-  GT.alerts[key].lastMessage = "";
-  GT.alerts[key].lastTime = 0;
-  GT.alerts[key].fired = 0;
-  GT.alerts[key].needAck = 0;
+  GT.settings.customAlerts[key].lastMessage = "";
+  GT.settings.customAlerts[key].lastTime = 0;
+  GT.settings.customAlerts[key].fired = 0;
+  GT.settings.customAlerts[key].needAck = 0;
   displayAlerts();
 }
 
 function processAlertMessage(decodeWords, message, band, mode)
 {
-  if (Object.keys(GT.alerts).length == 0)
+  if (Object.keys(GT.settings.customAlerts).length == 0)
   {
     // no alerts, don't bother
     return false;
@@ -382,9 +367,9 @@ function checkAlerts(
 )
 {
   var hadAlert = false;
-  for (var key in GT.alerts)
+  for (var key in GT.settings.customAlerts)
   {
-    var nalert = GT.alerts[key];
+    var nalert = GT.settings.customAlerts[key];
     if (nalert.type == 0)
     {
       // callsign exatch match
@@ -406,7 +391,7 @@ function checkAlerts(
     else if (nalert.type == 4)
     {
       // QRZ
-      if (GT.appSettings.myCall.length > 0 && originalMessage.indexOf(GT.appSettings.myCall + " ") == 0)
+      if (GT.settings.app.myCall.length > 0 && originalMessage.indexOf(GT.settings.app.myCall + " ") == 0)
       {
         handleAlert(nalert, DEcallsign, originalMessage, callsignRecord, grid);
         hadAlert = true;
@@ -463,7 +448,7 @@ function handleAlert(nAlert, target, lastMessage, callsignRecord, grid)
     {
       GT.map
         .getView()
-        .setCenter(ol.proj.transform([LL.o, LL.a], "EPSG:4326", GT.mapSettings.projection));
+        .setCenter(ol.proj.transform([LL.o, LL.a], "EPSG:4326", GT.settings.map.projection));
     }
   }
 
@@ -486,7 +471,7 @@ function handleAlert(nAlert, target, lastMessage, callsignRecord, grid)
   if (nAlert.type == 4)
   {
     if (nAlert.notify == 0) playAlertMediaFile(nAlert.filename);
-    if (nAlert.notify == 1) speakQRZString(target, "Calling", GT.appSettings.myCall);
+    if (nAlert.notify == 1) speakQRZString(target, "Calling", GT.settings.app.myCall);
     if (nAlert.notify == 2) displayAlertPopUp("QRZ", null, null);
   }
   nAlert.fired++;
@@ -494,7 +479,7 @@ function handleAlert(nAlert, target, lastMessage, callsignRecord, grid)
 
 function playAlertMediaFile(filename)
 {
-  if (GT.audioSettings.alertMute == 1) return;
+  if (GT.settings.audio.alertMute == 1) return;
 
   // check if this is an alert stored with an older version of GT
   // which has a full file path given.
@@ -513,7 +498,7 @@ function playAlertMediaFile(filename)
   var audio = document.createElement("audio");
   audio.src = "file://" + fpath;
   audio.setSinkId(GT.soundCard);
-  audio.volume = GT.audioSettings.volume;
+  audio.volume = GT.settings.audio.volume;
   audio.play();
 }
 
@@ -522,7 +507,7 @@ function stringToPhonetics(string)
   var newMsg = "";
   for (var x = 0; x < string.length; x++)
   {
-    if (GT.audioSettings.speechPhonetics == true)
+    if (GT.settings.audio.speechPhonetics == true)
     { newMsg += GT.phonetics[string.substr(x, 1)]; }
     else
     {
@@ -537,7 +522,7 @@ function stringToPhonetics(string)
 
 function speakQRZString(caller, words, you)
 {
-  if (GT.audioSettings.alertMute == 0)
+  if (GT.settings.audio.alertMute == 0)
   {
     var sCaller = "";
     var sYou = "";
@@ -549,11 +534,11 @@ function speakQRZString(caller, words, you)
       var speak = sCaller.trim() + ", " + words.trim() + ", " + sYou.trim();
       var msg = new SpeechSynthesisUtterance(speak);
       msg.lang = GT.localeString;
-      if (GT.audioSettings.speechVoice > 0)
-      { msg.voice = GT.voices[GT.audioSettings.speechVoice - 1]; }
-      msg.rate = GT.audioSettings.speechRate;
-      msg.pitch = GT.audioSettings.speechPitch;
-      msg.volume = GT.audioSettings.speechVolume;
+      if (GT.settings.audio.speechVoice > 0)
+      { msg.voice = GT.voices[GT.settings.audio.speechVoice - 1]; }
+      msg.rate = GT.settings.audio.speechRate;
+      msg.pitch = GT.settings.audio.speechPitch;
+      msg.volume = GT.settings.audio.speechVolume;
       window.speechSynthesis.speak(msg);
     }
   }
@@ -561,7 +546,7 @@ function speakQRZString(caller, words, you)
 
 function speakAlertString(what, message, target)
 {
-  if (GT.audioSettings.alertMute == 0)
+  if (GT.settings.audio.alertMute == 0)
   {
     var sMsg = "";
     var sTarget = "";
@@ -573,11 +558,11 @@ function speakAlertString(what, message, target)
       var speak = what.trim() + ", " + sMsg.trim() + ", " + sTarget.trim();
       var msg = new SpeechSynthesisUtterance(speak);
       msg.lang = GT.localeString;
-      if (GT.audioSettings.speechVoice > 0)
-      { msg.voice = GT.voices[GT.audioSettings.speechVoice - 1]; }
-      msg.rate = GT.audioSettings.speechRate;
-      msg.pitch = GT.audioSettings.speechPitch;
-      msg.volume = GT.audioSettings.speechVolume;
+      if (GT.settings.audio.speechVoice > 0)
+      { msg.voice = GT.voices[GT.settings.audio.speechVoice - 1]; }
+      msg.rate = GT.settings.audio.speechRate;
+      msg.pitch = GT.settings.audio.speechPitch;
+      msg.volume = GT.settings.audio.speechVolume;
       window.speechSynthesis.speak(msg);
     }
   }
@@ -590,11 +575,11 @@ function displayAlertPopUp(what, message, target)
   var worker = "";
   var acount = 0;
 
-  if (Object.keys(GT.alerts).length > 0)
+  if (Object.keys(GT.settings.customAlerts).length > 0)
   {
-    for (var key in GT.alerts)
+    for (var key in GT.settings.customAlerts)
     {
-      if (GT.alerts[key].needAck) acount++;
+      if (GT.settings.customAlerts[key].needAck) acount++;
     }
 
     worker +=
@@ -613,42 +598,42 @@ function displayAlertPopUp(what, message, target)
     worker += "<th>When</th>";
     worker += "</tr>";
 
-    for (var key in GT.alerts)
+    for (var key in GT.settings.customAlerts)
     {
-      if (GT.alerts[key].needAck)
+      if (GT.settings.customAlerts[key].needAck)
       {
         worker += "<tr>";
-        worker += "<td>" + GT.alertTypeOptions[GT.alerts[key].type] + "</td>";
-        if (GT.alerts[key].type == 0)
-        { worker += "<td style='color:yellow'>" + GT.alerts[key].value + "</td>"; }
-        if (GT.alerts[key].type == 2)
-        { worker += "<td style='color:red'>" + GT.alerts[key].value + "</td>"; }
-        if (GT.alerts[key].type == 4)
-        { worker += "<td style='color:cyan'>" + GT.appSettings.myCall + "</td>"; }
-        if (GT.alerts[key].type == 5)
+        worker += "<td>" + GT.alertTypeOptions[GT.settings.customAlerts[key].type] + "</td>";
+        if (GT.settings.customAlerts[key].type == 0)
+        { worker += "<td style='color:yellow'>" + GT.settings.customAlerts[key].value + "</td>"; }
+        if (GT.settings.customAlerts[key].type == 2)
+        { worker += "<td style='color:red'>" + GT.settings.customAlerts[key].value + "</td>"; }
+        if (GT.settings.customAlerts[key].type == 4)
+        { worker += "<td style='color:cyan'>" + GT.settings.app.myCall + "</td>"; }
+        if (GT.settings.customAlerts[key].type == 5)
         {
           worker +=
-            "<td style='color:lightgreen'>" + GT.alerts[key].value + "*</td>";
+            "<td style='color:lightgreen'>" + GT.settings.customAlerts[key].value + "*</td>";
         }
-        if (GT.alerts[key].type == 6)
-        { worker += "<td style='color:pink'>" + GT.alerts[key].value + "</td>"; }
+        if (GT.settings.customAlerts[key].type == 6)
+        { worker += "<td style='color:pink'>" + GT.settings.customAlerts[key].value + "</td>"; }
 
-        worker += "<td>" + GT.alertValueOptions[GT.alerts[key].notify] + "</td>";
-        worker += "<td>" + GT.alertRepeatOptions[GT.alerts[key].repeat] + "</td>";
+        worker += "<td>" + GT.alertValueOptions[GT.settings.customAlerts[key].notify] + "</td>";
+        worker += "<td>" + GT.alertRepeatOptions[GT.settings.customAlerts[key].repeat] + "</td>";
         worker +=
           "<td>" +
-          (GT.alerts[key].shortname.length > 0 ? GT.alerts[key].shortname : "-") +
+          (GT.settings.customAlerts[key].shortname.length > 0 ? GT.settings.customAlerts[key].shortname : "-") +
           "</td>";
-        worker += "<td>" + (GT.alerts[key].fired > 0 ? "Yes" : "No") + "</td>";
+        worker += "<td>" + (GT.settings.customAlerts[key].fired > 0 ? "Yes" : "No") + "</td>";
         worker +=
           "<td style='color:cyan'>" +
-          (GT.alerts[key].lastMessage.length > 0
-            ? GT.alerts[key].lastMessage
+          (GT.settings.customAlerts[key].lastMessage.length > 0
+            ? GT.settings.customAlerts[key].lastMessage
             : "-") +
           "</td>";
-        ageString = userTimeString(GT.alerts[key].lastTime * 1000);
+        ageString = userTimeString(GT.settings.customAlerts[key].lastTime * 1000);
         worker +=
-          "<td>" + (GT.alerts[key].lastTime > 0 ? ageString : "-") + "</td>";
+          "<td>" + (GT.settings.customAlerts[key].lastTime > 0 ? ageString : "-") + "</td>";
         worker += "</tr>";
       }
     }
@@ -664,9 +649,9 @@ function displayAlertPopUp(what, message, target)
 
 function ackAlerts()
 {
-  for (var key in GT.alerts)
+  for (var key in GT.settings.customAlerts)
   {
-    GT.alerts[key].needAck = 0;
+    GT.settings.customAlerts[key].needAck = 0;
   }
 }
 
@@ -685,7 +670,7 @@ function alertTypeChanged()
   }
   else if (alertTypeSelect.value == 4)
   {
-    alertValueSelect.innerHTML = "<input id=\"alertValueInput\" disabled=\"true\" type=\"text\" class=\"inputTextValue\" value=\"" + GT.appSettings.myCall + "\" maxlength=\"12\"  size=\"5\" oninput=\"ValidateCallsign(this,null);\" / >";
+    alertValueSelect.innerHTML = "<input id=\"alertValueInput\" disabled=\"true\" type=\"text\" class=\"inputTextValue\" value=\"" + GT.settings.app.myCall + "\" maxlength=\"12\"  size=\"5\" oninput=\"ValidateCallsign(this,null);\" / >";
     ValidateCallsign(alertValueInput, null);
   }
   else if (alertTypeSelect.value == 6)
@@ -741,11 +726,11 @@ function displayAlerts()
 {
   var worker = "";
 
-  if (Object.keys(GT.alerts).length > 0)
+  if (Object.keys(GT.settings.customAlerts).length > 0)
   {
     worker +=
       "<div style='padding-right:8px;overflow:auto;overflow-x:hidden;height:" +
-      Math.min(Object.keys(GT.alerts).length * 24 + 23, 312) +
+      Math.min(Object.keys(GT.settings.customAlerts).length * 24 + 23, 312) +
       "px;'>";
 
     worker += "<table align='center' class='darkTable' >";
@@ -763,40 +748,40 @@ function displayAlerts()
     worker += "<th>Delete</th>";
     worker += "</tr>";
 
-    for (var key in GT.alerts)
+    for (var key in GT.settings.customAlerts)
     {
       worker += "<tr>";
-      worker += "<td>" + GT.alertTypeOptions[GT.alerts[key].type] + "</td>";
-      if (GT.alerts[key].type == 0)
-      { worker += "<td style='color:yellow'>" + GT.alerts[key].value + "</td>"; }
-      if (GT.alerts[key].type == 2)
-      { worker += "<td style='color:red'>" + GT.alerts[key].value + "</td>"; }
-      if (GT.alerts[key].type == 4)
-      { worker += "<td style='color:cyan'>" + GT.appSettings.myCall + "</td>"; }
-      if (GT.alerts[key].type == 5)
+      worker += "<td>" + GT.alertTypeOptions[GT.settings.customAlerts[key].type] + "</td>";
+      if (GT.settings.customAlerts[key].type == 0)
+      { worker += "<td style='color:yellow'>" + GT.settings.customAlerts[key].value + "</td>"; }
+      if (GT.settings.customAlerts[key].type == 2)
+      { worker += "<td style='color:red'>" + GT.settings.customAlerts[key].value + "</td>"; }
+      if (GT.settings.customAlerts[key].type == 4)
+      { worker += "<td style='color:cyan'>" + GT.settings.app.myCall + "</td>"; }
+      if (GT.settings.customAlerts[key].type == 5)
       {
         worker +=
-          "<td style='color:lightgreen'>" + GT.alerts[key].value + "*</td>";
+          "<td style='color:lightgreen'>" + GT.settings.customAlerts[key].value + "*</td>";
       }
-      if (GT.alerts[key].type == 6)
-      { worker += "<td style='color:pink'>" + GT.alerts[key].value + "</td>"; }
+      if (GT.settings.customAlerts[key].type == 6)
+      { worker += "<td style='color:pink'>" + GT.settings.customAlerts[key].value + "</td>"; }
 
-      worker += "<td>" + GT.alertValueOptions[GT.alerts[key].notify] + "</td>";
-      worker += "<td>" + GT.alertRepeatOptions[GT.alerts[key].repeat] + "</td>";
+      worker += "<td>" + GT.alertValueOptions[GT.settings.customAlerts[key].notify] + "</td>";
+      worker += "<td>" + GT.alertRepeatOptions[GT.settings.customAlerts[key].repeat] + "</td>";
       worker +=
         "<td>" +
-        (GT.alerts[key].shortname.length > 0 ? GT.alerts[key].shortname : "-") +
+        (GT.settings.customAlerts[key].shortname.length > 0 ? GT.settings.customAlerts[key].shortname : "-") +
         "</td>";
-      worker += "<td>" + (GT.alerts[key].fired > 0 ? "Yes" : "No") + "</td>";
+      worker += "<td>" + (GT.settings.customAlerts[key].fired > 0 ? "Yes" : "No") + "</td>";
       worker +=
         "<td style='color:cyan'>" +
-        (GT.alerts[key].lastMessage.length > 0
-          ? GT.alerts[key].lastMessage
+        (GT.settings.customAlerts[key].lastMessage.length > 0
+          ? GT.settings.customAlerts[key].lastMessage
           : "-") +
         "</td>";
-      ageString = userTimeString(GT.alerts[key].lastTime * 1000);
+      ageString = userTimeString(GT.settings.customAlerts[key].lastTime * 1000);
       worker +=
-        "<td>" + (GT.alerts[key].lastTime > 0 ? ageString : "-") + "</td>";
+        "<td>" + (GT.settings.customAlerts[key].lastTime > 0 ? ageString : "-") + "</td>";
       worker +=
         "<td style='cursor:pointer' onclick='resetAlert(\"" +
         key +
@@ -815,14 +800,14 @@ function displayAlerts()
 
 function loadClassicAlertView()
 {
-  for (node in GT.classicAlerts)
+  for (node in GT.settings.classicAlerts)
   {
     what = document.getElementById(node);
     if (what != null)
     {
       if (what.type == "select-one" || what.type == "text")
       {
-        what.value = GT.classicAlerts[node];
+        what.value = GT.settings.classicAlerts[node];
         if (what.id.endsWith("Notify"))
         {
           var mediaNode = document.getElementById(what.id + "Media");
@@ -845,7 +830,7 @@ function loadClassicAlertView()
       }
       else if (what.type == "checkbox")
       {
-        what.checked = GT.classicAlerts[node];
+        what.checked = GT.settings.classicAlerts[node];
       }
     }
   }
@@ -855,7 +840,7 @@ function wantedChanged(what)
 {
   if (what.type == "select-one" || what.type == "text")
   {
-    GT.classicAlerts[what.id] = what.value;
+    GT.settings.classicAlerts[what.id] = what.value;
     if (what.id.endsWith("Notify"))
     {
       var mediaNode = document.getElementById(what.id + "Media");
@@ -878,9 +863,8 @@ function wantedChanged(what)
   }
   else if (what.type == "checkbox")
   {
-    GT.classicAlerts[what.id] = what.checked;
+    GT.settings.classicAlerts[what.id] = what.checked;
   }
-  GT.localStorage.classicAlerts = JSON.stringify(GT.classicAlerts);
 }
 
 GT.classic_alert_count_template = {
@@ -941,61 +925,61 @@ function processClassicAlerts()
 function checkClassicAlerts(CQ, callObj, message, DXcall)
 {
   var didAlert = false;
-  if (GT.alertSettings.cqOnly == true && CQ == false) return didAlert;
+  if (GT.settings.alerts.cqOnly == true && CQ == false) return didAlert;
 
-  if (GT.alertSettings.requireGrid == true && callObj.grid.length != 4)
+  if (GT.settings.alerts.requireGrid == true && callObj.grid.length != 4)
   { return didAlert; }
 
-  if (GT.alertSettings.wantMinDB == true && message.SR < GT.alertSettings.minDb)
+  if (GT.settings.alerts.wantMinDB == true && message.SR < GT.settings.alerts.minDb)
   { return didAlert; }
 
   if (
-    GT.alertSettings.wantMaxDT == true &&
-    Math.abs(message.DT) > GT.alertSettings.maxDT
+    GT.settings.alerts.wantMaxDT == true &&
+    Math.abs(message.DT) > GT.settings.alerts.maxDT
   )
   { return didAlert; }
 
   if (
-    GT.alertSettings.wantMinFreq == true &&
-    message.DF < GT.alertSettings.minFreq
+    GT.settings.alerts.wantMinFreq == true &&
+    message.DF < GT.settings.alerts.minFreq
   )
   { return didAlert; }
 
   if (
-    GT.alertSettings.wantMaxFreq == true &&
-    message.DF > GT.alertSettings.maxFreq
+    GT.settings.alerts.wantMaxFreq == true &&
+    message.DF > GT.settings.alerts.maxFreq
   )
   { return didAlert; }
 
   if (DXcall == "CQ RU")
   {
-    if (GT.alertSettings.noRoundUp == true) return didAlert;
+    if (GT.settings.alerts.noRoundUp == true) return didAlert;
   }
   else
   {
-    if (GT.alertSettings.onlyRoundUp == true) return didAlert;
+    if (GT.settings.alerts.onlyRoundUp == true) return didAlert;
   }
 
   if (callObj.dxcc == GT.myDXCC)
   {
-    if (GT.alertSettings.noMyDxcc == true) return didAlert;
+    if (GT.settings.alerts.noMyDxcc == true) return didAlert;
   }
   else
   {
-    if (GT.alertSettings.onlyMyDxcc == true) return didAlert;
+    if (GT.settings.alerts.onlyMyDxcc == true) return didAlert;
   }
 
   if (
-    GT.callsignLookups.lotwUseEnable == true &&
-    GT.alertSettings.usesLoTW == true
+    GT.settings.callsignLookups.lotwUseEnable == true &&
+    GT.settings.alerts.usesLoTW == true
   )
   {
     if (!(callObj.DEcall in GT.lotwCallsigns)) return didAlert;
   }
 
   if (
-    GT.callsignLookups.eqslUseEnable == true &&
-    GT.alertSettings.useseQSL == true
+    GT.settings.callsignLookups.eqslUseEnable == true &&
+    GT.settings.alerts.useseQSL == true
   )
   {
     if (!(callObj.DEcall in GT.eqslCallsigns)) return didAlert;

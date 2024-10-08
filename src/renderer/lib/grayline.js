@@ -283,7 +283,7 @@ var dayNight = {
         }),
         stroke: null
       }),
-      opacity: Number(GT.mapSettings.graylineOpacity),
+      opacity: Number(GT.settings.map.graylineOpacity),
       zIndex: 0
     });
     map.getLayers().insertAt(1, this.vectorLayer);
@@ -296,7 +296,7 @@ var dayNight = {
       })
     });
     this.vectorLayer.setStyle(circleStyle);
-    this.vectorLayer.setOpacity(Number(GT.mapSettings.graylineOpacity));
+    this.vectorLayer.setOpacity(Number(GT.settings.map.graylineOpacity));
     this.vectorSource.clear();
 
     this.vectorSource.addFeature(
@@ -403,7 +403,7 @@ var moonLayer = {
 
     if (GT.useTransform)
     {
-      feature.getGeometry().transform("EPSG:3857", GT.mapSettings.projection);
+      feature.getGeometry().transform("EPSG:3857", GT.settings.map.projection);
     }
     
     feature.setStyle(
@@ -417,10 +417,10 @@ var moonLayer = {
   refresh: function ()
   {
     this.vectorSource.clear();
-    if (GT.appSettings.moonTrack == 1)
+    if (GT.settings.app.moonTrack == 1)
     {
       now = timeNowSec();
-      if (GT.appSettings.moonPath == 1)
+      if (GT.settings.app.moonPath == 1)
       { this.vectorSource.addFeature(this.future(now)); }
       this.pin = iconFeature(
         ol.proj.fromLonLat(subLunar(now).ll),

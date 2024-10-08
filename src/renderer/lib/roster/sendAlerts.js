@@ -64,7 +64,7 @@ function sendAlerts(callRoster, rosterSettings)
 
   if (shouldAlert > 0)
   {
-    if (window.opener.GT.classicAlerts.huntRoster == true)
+    if (window.opener.GT.settings.classicAlerts.huntRoster == true)
     {
       let notify = window.opener.huntRosterNotify.value;
       if (notify == "0")
@@ -98,11 +98,11 @@ function sendAlerts(callRoster, rosterSettings)
         conosle.log(e);
       }
     }
-    if (window.opener.GT.msgSettings.msgPushover && window.opener.GT.msgSettings.msgPushoverRoster)
+    if (window.opener.GT.settings.msg.msgPushover && window.opener.GT.settings.msg.msgPushoverRoster)
     {
       sendPushOverAlert(parseCRJson(CR.scriptReport));
     }
-    if (window.opener.GT.msgSettings.msgSimplepush && window.opener.GT.msgSettings.msgSimplepushRoster)
+    if (window.opener.GT.settings.msg.msgSimplepush && window.opener.GT.settings.msg.msgSimplepushRoster)
     {
       sendSimplePushMessage(parseCRJson(CR.scriptReport));
     }
@@ -114,8 +114,8 @@ function sendSimplePushMessage(message)
 {
   const url = "https://api.simplepush.io/send";
   let data = {
-    key: window.opener.GT.msgSettings.msgSimplepushApiKey,
-    title: "GT Alert - " + formatCallsign(window.opener.GT.appSettings.myCall),
+    key: window.opener.GT.settings.msg.msgSimplepushApiKey,
+    title: "GT Alert - " + formatCallsign(window.opener.GT.settings.app.myCall),
     msg: message
   };
 
@@ -134,9 +134,9 @@ function sendPushOverAlert(message)
 {
   const url = "https://api.pushover.net/1/messages.json";
   let data = {
-    user: window.opener.GT.msgSettings.msgPushoverUserKey,
-    token: window.opener.GT.msgSettings.msgPushoverToken,
-    title: "GT Alert - " + formatCallsign(window.opener.GT.appSettings.myCall),
+    user: window.opener.GT.settings.msg.msgPushoverUserKey,
+    token: window.opener.GT.settings.msg.msgPushoverToken,
+    title: "GT Alert - " + formatCallsign(window.opener.GT.settings.app.myCall),
     message: message
   };
 

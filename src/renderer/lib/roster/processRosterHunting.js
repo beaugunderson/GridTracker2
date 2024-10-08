@@ -14,7 +14,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
 
   const currentYear = new Date().getFullYear();
   const currentYearSuffix = `&rsquo;${currentYear - 2000}`;
-  const potaEnabled = (window.opener.GT.appSettings.potaEnabled == 1 && window.opener.GT.mapSettings.offlineMode == false);
+  const potaEnabled = (window.opener.GT.settings.app.potaEnabled == 1 && window.opener.GT.settings.map.offlineMode == false);
   // TODO: Hunting results might be used to filter, based on the "Callsigns: Only Wanted" option,
   //       so maybe we can move this loop first, and add a check to the filtering loop?
   
@@ -445,7 +445,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for US Counties
-        if ((huntCounty.checked || awardTrackerOverrides.cnty) && window.opener.GT.callsignLookups.ulsUseEnable == true)
+        if ((huntCounty.checked || awardTrackerOverrides.cnty) && window.opener.GT.settings.callsignLookups.ulsUseEnable == true)
         {
           let finalDxcc = callObj.dxcc;
           if (callObj.cnty && (finalDxcc == 291 || finalDxcc == 110 || finalDxcc == 6 || finalDxcc == 202) && callObj.cnty.length > 0)
@@ -757,7 +757,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
       }
 
       // Station is calling us
-      if (callObj.DXcall == window.opener.GT.appSettings.myCall)
+      if (callObj.DXcall == window.opener.GT.settings.app.myCall)
       {
         callingBg = "#0000FF" + inversionAlpha;
         calling = "#FFFF00;text-shadow: 0px 0px 2px #FFFF00";

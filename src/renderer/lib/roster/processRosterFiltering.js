@@ -45,7 +45,7 @@ function processRosterFiltering(callRoster, rosterSettings)
     if (CR.rosterSettings.columns.Spot == true)
     {
       callObj.spot = window.opener.getSpotTime(callObj.DEcall + callObj.mode + callObj.band);
-      if (CR.rosterSettings.onlySpot == true && (callObj.spot.when == 0 || (timeNowSec() - callObj.spot.when > window.opener.GT.receptionSettings.viewHistoryTimeSec)))
+      if (CR.rosterSettings.onlySpot == true && (callObj.spot.when == 0 || (timeNowSec() - callObj.spot.when > window.opener.GT.settings.reception.viewHistoryTimeSec)))
       {
         entry.tx = false;
         continue;
@@ -163,7 +163,7 @@ function processRosterFiltering(callRoster, rosterSettings)
     let usesOneOf = 0;
     let checkUses = 0;
 
-    if (window.opener.GT.callsignLookups.lotwUseEnable == true && CR.rosterSettings.usesLoTW == true)
+    if (window.opener.GT.settings.callsignLookups.lotwUseEnable == true && CR.rosterSettings.usesLoTW == true)
     {
       checkUses++;
       if (call in window.opener.GT.lotwCallsigns)
@@ -180,7 +180,7 @@ function processRosterFiltering(callRoster, rosterSettings)
       }
     }
 
-    if (window.opener.GT.callsignLookups.eqslUseEnable == true && CR.rosterSettings.useseQSL == true)
+    if (window.opener.GT.settings.callsignLookups.eqslUseEnable == true && CR.rosterSettings.useseQSL == true)
     {
       checkUses++;
       if (call in window.opener.GT.eqslCallsigns)
@@ -189,7 +189,7 @@ function processRosterFiltering(callRoster, rosterSettings)
       }
     }
 
-    if (window.opener.GT.callsignLookups.oqrsUseEnable == true && CR.rosterSettings.usesOQRS == true)
+    if (window.opener.GT.settings.callsignLookups.oqrsUseEnable == true && CR.rosterSettings.usesOQRS == true)
     {
       checkUses++;
       if (call in window.opener.GT.oqrsCallsigns)

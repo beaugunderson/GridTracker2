@@ -4,7 +4,7 @@ function renderRoster(callRoster, rosterSettings)
     Callsign: true
   }
 
-  if (window.opener.GT.callsignLookups.eqslUseEnable == true)
+  if (window.opener.GT.settings.callsignLookups.eqslUseEnable == true)
   {
     useseQSLDiv.style.display = "";
   }
@@ -14,7 +14,7 @@ function renderRoster(callRoster, rosterSettings)
     useseQSLDiv.style.display = "none";
   }
 
-  if (window.opener.GT.callsignLookups.oqrsUseEnable == true)
+  if (window.opener.GT.settings.callsignLookups.oqrsUseEnable == true)
   {
     usesOQRSDiv.style.display = "";
   }
@@ -24,7 +24,7 @@ function renderRoster(callRoster, rosterSettings)
     usesOQRSDiv.style.display = "none";
   }
 
-  if (window.opener.GT.callsignLookups.lotwUseEnable == true)
+  if (window.opener.GT.settings.callsignLookups.lotwUseEnable == true)
   {
     usesLoTWDiv.style.display = "";
   }
@@ -44,7 +44,7 @@ function renderRoster(callRoster, rosterSettings)
     columnOverrides.OAMS = false;
   }
 
-  if (window.opener.GT.appSettings.potaEnabled == 1 && window.opener.GT.mapSettings.offlineMode == false)
+  if (window.opener.GT.settings.app.potaEnabled == 1 && window.opener.GT.settings.map.offlineMode == false)
   {
     huntingMatrixPotaDiv.style.display = "";
   }

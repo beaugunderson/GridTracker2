@@ -88,17 +88,17 @@
             {
               var thisMsg = "Returned from away.";
               window.opener.gtSendMessage(thisMsg, g_currentId);
-              worker = makeViewMessage("self", window.opener.GT.appSettings.myCall, thisMsg);
+              worker = makeViewMessage("self", window.opener.GT.settings.app.myCall, thisMsg);
               messageTextDiv.innerHTML += worker;
               delete window.opener.GT.gtSentAwayToCid[g_currentId];
             }
-            if (window.opener.GT.msgSettings.msgAwaySelect == 1)
+            if (window.opener.GT.settings.msg.msgAwaySelect == 1)
             {
               window.opener.msgAwaySelect.value = 0;
               window.opener.newMessageSetting(window.opener.msgAwaySelect);
             }
             window.opener.gtSendMessage(msg, g_currentId);
-            worker = makeViewMessage("self", window.opener.GT.appSettings.myCall, htmlEntities(msg));
+            worker = makeViewMessage("self", window.opener.GT.settings.app.myCall, htmlEntities(msg));
             messageTextDiv.innerHTML += worker;
             scrollDown(messageTextDiv);
           }
@@ -264,9 +264,9 @@
             }
             catch (e) {}
 
-            if (g_viewBand > 0 && window.opener.GT.appSettings.myBand != obj.band) show = false;
+            if (g_viewBand > 0 && window.opener.GT.settings.app.myBand != obj.band) show = false;
 
-            if (g_viewMode > 0 && window.opener.GT.appSettings.myMode != obj.mode) show = false;
+            if (g_viewMode > 0 && window.opener.GT.settings.app.myMode != obj.mode) show = false;
 
             if (obj.canmsg == false) show = false;
 
@@ -343,9 +343,9 @@
             }
             catch (e) {}
 
-            if (g_viewBand > 0 && window.opener.GT.appSettings.myBand != obj.band) show = false;
+            if (g_viewBand > 0 && window.opener.GT.settings.app.myBand != obj.band) show = false;
 
-            if (g_viewMode > 0 && window.opener.GT.appSettings.myMode != obj.mode) show = false;
+            if (g_viewMode > 0 && window.opener.GT.settings.app.myMode != obj.mode) show = false;
 
             if (obj.canmsg == false) show = false;
 
@@ -366,7 +366,7 @@
 
         if (g_viewBand)
         {
-          viewBand.innerHTML = window.opener.GT.appSettings.myBand;
+          viewBand.innerHTML = window.opener.GT.settings.app.myBand;
         }
         else 
         {
@@ -375,7 +375,7 @@
 
         if (g_viewMode)
         {
-          viewMode.innerHTML = window.opener.GT.appSettings.myMode;
+          viewMode.innerHTML = window.opener.GT.settings.app.myMode;
         }
         else
         {
@@ -533,7 +533,7 @@
             else
               worker += makeViewMessage(
                 "self",
-                window.opener.GT.appSettings.myCall,
+                window.opener.GT.settings.app.myCall,
                 window.opener.GT.gtMessages[id].history[msg].msg,
                 window.opener.GT.gtMessages[id].history[msg].when
               );
