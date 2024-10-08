@@ -1582,8 +1582,6 @@ function init()
   loadRosterI18n();
 
   setRosterTop();
-
-  setWatcherFileSelectors();
 }
 
 function toggleShowControls()

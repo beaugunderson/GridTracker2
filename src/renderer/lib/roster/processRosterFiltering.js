@@ -34,6 +34,7 @@ function processRosterFiltering(callRoster, rosterSettings)
     callObj.shouldAlert = false;
     callObj.reason = Array();
     callObj.awardReason = "Callsign";
+    callObj.awardType = null;
 
     if (!call || !call.match(CALLSIGN_REGEXP))
     {
@@ -220,6 +221,7 @@ function processRosterFiltering(callRoster, rosterSettings)
 
             // TODO: Move award reason out of exclusions code?
             callObj.awardReason = CR.awards[x.sponsor].awards[x.name].tooltip + " (" + CR.awards[x.sponsor].sponsor + ")";
+            callObj.awardType = CR.awards[x.sponsor].awards[x.name].rule.type;
             callObj.shouldAlert = true;
             break;
           }

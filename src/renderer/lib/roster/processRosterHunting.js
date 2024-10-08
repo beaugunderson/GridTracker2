@@ -1,3 +1,39 @@
+
+const AWT_MAP = {
+  call: "Callsign",
+  calls2band: "Callsign",
+  calls2dxcc: "Callsign",
+  grids: "Grid",
+  dxcc2band: "DXCC",
+  dxcc: "DXCC",
+  states: "State",
+  states2band: "State",
+  cnty: "County",
+  cqz: "CQz",
+  px: "PX",
+  pxplus: "PX",
+  cont: "Cont",
+  cont2band: "Cont",
+  cont52band: "Cont"
+};
+
+const AWARD_HUNT_EMPTY = {
+  Callsign: false,
+  QRZ: false,
+  OAMS: false,
+  Grid: false,
+  DXCC: false,
+  Marathon: false,
+  State: false,
+  County: false,
+  POTA: false,
+  CQz: false,
+  ITUz: false,
+  PX: false,
+  Cont: false,
+  Watcher: false
+};
+
 function processRosterHunting(callRoster, rosterSettings, awardTracker)
 {
   // these lets, do they rely on anything between the top and here?
@@ -18,29 +54,29 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
   // TODO: Hunting results might be used to filter, based on the "Callsigns: Only Wanted" option,
   //       so maybe we can move this loop first, and add a check to the filtering loop?
   
-  // award tracker overrides
-  let awardTrackerOverrides = {
-    call: false,
-    grids: false,
-    dxcc: false,
-    states: false,
-    cnty: false,
-    cqz: false,
-    px: false,
-    cont: false
-  };
-
-  if (CR.rosterSettings.reference == LOGBOOK_AWARD_TRACKER)
+  let isAwardTracker = (CR.rosterSettings.reference == LOGBOOK_AWARD_TRACKER);
+  let hunt = {};
+  if (!isAwardTracker)
   {
-    for (let key in awardTracker)
-    {
-      if (awardTracker[key].enable)
-      {
-        awardTrackerOverrides[awardTracker[key].rule.type] = true;
-      }
-    }
+    hunt = {
+      Callsign: huntCallsign.checked,
+      QRZ: huntQRZ.checked,
+      OAMS: huntOAMS.checked,
+      Grid: huntGrid.checked,
+      DXCC: huntDXCC.checked,
+      Marathon: huntMarathon.checked,
+      State: huntState.checked,
+      County: huntCounty.checked,
+      POTA: huntPOTA.checked,
+      CQz: huntCQz.checked,
+      ITUz: huntITUz.checked,
+      PX: huntPX.checked,
+      Cont: huntCont.checked,
+      Watcher: huntWatcher.checked
+    };
   }
 
+ 
   // Second loop, hunting and highlighting
   for (const callHash in callRoster)
   {
@@ -191,8 +227,19 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
           }
         }
 
+        if (isAwardTracker)
+        {
+          hunt = { ...AWARD_HUNT_EMPTY };
+          if (callObj.awardType in AWT_MAP)
+          {
+            hunt[AWT_MAP[callObj.awardType]] = true;
+          }
+          hunt.QRZ = huntQRZ.checked;
+          hunt.Watcher = huntWatcher.checked;
+        }
+
         // Hunting for callsigns
-        if (huntCallsign.checked || awardTrackerOverrides.call)
+        if (hunt.Callsign)
         {
           let hash = callsign + workHashSuffix;
           let layeredHash = rosterSettings.layeredMode && (callsign + layeredHashSuffix)
@@ -250,13 +297,13 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
           }
         }
 
-        if (huntWatcher.checked)
+        if (hunt.Watcher)
         {
           shouldAlert |= processWatchers(callObj);
         }
 
         // Hunting for "stations calling you"
-        if (huntQRZ.checked == true && callObj.qrz == true)
+        if (hunt.QRZ && callObj.qrz == true)
         {
           callObj.callFlags.calling = true
           callObj.hunting.qrz = "hunted";
@@ -265,7 +312,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for stations with OAMS
-        if (huntOAMS.checked == true && hasGtPin == true)
+        if (hunt.OAMS && hasGtPin == true)
         {
           callObj.hunting.oams = "hunted";
           shouldAlert = true;
@@ -273,7 +320,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for grids
-        if ((huntGrid.checked || awardTrackerOverrides.grids) && callObj.grid.length > 1)
+        if (hunt.Grid && callObj.grid.length > 1)
         {
           let hash = callObj.grid.substr(0, 4) + workHashSuffix;
           let layeredHash = rosterSettings.layeredMode && (callObj.grid.substr(0, 4) + layeredHashSuffix)
@@ -322,7 +369,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for DXCC
-        if (huntDXCC.checked || awardTrackerOverrides.dxcc || awardTrackerOverrides.dxcc2band)
+        if (hunt.DXCC)
         {
           let hash = String(callObj.dxcc) + "|" + workHashSuffix;
           let layeredHash = rosterSettings.layeredMode && (String(callObj.dxcc) + "|" + layeredHashSuffix)
@@ -370,7 +417,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
           }
 
           callObj.dxccSuffix = null
-          if (huntMarathon.checked && callObj.hunting.dxcc != "hunted" && callObj.hunting.dxcc != "checked")
+          if (hunt.Marathon && callObj.hunting.dxcc != "hunted" && callObj.hunting.dxcc != "checked")
           {
             callObj.reason.push("dxcc-marathon");
 
@@ -392,7 +439,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for Known States
-        if (huntState.checked || awardTrackerOverrides.states)
+        if (hunt.State)
         {
           let stateSearch = callObj.state;
           if (stateSearch in window.opener.GT.StateData)
@@ -445,7 +492,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for US Counties
-        if ((huntCounty.checked || awardTrackerOverrides.cnty) && window.opener.GT.settings.callsignLookups.ulsUseEnable == true)
+        if (hunt.County && window.opener.GT.settings.callsignLookups.ulsUseEnable == true)
         {
           let finalDxcc = callObj.dxcc;
           if (callObj.cnty && (finalDxcc == 291 || finalDxcc == 110 || finalDxcc == 6 || finalDxcc == 202) && callObj.cnty.length > 0)
@@ -496,7 +543,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for POTAs
-        if (potaEnabled && huntPOTA.checked == true && callObj.pota)
+        if (potaEnabled && hunt.POTA && callObj.pota)
         {
           let hash = CR.dayAsString + callsign + callObj.pota + (rosterSettings.layeredMode ? layeredHashSuffix : workHashSuffix);
           let parkHash = callObj.pota + (rosterSettings.layeredMode ? layeredHashSuffix : workHashSuffix);
@@ -523,7 +570,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for CQ Zones
-        if ((huntCQz.checked || awardTrackerOverrides.cqz) && callObj.cqz)
+        if (hunt.CQz && callObj.cqz)
         {
           let huntTotal = 1;
           let huntFound = 0, layeredFound = 0, workedFound = 0, layeredWorkedFound = 0, marathonFound = 0;
@@ -602,7 +649,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for ITU Zones
-        if (huntITUz.checked == true && callObj.ituz)
+        if (hunt.ITUz && callObj.ituz)
         {
           let huntTotal = 1;
           let huntFound = 0, layeredFound = 0, workedFound = 0, layeredWorkedFound = 0;
@@ -658,7 +705,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for WPX (Prefixes)
-        if ((huntPX.checked || awardTrackerOverrides.px) && callObj.px)
+        if ((hunt.PX) && callObj.px)
         {
           let hash = String(callObj.px) + workHashSuffix;
           let layeredHash = rosterSettings.layeredMode && (String(callObj.px) + layeredHashSuffix)
@@ -707,7 +754,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for Continents
-        if ((huntCont.checked || awardTrackerOverrides.cont) && callObj.cont)
+        if ((hunt.Cont) && callObj.cont)
         {
           let hash = String(callObj.cont) + workHashSuffix;
           let layeredHash = rosterSettings.layeredMode && (String(callObj.cont) + layeredHashSuffix)
