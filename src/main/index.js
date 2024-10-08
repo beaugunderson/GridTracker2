@@ -1,7 +1,7 @@
 const fs = require('fs');
 const timers = require('timers');
 const remoteMain = require('@electron/remote/main');
-const { app, shell, BrowserWindow, ipcMain, screen } = require('electron');
+const { app, shell, BrowserWindow, ipcMain, Menu, screen } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const { electronApp, optimizer } = require('@electron-toolkit/utils');
 const { join } = require('path');
@@ -10,13 +10,89 @@ const singleInstanceLock = app.requestSingleInstanceLock();
 
 const isMac = process.platform === 'darwin';
 
-
 if (!singleInstanceLock) {
   app.quit();
 }
 
 // Needed for direct accsess to Menu and MenuItem
 remoteMain.initialize();
+
+const template = [
+  ...(isMac
+    ? [
+        {
+          label: app.name,
+          submenu: [
+            { role: 'about' },
+            {
+              label: 'Check for updates...',
+              click: async () => {
+                checkForUpdates();
+              },
+            },
+            { type: 'separator' },
+            { role: 'services' },
+            { type: 'separator' },
+            { role: 'hide', label: 'Hide GridTracker2' },
+            { role: 'hideOthers' },
+            { role: 'unhide' },
+            { type: 'separator' },
+            { role: 'quit', label: 'Quit GridTracker2' },
+          ],
+        },
+      ]
+    : []),
+  {
+    label: 'File',
+    submenu: [isMac ? { role: 'close' } : { role: 'quit' }],
+  },
+  {
+    label: 'View',
+    submenu: [
+      // include developer menu items if the app is not packaged
+      ...(!app.isPackaged
+        ? [{ role: 'reload' }, { role: 'forceReload' }, { role: 'toggleDevTools' }]
+        : []),
+      { type: 'separator' },
+      { role: 'resetZoom' },
+      { role: 'zoomIn' },
+      { role: 'zoomOut' },
+      { type: 'separator' },
+      { role: 'togglefullscreen' },
+    ],
+  },
+  {
+    label: 'Window',
+    submenu: [
+      { role: 'minimize' },
+      { role: 'zoom' },
+      ...(isMac
+        ? [{ type: 'separator' }, { role: 'front' }, { type: 'separator' }, { role: 'window' }]
+        : [{ role: 'close' }]),
+    ],
+  },
+  // Add about menu on Windows
+  ...(!isMac
+    ? [
+        {
+          label: 'Help',
+          submenu: [
+            { role: 'about' },
+            {
+              label: 'Check for updates...',
+              click: async () => {
+                checkForUpdates();
+              },
+            },
+          ],
+        },
+      ]
+    : []),
+];
+
+const menu = Menu.buildFromTemplate(template);
+
+Menu.setApplicationMenu(menu);
 
 // Every window accounted for here
 const allowedWindows = {
@@ -226,8 +302,7 @@ function createMainWindow() {
   });
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
-    if (details.frameName == "printHotKeys")
-    {
+    if (details.frameName == 'printHotKeys') {
       let options = {
         show: false,
         // for macOS
@@ -237,8 +312,8 @@ function createMainWindow() {
         webPreferences: {
           autoHideMenuBar: true,
           devTools: !app.isPackaged,
-        }
-      }
+        },
+      };
       return { action: 'allow', overrideBrowserWindowOptions: options };
     } else if (details.frameName in allowedWindows) {
       let options = {
@@ -272,6 +347,10 @@ function createMainWindow() {
   mainWindow.loadFile(join(__dirname, '../renderer/GridTracker2.html'));
 }
 
+function checkForUpdates() {
+  autoUpdater.checkForUpdatesAndNotify();
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -285,8 +364,8 @@ app.whenReady().then(() => {
     autoUpdater.forceDevUpdateConfig = true;
   }
 
-  autoUpdater.checkForUpdatesAndNotify();
-  
+  checkForUpdates();
+
   // Inital screen count
   displayHandler.initialScreenCount = screen.getAllDisplays().length;
 
