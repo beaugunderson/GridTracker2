@@ -1,7 +1,7 @@
 const fs = require('fs');
 const timers = require('timers');
 const remoteMain = require('@electron/remote/main');
-const { app, shell, BrowserWindow, ipcMain, Menu, screen } = require('electron');
+const { app, shell, BrowserWindow, ipcMain, Menu, screen, clipboard } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const { electronApp, optimizer } = require('@electron-toolkit/utils');
 const { join } = require('path');
@@ -261,6 +261,18 @@ ipcMain.on('toggleWin', (event, what) => {
 ipcMain.on('focusWin', (event, what) => {
   if (allowedWindows[what]?.window) {
     allowedWindows[what].window.focus();
+  }
+});
+
+async function screenshot(window) {
+  await window.capturePage().then(image => {
+    clipboard.writeImage(image);
+  });
+}
+
+ipcMain.on('capturePageToClipboard', (event, what) => {
+  if (allowedWindows[what]?.window) {
+    screenshot(allowedWindows[what].window);
   }
 });
 

@@ -1879,7 +1879,7 @@ function registerHotKeys()
   registerHotKey("Toggle GridTracker Users", "KeyG", toggleGtMap, null, null, "ctrlKey");
   registerHotKey("Toggle Timezone Overlay", "KeyH", toggleTimezones, null, null, "ctrlKey");
   registerHotKey("Open Statistics Window", "KeyI", showRootInfoBox, null, null, "ctrlKey");
-
+  registerHotKey("Capture Window to Clipboard", "KeyK", captureScreenshot, null, null, "ctrlKey");
   registerHotKey("Open ADIF file", "KeyL", adifLoadDialog, null, null, "ctrlKey");
   registerHotKey("Toggle Audio Mute", "KeyM", toggleAlertMute, null, null, "ctrlKey");
   registerHotKey("Toggle Grayline", "KeyN", toggleEarth, null, null, "ctrlKey");
@@ -11916,6 +11916,7 @@ function postInit()
   nodeTimers.setInterval(saveAllSettings, 900000); // Every 10 minutes, save our settings as a safety
   nodeTimers.setInterval(removeFlightPathsAndDimSquares, 2000); // Every 2 seconds
   nodeTimers.setInterval(downloadCtyDat, 86400000);  // Every 24 hours
+  nodeTimers.setInterval(refreshSpotsNoTx, 300000); // Redraw spots every 5 minutes, this clears old ones
   nodeTimers.setTimeout(downloadCtyDat, 300000); // In 5 minutes, when the dust settles
 
   exportSettingsButton.addEventListener('click', async function(){
@@ -14886,4 +14887,9 @@ function saveGridTrackerSettings()
   }
 }
 
-nodeTimers.setInterval(refreshSpotsNoTx, 300000);
+function captureScreenshot()
+{
+  electron.ipcRenderer.send("capturePageToClipboard", "GridTracker2");
+  addLastTraffic("<font style='color:lightgreen;'>Screenshot Captured</font>");
+}
+
