@@ -198,7 +198,7 @@ function adifParseComplete(task)
   {
     GT.settings.adifLog.lastFetch.lotw_qso = parseInt(Math.max(task.lotw_qso, GT.settings.adifLog.lastFetch.lotw_qso));
     GT.settings.adifLog.lastFetch.lotw_qsl = parseInt(Math.max(task.lotw_qsl, GT.settings.adifLog.lastFetch.lotw_qsl));
-    saveLogSettings();
+    
   }
 
   stateCheck();
@@ -2492,7 +2492,7 @@ function CloudLogValidateURL(shouldSaveIfChanged = false)
   if (shouldSaveIfChanged == true && CloudlogURL.value != initialValue)
   {
     GT.settings.adifLog.text.CloudlogURL = CloudlogURL.value;
-    saveAdifSettings();
+    
   }
 }
 
@@ -2500,7 +2500,7 @@ function CloudLogProfileChanged(obj)
 {
   GT.settings.adifLog.text.CloudlogStationProfileID = obj.options[obj.selectedIndex].value;
   GT.settings.adifLog.text.CloudlogStationProfileName = obj.options[obj.selectedIndex].text;
-  saveAdifSettings();
+  
 }
 
 function CloudlogTest(test)

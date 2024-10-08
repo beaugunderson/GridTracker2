@@ -153,15 +153,6 @@ function setAudioView()
   audioVolumeTd.innerText = parseInt(audioVolume.value * 100) + "%";
 }
 
-function saveAudioSettings()
-{
-
-}
-
-function saveAlerts()
-{
-}
-
 GT.testAudioTimer = null;
 
 function changeAudioValues()
@@ -172,7 +163,7 @@ function changeAudioValues()
   audioVolumeTd.innerText = parseInt(audioVolume.value * 100) + "%";
 
   GT.testAudioTimer = nodeTimers.setTimeout(playTestFile, 200);
-  saveAudioSettings();
+  
 }
 
 function playTestFile()
@@ -193,7 +184,7 @@ function changeSpeechValues()
   speechPitchTd.innerText = speechPitch.value;
   speechRateTd.innerText = speechRate.value;
 
-  saveAudioSettings();
+  
 }
 
 function addNewAlert()
@@ -264,7 +255,7 @@ function addAlert(value, type, notify, repeat, filename, shortname)
     alertItem.needAck = 0;
     GT.settings.customAlerts[newKey] = alertItem;
 
-    saveAlerts();
+    
     return true;
   }
   return false; // we have this alert already
@@ -273,7 +264,7 @@ function addAlert(value, type, notify, repeat, filename, shortname)
 function deleteAlert(key)
 {
   delete GT.settings.customAlerts[key];
-  saveAlerts();
+  
   displayAlerts();
 }
 

@@ -147,31 +147,6 @@ function loadObjectIfExists(key)
   return data;
 }
 
-function saveAppSettings()
-{
-
-}
-
-function saveMapSettings()
-{
-
-}
-
-function saveLegendColors()
-{
-  
-}
-
-function saveAdifSettings()
-{
-  
-}
-
-function saveLogSettings()
-{
-
-}
-
 function saveAllSettings()
 {
   try
@@ -186,15 +161,7 @@ function saveAllSettings()
       mapMemory(6, true, true);
       GT.settings.map.zoom = GT.map.getView().getZoom() / 0.333;
     }
-
-    saveAppSettings();
-    saveMapSettings();
-    saveAudioSettings();
-    saveAdifSettings();
-    saveLegendColors();
-    saveCallsignSettings();
-    saveLogSettings();
-    saveAlerts();
+    
     saveGridTrackerSettings();
   }
   catch (e)
@@ -543,7 +510,7 @@ function toggleMapViewFiltersCollapse()
 {
   GT.settings.app.collapsedMapViewFilters = !GT.settings.app.collapsedMapViewFilters;
   displayMapViewFilters();
-  saveAppSettings();
+  
 }
 
 function checkMapViewFiltersMaximize()
@@ -651,7 +618,7 @@ function qsoTriangleGrid(i)
 function setGridView()
 {
   GT.settings.app.gridViewMode = gtGridViewMode.value;
-  saveAppSettings();
+  
   redrawGrids();
 }
 
@@ -663,7 +630,7 @@ function cycleGridView()
   if (mode < 1) mode = 1;
   gtGridViewMode.value = GT.settings.app.gridViewMode = mode;
 
-  saveAppSettings();
+  
   redrawGrids();
 }
 
@@ -1068,13 +1035,13 @@ function changeGridDecay()
 function changeMouseOverValue()
 {
   GT.settings.map.mouseOver = mouseOverValue.checked;
-  saveMapSettings();
+  
 }
 
 function changeMergeOverlayValue()
 {
   GT.settings.map.mergeOverlay = mergeOverlayValue.checked;
-  saveMapSettings();
+  
   setTrophyOverlay(GT.currentOverlay);
 }
 
@@ -1114,7 +1081,7 @@ function changeGrayline()
 {
   GT.settings.map.graylineOpacity = graylineValue.value;
   showDarknessTd.innerHTML = parseInt(graylineValue.value * 100) + "%";
-  saveMapSettings();
+  
   GT.nightTime = dayNight.refresh();
 }
 
@@ -1128,7 +1095,7 @@ function changePathValues()
   pathWidthTd.innerHTML = pathWidthValue.value;
   qrzPathWidthTd.innerHTML = qrzPathWidthValue.value;
   setMapColors();
-  saveMapSettings();
+  
   styleAllFlightPaths();
 }
 
@@ -1603,7 +1570,7 @@ function updateRosterInstances()
 function changeLogbookPage()
 {
   qsoItemsPerPageTd.innerHTML = GT.settings.app.qsoItemsPerPage = parseInt(qsoItemsPerPageValue.value);
-  saveAppSettings();
+  
 }
 
 GT.qslAuthorityTimer = null;
@@ -1617,7 +1584,7 @@ function qslAuthorityChanged()
   }
 
   GT.settings.app.qslAuthority = qslAuthority.value;
-  saveAppSettings();
+  
   // we set the timer as calling directly will pause the input queue
   GT.qslAuthorityTimer = nodeTimers.setTimeout(reloadFromQslAuthorityChanged, 500);
 }
@@ -2118,7 +2085,7 @@ function makeTitleInfo(mapWindow)
 function gtTrophyLayerChanged(element)
 {
   setTrophyOverlay(element.value);
-  saveMapSettings();
+  
 }
 
 function setTrophyOverlay(which)
@@ -3471,7 +3438,7 @@ function changeTrafficDecode()
 {
   GT.settings.map.trafficDecode = trafficDecode.checked;
   trafficDecodeView();
-  saveMapSettings();
+  
 }
 
 function trafficDecodeView()
@@ -3486,38 +3453,38 @@ function trafficDecodeView()
 function changeFitQRZvalue()
 {
   GT.settings.map.fitQRZ = fitQRZvalue.checked;
-  saveMapSettings();
+  
 }
 
 function changeQrzDxccFallbackValue()
 {
   GT.settings.map.qrzDxccFallback = qrzDxccFallbackValue.checked;
-  saveMapSettings();
+  
 }
 
 function changeCqHiliteValue(check)
 {
   GT.settings.map.CQhilite = check.checked;
-  saveMapSettings();
+  
   if (check.checked == false) removePaths();
 }
 
 function changeFocusRigValue(check)
 {
   GT.settings.map.focusRig = check.checked;
-  saveMapSettings();
+  
 }
 
 function changeHaltOntTxValue(check)
 {
   GT.settings.map.haltAllOnTx = check.checked;
-  saveMapSettings();
+  
 }
 
 function changeSplitQSL()
 {
   GT.settings.map.splitQSL = splitQSLValue.checked;
-  saveMapSettings();
+  
   redrawGrids();
 }
 
@@ -3542,7 +3509,7 @@ function toggleAllGrids()
 function changeAnimate()
 {
   GT.settings.map.animate = animateValue.checked;
-  saveMapSettings();
+  
 
   var dash = [];
   var dashOff = 0;
@@ -3583,7 +3550,7 @@ function changeAnimate()
 function changeAnimateSpeedValue()
 {
   GT.settings.map.animateSpeed = 21 - animateSpeedValue.value;
-  saveMapSettings();
+  
 }
 
 GT.animateFrame = 0;
@@ -3925,7 +3892,7 @@ function clearLogFilesAndCounts()
   GT.settings.adifLog.downloads = {};
   GT.settings.adifLog.lastFetch.lotw_qso = 0;
   GT.settings.adifLog.lastFetch.lotw_qsl = 0;
-  saveAdifSettings();
+  
 }
 
 function getCurrentBandModeHTML()
@@ -4322,33 +4289,25 @@ function initMap()
   GT.maps = requireJson("data/maps.json");
   if (GT.maps)
   {
-    var saveSettings = false;
     GT.maps = Object.keys(GT.maps).sort().reduce((obj, key) => { obj[key] = GT.maps[key]; return obj; }, {});
 
     if (!(GT.settings.map.mapIndex in GT.maps))
     {
       GT.settings.map.mapIndex = def_mapSettings.mapIndex;
-      saveSettings = true;
     }
     if (!(GT.settings.map.nightMapIndex in GT.maps))
     {
       GT.settings.map.nightMapIndex = def_mapSettings.nightMapIndex;
-      saveSettings = true;
     }
     if (!(GT.settings.map.offlineMapIndex in GT.maps))
     {
       GT.settings.map.offlineMapIndex = def_mapSettings.offlineMapIndex;
-      saveSettings = true;
     }
     if (!(GT.settings.map.offlineNightMapIndex in GT.maps))
     {
       GT.settings.map.offlineNightMapIndex = def_mapSettings.offlineNightMapIndex;
-      saveSettings = true;
     }
-    if (saveSettings)
-    {
-      saveMapSettings();
-    }
+
     for (const key in GT.maps)
     {
       GT.maps[key].attributions = "&copy; <a href='https://gridtracker.org' target='_blank'>GridTracker.org</a> " + GT.maps[key].attributions;
@@ -4694,7 +4653,7 @@ function changeNightMapEnable(check)
   changeMapLayer();
   styleAllFlightPaths();
   redrawSpots();
-  saveMapSettings();
+  
 }
 
 GT.lasttimezone = null;
@@ -4726,7 +4685,7 @@ function toggleNexrad()
 {
   GT.settings.map.usNexrad = !GT.settings.map.usNexrad;
   displayNexrad();
-  saveMapSettings();
+  
 }
 
 function displayNexrad()
@@ -6549,7 +6508,7 @@ function importSettings(contents)
 {
   try {
     let data = JSON.parse(contents);
-    if (data && "appSettings" in data && "currentVersion" in data)
+    if (data && "app" in data && "currentVersion" in data)
     {
       if (Number(data.currentVersion.substring(0,7)) < 2241005 )
       {
@@ -6573,7 +6532,7 @@ function importSettings(contents)
   }
   catch (e)
   {
-    importSettingsInfo.innerHTML = "<font style='color:orange;font-weight:bold'>File Corrupt!</font>";
+    importSettingsInfo.innerHTML = "<font style='color:orange;font-weight:bold'>File Read!</font>";
   }
 }
 
@@ -9375,7 +9334,7 @@ function toggleAlertMute()
   {
     window.speechSynthesis.cancel();
   }
-  saveAudioSettings();
+  
 }
 
 function togglePushPinMode()
@@ -11196,7 +11155,7 @@ function changeMapNightPathValues()
   GT.settings.map.nightQrzPathColor = nightQrzPathColorValue.value;
   setNightMapColors();
   styleAllFlightPaths();
-  saveMapSettings();
+  
 }
 
 function changeMapNightValues()
@@ -11204,7 +11163,7 @@ function changeMapNightValues()
   GT.settings.map.nightMapIndex = mapNightSelect.value;
   GT.settings.map.nightMapOpacity = nightBrightnessValue.value;
 
-  saveMapSettings();
+  
   changeMapLayer();
 }
 
@@ -11287,7 +11246,7 @@ function changeMapValues()
     GT.layerVectors.gtflags.setVisible(false);
   }
 
-  saveMapSettings();
+  
 
   changeMapLayer();
 }
@@ -11313,7 +11272,7 @@ function resetLegendColors()
   }
 
   setLegendGridSettings();
-  saveLegendColors();
+  
   redrawGrids();
 }
 
@@ -11505,7 +11464,7 @@ function soundCardChangedValue()
 {
   GT.settings.app.soundCard = GT.soundCard = soundCardInput.value;
   playTestFile();
-  saveAppSettings();
+  
 }
 
 function setPins()
@@ -11543,7 +11502,7 @@ function setPins()
 function changeClearOnCQ()
 {
   GT.settings.app.clearOnCQ = clearOnCQ.checked;
-  saveAppSettings();
+  
 }
 
 function loadViewSettings()
@@ -14673,7 +14632,7 @@ function changeGridOpacity()
   GT.settings.map.gridAlpha = opacityValue.value;
   showOpacityTd.innerHTML = parseInt((GT.settings.map.gridAlpha / 255) * 100) + "%";
   GT.gridAlpha = parseInt(GT.settings.map.gridAlpha).toString(16);
-  saveMapSettings();
+  
 }
 
 function currentTimeStampString()
@@ -14789,7 +14748,7 @@ function cyclePredLayer()
 {
   GT.settings.map.predMode = (GT.settings.map.predMode + 1) % 5;
   displayPredLayer();
-  saveMapSettings();
+  
 }
 
 function predInit()

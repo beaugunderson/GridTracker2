@@ -81,11 +81,6 @@ function callsignServicesInit()
   oqrsSettingsDisplay();
 }
 
-function saveCallsignSettings()
-{
-
-}
-
 function lotwLoadCallsigns()
 {
   var now = timeNowSec();
@@ -171,7 +166,7 @@ function lotwValuesChanged()
 {
   let wasEnabled = GT.settings.callsignLookups.lotwUseEnable;
   GT.settings.callsignLookups.lotwUseEnable = lotwUseEnable.checked;
-  saveCallsignSettings();
+  
   if (GT.settings.callsignLookups.lotwUseEnable == true)
   {
     if (wasEnabled == false)
@@ -230,7 +225,7 @@ function processLotwCallsigns(result, flag)
   }
 
   GT.settings.callsignLookups.lotwLastUpdate = timeNowSec();
-  saveCallsignSettings();
+  
 
   var now = timeNowSec();
   if (GT.lotwLoadTimer != null) nodeTimers.clearTimeout(GT.lotwLoadTimer);
@@ -301,7 +296,7 @@ function processCacCallsigns(buffer, flag)
   parseCacCallsigns(data);
 
   GT.settings.callsignLookups.cacLastUpdate = timeNowSec();
-  saveCallsignSettings();
+  
 
   var now = timeNowSec();
   if (GT.cacLoadTimer != null) nodeTimers.clearTimeout(GT.cacLoadTimer);
@@ -369,7 +364,7 @@ function cacValuesChanged()
 {
   let wasEnabled = GT.settings.callsignLookups.cacUseEnable;
   GT.settings.callsignLookups.cacUseEnable = cacUseEnable.checked;
-  saveCallsignSettings();
+  
   if (GT.settings.callsignLookups.cacUseEnable == true)
   {
     if (wasEnabled == false)
@@ -465,7 +460,7 @@ function oqrsValuesChanged()
 {
   let wasEnabled = GT.settings.callsignLookups.oqrsUseEnable;
   GT.settings.callsignLookups.oqrsUseEnable = oqrsUseEnable.checked;
-  saveCallsignSettings();
+  
   if (GT.settings.callsignLookups.oqrsUseEnable == true)
   {
     if (wasEnabled == false)
@@ -502,7 +497,7 @@ function processoqrsCallsigns(buffer, flag)
   GT.oqrsCallsigns = JSON.parse(buffer);
 
   GT.settings.callsignLookups.oqrsLastUpdate = timeNowSec();
-  saveCallsignSettings();
+  
 
   var now = timeNowSec();
   if (GT.oqrsLoadTimer != null) nodeTimers.clearTimeout(GT.oqrsLoadTimer);
@@ -596,7 +591,7 @@ function eqslValuesChanged()
 {
   let wasEnabled = GT.settings.callsignLookups.eqslUseEnable;
   GT.settings.callsignLookups.eqslUseEnable = eqslUseEnable.checked;
-  saveCallsignSettings();
+  
   if (GT.settings.callsignLookups.eqslUseEnable == true)
   {
     if (wasEnabled == false)
@@ -639,7 +634,7 @@ function processeqslCallsigns(buffer, flag)
     GT.eqslCallsigns[lines[x].trim()] = true;
   }
   GT.settings.callsignLookups.eqslLastUpdate = timeNowSec();
-  saveCallsignSettings();
+  
 
   var now = timeNowSec();
   if (GT.eqslLoadTimer != null) nodeTimers.clearTimeout(GT.eqslLoadTimer);
@@ -786,7 +781,7 @@ function ulsValuesChanged()
     ulsSettingsDisplay();
     ulsCountTd.innerHTML = 0;
   }
-  saveCallsignSettings();
+  
 
   goProcessRoster();
   if (GT.rosterInitialized) GT.callRosterWindowHandle.window.resize();
@@ -811,7 +806,7 @@ function resetULSDatabase()
   GT.ulsCallsignsCount = 0;
   GT.ulsCallsigns = {};
 
-  saveCallsignSettings();
+  
 }
 
 function ulsDownloadHandler(data)
@@ -819,7 +814,7 @@ function ulsDownloadHandler(data)
   fs.writeFileSync(GT.ulsFile, data);
 
   GT.settings.callsignLookups.ulsLastUpdate = timeNowSec();
-  saveCallsignSettings();
+  
 
   loadULSFile();
 }

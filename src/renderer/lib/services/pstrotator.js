@@ -8,15 +8,13 @@
  *   https://groups.io/g/PstRotator/message/5825
  *
  */
-GT.settings.pstrotator = {};
-
 function pstrotatorServiceChanged()
 {
   GT.settings.pstrotator.enable = pstrotatorCheckBox.checked;
   GT.settings.pstrotator.ip = pstrotatorIpInput.value;
   GT.settings.pstrotator.port = pstrotatorPortInput.value;
 
-  saveLogSettings();
+  
   if (GT.rosterInitialized)
   {
     GT.callRosterWindowHandle.window.setPstrotatorEnable(GT.settings.pstrotator.enable);

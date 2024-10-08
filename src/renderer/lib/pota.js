@@ -114,7 +114,7 @@ function changePotaEnable()
     getPotaParks();
   }
   
-  saveAppSettings();
+  
   goProcessRoster();
 }
 
@@ -125,7 +125,7 @@ function changePotaMenu()
   potaButton.style.display = (GT.settings.app.potaEnabled == 1 && GT.settings.app.potaShowMenu && GT.settings.map.offlineMode == false) ? "" : "none";
   potaImg.style.filter = GT.settings.app.potaMapEnabled ? "" : "grayscale(1)";
   
-  saveAppSettings();
+  
 }
 
 function togglePotaMap()
@@ -133,7 +133,7 @@ function togglePotaMap()
   GT.settings.app.potaMapEnabled = !GT.settings.app.potaMapEnabled;
   potaImg.style.filter = GT.settings.app.potaMapEnabled ? "" : "grayscale(1)";
 
-  saveAppSettings();
+  
 
   redrawParks();
 }
