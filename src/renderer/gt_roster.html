@@ -44,7 +44,7 @@
         <button data-i18n="settings.General.label" id="generalbox" class="infoTablinks active" onclick="openInfoTab(event, 'generalSettingsDiv')">
           General
         </button>
-        <button data-i18n="roster.watcher.label" id="watcherbox" class="infoTablinks" onclick="openInfoTab(event, 'watcherBoxDiv', openWathcherTab);">
+        <button data-i18n="roster.watcher.label" id="watcherbox" class="infoTablinks" onclick="openInfoTab(event, 'watcherBoxDiv', openWatchersTab);">
           Watcher
         </button>
         <button data-i18n="roster.exceptions.label" id="exceptionsbox" class="infoTablinks" onclick="openInfoTab(event, 'exceptionsBoxDiv')">
@@ -486,7 +486,7 @@
                 </tr>
                 <tr>
                   <td align="left">
-                    <select id="awardName" onchange="awardNameChanged();">
+                    <select id="awardName" onchange="addAwardTracker(awardSponsor.value, awardName.value, true);">
                       <option data-i18n="roster.controls.awardTracker.name" value="" disabled selected>Name</option>
                     </select>
                   </td>

@@ -57,7 +57,8 @@ CR.modeColors.QRA64 = "FF00FF";
 CR.modeColors.MSK144 = "4949FF";
 CR.rosterTimeout = null;
 CR.rosterFocus = false;
-CR.watchers = null;
+CR.watchers = {};
+CR.watchersTest = {};
 
 CR.defaultSettings = {
   onlyHits: false,
@@ -196,7 +197,9 @@ if (!("awardTracker" in GT.settings))
   writeRosterSettings();
 }
 
-CR.awardTracker = GT.settings.awardTracker;
+// awardTrackersActive is a much smaller object than awardTracker
+CR.awardTrackersActive = GT.settings.awardTracker;
+CR.awardTracker = {};
 
 if ("ignoredCalls" in  GT.settings)
 {
@@ -233,7 +236,17 @@ function storeBlocks(render = true)
 
 function storeAwardTracker()
 {
-  GT.settings.awardTracker = CR.awardTracker;
+  let activeAwards = {};
+  for (const hash in CR.awardTracker)
+  {
+    let award = {
+      sponsor: CR.awardTracker[hash].sponsor,
+      name: CR.awardTracker[hash].name,
+      enable: CR.awardTracker[hash].enable
+    };
+    activeAwards[hash] = award;
+  }
+  GT.settings.awardTracker = activeAwards;
 }
 
 function loadSettings()
@@ -247,13 +260,20 @@ function loadSettings()
 
   fixLegacySettings();
 
-  // Fix because I allowed \ to be input as a key name char. -Tag
+  
   for (let key in CR.rosterSettings.watchers)
   {
+    // Fix because I allowed \ to be input as a key name char. -Tag
     let test = key.replace(/\\/g, "");
     if (test.length != key.length)
     {
       delete CR.rosterSettings.watchers[key];
+    }
+
+    // Fix beacues we could have stored a regex object in settings in older versions
+    if ("test" in CR.rosterSettings.watchers[key])
+    {
+      delete CR.rosterSettings.watchers[key].test;
     }
   }
 
@@ -271,12 +291,9 @@ function fixLegacySettings()
 
 function writeRosterSettings()
 {
-  for (let key in CR.rosterSettings.watchers)
-  {
-    CR.rosterSettings.watchers[key].test = null;
-  }
-
   GT.settings.roster =  CR.rosterSettings;
+  storeAwardTracker();
+  storeBlocks();
 }
 
 function isKnownCallsignDXCC(dxcc)
@@ -599,12 +616,12 @@ function awardSponsorChanged()
   );
 }
 
-function awardNameChanged()
+function addAwardTracker(sponsor, name, enabled)
 {
   let awardToAdd = newAwardTrackerObject(
-    awardSponsor.value,
-    awardName.value,
-    true
+    sponsor,
+    name,
+    enabled
   );
 
   let hash = awardToAdd.name + "-" + awardToAdd.sponsor;
@@ -1308,7 +1325,7 @@ function openSettings()
 
 function openWatcher()
 {
-  openInfoTab("watcherbox", "watcherBoxDiv", openWathcherTab);
+  openInfoTab("watcherbox", "watcherBoxDiv", openWatchersTab);
   settingsDiv.style.display = "inline-block";
 }
 
@@ -1560,10 +1577,7 @@ function resize()
 
 function init()
 {
-  
   loadSettings();
-
-  window.opener.GT.rosterInitialized = true;
 
   CR.callsignDatabaseDXCC = window.opener.GT.callsignDatabaseDXCC;
   CR.callsignDatabaseUS = window.opener.GT.callsignDatabaseUS;
@@ -1582,6 +1596,10 @@ function init()
   loadRosterI18n();
 
   setRosterTop();
+
+  createActiveAwardsFromSettings();
+
+  window.opener.GT.rosterInitialized = true;
 }
 
 function toggleShowControls()
@@ -2876,6 +2894,18 @@ function loadAwardJson()
   }
 }
 
+function createActiveAwardsFromSettings()
+{
+  for (const hash in CR.awardTrackersActive)
+  {
+    const award = CR.awardTrackersActive[hash];
+    if (award.sponsor in CR.awards && award.name in CR.awards[award.sponsor].awards)
+    {
+      addAwardTracker(award.sponsor, award.name, award.enable);
+    }
+  }
+}
+
 function processAllAwardTrackers()
 {
   for (let tracker in CR.awardTracker)
@@ -3301,7 +3331,7 @@ function newWatcherEntry()
   entry.type = "Callsign";
   entry.regex = false;
   entry.text = "";
-  entry.test = null;
+
   entry.start = false;
   entry.end = false;
   entry.startTime = Date.now();
@@ -3323,6 +3353,7 @@ function saveWatcher()
   if (CR.watcherEditKey.length > 0 && CR.watcherEditKey in CR.watchers)
   {
     delete CR.watchers[CR.watcherEditKey];
+    delete CR.watchersTest[CR.watcherEditKey];
   }
 
   let entry = newWatcherEntry();
@@ -3330,7 +3361,6 @@ function saveWatcher()
   entry.type = watcherType.value;
   entry.regex = watcherRegexCheckbox.checked;
   entry.text = watcherText.value;
-  entry.test = null;
   entry.start = watcherStartDateCheckbox.checked;
   entry.end = watcherEndDateCheckbox.checked;
   entry.autoDelete = entry.end ? watcherAutoDeleteCheckbox.checked : false;
@@ -3364,8 +3394,9 @@ function saveWatcher()
     }
   }
   CR.watchers[watcherName.value] = entry;
+  CR.watchersTest[watcherName.value] = null;
   writeRosterSettings();
-  openWathcherTab();
+  openWatchersTab();
   window.opener.goProcessRoster();
 }
 
@@ -3378,9 +3409,9 @@ function addWatcher(value, type)
     entry.type = type;
     entry.regex = false;
     entry.text = value;
-    entry.test = null;
     entry.autoDelete = false;
     CR.watchers[value] = entry;
+    CR.watchersTest[value] = null;
     CR.rosterSettings.wanted.huntWatcher = huntWatcher.checked = true;
     writeRosterSettings();
     window.opener.goProcessRoster();
@@ -3411,6 +3442,7 @@ function toggleWatcher(key)
 function deleteWatcher(key)
 {
   delete CR.watchers[key];
+  delete CR.watchersTest[key];
   writeRosterSettings();
   wantRenderWatchersTab();
   window.opener.goProcessRoster();
@@ -3450,7 +3482,7 @@ function htmlEntities(str)
     .replace(/"/g, "&quot;");
 }
 
-function openWathcherTab()
+function openWatchersTab()
 {
   clearWatcher();
   wantRenderWatchersTab();

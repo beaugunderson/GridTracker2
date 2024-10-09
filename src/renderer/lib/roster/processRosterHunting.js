@@ -865,18 +865,18 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
   }
 }
 
-function buildWatcher(watcher)
+function buildWatcher(watcher, key)
 {
   if (watcher.regex)
   {
     try
     {
-      watcher.test = new RegExp(watcher.text, "gi");
+      CR.watchersTest[key] = new RegExp(watcher.text, "gi");
     }
     catch (e)
     {
       watcher.watch = false;
-      watcher.test = null;
+      CR.watchersTest[key] = null;
       watcher.error = true;
       wantRenderWatchersTab();
     }
@@ -885,12 +885,12 @@ function buildWatcher(watcher)
   {
     try
     {
-      watcher.test = new RegExp("^" + watcher.text + "$", "gi");
+      CR.watchersTest[key] = new RegExp("^" + watcher.text + "$", "gi");
     }
     catch (e)
     {
       watcher.watch = false;
-      watcher.test = null;
+      CR.watchersTest[key] = null;
       watcher.error = true;
       wantRenderWatchersTab();
     }
@@ -916,7 +916,7 @@ function buildWatcher(watcher)
     watcher.source = "msg";
     watcher.html = "msgHTML";
   }
-  return watcher.test;
+  return CR.watchersTest[key];
 }
 
 function processWatchers(callObj)
@@ -934,6 +934,7 @@ function processWatchers(callObj)
         {
           // Don't call deleteWatcher() as it calls the roster renderer
           delete CR.watchers[key];
+          delete CR.watchersTest[key];
           writeRosterSettings();
           wantRenderWatchersTab();
         }
@@ -944,24 +945,24 @@ function processWatchers(callObj)
         }
         continue;
       }
-      watcher.test = watcher.test || buildWatcher(watcher);
-      if (watcher.test)
+      CR.watchersTest[key] = CR.watchersTest[key] || buildWatcher(watcher, key);
+      if (CR.watchersTest[key])
       {
         try
         {
-          if (callObj[watcher.source].match(watcher.test))
+          if (callObj[watcher.source].match(CR.watchersTest[key]))
           {
             callObj.reason.push("watcher");
             callObj.hunting.watcher = "hunted";
             callObj.watcherKey = key;
             let htmlPrevent = htmlEntities(callObj[watcher.source]);
-            callObj[watcher.html] = htmlPrevent.replace(watcher.test, (x, y) => `<span class='regexMatch'>${x}</span>`);
+            callObj[watcher.html] = htmlPrevent.replace(CR.watchersTest[key], (x, y) => `<span class='regexMatch'>${x}</span>`);
             return true;
           }
         }
         catch (e)
         {
-          watcher.test = null;
+          CR.watchersTest[key] = null;
           watcher.watch = false;
           watcher.error = true;
           wantRenderWatchersTab();
