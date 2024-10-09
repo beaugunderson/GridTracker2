@@ -1,7 +1,7 @@
 const fs = require('fs');
 const timers = require('timers');
 const remoteMain = require('@electron/remote/main');
-const { app, shell, BrowserWindow, ipcMain, Menu, screen, clipboard } = require('electron');
+const { app, Notification, shell, BrowserWindow, ipcMain, Menu, screen, clipboard } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const { electronApp, optimizer } = require('@electron-toolkit/utils');
 const { join } = require('path');
@@ -367,6 +367,10 @@ function checkForUpdates() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+    // Set app user model id for windows
+  electronApp.setAppUserModelId('org.gridtracker.GridTracker2');
+  app.setAppUserModelId('org.gridtracker.GridTracker2');
+  
   if (process.env.DEBUG_AUTO_UPDATING === 'true') {
     const log = require('electron-log');
 
@@ -387,9 +391,6 @@ app.whenReady().then(() => {
   screen.on('display-removed', () => {
     displayHandler.onDisplayRemoved();
   });
-
-  // Set app user model id for windows
-  electronApp.setAppUserModelId('org.gridtracker.GridTracker2');
 
   app.on('browser-window-created', (_, window) => {
     // window.title works on Windows, window.tabbingIdentifier works on macOS
