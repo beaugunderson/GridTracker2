@@ -1,7 +1,16 @@
 const fs = require('fs');
 const timers = require('timers');
 const remoteMain = require('@electron/remote/main');
-const { app, Notification, shell, BrowserWindow, ipcMain, Menu, screen, clipboard } = require('electron');
+const {
+  app,
+  Notification,
+  shell,
+  BrowserWindow,
+  ipcMain,
+  Menu,
+  screen,
+  clipboard,
+} = require('electron');
 const { autoUpdater } = require('electron-updater');
 const { electronApp, optimizer } = require('@electron-toolkit/utils');
 const { join } = require('path');
@@ -46,21 +55,15 @@ const template = [
     label: 'File',
     submenu: [isMac ? { role: 'close' } : { role: 'quit' }],
   },
-  {
-    label: 'View',
-    submenu: [
-      // include developer menu items if the app is not packaged
-      ...(!app.isPackaged
-        ? [{ role: 'reload' }, { role: 'forceReload' }, { role: 'toggleDevTools' }]
-        : []),
-      { type: 'separator' },
-      { role: 'resetZoom' },
-      { role: 'zoomIn' },
-      { role: 'zoomOut' },
-      { type: 'separator' },
-      { role: 'togglefullscreen' },
-    ],
-  },
+  // include developer menu items if the app is not packaged
+  ...(!app.isPackaged
+    ? [
+        {
+          label: 'View',
+          submenu: [{ role: 'reload' }, { role: 'forceReload' }, { role: 'toggleDevTools' }],
+        },
+      ]
+    : []),
   {
     label: 'Window',
     submenu: [
@@ -265,7 +268,7 @@ ipcMain.on('focusWin', (event, what) => {
 });
 
 async function screenshot(window) {
-  await window.capturePage().then(image => {
+  await window.capturePage().then((image) => {
     clipboard.writeImage(image);
   });
 }
@@ -367,10 +370,10 @@ function checkForUpdates() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-    // Set app user model id for windows
+  // Set app user model id for windows
   electronApp.setAppUserModelId('org.gridtracker.GridTracker2');
   app.setAppUserModelId('org.gridtracker.GridTracker2');
-  
+
   if (process.env.DEBUG_AUTO_UPDATING === 'true') {
     const log = require('electron-log');
 
