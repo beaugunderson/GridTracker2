@@ -43,15 +43,13 @@ function sendAlerts(callRoster, rosterSettings)
       {
         script = "cr-alert.bat";
       }
-      if (fs.existsSync(dirPath + script))
+      if (fs.existsSync(path.join(dirPath, script)))
       {
         scriptExists = true;
-        scriptIcon.innerHTML =
-          "<div class='buttonScript' onclick='window.opener.toggleCRScript();'>" +
-          (window.opener.GT.crScript == 1
-            ? `<font color='lightgreen'>${I18N("sendAlerts.scriptEnabled")}</font>`
-            : `<font color='yellow'>${I18N("sendAlerts.scriptDisabled")}</font>`) +
-          "</div>";
+        scriptIcon.innerHTML = "<div class='buttonScript' onclick='window.opener.toggleCRScript();'>"
+          + (window.opener.GT.crScript == 1
+          ? `<font color='lightgreen'>${I18N("sendAlerts.scriptEnabled")}</font>`
+          : `<font color='yellow'>${I18N("sendAlerts.scriptDisabled")}</font>`) + "</div>";
         scriptIcon.style.display = "block";
       }
       else
@@ -64,31 +62,17 @@ function sendAlerts(callRoster, rosterSettings)
 
   if (shouldAlert > 0)
   {
-    if (window.opener.GT.settings.classicAlerts.huntRoster == true)
-    {
-      let notify = window.opener.huntRosterNotify.value;
-      if (notify == "0")
-      {
-        let media = window.opener.huntRosterNotifyMedia.value;
-        if (media != "none") window.opener.playAlertMediaFile(media);
-      }
-      else if (notify == "1")
-      {
-        window.opener.speakAlertString(window.opener.huntRosterNotifyWord.value);
-      }
-    }
-
     if (scriptExists && window.opener.GT.crScript == 1)
     {
       try
       {
-        fs.writeFileSync(dirPath + "cr-alert.json", JSON.stringify(CR.scriptReport, null, 2));
+        fs.writeFileSync(path.join(dirPath, "cr-alert.json"), JSON.stringify(CR.scriptReport, null, 2));
 
-        let thisProc = dirPath + script;
+        let thisProc = path.join(dirPath, script);
         let cp = require("child_process");
         let child = cp.spawn(thisProc, [], {
           detached: true,
-          cwd: dirPath.slice(0, -1),
+          cwd: dirPath,
           stdio: ["ignore", "ignore", "ignore"]
         });
         child.unref();

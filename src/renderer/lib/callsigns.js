@@ -181,7 +181,6 @@ function lotwValuesChanged()
     lotwSettingsDisplay();
   }
 
-  setAlertVisual();
   goProcessRoster();
   if (GT.rosterInitialized) GT.callRosterWindowHandle.window.resize();
 }
@@ -475,7 +474,7 @@ function oqrsValuesChanged()
     oqrsSettingsDisplay();
   }
 
-  setAlertVisual();
+
   goProcessRoster();
   if (GT.rosterInitialized) GT.callRosterWindowHandle.window.resize();
 }
@@ -606,7 +605,6 @@ function eqslValuesChanged()
     eqslSettingsDisplay();
   }
 
-  setAlertVisual();
   goProcessRoster();
   if (GT.rosterInitialized) GT.callRosterWindowHandle.window.resize();
 }

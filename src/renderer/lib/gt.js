@@ -6005,9 +6005,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
 
     if (newMessage.NW)
     {
-      didCustomAlert = processAlertMessage(decodeWords, theMessage.substr(0, 30).trim(), callsign.band, callsign.mode);
-
-      didAlert = checkClassicAlerts(CQ, callsign, newMessage, msgDXcallsign);
+      didCustomAlert = processCustomAlertMessage(decodeWords, theMessage.substr(0, 30).trim(), callsign.band, callsign.mode);
 
       insertMessageInRoster(newMessage, msgDEcallsign, msgDXcallsign, callsign, hash);
 
@@ -6429,7 +6427,7 @@ function handleWsjtxWSPR(newMessage)
     ""
   );
 
-  processAlertMessage(callsign + " " + newMessage.Grid);
+  processCustomAlertMessage(callsign + " " + newMessage.Grid);
 
   updateCountStats();
 }
@@ -13976,41 +13974,26 @@ function startGenMessages(call, grid, instance = null)
 
 function mediaCheck()
 {
-
   GT.LoTWLogFile = path.join(GT.appData, "LogbookOfTheWorld.adif");
   GT.QrzLogFile = path.join(GT.appData, "qrz.adif");
   GT.clublogLogFile = path.join(GT.appData, "clublog.adif");
 
   logEventMedia.appendChild(newOption("none", "None"));
-  msgAlertMedia.appendChild(newOption("none", "Select File"));
   alertMediaSelect.appendChild(newOption("none", "Select File"));
-  huntCallsignNotifyMedia.appendChild(newOption("none", "Select File"));
-  huntGridNotifyMedia.appendChild(newOption("none", "Select File"));
-  huntDXCCNotifyMedia.appendChild(newOption("none", "Select File"));
-  huntCQzNotifyMedia.appendChild(newOption("none", "Select File"));
-  huntITUzNotifyMedia.appendChild(newOption("none", "Select File"));
-  huntStatesNotifyMedia.appendChild(newOption("none", "Select File"));
-  huntRosterNotifyMedia.appendChild(newOption("none", "Select File"));
+  alertMediaSelect.appendChild(newOption("none", "Select File"));
 
-  var mediaFiles = fs.readdirSync(GT.gtMediaDir);
+  let mediaFiles = fs.readdirSync(GT.gtMediaDir);
 
   mediaFiles.forEach((filename) =>
   {
-    var noExt = path.parse(filename).name;
+    let noExt = path.parse(filename).name;
     logEventMedia.appendChild(newOption(filename, noExt));
     alertMediaSelect.appendChild(newOption(filename, noExt));
-    huntCallsignNotifyMedia.appendChild(newOption(filename, noExt));
-    huntGridNotifyMedia.appendChild(newOption(filename, noExt));
-    huntDXCCNotifyMedia.appendChild(newOption(filename, noExt));
-    huntCQzNotifyMedia.appendChild(newOption(filename, noExt));
-    huntITUzNotifyMedia.appendChild(newOption(filename, noExt));
-    huntStatesNotifyMedia.appendChild(newOption(filename, noExt));
-    huntRosterNotifyMedia.appendChild(newOption(filename, noExt));
     msgAlertMedia.appendChild(newOption(filename, noExt));
   });
 
   GT.modes = requireJson("data/modes.json");
-  for (var key in GT.modes)
+  for (const key in GT.modes)
   {
     gtModeFilter.appendChild(newOption(key));
   }
@@ -14018,6 +14001,7 @@ function mediaCheck()
   GT.modes_phone = requireJson("data/modes-phone.json");
 
   initQSOdata();
+
   GT.QSOhash = {};
   GT.QSLcount = 0;
   GT.QSOcount = 0;

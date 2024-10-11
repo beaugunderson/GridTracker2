@@ -6,137 +6,19 @@ GT.enums = {};
 
 function loadAlerts()
 {
+  logEventMedia.value = GT.settings.app.logEventMedia;
+
   loadClassicAlertView();
 
-  wantGrid.checked = GT.settings.alerts.requireGrid;
 
-  wantMaxDT.checked = GT.settings.alerts.wantMaxDT;
-  wantMinDB.checked = GT.settings.alerts.wantMinDB;
-  wantMinFreq.checked = GT.settings.alerts.wantMinFreq;
-  wantMaxFreq.checked = GT.settings.alerts.wantMaxFreq;
-
-  maxDTView.innerHTML = maxDT.value = GT.settings.alerts.maxDT;
-  minDbView.innerHTML = minDb.value = GT.settings.alerts.minDb;
-  minFreqView.innerHTML = minFreq.value = GT.settings.alerts.minFreq;
-  maxFreqView.innerHTML = maxFreq.value = GT.settings.alerts.maxFreq;
-
-  cqOnly.checked = GT.settings.alerts.cqOnly;
-  noMyDxcc.checked = GT.settings.alerts.noMyDxcc;
-  onlyMyDxcc.checked = GT.settings.alerts.onlyMyDxcc;
-  noRoundUp.checked = GT.settings.alerts.noRoundUp;
-  onlyRoundUp.checked = GT.settings.alerts.onlyRoundUp;
-  usesLoTW.checked = GT.settings.alerts.usesLoTW;
-  useseQSL.checked = GT.settings.alerts.useseQSL;
-
-  referenceNeed.value = GT.settings.alerts.reference;
-  logEventMedia.value = GT.settings.alerts.logEventMedia;
-  setAlertVisual();
+  
 }
 
 function newLogEventSetting(obj)
 {
-  GT.settings.alerts.logEventMedia = obj.value;
+  GT.settings.app.logEventMedia = obj.value;
 }
 
-function exceptionValuesChanged()
-{
-  setAlertVisual();
-
-  GT.settings.alerts.requireGrid = wantGrid.checked;
-
-  GT.settings.alerts.wantMaxDT = wantMaxDT.checked;
-  GT.settings.alerts.wantMinDB = wantMinDB.checked;
-  GT.settings.alerts.wantMinFreq = wantMinFreq.checked;
-  GT.settings.alerts.wantMaxFreq = wantMaxFreq.checked;
-
-  maxDTView.innerHTML = GT.settings.alerts.maxDT = maxDT.value;
-  minDbView.innerHTML = GT.settings.alerts.minDb = minDb.value;
-  minFreqView.innerHTML = GT.settings.alerts.minFreq = minFreq.value;
-  maxFreqView.innerHTML = GT.settings.alerts.maxFreq = maxFreq.value;
-
-  GT.settings.alerts.cqOnly = cqOnly.checked;
-  GT.settings.alerts.noMyDxcc = noMyDxcc.checked;
-  GT.settings.alerts.onlyMyDxcc = onlyMyDxcc.checked;
-  GT.settings.alerts.noRoundUp = noRoundUp.checked;
-  GT.settings.alerts.onlyRoundUp = onlyRoundUp.checked;
-  GT.settings.alerts.usesLoTW = usesLoTW.checked;
-  GT.settings.alerts.useseQSL = useseQSL.checked;
-
-  GT.settings.alerts.reference = referenceNeed.value;
-}
-
-function hashMaker(band, mode)
-{
-  // "Current Band & Mode"
-  if (GT.settings.alerts.reference == 0) return band + mode;
-
-  // "Current Band, Any Mode"
-  if (GT.settings.alerts.reference == 1) return band;
-
-  // "Current Band, Any Digi Mode"
-  if (GT.settings.alerts.reference == 2) return band + "dg";
-
-  // "Current Mode, Any Band"
-  if (GT.settings.alerts.reference == 3) return mode;
-
-  // "Any Band, Any Mode"
-  if (GT.settings.alerts.reference == 4) return "";
-
-  // "Any Band, Any Digit Mode"
-  if (GT.settings.alerts.reference == 5) return "dg";
-}
-
-function setAlertVisual()
-{
-  if (wantMaxDT.checked == true)
-  {
-    maxDT.style.display = "block";
-    maxDTView.style.display = "block";
-  }
-  else
-  {
-    maxDT.style.display = "none";
-    maxDTView.style.display = "none";
-  }
-  if (wantMinDB.checked == true)
-  {
-    minDb.style.display = "block";
-    minDbView.style.display = "block";
-  }
-  else
-  {
-    minDb.style.display = "none";
-    minDbView.style.display = "none";
-  }
-  if (wantMinFreq.checked == true)
-  {
-    minFreq.style.display = "block";
-    minFreqView.style.display = "block";
-  }
-  else
-  {
-    minFreq.style.display = "none";
-    minFreqView.style.display = "none";
-  }
-  if (wantMaxFreq.checked == true)
-  {
-    maxFreq.style.display = "block";
-    maxFreqView.style.display = "block";
-  }
-  else
-  {
-    maxFreq.style.display = "none";
-    maxFreqView.style.display = "none";
-  }
-
-  if (GT.settings.callsignLookups.lotwUseEnable == true)
-  { usesLoTWDiv.style.display = "block"; }
-  else usesLoTWDiv.style.display = "none";
-
-  if (GT.settings.callsignLookups.eqslUseEnable == true)
-  { useseQSLDiv.style.display = "block"; }
-  else useseQSLDiv.style.display = "none";
-}
 
 function setAudioView()
 {
@@ -277,7 +159,7 @@ function resetAlert(key)
   displayAlerts();
 }
 
-function processAlertMessage(decodeWords, message, band, mode)
+function processCustomAlertMessage(decodeWords, message, band, mode)
 {
   if (Object.keys(GT.settings.customAlerts).length == 0)
   {
@@ -778,7 +660,7 @@ function displayAlerts()
 
 function loadClassicAlertView()
 {
-  for (node in GT.settings.classicAlerts)
+ /* for (node in GT.settings.classicAlerts)
   {
     what = document.getElementById(node);
     if (what != null)
@@ -811,12 +693,12 @@ function loadClassicAlertView()
         what.checked = GT.settings.classicAlerts[node];
       }
     }
-  }
+  }*/
 }
 
 function wantedChanged(what)
 {
-  if (what.type == "select-one" || what.type == "text")
+ /* if (what.type == "select-one" || what.type == "text")
   {
     GT.settings.classicAlerts[what.id] = what.value;
     if (what.id.endsWith("Notify"))
@@ -842,7 +724,7 @@ function wantedChanged(what)
   else if (what.type == "checkbox")
   {
     GT.settings.classicAlerts[what.id] = what.checked;
-  }
+  }*/
 }
 
 GT.classic_alert_count_template = {
@@ -856,14 +738,6 @@ GT.classic_alert_count_template = {
 
 GT.classic_alert_counts = Object.assign({}, GT.classic_alert_count_template);
 
-GT.classic_alert_functions = {
-  huntCallsign: alertCheckCallsign,
-  huntGrid: alertCheckGrid,
-  huntDXCC: alertCheckDXCC,
-  huntCQz: alertCheckCQz,
-  huntITUz: alertCheckITUz,
-  huntStates: alertCheckStates
-};
 
 GT.classic_alert_words = {
   huntCallsign: "Call",
@@ -876,12 +750,9 @@ GT.classic_alert_words = {
 
 function processClassicAlerts()
 {
-  for (key in GT.classic_alert_counts)
+ /* for (key in GT.classic_alert_counts)
   {
-    if (
-      document.getElementById(key).checked == true &&
-      GT.classic_alert_counts[key] > 0
-    )
+    if (document.getElementById(key).checked == true && GT.classic_alert_counts[key] > 0)
     {
       var notify = document.getElementById(key + "Notify").value;
       if (notify == "0")
@@ -891,198 +762,10 @@ function processClassicAlerts()
       }
       else if (notify == "1")
       {
-        speakAlertString(
-          document.getElementById(key + "Notify" + "Word").value
-        );
+        speakAlertString(document.getElementById(key + "Notify" + "Word").value);
       }
     }
   }
-  GT.classic_alert_counts = Object.assign({}, GT.classic_alert_count_template);
+  GT.classic_alert_counts = Object.assign({}, GT.classic_alert_count_template);*/
 }
 
-function checkClassicAlerts(CQ, callObj, message, DXcall)
-{
-  var didAlert = false;
-  if (GT.settings.alerts.cqOnly == true && CQ == false) return didAlert;
-
-  if (GT.settings.alerts.requireGrid == true && callObj.grid.length != 4)
-  { return didAlert; }
-
-  if (GT.settings.alerts.wantMinDB == true && message.SR < GT.settings.alerts.minDb)
-  { return didAlert; }
-
-  if (
-    GT.settings.alerts.wantMaxDT == true &&
-    Math.abs(message.DT) > GT.settings.alerts.maxDT
-  )
-  { return didAlert; }
-
-  if (
-    GT.settings.alerts.wantMinFreq == true &&
-    message.DF < GT.settings.alerts.minFreq
-  )
-  { return didAlert; }
-
-  if (
-    GT.settings.alerts.wantMaxFreq == true &&
-    message.DF > GT.settings.alerts.maxFreq
-  )
-  { return didAlert; }
-
-  if (DXcall == "CQ RU")
-  {
-    if (GT.settings.alerts.noRoundUp == true) return didAlert;
-  }
-  else
-  {
-    if (GT.settings.alerts.onlyRoundUp == true) return didAlert;
-  }
-
-  if (callObj.dxcc == GT.myDXCC)
-  {
-    if (GT.settings.alerts.noMyDxcc == true) return didAlert;
-  }
-  else
-  {
-    if (GT.settings.alerts.onlyMyDxcc == true) return didAlert;
-  }
-
-  if (
-    GT.settings.callsignLookups.lotwUseEnable == true &&
-    GT.settings.alerts.usesLoTW == true
-  )
-  {
-    if (!(callObj.DEcall in GT.lotwCallsigns)) return didAlert;
-  }
-
-  if (
-    GT.settings.callsignLookups.eqslUseEnable == true &&
-    GT.settings.alerts.useseQSL == true
-  )
-  {
-    if (!(callObj.DEcall in GT.eqslCallsigns)) return didAlert;
-  }
-
-  if (DXcall == "CQ DX" && callObj.dxcc == GT.myDXCC) return didAlert;
-
-  if (
-    callObj.DEcall + hashMaker(callObj.band, callObj.mode) in
-    GT.tracker.worked.call
-  )
-  { return didAlert; }
-
-  for (key in GT.classic_alert_functions)
-  {
-    if (document.getElementById(key).checked == true)
-    {
-      var alerted = GT.classic_alert_functions[key](key, callObj);
-      if (alerted == true) didAlert = true;
-      GT.classic_alert_counts[key] += alerted;
-    }
-  }
-
-  return didAlert;
-}
-
-function alertCheckCallsign(key, callObj)
-{
-  var status = document.getElementById(key + "Need").value;
-
-  if (
-    status == "worked" &&
-    callObj.DEcall + hashMaker(callObj.band, callObj.mode) in
-      GT.tracker.worked.call
-  )
-  { return 0; }
-  if (
-    status == "confirmed" &&
-    callObj.DEcall + hashMaker(callObj.band, callObj.mode) in
-      GT.tracker.confirmed.call
-  )
-  { return 0; }
-
-  return 1;
-}
-
-function alertCheckGrid(key, callObj)
-{
-  var status = document.getElementById(key + "Need").value;
-  if (callObj.grid.length == 0) return 0;
-
-  if (
-    status == "worked" &&
-    callObj.grid + hashMaker(callObj.band, callObj.mode) in
-      GT.tracker.worked.grid
-  )
-  { return 0; }
-  if (
-    status == "confirmed" &&
-    callObj.grid + hashMaker(callObj.band, callObj.mode) in
-      GT.tracker.confirmed.grid
-  )
-  { return 0; }
-
-  return 1;
-}
-
-function alertCheckDXCC(key, callObj)
-{
-  var status = document.getElementById(key + "Need").value;
-
-  if (
-    status == "worked" &&
-    String(callObj.dxcc) + "|" + hashMaker(callObj.band, callObj.mode) in
-      GT.tracker.worked.dxcc
-  )
-  { return 0; }
-  if (
-    status == "confirmed" &&
-    String(callObj.dxcc) + "|" + hashMaker(callObj.band, callObj.mode) in
-      GT.tracker.confirmed.dxcc
-  )
-  { return 0; }
-
-  return 1;
-}
-
-function alertCheckCQz(key, callObj)
-{
-  var status = document.getElementById(key + "Need").value;
-  
-  if (status == "worked" && callObj.cqz + "|" + hashMaker(callObj.band, callObj.mode) in GT.tracker.worked.cqz) return 0;
-
-  if (status == "confirmed" && callObj.cqz + "|" + hashMaker(callObj.band, callObj.mode) in GT.tracker.confirmed.cqz) return 0;
-
-  return 1;
-}
-
-function alertCheckITUz(key, callObj)
-{
-  var status = document.getElementById(key + "Need").value;
-
-  if (status == "worked" && callObj.ituz + "|" + hashMaker(callObj.band, callObj.mode) in GT.tracker.worked.ituz) return 0;
-
-  if (status == "confirmed" && callObj.ituz + "|" + hashMaker(callObj.band, callObj.mode) in GT.tracker.confirmed.ituz) return 0;
-
-  return 1;
-}
-
-function alertCheckStates(key, callObj)
-{
-  if (callObj.dxcc == 291 || callObj.dxcc == 110 || callObj.dxcc == 6)
-  {
-    if (callObj.state in GT.StateData)
-    {
-      var hash = callObj.state + hashMaker(callObj.band, callObj.mode);
-      var status = document.getElementById(key + "Need").value;
-
-      if (status == "worked" && hash in GT.tracker.worked.state) return 0;
-
-      if (status == "confirmed" && hash in GT.tracker.confirmed.state) return 0;
-
-      return 1;
-    }
-    return 0;
-  }
-  return 0;
-}

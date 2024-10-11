@@ -1168,7 +1168,7 @@ function removeStartupLog(i)
 
 function startupAdifLoadCheck()
 {
-  logEventMedia.value = GT.settings.alerts.logEventMedia;
+  logEventMedia.value = GT.settings.app.logEventMedia;
  
   loadWsjtLogFile();
 
