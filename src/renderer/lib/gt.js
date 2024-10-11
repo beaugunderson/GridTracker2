@@ -61,6 +61,11 @@ function loadAllSettings()
     GT.settings.defaultsApplied = true;
     GT.settings.importLegacy = importLegacy;
   }
+  else
+  {
+    GT.settings = deepmerge(def_settings, GT.settings);
+  }
+
 
   if (GT.settings.importLegacy == true)
   {
