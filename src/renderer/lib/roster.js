@@ -98,7 +98,6 @@ CR.defaultSettings = {
     huntPOTA: false,
     huntQRZ: true,
     huntOAMS: false,
-    huntRegex: false,
     huntWatcher: false
   },
   columns: {

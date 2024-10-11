@@ -7,7 +7,6 @@ var gtVersion = parseInt(gtVersionStr.replace(/\./g, ""));
 // var GT is in screen.js
 GT.startingUp = true;
 GT.firstRun = false;
-GT.dirSeperator = path.sep;
 
 GT.platform = os.platform();
 if (GT.platform.indexOf("win") == 0 || GT.platform.indexOf("Win") == 0)
@@ -25,6 +24,35 @@ if (GT.platform.indexOf("darwin") > -1)
 
 function loadAllSettings()
 {
+  GT.scriptDir = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Call Roster Scripts");
+  GT.appData = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Ginternal");
+  GT.qsoBackupDir = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Backup Logs");
+  GT.dxccInfoPath = path.join(GT.appData, "dxcc-info.json");
+  GT.tempDxccInfoPath = path.join(GT.appData, "dxcc-info-update.json");
+  GT.spotsPath = path.join(GT.appData,"spots.json");
+
+  try
+  {
+    var tryDirectory = "";
+    var userdirs = [
+      GT.appData,
+      GT.scriptDir,
+      GT.qsoBackupDir
+    ];
+    for (var dir of userdirs)
+    {
+      if (!fs.existsSync(dir))
+      {
+        tryDirectory = dir;
+        fs.mkdirSync(dir);
+      }
+    }
+  }
+  catch (e)
+  {
+    alert("Unable to create or access " + tryDirectory + " folder.\r\nPermission violation, GT cannot continue");
+  }
+
   let importLegacy = GT.settings.importLegacy;
   // Apply defaults once if not applied
   if (!("defaultsApplied" in GT.settings))
@@ -38,6 +66,8 @@ function loadAllSettings()
   {
     console.log("Importing legacy settings");
     importLegacySettings();
+    // Yes, reset the button panel order
+    GT.settings.app.buttonPanelOrder = [];
     GT.settings.importLegacy = false;
   }
   else
@@ -80,7 +110,7 @@ loadAllSettings();
 const gtShortVersion = "v" + gtVersionStr;
 const gtUserAgent = "GridTracker/" + gtVersionStr;
 const k_frequencyBucket = 10000;
-
+const backupAdifHeader = "GridTracker v" + gtVersion + " <EOH>\r\n";
 GT.popupWindowHandle = null;
 GT.popupWindowInitialized = false;
 GT.callRosterWindowHandle = null;
@@ -313,7 +343,7 @@ GT.loadQSOs = false;
 GT.mainBorderColor = "#222222FF";
 GT.pushPinMode = false;
 GT.pskBandActivityTimerHandle = null;
-GT.wsjtxLogPath = "";
+
 GT.dxccInfo = {};
 GT.dxccVersion = 0;
 GT.newDxccVersion = 0;
@@ -364,16 +394,6 @@ GT.mouseY = 0;
 GT.screenX = 0;
 GT.screenY = 0;
 
-GT.appData = "";
-GT.GTappData = "";
-GT.dxccInfoPath = "";
-GT.tempDxccInfoPath = "";
-GT.scriptDir = "";
-GT.qsoLogFile = "";
-GT.clublogLogFile = "";
-GT.LoTWLogFile = "";
-GT.QrzLogFile = "";
-GT.userMediaDir = "";
 GT.gtMediaDir = path.resolve(resourcesPath, "media");
 GT.localeString = navigator.language;
 GT.voices = null;
@@ -497,20 +517,10 @@ GT.gridAlpha = "88";
 
 if (typeof GT.settings.mapMemory[6] == "undefined") GT.settings.mapMemory[6] = GT.settings.mapMemory[0];
 
-function qsoBackupFileInit()
-{
-  var adifHeader = "GridTracker v" + gtVersion + " <EOH>\r\n";
-  if (!fs.existsSync(GT.qsoLogFile))
-  {
-    fs.writeFileSync(GT.qsoLogFile, adifHeader);
-  }
-}
-
 function toggleMapViewFiltersCollapse()
 {
   GT.settings.app.collapsedMapViewFilters = !GT.settings.app.collapsedMapViewFilters;
   displayMapViewFilters();
-  
 }
 
 function checkMapViewFiltersMaximize()
@@ -1907,10 +1917,15 @@ function registerHotKeys()
   generatePrintTable();
 }
 
+const naturalCollator = new Intl.Collator('en', {
+  numeric: true,
+  sensitivity: 'base'
+});
+
 function generatePrintTable()
 {
   let rows = [];
-  let keys = Object.keys(GT.hotKeys).sort();
+  let keys = Object.keys(GT.hotKeys).sort((a, b) => naturalCollator.compare(a, b));
   for (const index in keys)
   {
     let key = keys[index];
@@ -1940,9 +1955,9 @@ function generatePrintTable()
   htmlWorker += "<tr><th>Key</th><th>Action</th><th>Key</th><th>Action</th></tr>";
   GT.printableHotkeyList = "<table class='darkTable'><tr><th colspan='4'><h1>GridTracker2</h1><h3>Hot Key List (<i>" + gtShortVersion + "</i>)</h3></th></tr>";
   GT.printableHotkeyList += "<tr><th>Key</th><th>Action</th><th>Key</th><th>Action</th></tr>";
-  for (let x = 0; x < halfOfRows; x++)
+  for (let x = 0; x <= halfOfRows; x++)
   {
-    let secondX = x + halfOfRows;
+    let secondX = x + halfOfRows + 1;
     let row;
     if (secondX < rows.length)
     {
@@ -2092,7 +2107,6 @@ function setTrophyOverlay(which)
 {
   gtTrophyLayer.value = GT.currentOverlay = GT.settings.map.trophyOverlay = which;
   window.document.title = makeTitleInfo(true);
-  // trophyImg.src = GT.trophyImageArray[which];
   myTrophyTooltip.style.zIndex = -1;
   clearCurrentShapes();
   // set the scope of key
@@ -3889,7 +3903,7 @@ function clearLogFilesAndCounts()
   tryToDeleteLog("LogbookOfTheWorld.adif");
   tryToDeleteLog("qrz.adif");
   tryToDeleteLog("clublog.adif");
-  GT.settings.adifLog.downloads = {};
+
   GT.settings.adifLog.lastFetch.lotw_qso = 0;
   GT.settings.adifLog.lastFetch.lotw_qsl = 0;
   
@@ -9812,9 +9826,9 @@ function getIniFromApp(appName)
   result.N1MMServerPort = 0;
   result.BroadcastToN1MM = false;
   result.appName = appName;
-  var wsjtxCfgPath = "";
-  var logPath = "";
-  var appData = electron.ipcRenderer.sendSync("getPath","appData");
+  let wsjtxCfgPath = "";
+  let logPath = "";
+  let appData = electron.ipcRenderer.sendSync("getPath","appData");
 
   if (GT.platform == "windows")
   {
@@ -9839,65 +9853,65 @@ function getIniFromApp(appName)
   }
   if (fs.existsSync(wsjtxCfgPath))
   {
-    var fileBuf = fs.readFileSync(wsjtxCfgPath, "ascii");
-    var fileArray = fileBuf.split("\n");
-    for (var key in fileArray) fileArray[key] = fileArray[key].trim();
+    let fileBuf = fs.readFileSync(wsjtxCfgPath, "ascii");
+    let fileArray = fileBuf.split("\n");
+    for (const key in fileArray) fileArray[key] = fileArray[key].trim();
     result.LogPath = logPath;
-    for (var x = 0; x < fileArray.length; x++)
+    for (let x = 0; x < fileArray.length; x++)
     {
-      var indexOfPort = fileArray[x].indexOf("UDPServerPort=");
-      if (indexOfPort == 0)
+      let indexOfSearch = fileArray[x].indexOf("UDPServerPort=");
+      if (indexOfSearch == 0)
       {
-        var portSplit = fileArray[x].split("=");
-        result.port = portSplit[1];
+        let valSplit = fileArray[x].split("=");
+        result.port = valSplit[1];
       }
-      indexOfPort = fileArray[x].indexOf("UDPServer=");
-      if (indexOfPort == 0)
+      indexOfSearch = fileArray[x].indexOf("UDPServer=");
+      if (indexOfSearch == 0)
       {
-        var portSplit = fileArray[x].split("=");
-        result.ip = portSplit[1];
+        let valSplit = fileArray[x].split("=");
+        result.ip = valSplit[1];
       }
-      indexOfPort = fileArray[x].indexOf("MyCall=");
-      if (indexOfPort == 0)
+      indexOfSearch = fileArray[x].indexOf("MyCall=");
+      if (indexOfSearch == 0)
       {
-        var portSplit = fileArray[x].split("=");
-        result.MyCall = portSplit[1];
+        let valSplit = fileArray[x].split("=");
+        result.MyCall = valSplit[1];
       }
-      indexOfPort = fileArray[x].indexOf("MyGrid=");
-      if (indexOfPort == 0)
+      indexOfSearch = fileArray[x].indexOf("MyGrid=");
+      if (indexOfSearch == 0)
       {
-        var portSplit = fileArray[x].split("=");
-        result.MyGrid = portSplit[1].substr(0, 6);
+        let valSplit = fileArray[x].split("=");
+        result.MyGrid = valSplit[1].substr(0, 6);
       }
-      indexOfPort = fileArray[x].indexOf("Mode=");
-      if (indexOfPort == 0)
+      indexOfSearch = fileArray[x].indexOf("Mode=");
+      if (indexOfSearch == 0)
       {
-        var portSplit = fileArray[x].split("=");
-        result.MyMode = portSplit[1];
+        let valSplit = fileArray[x].split("=");
+        result.MyMode = valSplit[1];
       }
-      indexOfPort = fileArray[x].indexOf("DialFreq=");
-      if (indexOfPort == 0)
+      indexOfSearch = fileArray[x].indexOf("DialFreq=");
+      if (indexOfSearch == 0)
       {
-        var portSplit = fileArray[x].split("=");
-        result.MyBand = formatBand(Number(portSplit[1] / 1000000));
+        let valSplit = fileArray[x].split("=");
+        result.MyBand = formatBand(Number(valSplit[1] / 1000000));
       }
-      indexOfPort = fileArray[x].indexOf("N1MMServerPort=");
-      if (indexOfPort == 0)
+      indexOfSearch = fileArray[x].indexOf("N1MMServerPort=");
+      if (indexOfSearch == 0)
       {
-        var portSplit = fileArray[x].split("=");
-        result.N1MMServerPort = portSplit[1];
+        let valSplit = fileArray[x].split("=");
+        result.N1MMServerPort = valSplit[1];
       }
-      indexOfPort = fileArray[x].indexOf("N1MMServer=");
-      if (indexOfPort == 0)
+      indexOfSearch = fileArray[x].indexOf("N1MMServer=");
+      if (indexOfSearch == 0)
       {
-        var portSplit = fileArray[x].split("=");
-        result.N1MMServer = portSplit[1];
+        let valSplit = fileArray[x].split("=");
+        result.N1MMServer = valSplit[1];
       }
-      indexOfPort = fileArray[x].indexOf("BroadcastToN1MM=");
-      if (indexOfPort == 0)
+      indexOfSearch = fileArray[x].indexOf("BroadcastToN1MM=");
+      if (indexOfSearch == 0)
       {
-        var portSplit = fileArray[x].split("=");
-        result.BroadcastToN1MM = portSplit[1] == "true";
+        let valSplit = fileArray[x].split("=");
+        result.BroadcastToN1MM = valSplit[1] == "true";
       }
     }
   }
@@ -9923,6 +9937,8 @@ function updateBasedOnIni()
     {
       GT.settings.app.multicast = false;
     }
+
+    GT.settings.app.wsjtLogPath = which.LogPath;
   }
  
   if (GT.settings.app.wsjtUdpPort == 0)
@@ -9938,7 +9954,6 @@ function updateBasedOnIni()
     GT.settings.app.myGrid = GT.settings.app.myRawGrid = which.MyGrid;
     GT.lastBand = GT.settings.app.myBand;
     GT.lastMode = GT.settings.app.myMode;
-    GT.wsjtxLogPath = which.LogPath;
 
     if (which.BroadcastToN1MM == true && GT.settings.N1MM.enable == true)
     {
@@ -11877,9 +11892,6 @@ function postInit()
     section = "TimezonesLayer";
     displayTimezones();
 
-
-    GT.finishedLoading = true;
-
     section = "inputRanges";
     var x = document.querySelectorAll("input[type='range']");
     for (var i = 0; i < x.length; i++)
@@ -11912,6 +11924,7 @@ function postInit()
   displayMouseTrack();
 
   projectionImg.style.filter = GT.settings.map.projection == "AEQD" ? "" : "grayscale(1)";
+  createFileSelectorHandlers();
 
   nodeTimers.setInterval(saveAllSettings, 900000); // Every 10 minutes, save our settings as a safety
   nodeTimers.setInterval(removeFlightPathsAndDimSquares, 2000); // Every 2 seconds
@@ -11919,61 +11932,7 @@ function postInit()
   nodeTimers.setInterval(refreshSpotsNoTx, 300000); // Redraw spots every 5 minutes, this clears old ones
   nodeTimers.setTimeout(downloadCtyDat, 300000); // In 5 minutes, when the dust settles
 
-  exportSettingsButton.addEventListener('click', async function(){
-    saveAllSettings();
-    try {
-      const blob = new Blob([JSON.stringify(GT.settings, null,2)], { type: 'application/json'});
-      
-      const pickerOptions = {
-        suggestedName: "GridTracker2 Settings.json",
-        startIn: "desktop",
-        types: [
-          {
-            description: "GridTracker2 Settings",
-            accept: {
-              "application/json": [".json"]
-            },
-          },
-        ],
-      };
-      const fileHandle = await window.showSaveFilePicker(pickerOptions);
-      const writableFileStream = await fileHandle.createWritable();
-      await writableFileStream.write(blob);
-      await writableFileStream.close();
-    }
-    catch (e)
-    {
-      // user aborted or file permission issue
-    }
-  });
-
-  GT.importFileHandle = null;
-  importSettingsButton.addEventListener('click', async () => {
-    try
-    {
-      const pickerOptions = {
-        types: [
-          {
-            description: "GridTracker2 Settings",
-            accept: {
-              "application/json": [".json"],
-            },
-          },
-        ],
-        startIn: "desktop",
-        excludeAcceptAllOption: true,
-        multiple: false,
-      };
-
-      [GT.importFileHandle] = await window.showOpenFilePicker(pickerOptions);
-      let file = await GT.importFileHandle.getFile();
-      importSettings(await file.text());
-    }
-    catch (e)
-    {
-      // user aborted or file permission issue
-    }
-  });
+  GT.finishedLoading = true;
 }
 
 GT.defaultButtons = [];
@@ -12170,7 +12129,6 @@ document.addEventListener("drop", function (event)
 
 GT.startupTable = [
   [loadI18n, "Loading Locales", "gt.startupTable.loadi18n"],
-  [qsoBackupFileInit, "QSO Backup Initialized", "gt.startupTable.qsoBackup"],
   [callsignServicesInit, "Callsign Services Initialized", "gt.startupTable.callsigns"],
   [loadMapSettings, "Map Settings Initialized", "gt.startupTable.mapSettings"],
   [initMap, "Loaded Map", "gt.startupTable.loadMap"],
@@ -14050,40 +14008,7 @@ function startGenMessages(call, grid, instance = null)
 
 function mediaCheck()
 {
-  GT.GTappData = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Ginternal");
-  GT.dxccInfoPath = path.join(GT.GTappData, "dxcc-info.json");
-  GT.tempDxccInfoPath = path.join(GT.GTappData, "dxcc-info-update.json");
-  
-  GT.appData = path.join(electron.ipcRenderer.sendSync("getPath", "userData"), "Documents");
 
-  GT.scriptDir = path.join(GT.appData, "scripts");
-
-  try
-  {
-    var tryDirectory = "";
-    var userdirs = [
-      GT.GTappData,
-      GT.appData,
-      GT.scriptDir
-    ];
-    for (var dir of userdirs)
-    {
-      if (!fs.existsSync(dir))
-      {
-        tryDirectory = dir;
-        fs.mkdirSync(dir);
-      }
-    }
-  }
-  catch (e)
-  {
-    alert("Unable to create or access " + tryDirectory + " folder.\r\nPermission violation, GT cannot continue");
-  }
-
-  GT.GTappData += GT.dirSeperator;
-  GT.scriptDir += GT.dirSeperator;
-
-  GT.qsoLogFile = path.join(GT.appData, "GridTracker_QSO.adif");
   GT.LoTWLogFile = path.join(GT.appData, "LogbookOfTheWorld.adif");
   GT.QrzLogFile = path.join(GT.appData, "qrz.adif");
   GT.clublogLogFile = path.join(GT.appData, "clublog.adif");
@@ -14150,10 +14075,7 @@ function saveReceptionReports()
 {
   try
   {
-    fs.writeFileSync(
-      GT.GTappData + "spots.json",
-      JSON.stringify(GT.receptionReports)
-    );
+    fs.writeFileSync(GT.spotsPath, JSON.stringify(GT.receptionReports));
   }
   catch (e)
   {
@@ -14165,9 +14087,9 @@ function loadReceptionReports()
 {
   try
   {
-    if (fs.existsSync(GT.GTappData + "spots.json"))
+    if (fs.existsSync(GT.spotsPath))
     {
-      GT.receptionReports = require(GT.GTappData + "spots.json");
+      GT.receptionReports = require(GT.spotsPath);
     }
   }
   catch (e)
@@ -14873,7 +14795,7 @@ function handleKpIndexJSON(json)
 
 function saveGridTrackerSettings()
 {
-  let filename = path.join(GT.GTappData, "app-settings.json");
+  let filename = path.join(GT.appData, "app-settings.json");
   try
   {
     // If we made it to saving, we never import from legacy settings again
@@ -14893,3 +14815,61 @@ function captureScreenshot()
   addLastTraffic("<font style='color:lightgreen;'>Screenshot Captured</font>");
 }
 
+function createFileSelectorHandlers()
+{
+  exportSettingsButton.addEventListener('click', async function(){
+    saveAllSettings();
+    try {
+      const blob = new Blob([JSON.stringify(GT.settings, null,2)], { type: 'application/json'});
+      
+      const pickerOptions = {
+        suggestedName: "GridTracker2 Settings.json",
+        startIn: "desktop",
+        types: [
+          {
+            description: "GridTracker2 Settings",
+            accept: {
+              "application/json": [".json"]
+            },
+          },
+        ],
+      };
+      const fileHandle = await window.showSaveFilePicker(pickerOptions);
+      const writableFileStream = await fileHandle.createWritable();
+      await writableFileStream.write(blob);
+      await writableFileStream.close();
+    }
+    catch (e)
+    {
+      // user aborted or file permission issue
+    }
+  });
+
+  GT.importFileHandle = null;
+  importSettingsButton.addEventListener('click', async () => {
+    try
+    {
+      const pickerOptions = {
+        types: [
+          {
+            description: "GridTracker2 Settings",
+            accept: {
+              "application/json": [".json"],
+            },
+          },
+        ],
+        startIn: "desktop",
+        excludeAcceptAllOption: true,
+        multiple: false,
+      };
+
+      [GT.importFileHandle] = await window.showOpenFilePicker(pickerOptions);
+      let file = await GT.importFileHandle.getFile();
+      importSettings(await file.text());
+    }
+    catch (e)
+    {
+      // user aborted or file permission issue
+    }
+  });
+}

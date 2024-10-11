@@ -1920,6 +1920,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <th data-i18n="settings.logging.tableheader.result">Result</th>
           </tr>
           <tr>
+            <td>WSJT-X Log</td>
+            <td></td>
+            <td>
+              <input type="checkbox" checked="false" id="loadWSJTCheckBox" onclick="adifStartupCheckBoxChanged(this);" />
+            </td>
+            <td>
+            </td>
+            <td><div id="wsjtFilePathDiv" class="button" onclick="GT.wsjtLogFileSelector.click()">not set</div></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
             <td data-i18n="settings.logging.gridtracker.source">GridTracker2</td>
             <td></td>
             <td>
@@ -1928,7 +1940,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td>
               <input type="checkbox" checked="false" id="logGTqsoCheckBox" onclick="adifLogQsoCheckBoxChanged(this);" />
             </td>
-            <td data-i18n="settings.logging.gridtracker.details">GridTracker2 QSO Logfile</td>
+            <td data-i18n="settings.logging.gridtracker.details">GridTracker2 Backup Logs/td>
             <td></td>
             <td></td>
           </tr>

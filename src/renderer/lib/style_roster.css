@@ -151,7 +151,7 @@ body.roster {
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 246px;
+  width: 242px;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -197,7 +197,7 @@ body.roster {
 
 #RosterControls.extended #MainRosterControls {
   margin-top: 30px;
-  min-width: 250px;
+  min-width: 242px;
   flex: 0;
 }
 
@@ -239,13 +239,13 @@ body.roster {
   max-height: 142px;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 770px) {
   #RosterControls.normal #HuntModeControls {
     display: none !important;
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 580px) {
   #RosterControls.normal #LogbookControls {
     display: none;
   }
@@ -768,6 +768,7 @@ p {
 .flexButton:hover {
   border-color: #fff;
 }
+
 .ignoresTables  {
   margin:10px;
   padding:0px;
@@ -806,4 +807,19 @@ p {
   position: absolute;
   z-index: 600;
   border: 1px solid lightblue;
+  border-radius: 4px;
+}
+
+
+.alertButtonOff {
+
+  font-size:smaller;
+  text-decoration: line-through red;
+  text-decoration-thickness: 3px;
+  /* text-decoration-style: double; */
+}
+
+.alertButtonOn {
+  font-size:smaller;
+  /* text-decoration-style: double; */
 }

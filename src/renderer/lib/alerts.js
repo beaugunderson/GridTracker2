@@ -468,29 +468,16 @@ function handleAlert(nAlert, target, lastMessage, callsignRecord, grid)
   nAlert.fired++;
 }
 
+const audioElement = document.createElement("audio");
 function playAlertMediaFile(filename)
 {
   if (GT.settings.audio.alertMute == 1) return;
 
-  // check if this is an alert stored with an older version of GT
-  // which has a full file path given.
-  if (path.isAbsolute(filename) && !fs.existsSync(filename))
-  {
-    // full alert file name stored with old GT version referencing
-    // the user media dir. determine basename of the file and try
-    // constructing the path
-    filename = path.basename(filename);
-  }
-  // construct the path from the user media dir or
-  // fall back on the global media dir
-  var fpath = path.join(GT.userMediaDir, filename);
-  if (!fs.existsSync(fpath)) fpath = path.join(GT.gtMediaDir, filename);
-
-  var audio = document.createElement("audio");
-  audio.src = "file://" + fpath;
-  audio.setSinkId(GT.soundCard);
-  audio.volume = GT.settings.audio.volume;
-  audio.play();
+  let fpath = path.join(GT.gtMediaDir, filename);
+  audioElement.src = "file://" + fpath;
+  audioElement.setSinkId(GT.soundCard);
+  audioElement.volume = GT.settings.audio.volume;
+  audioElement.play();
 }
 
 function stringToPhonetics(string)

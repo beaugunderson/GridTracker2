@@ -47,11 +47,11 @@ function dumpDir(dir)
 
 function callsignServicesInit()
 {
-  GT.lotwFile = GT.GTappData + "lotw-ts-callsigns.json";
-  GT.eqslFile = GT.GTappData + "eqsl-callsigns.json";
-  GT.oqrsFile = GT.GTappData + "cloqrs-callsigns.json";
-  GT.cacFile = GT.GTappData + "canada-callsigns.txt";
-  GT.ulsFile = GT.GTappData + "uls-callsigns.txt";
+  GT.lotwFile = path.join(GT.appData, "lotw-ts-callsigns.json");
+  GT.eqslFile = path.join(GT.appData, "eqsl-callsigns.json");
+  GT.oqrsFile = path.join(GT.appData, "cloqrs-callsigns.json");
+  GT.cacFile = path.join(GT.appData, "canada-callsigns.txt");
+  GT.ulsFile = path.join(GT.appData, "uls-callsigns.txt");
 
   if (GT.settings.callsignLookups.lotwUseEnable)
   {

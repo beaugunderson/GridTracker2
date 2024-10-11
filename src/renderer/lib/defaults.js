@@ -92,6 +92,7 @@ const def_settings = {
     wsjtForwardUdpPort: 2238,
     wsjtIP: "",
     wsjtUdpPort: 0,
+    wsjtLogPath: "",
     workingCallsignEnable: false,
     workingCallsigns: {},
     workingGridEnable: false,
@@ -151,12 +152,13 @@ const def_settings = {
       buttonPsk24CheckBox: false
     },
     startup: {
+      loadWSJTCheckBox: true,
+      loadGTCheckBox: true,
       loadAdifCheckBox: false,
       loadPsk24CheckBox: false,
       loadQRZCheckBox: false,
       loadLOTWCheckBox: false,
-      loadClubCheckBox: false,
-      loadGTCheckBox: true
+      loadClubCheckBox: false
     },
     qsolog: {
       logQRZqsoCheckBox: false,
@@ -191,7 +193,6 @@ const def_settings = {
       eQSLNickname: "",
       HamCQApiKey: ""
     },
-    downloads: {},
     lastFetch: {
       lotw_qso: 0,
       lotw_qsl: 0
@@ -422,6 +423,7 @@ const def_mapMemory = {
 };
 
 const legacySettingsMapping = {
+  appSettings: "app",
   awardTracker: "awardTracker",
   bandActivity: "bandActivity",
   callsignLookups: "callsignLookups",
@@ -482,8 +484,10 @@ function importLegacySettings()
             let obj = JSON.parse(json[key]);
             if (obj)
             {
-              // Do a spread so we don't lose any new settings that came before
+              // use unless it's going to be a problem
               GT.settings[legacySettingsMapping[key]] = { ...GT.settings[legacySettingsMapping[key]], ...obj };
+              // a backup solution
+              // deepmerge(GT.settings[legacySettingsMapping[key]], obj);
             }
             else
             {
@@ -506,5 +510,21 @@ function importLegacySettings()
     {
       console.log("failed to parse legacy settings")
     }
+  }
+
+  // Copy over GridTracker_QSO.adif if it exists and we haven't copied it yet
+  // Do not overwrite existing, please
+  try {
+    let copiedGridTrackerOneAdif = path.join(GT.qsoBackupDir, "GridTrackerV1.adif");
+    if (!fs.existsSync(copiedGridTrackerOneAdif))
+    {
+      let documentsPath = path.join(electron.ipcRenderer.sendSync("getPath","documents"), "GridTracker", "GridTracker_QSO.adif");
+      fs.copyFileSync(documentsPath, copiedGridTrackerOneAdif, fs.constants.COPYFILE_EXCL);
+      console.log("Copied v1 Logfile to Backup Logs");
+    }
+  }
+  catch (e)
+  {
+    console.log("Error copying old gridtracker log file");
   }
 }

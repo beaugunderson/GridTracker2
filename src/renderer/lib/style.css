@@ -773,7 +773,7 @@ table.darkTable {
 table.darkTable td,
 table.darkTable th {
   border: 1px solid #888;
-  padding: 2px 4px;
+  padding: 2px;
 }
 
 table.darkTable thead {
@@ -802,7 +802,7 @@ table.subtable {
 table.subtable td,
 table.subtable th {
   border: 0px;
-  padding: 2px 4px;
+  padding: 2px;
 }
 
 table.subtable thead {
@@ -934,7 +934,7 @@ table.bioTable {
 table.bioTable td,
 table.bioTable th {
   border: 1px solid #888;
-  padding: 2px 4px;
+  padding: 2px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

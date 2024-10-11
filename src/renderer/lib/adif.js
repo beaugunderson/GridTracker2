@@ -78,6 +78,7 @@ GT.adifWorkerCallbacks = {
   parsed: adifParseComplete,
   parsedLive: adifParseLiveComplete,
   filteredLive: adifFilteredLiveComplete,
+  exception: exceptionComplete,
   cleared: clearComplete
 };
 
@@ -169,6 +170,21 @@ function onAdiLoadComplete(rawAdiBuffer, nextFunc = null, liveLog = false)
   GT.fileSelector.value = null;
 }
 
+function tryNextTask(task)
+{
+  if (task.nextFunc != null)
+  {
+    if (typeof window[task.nextFunc] == "function")
+    {
+      window[task.nextFunc]();
+    }
+    else
+    {
+      console.log("tryNextTask: nextFunc not a function: " + task.nextFunc);
+    }
+  }
+}
+
 function adifParseLiveComplete(task)
 {
   GT.adifLogCount--;
@@ -177,12 +193,24 @@ function adifParseLiveComplete(task)
   var currentYear = new Date().getFullYear();
   trackQSO(GT.QSOhash[task.details.hash], currentYear);
   applyQSOs(null);
+
+  tryNextTask(task);
 }
 
 function adifFilteredLiveComplete(task)
 {
   GT.adifLogCount--;
   GT.rowsFiltered += task.rowsFiltered;
+
+  tryNextTask(task);
+}
+
+function exceptionComplete(task)
+{
+  GT.adifLogCount--;
+  console.log("Expection loading last log");
+
+  tryNextTask(task);
 }
 
 function adifParseComplete(task)
@@ -207,17 +235,7 @@ function adifParseComplete(task)
   qsoGridsFound.innerHTML = "Found: " + Object.keys(GT.myQsoGrids).join(",");
   qsoCallsignsFound.innerHTML = "Found: " + Object.keys(GT.myQsoCalls).join(",");
 
-  if (task.nextFunc != null)
-  {
-    if (typeof window[task.nextFunc] == "function")
-    {
-      window[task.nextFunc]();
-    }
-    else
-    {
-      console.log("adifParseComplete: nextFunc not a function: " + task.nextFunc);
-    }
-  }
+  tryNextTask(task);
 }
 
 function clubLogCallback(buffer, flag, cookie)
@@ -275,7 +293,7 @@ function grabClubLog(test)
 
 function tryToWriteAdifToDocFolder(filename, buffer, append = false)
 {
-  var finalFile = GT.appData + GT.dirSeperator + filename;
+  var finalFile = path.join(GT.appData, filename);
   try
   {
     if (append == false)
@@ -355,7 +373,7 @@ function lotwCallback(buffer, flag, cookies, url)
 
 function tryToDeleteLog(filename)
 {
-  var finalFile = GT.appData + GT.dirSeperator + filename;
+  var finalFile = path.join(GT.appData, filename);
   try
   {
     if (fs.existsSync(finalFile))
@@ -637,6 +655,23 @@ function adifTextValueChange(what)
 
 }
 
+GT.wsjtLogFileSelector = document.createElement("input");
+GT.wsjtLogFileSelector.setAttribute("type", "file");
+GT.wsjtLogFileSelector.setAttribute("accept", ".adi, .adif");
+GT.wsjtLogFileSelector.onchange = function ()
+{
+  if (this.files && this.files[0])
+  {
+    let extName =  path.extname(this.files[0].path);
+    if (extName == ".adi" || extName == ".adif")
+    {
+      GT.settings.app.wsjtLogPath = this.files[0].path;
+      updateWsjtLogUI(true);
+    }
+  }
+};
+
+
 GT.fileSelector = document.createElement("input");
 GT.fileSelector.setAttribute("type", "file");
 GT.fileSelector.setAttribute("accept", "*");
@@ -644,11 +679,11 @@ GT.fileSelector.onchange = function ()
 {
   if (this.files && this.files[0])
   {
-    addLogToStartupList(this.files[0], GT.fileSelector);
+    addLogToStartupList(this.files[0]);
   }
 };
 
-function addLogToStartupList(fileObject, selector = null)
+function addLogToStartupList(fileObject)
 {
   loadAdifCheckBox.checked = true;
   adifStartupCheckBoxChanged(loadAdifCheckBox);
@@ -687,7 +722,7 @@ GT.startupFileSelector.onchange = function ()
 {
   if (this.files && this.files[0])
   {
-    addLogToStartupList(this.files[0], GT.startupFileSelector);
+    addLogToStartupList(this.files[0]);
   }
 };
 
@@ -751,11 +786,20 @@ GT.tqslFileSelector.onchange = function ()
   }
 };
 
-function loadGtQSOLogFile()
+function loadBackupLogFiles()
 {
-  if (fs.existsSync(GT.qsoLogFile))
+  try 
   {
-    fs.readFile(GT.qsoLogFile, "utf-8", handleAdifLoad);
+    let logFiles = fs.readdirSync(GT.qsoBackupDir);
+
+    logFiles.forEach((filename) =>
+    {
+      fs.readFile(path.join(GT.qsoBackupDir, filename), "UTF-8", handleAdifLoad);
+    });
+  }
+  catch (e)
+  {
+    console.log("Error trying to read directory:", GT.qsoBackupDir);
   }
 }
 
@@ -791,9 +835,9 @@ function loadLoTWLogFile()
 
 function loadWsjtLogFile()
 {
-  if (fs.existsSync(GT.wsjtxLogPath))
+  if (GT.settings.app.wsjtLogPath.length > 0 && GT.settings.adifLog.startup.loadWSJTCheckBox == true &&  fs.existsSync(GT.settings.app.wsjtLogPath))
   {
-    fs.readFile(GT.wsjtxLogPath, "utf-8", handleAdifLoad);
+    fs.readFile(GT.settings.app.wsjtLogPath, "UTF-8", handleAdifLoad);
   }
 }
 
@@ -1062,6 +1106,31 @@ function setAdifStartup(checkbox)
     GT.startupFileSelector.value = null;
     selectFileOnStartupDiv.style.display = "none";
   }
+
+  updateWsjtLogUI();
+}
+
+function updateWsjtLogUI(shouldLoad = false)
+{
+  if (GT.settings.app.wsjtLogPath.length > 0)
+  {
+    if (fs.existsSync(GT.settings.app.wsjtLogPath))
+    {
+      wsjtFilePathDiv.innerHTML = path.basename(GT.settings.app.wsjtLogPath);
+      if (shouldLoad == true)
+      {
+        loadWsjtLogFile();
+      }
+    }
+    else
+    {
+      wsjtFilePathDiv.innerHTML = "not found";
+    }
+  } 
+  else
+  {
+    wsjtFilePathDiv.innerHTML = "not set";
+  }
 }
 
 function removeStartupLog(i)
@@ -1080,7 +1149,7 @@ function startupAdifLoadCheck()
  
   loadWsjtLogFile();
 
-  if (loadGTCheckBox.checked == true) loadGtQSOLogFile();
+  if (loadGTCheckBox.checked == true) loadBackupLogFiles();
 
   if (loadAdifCheckBox.checked == true && GT.settings.startupLogs.length > 0) startupAdifLoadFunction();
 
@@ -1577,10 +1646,10 @@ function sendToLogger(ADIF)
     }
   }
 
-  finishSendingReport(record, localMode);
+  finishSendingReport(record);
 }
 
-function finishSendingReport(record, localMode)
+function finishSendingReport(record)
 {
   var report = "";
   for (const key in record)
@@ -1661,10 +1730,25 @@ function finishSendingReport(record, localMode)
       // Log worthy
       if (logGTqsoCheckBox.checked == true)
       {
-        fs.appendFileSync(GT.qsoLogFile, reportWithPota + "\r\n");
-        addLastTraffic(
-          "<font style='color:white'>Logged to GridTracker backup</font>"
-        );
+        let logNameArray = [ "GridTracker2"];
+        if ("STATION_CALLSIGN" in record)
+        {
+          logNameArray.push(record["STATION_CALLSIGN"]);
+        }
+        if ("MY_GRIDSQUARE" in record)
+        {
+          logNameArray.push(record["MY_GRIDSQUARE"].substring(0,4));
+        }
+        let filename = logNameArray.join("_") + ".adif";
+        let fullPath = path.join(GT.qsoBackupDir, filename);
+
+        if (!fs.existsSync(fullPath))
+        {
+          fs.writeFileSync(fullPath, backupAdifHeader);
+        }
+
+        fs.appendFileSync(fullPath, reportWithPota + "\r\n");
+        addLastTraffic("<font style='color:white'>Logged to Backup</font>");
       }
     }
     catch (e)
@@ -2010,7 +2094,7 @@ function sendLotwLogEntry(report)
     header += "<EOH>\r\n";
     var finalLog = header + report + "\r\n";
 
-    GT.trustTempPath = os.tmpdir() + GT.dirSeperator + unique(report) + ".adif";
+    GT.trustTempPath = path.join(os.tmpdir(), unique(report) + ".adif");
     fs.writeFileSync(GT.trustTempPath, finalLog);
 
     var child_process = require("child_process");
@@ -2492,7 +2576,6 @@ function CloudLogValidateURL(shouldSaveIfChanged = false)
   if (shouldSaveIfChanged == true && CloudlogURL.value != initialValue)
   {
     GT.settings.adifLog.text.CloudlogURL = CloudlogURL.value;
-    
   }
 }
 
