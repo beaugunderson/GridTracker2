@@ -184,7 +184,7 @@ const allowedWindows = {
     honorVisibility: true,
     boundsUpdateTimer: null,
     tempBounds: {},
-    options: { x: 15, y: 15, width: 1000, height: 500, show: false, zoom: 0 },
+    options: { x: 15, y: 15, width: 760, height: 400, show: false, zoom: 0 },
     static: {
       minWidth: 390,
       minHeight: 250,
@@ -297,7 +297,17 @@ ipcMain.on('saveZoom', (event, zoom) => {
   }
 });
 
-ipcMain.on('restartGridTracker2', (event) => {
+ipcMain.on('restartGridTracker2', (event, resetWindowPositions = false) => {
+  if (resetWindowPositions == true) {
+    if (fs.existsSync(windowSettingsPath))
+    {
+      fs.unlinkSync(windowSettingsPath);
+    }
+  }
+  else
+  {
+    saveWindowPositions();
+  }
   app.relaunch();
   app.exit();
 });
@@ -519,13 +529,17 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
+  saveWindowPositions();
+  app.quit();
+});
+
+function saveWindowPositions() {
   const finalSettings = {};
   for (let window in allowedWindows) {
     finalSettings[window] = allowedWindows[window].options;
   }
   fs.writeFileSync(windowSettingsPath, JSON.stringify(finalSettings, null, 2));
-  app.quit();
-});
+}
 
 // this could be a class, never done one before if you can believe it.
 // it does depend on allowedWindows, so i dunno

@@ -498,7 +498,7 @@ function saveAndCloseApp(shouldRestart = false)
 
   if (shouldRestart == true)
   {
-    electron.ipcRenderer.sendSync("restartGridTracker2");
+    electron.ipcRenderer.sendSync("restartGridTracker2", false);
   }
 }
 
@@ -514,7 +514,7 @@ function clearAndReload()
   GT.settings = { };
   saveGridTrackerSettings();
 
-  electron.ipcRenderer.sendSync("restartGridTracker2");
+  electron.ipcRenderer.sendSync("restartGridTracker2", true);
 }
 
 window.addEventListener("beforeunload", function ()
@@ -6534,7 +6534,7 @@ function importSettings(contents)
           GT.settings[key] = data[key];
         }
         saveGridTrackerSettings();
-        electron.ipcRenderer.sendSync("restartGridTracker2");
+        electron.ipcRenderer.sendSync("restartGridTracker2", false);
       }
     }
     else
