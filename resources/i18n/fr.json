@@ -310,7 +310,7 @@
     "settings.logging.tableheader.test": "Test",
     "settings.logging.tableheader.result": "Résultat",
     "settings.logging.gridtracker.source": "GridTracker2",
-    "settings.logging.gridtracker.details": "Journaux de sauvegarde GridTracker2",
+    "settings.logging.gridtracker.details": "Journaux de sauvegarde",
     "settings.logging.LocalFiles.source": "Fichier(s) local(aux)",
     "settings.logging.LocalFiles.details.add": "Ajouter un fichier",
     "settings.logging.LocalFiles.details.noFiles": "Pas de fichier(s) sélectionné(s)",

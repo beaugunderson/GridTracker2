@@ -285,6 +285,12 @@ ipcMain.on('setAlwaysOnTop', (event, what, value) => {
   }
 });
 
+ipcMain.on('openFileFolder', (event, what, value) => {
+  if (allowedWindows[what]?.window) {
+    shell.openPath(value);
+  }
+});
+
 ipcMain.on('saveZoom', (event, zoom) => {
   if (event.sender.id in windowIdToAllowedWindows) {
     allowedWindows[windowIdToAllowedWindows[event.sender.id]].options.zoom = zoom;

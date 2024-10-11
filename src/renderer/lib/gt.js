@@ -111,6 +111,7 @@ const gtShortVersion = "v" + gtVersionStr;
 const gtUserAgent = "GridTracker/" + gtVersionStr;
 const k_frequencyBucket = 10000;
 const backupAdifHeader = "GridTracker v" + gtVersion + " <EOH>\r\n";
+
 GT.popupWindowHandle = null;
 GT.popupWindowInitialized = false;
 GT.callRosterWindowHandle = null;
@@ -137,45 +138,304 @@ GT.myLat = GT.settings.map.latitude;
 GT.myLon = GT.settings.map.longitude;
 GT.useTransform = false;
 GT.currentOverlay = GT.settings.map.trophyOverlay;
+GT.spotCollector = {};
+GT.spotDetailsCollector = {};
+GT.decodeCollector = {};
+GT.wsjtxIni = null;
+GT.setNewUdpPortTimeoutHandle = null;
+GT.map = null;
+GT.menuShowing = true;
+GT.closing = false;
+GT.liveGrids = {};
+GT.qsoGrids = {};
+GT.liveCallsigns = {};
+GT.hotKeys = {};
 
-function loadDefaultsAndMerge(key, def)
-{
-  let settings = {};
-  if (key in GT.settings)
-  {
-    settings = JSON.parse(GT.settings[key]);
-  }
-  let merged = { ...def, ...settings };
-  for (const x in merged)
-  {
-    if (!(x in def))
-    {
-      delete merged[x];
-    }
-  }
-  GT.settings[key] = JSON.stringify(merged);
-  return merged;
-}
+GT.flightPaths = [];
+GT.flightPathOffset = 0;
+GT.flightPathLineDash = [9, 3, 3];
+GT.flightPathTotal = (9 + 3 + 3) * 2;
 
-function loadArrayIfExists(key)
-{
-  let data = [];
-  if (key in GT.settings)
-  {
-    data = JSON.parse(GT.settings[key]);
-  }
-  return data;
-}
+GT.lastMessages = [];
+GT.lastTraffic = [];
 
-function loadObjectIfExists(key)
-{
-  let data = {};
-  if (key in GT.settings)
-  {
-    data = JSON.parse(GT.settings[key]);
-  }
-  return data;
-}
+GT.maps = [];
+GT.modes = {};
+GT.modes_phone = {};
+GT.colorBands = [
+  "OOB",
+  "4000m",
+  "2200m",
+  "630m",
+  "160m",
+  "80m",
+  "60m",
+  "40m",
+  "30m",
+  "20m",
+  "17m",
+  "15m",
+  "12m",
+  "11m",
+  "10m",
+  "8m",
+  "6m",
+  "4m",
+  "2m",
+  "1.25m",
+  "70cm",
+  "33cm",
+  "23cm",
+  "13cm",
+  "9cm",
+  "6cm",
+  "3cm",
+  "1.2cm",
+  "6mm",
+  "4mm",
+  "2.5mm",
+  "2mm",
+  "1mm"
+];
+
+GT.non_us_bands = [
+  "630m",
+  "160m",
+  "80m",
+  "60m",
+  "40m",
+  "30m",
+  "20m",
+  "17m",
+  "15m",
+  "12m",
+  "10m",
+  "6m",
+  "4m",
+  "2m"
+];
+
+GT.us_bands = [
+  "630m",
+  "160m",
+  "80m",
+  "60m",
+  "40m",
+  "30m",
+  "20m",
+  "17m",
+  "15m",
+  "12m",
+  "10m",
+  "6m",
+  "2m"
+];
+
+GT.pathIgnore = {};
+GT.pathIgnore.RU = true;
+GT.pathIgnore.FTRU = true;
+GT.pathIgnore.FD = true;
+GT.pathIgnore.TEST = true;
+GT.pathIgnore.DX = true;
+GT.pathIgnore.CQ = true;
+
+GT.replaceCQ = {};
+GT.replaceCQ.ASIA = "AS";
+
+GT.myDXCC = -1;
+GT.QSOhash = {};
+GT.myQsoCalls = {};
+GT.myQsoGrids = {};
+GT.QSLcount = 0;
+GT.QSOcount = 0;
+GT.rowsFiltered = 0;
+GT.ignoreMessages = 0;
+GT.lastTimeSinceMessageInSeconds = timeNowSec();
+GT.loadQSOs = false;
+GT.mainBorderColor = "#222222FF";
+GT.pushPinMode = false;
+GT.pskBandActivityTimerHandle = null;
+
+GT.dxccInfo = {};
+GT.dxccVersion = 0;
+GT.newDxccVersion = 0;
+GT.prefixToMap = {};
+GT.directCallToDXCC = {};
+GT.directCallToCQzone = {};
+GT.directCallToITUzone = {};
+GT.prefixToCQzone = {};
+GT.prefixToITUzone = {};
+GT.dxccToAltName = {};
+GT.dxccToCountryCode = {};
+GT.altNameToDXCC = {};
+GT.dxccToADIFName = {};
+GT.gridToDXCC = {};
+GT.gridToState = {};
+GT.StateData = {};
+GT.cqZones = {};
+GT.wacZones = {};
+GT.wasZones = {};
+GT.wacpZones = {};
+GT.ituZones = {};
+GT.dxccCount = {};
+GT.tracker = {};
+GT.lastTrasmissionTimeSec = timeNowSec();
+GT.getPostBuffer = getPostBuffer;
+GT.mapsLayer = [];
+GT.offlineMapsLayer = [];
+GT.tileLayer = null;
+GT.mapView = null;
+GT.layerSources = {};
+GT.layerVectors = {};
+GT.scaleLine = null;
+GT.scaleUnits = {};
+GT.scaleUnits.MI = "us";
+GT.scaleUnits.KM = "metric";
+GT.scaleUnits.NM = "nautical";
+GT.scaleUnits.DG = "degrees";
+GT.PredLayer = null;
+GT.predLayerTimeout = null;
+GT.epiTimeValue = 0;
+GT.mouseX = 0;
+GT.mouseY = 0;
+GT.screenX = 0;
+GT.screenY = 0;
+
+GT.gtMediaDir = path.resolve(resourcesPath, "media");
+GT.localeString = navigator.language;
+GT.voices = null;
+GT.shapeData = {};
+GT.countyData = {};
+GT.zipToCounty = {};
+GT.stateToCounty = {};
+GT.cntyToCounty = {};
+GT.us48Data = {};
+GT.lastLookupAddress = null;
+GT.lookupCache = {};
+GT.pskColors = {};
+GT.pskColors.OOB = "888888";
+GT.pskColors["4000m"] = "45E0FF";
+GT.pskColors["2200m"] = "FF4500";
+GT.pskColors["630m"] = "1E90FF";
+GT.pskColors["160m"] = "7CFC00";
+GT.pskColors["80m"] = "E550E5";
+GT.pskColors["60m"] = "99CCFF";
+GT.pskColors["40m"] = "00FFFF";
+GT.pskColors["30m"] = "62FF62";
+GT.pskColors["20m"] = "FFC40C";
+GT.pskColors["17m"] = "F2F261";
+GT.pskColors["15m"] = "CCA166";
+GT.pskColors["12m"] = "CB3D3D";
+GT.pskColors["11m"] = "00FF00";
+GT.pskColors["10m"] = "FF69B4";
+GT.pskColors["8m"] = "8b00fb";
+GT.pskColors["6m"] = "4dfff9";
+GT.pskColors["4m"] = "93ff05";
+GT.pskColors["2m"] = "FF1493";
+GT.pskColors["1.25m"] = "beff00";
+GT.pskColors["70cm"] = "999900";
+GT.pskColors["33cm"] = "ff8c90";
+GT.pskColors["23cm"] = "5AB8C7";
+GT.pskColors["13cm"] = "ff7540";
+GT.pskColors["9cm"] = "b77ac7";
+GT.pskColors["6cm"] = "b77ac7";
+GT.pskColors["3cm"] = "696969";
+GT.pskColors["1.2cm"] = "b77ac7";
+GT.pskColors["6mm"] = "b77ac7";
+GT.pskColors["4mm"] = "b77ac7";
+GT.pskColors["2.5mm"] = "b77ac7";
+GT.pskColors["2mm"] = "b77ac7";
+GT.pskColors["1mm"] = "b77ac7";
+
+GT.bandToColor = {};
+GT.colorLeafletPins = {};
+GT.colorLeafletQPins = {};
+
+GT.KColors = [
+  "#0F0",
+  "#0F0",
+  "#0F0",
+  "#0F0",
+  "#0F0",
+  "#FF0",
+  "#FC0",
+  "#F90",
+  "#F00",
+  "#F00"
+];
+
+
+GT.UTCoptions = {
+  year: "numeric",
+  month: "numeric",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  timeZone: "UTC",
+  timeZoneName: "short"
+};
+
+GT.LocalOptions = {
+  year: "numeric",
+  month: "numeric",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  timeZoneName: "short"
+};
+
+GT.GraylineImageArray = Array();
+GT.GraylineImageArray[0] = "img/shadow_on_32.png";
+GT.GraylineImageArray[1] = "img/shadow_off_32.png";
+GT.gtFlagImageArray = Array();
+GT.gtFlagImageArray[1] = "img/flag_on.png";
+GT.gtFlagImageArray[0] = "img/flag_off.png";
+GT.gtShareFlagImageArray = Array();
+GT.gtShareFlagImageArray[1] = "img/share-on.png";
+GT.gtShareFlagImageArray[0] = "img/share-off.png";
+GT.mapImageArray = Array();
+GT.mapImageArray[1] = "img/online_map.png";
+GT.mapImageArray[0] = "img/offline_map.png";
+GT.pinImageArray = Array();
+GT.pinImageArray[1] = "img/red_pin_32.png";
+GT.pinImageArray[0] = "img/gt_grid.png";
+GT.qsoLockImageArray = Array();
+GT.qsoLockImageArray[0] = "img/qso_unlocked_32.png";
+GT.qsoLockImageArray[1] = "img/qso_locked_32.png";
+GT.qslLockImageArray = Array();
+GT.qslLockImageArray[0] = "img/qsl_unlocked_32.png";
+GT.qslLockImageArray[1] = "img/qsl_locked_32.png";
+GT.alertImageArray = Array();
+GT.alertImageArray[0] = "img/unmuted-button.png";
+GT.alertImageArray[1] = "img/muted-button.png";
+GT.spotImageArray = Array();
+GT.spotImageArray[0] = "img/spots.png";
+GT.spotImageArray[1] = "img/spots.png";
+GT.spotImageArray[2] = "img/heat.png";
+GT.maidenheadModeImageArray = Array();
+GT.maidenheadModeImageArray[0] = "img/mh4_32.png";
+GT.maidenheadModeImageArray[1] = "img/mh6_32.png";
+GT.predImageArray = Array();
+GT.predImageArray[0] = "img/no-pred.png";
+GT.predImageArray[1] = "img/muf.png";
+GT.predImageArray[2] = "img/fof2.png";
+GT.predImageArray[3] = "img/epi.png";
+GT.predImageArray[4] = "img/auf.png";
+
+GT.viewInfo = {};
+GT.viewInfo[0] = ["qsoGrids", "Grids", 0, 0, 0];
+GT.viewInfo[1] = ["cqZones", "CQ Zones", 0, 0, 40];
+GT.viewInfo[2] = ["ituZones", "ITU Zones", 0, 0, 90];
+GT.viewInfo[3] = ["wacZones", "Continents", 0, 0, 6];
+GT.viewInfo[4] = ["wasZones", "US States", 0, 0, 50];
+GT.viewInfo[5] = ["dxccInfo", "DXCCs", 0, 0, 340];
+GT.viewInfo[6] = ["countyData", "US Counties", 0, 0, 3220];
+GT.viewInfo[7] = ["us48Data", "US Continental Grids", 0, 0, 488];
+GT.viewInfo[8] = ["wacpZones", "CA Provinces", 0, 0, 13];
+GT.soundCard = GT.settings.app.soundCard;
+GT.gridAlpha = "88";
 
 function saveAllSettings()
 {
@@ -257,265 +517,10 @@ function clearAndReload()
   electron.ipcRenderer.sendSync("restartGridTracker2");
 }
 
-// Must be impemented somewhere
 window.addEventListener("beforeunload", function ()
 {
   saveAndCloseApp();
 });
-
-GT.wsjtxIni = null;
-GT.setNewUdpPortTimeoutHandle = null;
-GT.map = null;
-GT.menuShowing = true;
-GT.closing = false;
-GT.liveGrids = {};
-GT.qsoGrids = {};
-GT.liveCallsigns = {};
-
-GT.flightPaths = Array();
-GT.flightPathOffset = 0;
-GT.flightPathLineDash = [9, 3, 3];
-GT.flightPathTotal = (9 + 3 + 3) * 2;
-
-GT.lastMessages = Array();
-GT.lastTraffic = Array();
-
-GT.maps = Array();
-GT.modes = {};
-GT.modes_phone = {};
-GT.colorBands = [
-  "OOB",
-  "4000m",
-  "2200m",
-  "630m",
-  "160m",
-  "80m",
-  "60m",
-  "40m",
-  "30m",
-  "20m",
-  "17m",
-  "15m",
-  "12m",
-  "11m",
-  "10m",
-  "8m",
-  "6m",
-  "4m",
-  "2m",
-  "1.25m",
-  "70cm",
-  "33cm",
-  "23cm",
-  "13cm",
-  "9cm",
-  "6cm",
-  "3cm",
-  "1.2cm",
-  "6mm",
-  "4mm",
-  "2.5mm",
-  "2mm",
-  "1mm"
-];
-
-GT.pathIgnore = {};
-GT.pathIgnore.RU = true;
-GT.pathIgnore.FTRU = true;
-GT.pathIgnore.FD = true;
-GT.pathIgnore.TEST = true;
-GT.pathIgnore.DX = true;
-GT.pathIgnore.CQ = true;
-
-GT.replaceCQ = {};
-GT.replaceCQ.ASIA = "AS";
-
-GT.myDXCC = -1;
-GT.QSOhash = {};
-GT.myQsoCalls = {};
-GT.myQsoGrids = {};
-GT.QSLcount = 0;
-GT.QSOcount = 0;
-GT.rowsFiltered = 0;
-GT.ignoreMessages = 0;
-GT.lastTimeSinceMessageInSeconds = timeNowSec();
-GT.loadQSOs = false;
-GT.mainBorderColor = "#222222FF";
-GT.pushPinMode = false;
-GT.pskBandActivityTimerHandle = null;
-
-GT.dxccInfo = {};
-GT.dxccVersion = 0;
-GT.newDxccVersion = 0;
-GT.prefixToMap = {};
-GT.directCallToDXCC = {};
-GT.directCallToCQzone = {};
-GT.directCallToITUzone = {};
-GT.prefixToCQzone = {};
-GT.prefixToITUzone = {};
-GT.dxccToAltName = {};
-GT.dxccToCountryCode = {};
-GT.altNameToDXCC = {};
-GT.dxccToADIFName = {};
-GT.gridToDXCC = {};
-GT.gridToState = {};
-GT.StateData = {};
-GT.cqZones = {};
-GT.wacZones = {};
-GT.wasZones = {};
-GT.wacpZones = {};
-GT.ituZones = {};
-GT.dxccCount = {};
-GT.tracker = {};
-GT.lastTrasmissionTimeSec = timeNowSec();
-GT.getPostBuffer = getPostBuffer;
-
-const PSKREPORTER_INTERVAL_IN_SECONDS = 5 * 60;
-
-initQSOdata();
-
-GT.mapsLayer = Array();
-GT.offlineMapsLayer = Array();
-GT.tileLayer = null;
-GT.mapView = null;
-GT.layerSources = {};
-GT.layerVectors = {};
-
-GT.scaleLine = null;
-GT.scaleUnits = {};
-
-GT.scaleUnits.MI = "us";
-GT.scaleUnits.KM = "metric";
-GT.scaleUnits.NM = "nautical";
-GT.scaleUnits.DG = "degrees";
-
-GT.mouseX = 0;
-GT.mouseY = 0;
-GT.screenX = 0;
-GT.screenY = 0;
-
-GT.gtMediaDir = path.resolve(resourcesPath, "media");
-GT.localeString = navigator.language;
-GT.voices = null;
-GT.shapeData = {};
-GT.countyData = {};
-GT.zipToCounty = {};
-GT.stateToCounty = {};
-GT.cntyToCounty = {};
-GT.us48Data = {};
-
-GT.pskColors = {};
-GT.pskColors.OOB = "888888";
-GT.pskColors["4000m"] = "45E0FF";
-GT.pskColors["2200m"] = "FF4500";
-GT.pskColors["630m"] = "1E90FF";
-GT.pskColors["160m"] = "7CFC00";
-GT.pskColors["80m"] = "E550E5";
-GT.pskColors["60m"] = "99CCFF";
-GT.pskColors["40m"] = "00FFFF";
-GT.pskColors["30m"] = "62FF62";
-GT.pskColors["20m"] = "FFC40C";
-GT.pskColors["17m"] = "F2F261";
-GT.pskColors["15m"] = "CCA166";
-GT.pskColors["12m"] = "CB3D3D";
-GT.pskColors["11m"] = "00FF00";
-GT.pskColors["10m"] = "FF69B4";
-GT.pskColors["8m"] = "8b00fb";
-GT.pskColors["6m"] = "4dfff9";
-GT.pskColors["4m"] = "93ff05";
-GT.pskColors["2m"] = "FF1493";
-GT.pskColors["1.25m"] = "beff00";
-GT.pskColors["70cm"] = "999900";
-GT.pskColors["33cm"] = "ff8c90";
-GT.pskColors["23cm"] = "5AB8C7";
-GT.pskColors["13cm"] = "ff7540";
-GT.pskColors["9cm"] = "b77ac7";
-GT.pskColors["6cm"] = "b77ac7";
-GT.pskColors["3cm"] = "696969";
-GT.pskColors["1.2cm"] = "b77ac7";
-GT.pskColors["6mm"] = "b77ac7";
-GT.pskColors["4mm"] = "b77ac7";
-GT.pskColors["2.5mm"] = "b77ac7";
-GT.pskColors["2mm"] = "b77ac7";
-GT.pskColors["1mm"] = "b77ac7";
-
-GT.bandToColor = {};
-GT.colorLeafletPins = {};
-GT.colorLeafletQPins = {};
-
-GT.UTCoptions = {
-  year: "numeric",
-  month: "numeric",
-  day: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-  second: "2-digit",
-  timeZone: "UTC",
-  timeZoneName: "short"
-};
-
-GT.LocalOptions = {
-  year: "numeric",
-  month: "numeric",
-  day: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-  second: "2-digit",
-  timeZoneName: "short"
-};
-
-GT.GraylineImageArray = Array();
-GT.GraylineImageArray[0] = "img/shadow_on_32.png";
-GT.GraylineImageArray[1] = "img/shadow_off_32.png";
-GT.gtFlagImageArray = Array();
-GT.gtFlagImageArray[1] = "img/flag_on.png";
-GT.gtFlagImageArray[0] = "img/flag_off.png";
-GT.gtShareFlagImageArray = Array();
-GT.gtShareFlagImageArray[1] = "img/share-on.png";
-GT.gtShareFlagImageArray[0] = "img/share-off.png";
-GT.mapImageArray = Array();
-GT.mapImageArray[1] = "img/online_map.png";
-GT.mapImageArray[0] = "img/offline_map.png";
-GT.pinImageArray = Array();
-GT.pinImageArray[1] = "img/red_pin_32.png";
-GT.pinImageArray[0] = "img/gt_grid.png";
-GT.qsoLockImageArray = Array();
-GT.qsoLockImageArray[0] = "img/qso_unlocked_32.png";
-GT.qsoLockImageArray[1] = "img/qso_locked_32.png";
-GT.qslLockImageArray = Array();
-GT.qslLockImageArray[0] = "img/qsl_unlocked_32.png";
-GT.qslLockImageArray[1] = "img/qsl_locked_32.png";
-GT.alertImageArray = Array();
-GT.alertImageArray[0] = "img/unmuted-button.png";
-GT.alertImageArray[1] = "img/muted-button.png";
-GT.spotImageArray = Array();
-GT.spotImageArray[0] = "img/spots.png";
-GT.spotImageArray[1] = "img/spots.png";
-GT.spotImageArray[2] = "img/heat.png";
-GT.maidenheadModeImageArray = Array();
-GT.maidenheadModeImageArray[0] = "img/mh4_32.png";
-GT.maidenheadModeImageArray[1] = "img/mh6_32.png";
-GT.predImageArray = Array();
-GT.predImageArray[0] = "img/no-pred.png";
-GT.predImageArray[1] = "img/muf.png";
-GT.predImageArray[2] = "img/fof2.png";
-GT.predImageArray[3] = "img/epi.png";
-GT.predImageArray[4] = "img/auf.png";
-
-GT.viewInfo = {};
-GT.viewInfo[0] = ["qsoGrids", "Grids", 0, 0, 0];
-GT.viewInfo[1] = ["cqZones", "CQ Zones", 0, 0, 40];
-GT.viewInfo[2] = ["ituZones", "ITU Zones", 0, 0, 90];
-GT.viewInfo[3] = ["wacZones", "Continents", 0, 0, 6];
-GT.viewInfo[4] = ["wasZones", "US States", 0, 0, 50];
-GT.viewInfo[5] = ["dxccInfo", "DXCCs", 0, 0, 340];
-GT.viewInfo[6] = ["countyData", "US Counties", 0, 0, 3220];
-GT.viewInfo[7] = ["us48Data", "US Continental Grids", 0, 0, 488];
-GT.viewInfo[8] = ["wacpZones", "CA Provinces", 0, 0, 13];
-GT.soundCard = GT.settings.app.soundCard;
-GT.gridAlpha = "88";
-
-if (typeof GT.settings.mapMemory[6] == "undefined") GT.settings.mapMemory[6] = GT.settings.mapMemory[0];
 
 function toggleMapViewFiltersCollapse()
 {
@@ -1852,8 +1857,6 @@ function mapMemory(x, save, internal = false)
     }
   }
 }
-
-GT.hotKeys = {};
 
 function registerHotKey(name, key, func, param1 = null, param2 = null, extKey = null, descPrefix = null)
 {
@@ -5650,8 +5653,8 @@ function getPoint(grid)
 
 function fitViewBetweenPoints(points, maxZoom = 20)
 {
-  var start = ol.proj.toLonLat(points[0], GT.settings.map.projection);
-  var end = ol.proj.toLonLat(points[1], GT.settings.map.projection);
+  let start = ol.proj.toLonLat(points[0]);
+  let end = ol.proj.toLonLat(points[1]);
 
   if (Math.abs(start[0] - end[0]) > 180)
   {
@@ -5668,24 +5671,19 @@ function fitViewBetweenPoints(points, maxZoom = 20)
 
   start = ol.proj.fromLonLat(start);
   end = ol.proj.fromLonLat(end);
-  var line = new ol.geom.LineString([start, end]);
-  var feature = new ol.Feature({ geometry: line });
+  let line = new ol.geom.LineString([start, end]);
+  let feature = new ol.Feature({ geometry: line });
   if (GT.useTransform)
   {
     feature.getGeometry().transform("EPSG:3857", GT.settings.map.projection);
   }
-  var extent = feature.getGeometry().getExtent();
 
-  GT.mapView.fit(extent, {
+  GT.mapView.fit(feature.getGeometry(), {
     duration: 500,
     maxZoom: maxZoom,
     padding: [75, 75, 75, 75]
   });
 }
-
-GT.spotCollector = {};
-GT.spotDetailsCollector = {};
-GT.decodeCollector = {};
 
 function handleWsjtxDecode(newMessage)
 {
@@ -9616,39 +9614,6 @@ function downloadAcknowledgements()
   }
 }
 
-GT.non_us_bands = [
-  "630m",
-  "160m",
-  "80m",
-  "60m",
-  "40m",
-  "30m",
-  "20m",
-  "17m",
-  "15m",
-  "12m",
-  "10m",
-  "6m",
-  "4m",
-  "2m"
-];
-
-GT.us_bands = [
-  "630m",
-  "160m",
-  "80m",
-  "60m",
-  "40m",
-  "30m",
-  "20m",
-  "17m",
-  "15m",
-  "12m",
-  "10m",
-  "6m",
-  "2m"
-];
-
 function renderBandActivity()
 {
   var buffer = "";
@@ -12156,6 +12121,8 @@ GT.startupTable = [
 
 function init()
 {
+  initQSOdata();
+
   aboutVersionText.innerHTML = gtShortVersion;
   GT.currentDay = parseInt(timeNowSec() / 86400);
 
@@ -13308,14 +13275,10 @@ function qrzLookupResults(buffer, gridPass, useCache)
   }
 }
 
-GT.lastLookupAddress = null;
-
 function startupApplication()
 {
   init();
 }
-
-GT.lookupCache = {};
 
 function addLookupObjectToCache(lookupObject)
 {
@@ -14576,19 +14539,15 @@ function currentTimeStampString()
   );
 }
 
-function showNativeFolder(fn)
+function openBackupLogsFolder()
 {
-  nw.Shell.showItemInFolder(decodeURI(fn));
+  electron.ipcRenderer.send("openFileFolder", "GridTracker2", GT.qsoBackupDir);
 }
 
 function refreshSpotsNoTx()
 {
   redrawSpots();
 }
-
-GT.PredLayer = null;
-GT.predLayerTimeout = null;
-GT.epiTimeValue = 0;
 
 function changePredOpacityValue()
 {
@@ -14758,19 +14717,6 @@ function handleAufTimesResponse(data)
     aufForTimeTd.innerHTML = userTimeString(Date.parse(json.f));
   }
 }
-
-GT.KColors = [
-  "#0F0",
-  "#0F0",
-  "#0F0",
-  "#0F0",
-  "#0F0",
-  "#FF0",
-  "#FC0",
-  "#F90",
-  "#F00",
-  "#F00"
-];
 
 function handleKpIndexJSON(json)
 {

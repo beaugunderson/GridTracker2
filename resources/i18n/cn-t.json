@@ -311,7 +311,7 @@
     "settings.logging.tableheader.test": "測試",
     "settings.logging.tableheader.result": "結果",
     "settings.logging.gridtracker.source": "GridTracker2",
-    "settings.logging.gridtracker.details": "GridTracker2 備份日誌",
+    "settings.logging.gridtracker.details": "備份日誌",
     "settings.logging.LocalFiles.source": "本地檔案(s)",
     "settings.logging.LocalFiles.details.add": "添加日誌檔案",
     "settings.logging.LocalFiles.details.noFiles": "未選擇日誌檔案",

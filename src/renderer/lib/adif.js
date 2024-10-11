@@ -166,7 +166,7 @@ function onAdiLoadComplete(rawAdiBuffer, nextFunc = null, liveLog = false)
 
   GT.fileSelector.setAttribute("type", "");
   GT.fileSelector.setAttribute("type", "file");
-  GT.fileSelector.setAttribute("accept", "*");
+  GT.fileSelector.setAttribute("accept", ".adi, .adif");
   GT.fileSelector.value = null;
 }
 
@@ -662,10 +662,11 @@ GT.wsjtLogFileSelector.onchange = function ()
 {
   if (this.files && this.files[0])
   {
-    let extName =  path.extname(this.files[0].path);
-    if (extName == ".adi" || extName == ".adif")
+    let fullPath = this.files[0].path;
+
+    if (ValidatePotentialAdifLogFileAgainstInternal(fullPath))
     {
-      GT.settings.app.wsjtLogPath = this.files[0].path;
+      GT.settings.app.wsjtLogPath = fullPath;
       updateWsjtLogUI(true);
     }
   }
@@ -674,7 +675,7 @@ GT.wsjtLogFileSelector.onchange = function ()
 
 GT.fileSelector = document.createElement("input");
 GT.fileSelector.setAttribute("type", "file");
-GT.fileSelector.setAttribute("accept", "*");
+GT.fileSelector.setAttribute("accept", ".adi, .adif");
 GT.fileSelector.onchange = function ()
 {
   if (this.files && this.files[0])
@@ -683,6 +684,26 @@ GT.fileSelector.onchange = function ()
   }
 };
 
+function ValidatePotentialAdifLogFileAgainstInternal(fullPath)
+{
+  let extName =  path.extname(fullPath);
+  // Is an ADIF file
+  if (!(extName == ".adi" || extName == ".adif")) return false;
+  // Is on disk
+  if (!(fs.existsSync(fullPath))) return false;
+  // Not in Local File(s)
+  if (GT.settings.startupLogs.indexOf(fullPath) != -1 ) return false;
+  // Not starting wsjtx_log.adi 
+  if (fullPath == GT.settings.app.wsjtLogPath) return false;
+  let dirname = path.dirname(fullPath);
+  // Not in Ginternal
+  if (dirname == GT.appData) return false;
+  // Not in Backup Logs
+  if (dirname == GT.qsoBackupDir) return false;
+
+  return true;
+}
+
 function addLogToStartupList(fileObject)
 {
   loadAdifCheckBox.checked = true;
@@ -690,7 +711,7 @@ function addLogToStartupList(fileObject)
 
   fs.readFile(fileObject.path, "utf-8", handleAdifLoad);
   
-  for (var i in GT.settings.startupLogs)
+  for (const i in GT.settings.startupLogs)
   {
     if (fileObject.path == GT.settings.startupLogs[i].file)
     {
@@ -698,8 +719,13 @@ function addLogToStartupList(fileObject)
       return;
     }
   }
+  if (ValidatePotentialAdifLogFileAgainstInternal(fileObject.path) == false)
+  {
+    addLastTraffic("<font color='white'>Not Allowed</font> <font color='orange'>" + fileObject.name + "</font>");
+    return;
+  }
 
-  var newObject = Object();
+  let newObject = Object();
   newObject.name = fileObject.name;
   newObject.file = fileObject.path;
   GT.settings.startupLogs.push(newObject);
@@ -717,7 +743,7 @@ function adifLoadDialog()
 
 GT.startupFileSelector = document.createElement("input");
 GT.startupFileSelector.setAttribute("type", "file");
-GT.startupFileSelector.setAttribute("accept", "*");
+GT.startupFileSelector.setAttribute("accept", ".adi, .adif");
 GT.startupFileSelector.onchange = function ()
 {
   if (this.files && this.files[0])
@@ -1020,9 +1046,9 @@ function startupAdifLoadFunction()
   {
     try
     {
-      if (fs.existsSync(GT.settings.startupLogs[i].file))
+      if (ValidatePotentialAdifLogFileAgainstInternal(GT.settings.startupLogs[i].file))
       {
-        fs.readFile(GT.settings.startupLogs[i].file, "utf-8", handleAdifLoad);
+        fs.readFile(GT.settings.startupLogs[i].file, "UTF-8", handleAdifLoad);
       }
     }
     catch (e) {}
@@ -1074,19 +1100,16 @@ function setAdifStartup(checkbox)
 
   if (buttonAdifCheckBox.checked || loadAdifCheckBox.checked)
   {
-    var worker = "";
+    let worker = "";
     if (GT.settings.startupLogs.length > 0)
     {
       worker += "<table class='darkTable'>";
-      for (var i in GT.settings.startupLogs)
+      for (const i in GT.settings.startupLogs)
       {
-        worker += "<tr title='" +
-          GT.settings.startupLogs[i].file +
-          "'><td>" +
-          GT.settings.startupLogs[i].name +
-          "</td><td onclick='removeStartupLog(" +
-          i +
-          ")'><img src='img/trash_24x48.png' style='height:17px;margin:-1px;margin-bottom:-3px;padding:0px;cursor:pointer'></td></tr>";
+        let style = ValidatePotentialAdifLogFileAgainstInternal(GT.settings.startupLogs[i].file) ? "" : "style='text-decoration: line-through red; text-decoration-thickness: 2px;'";
+        worker += "<tr title='" + GT.settings.startupLogs[i].file + "'>";
+        worker += "<td " + style + ">" +  GT.settings.startupLogs[i].name + "</td>";
+        worker += "<td onclick='removeStartupLog(" + i + ")'><img src='img/trash_24x48.png' style='height:17px;margin:-1px;margin-bottom:-3px;padding:0px;cursor:pointer'></td></tr>";
       }
       worker += "</table>";
     }
@@ -1102,7 +1125,7 @@ function setAdifStartup(checkbox)
     startupLogFileDiv.innerHTML = "No file(s) selected";
     GT.startupFileSelector.setAttribute("type", "");
     GT.startupFileSelector.setAttribute("type", "file");
-    GT.startupFileSelector.setAttribute("accept", "*");
+    GT.startupFileSelector.setAttribute("accept", ".adi, .adif");
     GT.startupFileSelector.value = null;
     selectFileOnStartupDiv.style.display = "none";
   }
