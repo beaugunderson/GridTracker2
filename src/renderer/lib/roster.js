@@ -60,101 +60,6 @@ CR.rosterFocus = false;
 CR.watchers = {};
 CR.watchersTest = {};
 
-CR.defaultSettings = {
-  onlyHits: false,
-  huntNeed: "confirmed",
-  requireGrid: false,
-  animateCQGT: true,
-  wantMaxDT: false,
-  wantMinDB: false,
-  wantMinFreq: false,
-  wantMaxFreq: false,
-  wantRRCQ: false,
-  maxDT: 0.5,
-  minDb: -25,
-  minFreq: 0,
-  maxFreq: 3500,
-  noMyDxcc: false,
-  onlyMyDxcc: false,
-  cqOnly: false,
-  usesLoTW: false,
-  maxLoTW: 27,
-  useseQSL: false,
-  usesOQRS: false,
-  onlySpot: false,
-  allOnlyNew: false,
-  realtime: true,
-  wanted: {
-    huntCallsign: false,
-    huntGrid: true,
-    huntDXCC: true,
-    huntCQz: false,
-    huntITUz: false,
-    huntMarathon: false,
-    huntState: true,
-    huntCounty: false,
-    huntCont: false,
-    huntPX: false,
-    huntPOTA: false,
-    huntQRZ: true,
-    huntOAMS: false,
-    huntWatcher: false
-  },
-  columns: {
-    Callsign: true,
-    Band: false,
-    Mode: false,
-    Calling: true,
-    Rig: false,
-    Grid: true,
-    Msg: false,
-    DXCC: true,
-    Flag: true,
-    State: true,
-    County: false,
-    POTA: false,
-    Cont: false,
-    dB: true,
-    Freq: false,
-    DT: false,
-    Dist: false,
-    Azim: false,
-    CQz: false,
-    ITUz: false,
-    PX: false,
-    LoTW: false,
-    eQSL: false,
-    OQRS: false,
-    Spot: false,
-    Life: false,
-    OAMS: true,
-    Age: true,
-    UTC: true
-  },
-  displayFilters: {
-    brightness: 100,
-    contrast: 100,
-    saturate: 100,
-    invert: 0,
-    sepia: 0,
-    huerotate: 0
-  },
-  reference: 4, // New users should start out Mixed Band & Mode to match GT Map View initial
-  controls: true,
-  controlsExtended: true,
-  compact: false,
-  settingProfiles: false,
-  sortColumn: "Age",
-  sortReverse: true,
-  clearRosterOnBandChange: true,
-  rosterAlwaysOnTop: false,
-  rosterDelayOnFocus: false,
-  rosterDelayTime: 1500,
-  rosterTime: 120,
-  compactEntity: "DXCC",
-  watchers: {}
-};
-
 CR.def_displayFilters = {
   brightness: 100,
   contrast: 100,
@@ -250,13 +155,7 @@ function storeAwardTracker()
 
 function loadSettings()
 {
-  let readSettings = {};
-  if (typeof GT.settings.roster != "undefined")
-  {
-    readSettings = GT.settings.roster;
-  }
-  CR.rosterSettings = { ...CR.defaultSettings, ...readSettings };
-
+  CR.rosterSettings = GT.settings.roster;
   fixLegacySettings();
 
   
@@ -277,7 +176,6 @@ function loadSettings()
   }
 
   writeRosterSettings();
-
   // Code reducer
   CR.watchers = CR.rosterSettings.watchers;
 }
