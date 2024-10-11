@@ -237,7 +237,7 @@ function processLotwCallsigns(result, flag)
   if (Object.keys(lotwCallsigns).length > 100)
   {
     GT.lotwCallsigns = lotwCallsigns;
-    fs.writeFileSync(GT.lotwFile, JSON.stringify(GT.lotwCallsigns));
+    fs.writeFileSync(GT.lotwFile, JSON.stringify(GT.lotwCallsigns), { flush: true });
   }
 
   lotwSettingsDisplay();
@@ -287,7 +287,7 @@ function parseCacCallsigns(data)
       GT.cacCallsigns[callsignRows[x].substr(8)] = callsignRows[x].substr(6, 2);
     }
   }
-  fs.writeFileSync(GT.cacFile, data, "UTF-8");
+  fs.writeFileSync(GT.cacFile, data, "UTF-8", { flush: true });
 }
 
 function processCacCallsigns(buffer, flag)
@@ -506,7 +506,7 @@ function processoqrsCallsigns(buffer, flag)
   GT.oqrsWhenDate = now + oqrsWhenTimer;
   GT.oqrsLoadTimer = nodeTimers.setTimeout(oqrsDownload, oqrsWhenTimer * 1000);
 
-  fs.writeFileSync(GT.oqrsFile, JSON.stringify(GT.oqrsCallsigns));
+  fs.writeFileSync(GT.oqrsFile, JSON.stringify(GT.oqrsCallsigns), { flush: true });
   oqrsSettingsDisplay();
 }
 
@@ -644,7 +644,7 @@ function processeqslCallsigns(buffer, flag)
   GT.eqslLoadTimer = nodeTimers.setTimeout(eqslDownload, eqslWhenTimer * 1000);
 
   if (Object.keys(GT.eqslCallsigns).length > 10000)
-  { fs.writeFileSync(GT.eqslFile, JSON.stringify(GT.eqslCallsigns)); }
+  { fs.writeFileSync(GT.eqslFile, JSON.stringify(GT.eqslCallsigns), { flush: true }); }
 
   eqslSettingsDisplay();
 }
@@ -811,7 +811,7 @@ function resetULSDatabase()
 
 function ulsDownloadHandler(data)
 {
-  fs.writeFileSync(GT.ulsFile, data);
+  fs.writeFileSync(GT.ulsFile, data, { flush: true });
 
   GT.settings.callsignLookups.ulsLastUpdate = timeNowSec();
   
@@ -973,7 +973,7 @@ function processCtyDat(buffer)
         updateDxccInfo(dxccInfo, ctydata);
         dxccInfo[0].version = GT.newDxccVersion;
         let toWrite = JSON.stringify(dxccInfo);
-        fs.writeFileSync(GT.tempDxccInfoPath, toWrite);
+        fs.writeFileSync(GT.tempDxccInfoPath, toWrite, { flush: true });
         let stats = fs.statSync(GT.tempDxccInfoPath);
         if (stats.size == toWrite.length)
         {

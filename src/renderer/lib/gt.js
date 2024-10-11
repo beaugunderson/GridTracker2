@@ -14038,7 +14038,7 @@ function saveReceptionReports()
 {
   try
   {
-    fs.writeFileSync(GT.spotsPath, JSON.stringify(GT.receptionReports));
+    fs.writeFileSync(GT.spotsPath, JSON.stringify(GT.receptionReports), { flush: true });
   }
   catch (e)
   {
@@ -14747,7 +14747,7 @@ function saveGridTrackerSettings()
     // If we made it to saving, we never import from legacy settings again
     // In 2025 we remove importLegacy code -Tag
     GT.settings.importLegacy = false;
-    fs.writeFileSync(filename, JSON.stringify(GT.settings, null, 2));
+    fs.writeFileSync(filename, JSON.stringify(GT.settings, null, 2), { flush: true });
   }
   catch (e)
   {

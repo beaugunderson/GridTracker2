@@ -538,7 +538,7 @@ function saveWindowPositions() {
   for (let window in allowedWindows) {
     finalSettings[window] = allowedWindows[window].options;
   }
-  fs.writeFileSync(windowSettingsPath, JSON.stringify(finalSettings, null, 2));
+  fs.writeFileSync(windowSettingsPath, JSON.stringify(finalSettings, null, 2), { flush: true });
 }
 
 // this could be a class, never done one before if you can believe it.

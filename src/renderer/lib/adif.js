@@ -298,12 +298,12 @@ function tryToWriteAdifToDocFolder(filename, buffer, append = false)
   {
     if (append == false)
     {
-      fs.writeFileSync(finalFile, buffer);
+      fs.writeFileSync(finalFile, buffer, { flush: true });
       return buffer;
     }
     else
     {
-      fs.appendFileSync(finalFile, buffer);
+      fs.appendFileSync(finalFile, buffer, { flush: true });
       return buffer;
     }
   }
@@ -1770,7 +1770,7 @@ function finishSendingReport(record)
           fs.writeFileSync(fullPath, backupAdifHeader);
         }
 
-        fs.appendFileSync(fullPath, reportWithPota + "\r\n");
+        fs.appendFileSync(fullPath, reportWithPota + "\r\n", { flush: true });
         addLastTraffic("<font style='color:white'>Logged to Backup</font>");
       }
     }
@@ -2118,7 +2118,7 @@ function sendLotwLogEntry(report)
     var finalLog = header + report + "\r\n";
 
     GT.trustTempPath = path.join(os.tmpdir(), unique(report) + ".adif");
-    fs.writeFileSync(GT.trustTempPath, finalLog);
+    fs.writeFileSync(GT.trustTempPath, finalLog, { flush: true });
 
     var child_process = require("child_process");
     var options = Array();
