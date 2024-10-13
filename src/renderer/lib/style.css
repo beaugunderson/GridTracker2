@@ -305,7 +305,7 @@ html, body {
   -webkit-border-radius: 6px;
   border: 1px solid #999;
   outline: none;
-  margin: 2px;
+  margin: 0px;
   padding: 1px;
   border-style: outset;
   font-size: 12px;
@@ -1080,7 +1080,7 @@ input[type="color"]::-webkit-color-swatch {
 .secondaryControlGroup .columns div {
   text-align: left;
   vertical-align: bottom;
-  margin-top: 1px;
+  margin-top: 3px;
   margin-right: 0px;
 }
 
