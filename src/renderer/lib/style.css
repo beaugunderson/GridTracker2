@@ -554,9 +554,8 @@ input[type="range"] {
 input[type="checkbox"] {
   appearance: checkbox !important;
   margin: 0;
-  vertical-align: middle;
+  vertical-align: top;
   position: relative;
-
 }
 
 input[type="range"]::-webkit-slider-runnable-track {
@@ -599,7 +598,7 @@ select {
   text-indent: 0.2px;
   min-width: 30px;
   padding: 1px;
-  margin: 2px;
+  margin: 0px;
   background-color: darkgreen;
   color: #ff0;
   cursor: pointer;
@@ -1081,7 +1080,7 @@ input[type="color"]::-webkit-color-swatch {
 .secondaryControlGroup .columns div {
   text-align: left;
   vertical-align: bottom;
-  margin-top: 3px;
+  margin-top: 1px;
   margin-right: 0px;
 }
 
