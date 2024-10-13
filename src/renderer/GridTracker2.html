@@ -1327,7 +1327,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </tr>
             <tr>
               <td>
-                <div class="roundBorderValue" style="margin-bottom:10px; width: auto; font-size: larger; font-weight: bold"
+                <div class="roundBorderValue" style="margin-bottom:5px; width: auto; font-size: larger; font-weight: bold"
                   id="workingDateString">
                   No Date
                 </div>
@@ -2157,11 +2157,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               <label data-i18n="settings.logging.LoTW.details.password" for="lotwPassword">Password</label>
               <input id="lotwPassword" type="password" class="inputTextValue" size="8"
                 oninput="ValidateText(this); adifTextValueChange(this);" /><br />
-              <div id="lotwUpload" style="display: none">
-                <div data-i18n="settings.logging.LoTW.details.TQSLPath" class="button" id="selectTQSLButton">TQSL Path
+              <div id="lotwUpload">
+                <div style="display: inline-block">
+                <div data-i18n="settings.logging.LoTW.details.TQSLPath" class="flexButton" style="display: inline-block" id="selectTQSLButton">TQSL Path
                 </div>
-                <text id="tqslFileDiv" style="margin-top: 2px; padding: 2px" class="roundBorderValue">No file
-                  selected</text><br />
+                <div id="tqslFileDiv" style="display: inline-block; margin:3px;" class="roundBorderValue">No file selected</div>
+              </div><br/>
                 <label data-i18n="settings.logging.LoTW.details.TQSLPass" for="lotwTrusted">TQSL Password</label>
                 <input id="lotwTrusted" type="password" class="inputTextValue" size="8"
                   oninput="ValidateText(this); adifTextValueChange(this);" /><br />

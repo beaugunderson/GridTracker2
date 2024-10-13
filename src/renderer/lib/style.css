@@ -308,6 +308,8 @@ html, body {
   outline: none;
   margin: 1px;
   padding: 1px;
+  background-color: darkblue;
+  color: yellow;
   border-style: outset;
   font-size: 12px;
 }
@@ -320,56 +322,19 @@ html, body {
 
 .roundBorderValue {
   border: 1px solid white;
-  -webkit-border-radius: 6px;
+  border-radius: 6px;
   background-color: Blue;
   color: #ff0;
+  padding: 1px;
   min-width: 20px;
   outline: none;
 }
 
-.roundBorderDEInfo {
-  border: 1px solid white;
-  -webkit-border-radius: 6px;
-  background-color: #000;
-  color: #ff0;
-  font-size: larger;
-  font-weight: bold;
-}
-
 .roundBorder {
   vertical-align: top;
-  -webkit-border-radius: 6px;
+  border-radius: 6px;
 }
 
-
-button:focus {
-  outline: none;
-}
-
-.button {
-  border-radius: 4px;
-  cursor: pointer;
-  margin: 0px;
-
-  padding: 2px;
-  padding-bottom: 0px;
-  border-width: 1px;
-  border-color: #999;
-  border-style: outset;
-  min-width: 40px;
-  display: inline-block;
-  color: #eee;
-
-  transition: border-style;
-}
-
-.button:active {
-  border-style: inset;
-}
-
-.button:hover {
-  border-color: #fff;
-}
 
 .buttonRed {
   height: 2em;
@@ -987,19 +952,48 @@ input[type="color"]::-webkit-color-swatch {
   top: 60px;
 }
 
-.flexButton {
+.button {
   border-radius: 4px;
   cursor: pointer;
+  margin: 0px;
+  padding: 2px;
+  padding-bottom: 0px;
   border-width: 1px;
   border-color: #999;
   border-style: outset;
+  min-width: 40px;
+  display: inline-block;
+  color: #eee;
+  transition: border-style;
+}
+
+button:focus {
+  outline: none;
+}
+
+.button:active {
+  border-style: inset;
+}
+
+.button:hover {
+  border-color: #fff;
+}
+
+.flexButton {
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px outset #999;
   color: #eee;
   transition: border-style;
   vertical-align: middle;
-  padding: 2px;
-  padding-bottom: 1px;
   text-align: center;
   width: fit-content;
+  padding: 2px;
+  padding-bottom: 0px;
+}
+
+.flexButton:active {
+  border-style: inset;
 }
 
 .flexButton:hover {
@@ -1013,7 +1007,6 @@ input[type="color"]::-webkit-color-swatch {
   justify-content: space-between;
   flex-wrap: wrap;
 }
-
 
 #SecondaryAudioAlertControls {
   display: flex;

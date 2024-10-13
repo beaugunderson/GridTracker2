@@ -40,49 +40,6 @@ input[type="checkbox"] {
   position: relative;
 }
 
-select {
-  appearance: none;
-  border-radius: 6px;
-  text-indent: 0.2px;
-  text-overflow: "";
-  padding: 2px;
-  padding-right: 3px;
-  background-color: darkblue;
-  color: #ff0;
-  cursor: pointer;
-}
-select:focus {
-  outline: none;
-}
-
-select:hover {
-  border-color: #fff;
-}
-
-select:disabled {
-  border: 1px solid #333;
-  background-color: #000;
-  color: #aaa;
-  outline: none;
-}
-
-select option {
-  margin: 40px;
-  background: #000;
-  color: #eee;
-  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
-  appearance: none;
-  border-radius: 8px;
-  text-indent: 0.2px;
-  text-overflow: "";
-  text-align: left;
-  padding: 5px;
-}
-
-select option:focus {
-  color: #f00;
-}
-
 option:disabled {
   color: #666;
 }
@@ -361,26 +318,6 @@ input.slider {
   width: max-content;
 }
 
-.inputTextValue {
-  border-radius: 6px;
-  border: 1px solid #999;
-  background-color: green;
-  color: yellow;
-  outline: none;
-  margin: 0px;
-  padding: 2px;
-  border-style: inset;
-}
-
-.inputTextValue:hover {
-  border-color: #fff;
-  border-style: outset;
-}
-
-.roundBorderValue {
-  padding: 3px;
-  font-size: larger;
-}
 
 #instancesWrapper .button {
   display: inline-block;
@@ -751,24 +688,7 @@ p {
   padding: 2px;
 }
 
-.flexButton {
-  border-radius: 4px;
-  cursor: pointer;
-  border-width: 1px;
-  border-color: #999;
-  border-style: outset;
-  color: #eee;
-  transition: border-style;
-  vertical-align: middle;
-  padding: 2px;
-  padding-bottom: 1px;
-  text-align: center;
-  width: fit-content;
-}
 
-.flexButton:hover {
-  border-color: #fff;
-}
 
 .ignoresTables  {
   margin:10px;
