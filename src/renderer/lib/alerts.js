@@ -1037,3 +1037,20 @@ function wantedMediaSpeechChanged(event)
   }
   GT.settings.audioAlerts.media[element.id] = element.value;
 }
+
+function openWatcher()
+{
+  if (GT.rosterInitialized)
+  {
+    try
+    {
+      GT.callRosterWindowHandle.window.openWatcher();
+      electron.ipcRenderer.send("showWin", "gt_roster");
+    }
+    catch (e)
+    {
+      console.log("Call Roster openWatcher");
+      console.log(e.message);
+    }
+  }
+}
