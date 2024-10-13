@@ -151,7 +151,7 @@
   "controlPanel.ClubLog.hover": "Cargar libro de guardia desde ClubLog",
   "controlPanel.LocalAIDF.hover": "Cargar archivos ADIF locales",
   "controlPanel.Timezone.hover": "Alternar capa de zona horaria",
-  "controlPanel.Radar.hover": "Alternar radar US Nexrad",
+  "controlPanel.Radar.hover": "Alternar radar US",
   "controlPanel.AllGrids.hover": "Alternar todas las superposiciones de Grid",
   "controlPanel.GTFlags.hover": "Alternar ver usuarios de GridTracker",
   "controlPanel.Chat.hover": "Ventana de mensajería",

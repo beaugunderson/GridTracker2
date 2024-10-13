@@ -151,7 +151,7 @@
     "controlPanel.ClubLog.hover": "Charger le log depuis ClubLog",
     "controlPanel.LocalAIDF.hover": "Charger les fichiers ADIF locaux",
     "controlPanel.Timezone.hover": "Calque du fuseau horaire",
-    "controlPanel.Radar.hover": "Charger US Nexrad Radar",
+    "controlPanel.Radar.hover": "Charger US Radar",
     "controlPanel.AllGrids.hover": "Afficher toutes les grilles",
     "controlPanel.GTFlags.hover": "Afficher les utilisateurs de GridTracker",
     "controlPanel.Chat.hover": "Fenêtre de messagerie",

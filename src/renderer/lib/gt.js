@@ -120,6 +120,7 @@ const backupAdifHeader = "GridTracker v" + gtVersion + " <EOH>\r\n";
 GT.popupWindowHandle = null;
 GT.popupWindowInitialized = false;
 GT.callRosterWindowHandle = null;
+GT.callRosterWindowInitialized = false;
 GT.conditionsWindowHandle = null;
 GT.conditionsWindowInitialized = false;
 GT.chatWindowHandle = null;
@@ -132,6 +133,9 @@ GT.baWindowHandle = null;
 GT.baWindowInitialized = false;
 GT.alertWindowHandle = null;
 GT.alertWindowInitialized = false;
+
+GT.callRoster = {};
+GT.rosterUpdateTimer = null;
 GT.myDXGrid = "";
 GT.speechAvailable = false;
 GT.receptionReports = { spots: {} };
@@ -151,6 +155,8 @@ GT.setNewUdpPortTimeoutHandle = null;
 GT.map = null;
 GT.menuShowing = true;
 GT.closing = false;
+GT.lastLookupCallsign = "";
+GT.lookupTimeout = null;
 GT.liveGrids = {};
 GT.qsoGrids = {};
 GT.liveCallsigns = {};
@@ -440,12 +446,173 @@ GT.viewInfo[8] = ["wacpZones", "CA Provinces", 0, 0, 13];
 GT.soundCard = GT.settings.app.soundCard;
 GT.gridAlpha = "88";
 GT.mediaFiles = null;
+GT.qslAuthorityTimer = null;
+GT.tempGridBox = null;
+GT.currentShapes = {};
+GT.helpShow = false;
+GT.MyCurrentGrid = "";
+GT.MyGridIsUp = false;
+GT.animateFrame = 0;
+GT.nextDimTime = 0;
+GT.lastFrame = 0;
+GT.currentDay = 0;
+GT.nightTime = false;
+GT.currentNightState = false;
+GT.timeNow = timeNowSec();
+GT.transmitFlightPath = null;
+GT.usRadar = null;
+GT.usRadarInterval = null;
+GT.oldQSOTimer = null;
+GT.lastBand = "";
+GT.lastMode = "";
+GT.weAreDecoding = false;
+GT.localDXcall = "";
+GT.countIndex = 0;
+GT.lastCountIndex = 0;
+GT.lastTransmitCallsign = {};
+GT.lastStatusCallsign = {};
+GT.lastTxMessage = null;
+GT.lastMapView = null;
+
+GT.hoverFunctors = {};
+GT.lastHover = { feature: null, functor: null };
+
+GT.wsjtHandlers = {
+  0: handleWsjtxNotSupported,
+  1: handleWsjtxStatus,
+  2: handleWsjtxDecode,
+  3: handleWsjtxClear,
+  4: handleWsjtxNotSupported,
+  5: handleWsjtxQSO,
+  6: handleWsjtxClose,
+  7: handleWsjtxNotSupported,
+  8: handleWsjtxNotSupported,
+  9: handleWsjtxNotSupported,
+  10: handleWsjtxWSPR,
+  11: handleWsjtxNotSupported,
+  12: handleWsjtxADIF
+};
+
+GT.gtFlagIcon = new ol.style.Icon({
+  src: "img/flag_gt_user.png",
+  anchorYUnits: "pixels",
+  anchorXUnits: "pixels",
+  anchor: [12, 17]
+});
+
+GT.pushPinIconOff = new ol.style.Icon({
+  src: "img/red-circle.png",
+  anchorYUnits: "pixels",
+  anchorXUnits: "pixels",
+  anchor: [5, 18]
+});
+
+GT.mapSourceTypes = {
+  XYZ: ol.source.XYZ,
+  TileWMS: ol.source.TileWMS,
+  Group: null
+};
+
+GT.trackerWorkerCallbacks = {
+  processed: applyQSOs
+};
+
+GT.trackerWorker = new Worker("./lib/trackerWorker.js");
+
+GT.trackerWorker.onmessage = function(event)
+{
+  if ("type" in event.data)
+  {
+    if (event.data.type in GT.trackerWorkerCallbacks)
+    {
+      GT.trackerWorkerCallbacks[event.data.type](event.data);
+    }
+    else console.log("trackerWorkerCallback: unknown event type : " + event.data.type);
+  }
+  else console.log("trackerWorkerCallback: no event type");
+};
+
+GT.sortFunction = [
+  myCallCompare,
+  myGridCompare,
+  myModeCompare,
+  myDxccCompare,
+  myTimeCompare,
+  myBandCompare,
+  myConfirmedCompare
+];
+
+GT.lastSortIndex = 4;
+GT.qsoPages = 1;
+GT.qsoPage = 0;
+GT.lastSortType = 0;
+GT.searchWB = "";
+GT.gridSearch = "";
+GT.filterBand = "Mixed";
+GT.filterMode = "Mixed";
+GT.filterDxcc = 0;
+GT.filterQSL = "All";
+GT.lastSearchSelection = null;
+GT.statBoxTimer = null;
+GT.timezoneLayer = null;
+GT.redrawFromLegendTimeoutHandle = null;
+GT.defaultButtons = [];
+GT.movingButton = null;
+GT.finishedLoading = false;
+GT.wsjtCurrentPort = -1;
+GT.wsjtUdpServer = null;
+GT.wsjtUdpSocketReady = false;
+GT.wsjtUdpSocketError = false;
+GT.qtToSplice = 0;
+GT.forwardUdpServer = null;
+GT.instances = {};
+GT.instancesIndex = [];
+GT.activeInstance = "";
+GT.activeIndex = 0;
+GT.currentID = null;
+GT.lastWsjtMessageByPort = {};
+GT.qrzLookupSessionId = null;
+GT.qrzLookupCallsign = "";
+GT.qrzLookupGrid = "";
+GT.sinceLastLookup = 0;
+GT.rosterSpot = false;
+GT.redrawSpotsTimeout = null;
+GT.spotTotalCount = 0;
+GT.spotFlightColor = "#FFFFFFBB";
+GT.spotNightFlightColor = "#FFFFFFBB";
+
+GT.startupTable = [
+  [loadI18n, "Loading Locales", "gt.startupTable.loadi18n"],
+  [callsignServicesInit, "Callsign Services Initialized", "gt.startupTable.callsigns"],
+  [loadMapSettings, "Map Settings Initialized", "gt.startupTable.mapSettings"],
+  [initMap, "Loaded Map", "gt.startupTable.loadMap"],
+  [setPins, "Created Pins", "gt.startupTable.setPins"],
+  [loadViewSettings, "Loaded View Settings", "gt.startupTable.viewSettings"],
+  [loadMsgSettings, "Loaded Messaging Settings", "gt.startupTable.msgSettings"],
+  [setFileSelectors, "Set File Selectors", "gt.startupTable.fileSelectors"],
+  [loadMaidenHeadData, "Loaded Maidenhead Dataset", "gt.startupTable.maidenheadData"],
+  [updateBasedOnIni, "Updated from WSJT-X", "gt.startupTable.updateINI"],
+  [loadAdifSettings, "Loaded ADIF Settings", "gt.startupTable.loadADIF"],
+  [startupButtonsAndInputs, "Buttons and Inputs Initialized", "gt.startupTable.initButtons"],
+  [initSpeech, "Speech Initialized", "gt.startupTable.initSpeech"],
+  [initSoundCards, "Sounds Initialized", "gt.startupTable.initSounds"],
+  [loadPortSettings, "Loaded Network Settings", "gt.startupTable.loadPorts"],
+  [loadLookupDetails, "Callsign Lookup Details Loaded", "gt.startupTable.loadLookup"],
+  [renderLocale, "Rendering Locale", "gt.startupTable.loadi18n"],
+  [startupEventsAndTimers, "Set Events and Timers", "gt.startupTable.eventTimers"],
+  [registerHotKeys, "Registered Hotkeys", "gt.startupTable.regHotkeys"],
+  [gtChatSystemInit, "Chat System Initialized", "gt.startupTable.initOams"],
+  [initPota, "POTA Initialized", "gt.startupTable.loadPOTA"],
+  [downloadAcknowledgements, "Contributor Acknowledgements Loaded", "gt.startupTable.getAcks"],
+  [postInit, "Finalizing System", "gt.startupTable.postInit"],
+  [undefined, "Completed", "gt.startupEngine.completed"]
+];
 
 function saveAllSettings()
 {
   try
   {
-    if (GT.rosterInitialized)
+    if (GT.callRosterWindowInitialized)
     {
       GT.callRosterWindowHandle.window.writeRosterSettings();
     }
@@ -751,7 +918,7 @@ function toggleOffline()
     setGtShareButtons();
     closePskMqtt();
   }
-  displayNexrad();
+  displayRadar();
   displayPredLayer();
 
   loadMapSettings();
@@ -814,25 +981,6 @@ function userTimeString(Msec)
   else dateTime = new Date();
   return dateToString(dateTime);
 }
-
-GT.trackerWorkerCallbacks = {
-  processed: applyQSOs
-};
-
-GT.trackerWorker = new Worker("./lib/trackerWorker.js");
-
-GT.trackerWorker.onmessage = function(event)
-{
-  if ("type" in event.data)
-  {
-    if (event.data.type in GT.trackerWorkerCallbacks)
-    {
-      GT.trackerWorkerCallbacks[event.data.type](event.data);
-    }
-    else console.log("trackerWorkerCallback: unknown event type : " + event.data.type);
-  }
-  else console.log("trackerWorkerCallback: no event type");
-};
 
 function refreshQSOs()
 {
@@ -1498,9 +1646,6 @@ function toggleConditionsBox()
   }
 }
 
-GT.rosterInitialized = false;
-GT.callRoster = {};
-GT.rosterUpdateTimer = null;
 
 function insertMessageInRoster(newMessage, msgDEcallsign, msgDXcallsign, callObj, hash)
 {
@@ -1549,7 +1694,7 @@ function openCallRosterWindow(show = true)
   {
     GT.callRosterWindowHandle = window.open("gt_roster.html", "gt_roster");
   }
-  else if (GT.rosterInitialized)
+  else if (GT.callRosterWindowInitialized)
   {
     electron.ipcRenderer.send("toggleWin", "gt_roster");
     goProcessRoster();
@@ -1558,7 +1703,7 @@ function openCallRosterWindow(show = true)
 
 function updateRosterWorked()
 {
-  if (GT.rosterInitialized)
+  if (GT.callRosterWindowInitialized)
   {
     try
     {
@@ -1573,7 +1718,7 @@ function updateRosterWorked()
 
 function updateRosterInstances()
 {
-  if (GT.rosterInitialized)
+  if (GT.callRosterWindowInitialized)
   {
     try
     {
@@ -1593,7 +1738,7 @@ function changeLogbookPage()
   
 }
 
-GT.qslAuthorityTimer = null;
+
 // Called from GridTracher.html
 function qslAuthorityChanged()
 {
@@ -1718,7 +1863,6 @@ function getMouseY()
 {
   return GT.mouseY;
 }
-GT.tempGridBox = null;
 
 function tempGridToBox(iQTH, oldGrid, borderColor, boxColor, layer)
 {
@@ -1752,7 +1896,7 @@ function tempGridToBox(iQTH, oldGrid, borderColor, boxColor, layer)
   GT.layerSources.temp.addFeature(newGridBox);
   return newGridBox;
 }
-GT.tempGrids = Array();
+
 
 function onMyKeyDown(event)
 {
@@ -1829,10 +1973,7 @@ function onMyKeyDown(event)
 function clearTempGrids()
 {
   GT.layerSources.temp.clear();
-  GT.tempGrids = Array();
 }
-
-GT.currentShapes = {};
 
 function clearCurrentShapes()
 {
@@ -1885,7 +2026,7 @@ function registerHotKeys()
   registerHotKey("Show US Counties Award Layer", "7", setTrophyOverlay, 6);
   registerHotKey("Show US48 Grids Award Layer", "8", setTrophyOverlay, 7);
   registerHotKey("Show CA Provinces Award Layer", "9", setTrophyOverlay, 8);
-  registerHotKey("Toggle US Radar Overlay", "0", toggleNexrad);
+  registerHotKey("Toggle US Radar Overlay", "0", toggleRadar);
   registerHotKey("Cycle Award Layers", "Equal", cycleTrophyOverlay);
 
   registerHotKey("Toggle Active Path Animation", "KeyA", toggleAnimate, null, null, "ctrlKey");
@@ -2055,7 +2196,7 @@ function toggleMenu()
   else collapseMenu(true);
 }
 
-GT.helpShow = false;
+
 function toggleHelp()
 {
   GT.helpShow = !GT.helpShow;
@@ -2626,9 +2767,6 @@ function trophyOut(feature)
 {
   myTrophyTooltip.style.zIndex = -1;
 }
-
-GT.MyCurrentGrid = "";
-GT.MyGridIsUp = false;
 
 function mouseDownGrid(longlat)
 {
@@ -3575,10 +3713,6 @@ function changeAnimateSpeedValue()
   
 }
 
-GT.animateFrame = 0;
-GT.nextDimTime = 0;
-GT.last = 0;
-
 function removeFlightPathsAndDimSquares()
 {
   for (var i = GT.flightPaths.length - 1; i >= 0; i--)
@@ -3605,8 +3739,8 @@ function animatePaths()
 {
   requestAnimationFrame(animatePaths);
 
-  GT.last ^= GT.last;
-  if (GT.last == 1) return;
+  GT.lastFrame ^= GT.lastFrame;
+  if (GT.lastFrame == 1) return;
 
   GT.animateFrame++;
   GT.animateFrame %= GT.settings.map.animateSpeed;
@@ -3930,11 +4064,6 @@ function getCurrentBandModeHTML()
   );
 }
 
-GT.currentDay = 0;
-GT.nightTime = false;
-GT.currentNightState = false;
-GT.timeNow = timeNowSec();
-
 function displayTime()
 {
   GT.timeNow = timeNowSec();
@@ -4065,20 +4194,6 @@ function createGeoJsonLayer(name, url, color, stroke)
   return layerVector;
 }
 
-GT.gtFlagIcon = new ol.style.Icon({
-  src: "img/flag_gt_user.png",
-  anchorYUnits: "pixels",
-  anchorXUnits: "pixels",
-  anchor: [12, 17]
-});
-
-GT.pushPinIconOff = new ol.style.Icon({
-  src: "img/red-circle.png",
-  anchorYUnits: "pixels",
-  anchorXUnits: "pixels",
-  anchor: [5, 18]
-});
-
 function toggleMouseTrack()
 {
   GT.settings.app.mouseTrack ^= 1;
@@ -4089,11 +4204,6 @@ function displayMouseTrack()
 {
   mouseTrackDiv.style.display = (GT.settings.app.mouseTrack == 1) ? "block" : "none";
 }
-
-GT.Nexrad = null;
-
-GT.hoverFunctors = Object();
-GT.lastHover = { feature: null, functor: null };
 
 function initHoverFunctors()
 {
@@ -4196,12 +4306,6 @@ function ProcessGroupMapSource(map)
   }
 }
 
-GT.mapSourceTypes = {
-  XYZ: ol.source.XYZ,
-  TileWMS: ol.source.TileWMS,
-  Group: null
-};
-
 function initAEQDprojection()
 {
   if (ol.proj.proj4.isRegistered())
@@ -4267,8 +4371,8 @@ function changeMapProjection(honorMemory = true)
   displayPredLayer();
   GT.timezoneLayer = null;
   displayTimezones();
-  GT.Nexrad = null;
-  displayNexrad();
+  GT.usRadar = null;
+  displayRadar();
   redrawGrids();
   redrawSpots();
   redrawParks();
@@ -4678,11 +4782,7 @@ function changeNightMapEnable(check)
   
 }
 
-GT.lasttimezone = null;
-
-GT.nexradInterval = null;
-
-function createNexRad()
+function createRadar()
 {
   var layerSource = new ol.source.TileWMS({
     projection: "EPSG:3857",
@@ -4703,48 +4803,48 @@ function createNexRad()
   return layerVector;
 }
 
-function toggleNexrad()
+function toggleRadar()
 {
-  GT.settings.map.usNexrad = !GT.settings.map.usNexrad;
-  displayNexrad();
+  GT.settings.map.usRadar = !GT.settings.map.usRadar;
+  displayRadar();
   
 }
 
-function displayNexrad()
+function displayRadar()
 {
-  if (GT.settings.map.usNexrad && GT.settings.map.offlineMode == false)
+  if (GT.settings.map.usRadar && GT.settings.map.offlineMode == false)
   {
-    if (GT.Nexrad == null)
+    if (GT.usRadar == null)
     {
-      GT.Nexrad = createNexRad();
-      GT.map.addLayer(GT.Nexrad);
+      GT.usRadar = createRadar();
+      GT.map.addLayer(GT.usRadar);
     }
 
-    if (GT.nexradInterval == null) { GT.nexradInterval = nodeTimers.setInterval(nexradRefresh, 600000); }
+    if (GT.usRadarInterval == null) { GT.usRadarInterval = nodeTimers.setInterval(radarRefresh, 600000); }
   }
   else
   {
-    if (GT.nexradInterval != null)
+    if (GT.usRadarInterval != null)
     {
-      nodeTimers.clearInterval(GT.nexradInterval);
-      GT.nexradInterval = null;
+      nodeTimers.clearInterval(GT.usRadarInterval);
+      GT.usRadarInterval = null;
     }
-    if (GT.Nexrad)
+    if (GT.usRadar)
     {
-      GT.map.removeLayer(GT.Nexrad);
-      GT.Nexrad = null;
+      GT.map.removeLayer(GT.usRadar);
+      GT.usRadar = null;
     }
   }
 
-  radarImg.style.filter = GT.settings.map.usNexrad ? "" : "grayscale(1)";
+  radarImg.style.filter = GT.settings.map.usRadar ? "" : "grayscale(1)";
 }
 
-function nexradRefresh()
+function radarRefresh()
 {
-  if (GT.Nexrad != null && GT.settings.map.offlineMode == false)
+  if (GT.usRadar != null && GT.settings.map.offlineMode == false)
   {
-    GT.Nexrad.getSource().updateParams({ ol3_salt: Math.random() });
-    GT.Nexrad.getSource().refresh();
+    GT.usRadar.getSource().updateParams({ ol3_salt: Math.random() });
+    GT.usRadar.getSource().refresh();
   }
 }
 
@@ -4977,8 +5077,6 @@ function setHomeGridsquare()
   if (push) GT.liveCallsigns[hash] = newCallsign;
 }
 
-GT.transmitFlightPath = null;
-
 function haltAllTx(allTx = false)
 {
   for (var instance in GT.instances)
@@ -5141,24 +5239,6 @@ function setCallAndGrid(callsign, grid, instance = null, genMessages = true)
   }
 }
 
-GT.wsjtHandlers = {
-  0: handleWsjtxNotSupported,
-  1: handleWsjtxStatus,
-  2: handleWsjtxDecode,
-  3: handleWsjtxClear,
-  4: handleWsjtxNotSupported,
-  5: handleWsjtxQSO,
-  6: handleWsjtxClose,
-  7: handleWsjtxNotSupported,
-  8: handleWsjtxNotSupported,
-  9: handleWsjtxNotSupported,
-  10: handleWsjtxWSPR,
-  11: handleWsjtxNotSupported,
-  12: handleWsjtxADIF
-};
-
-GT.oldQSOTimer = null;
-
 function handleWsjtxADIF(newMessage)
 {
   if (GT.oldQSOTimer)
@@ -5184,15 +5264,6 @@ function handleWsjtxQSO(newMessage)
 }
 
 function handleWsjtxNotSupported(newMessage) { }
-
-GT.lastBand = "";
-GT.lastMode = "";
-
-GT.weAreDecoding = false;
-GT.localDXcall = "";
-
-GT.countIndex = 0;
-GT.lastCountIndex = 0;
 
 function rigChange(up)
 {
@@ -5250,15 +5321,11 @@ function activeRig(instance)
   }
 }
 
-GT.lastTransmitCallsign = {};
-GT.lastStatusCallsign = {};
-GT.lastTxMessage = null;
-
 function handleWsjtxStatus(newMessage)
 {
   if (GT.ignoreMessages == 1) return;
 
-  if (GT.rosterInitialized)
+  if (GT.callRosterWindowInitialized)
   {
     try
     {
@@ -5305,7 +5372,7 @@ function handleWsjtxStatus(newMessage)
     }
   }
 
-  if (GT.rosterInitialized && GT.callRosterWindowHandle.window.CR.rosterSettings.clearRosterOnBandChange && GT.instances[newMessage.instance].oldStatus)
+  if (GT.callRosterWindowInitialized && GT.callRosterWindowHandle.window.CR.rosterSettings.clearRosterOnBandChange && GT.instances[newMessage.instance].oldStatus)
   {
     if (GT.instances[newMessage.instance].oldStatus.Band != newMessage.Band || GT.instances[newMessage.instance].oldStatus.MO != newMessage.MO)
     {
@@ -5626,8 +5693,6 @@ function reportDecodes()
     GT.decodeCollector = {};
   }
 }
-
-GT.lastMapView = null;
 
 function drawTraffic()
 {
@@ -6367,7 +6432,7 @@ function goProcessRoster()
       continue;
     }
   }
-  if (GT.rosterInitialized)
+  if (GT.callRosterWindowInitialized)
   {
     try
     {
@@ -6803,30 +6868,6 @@ function myConfirmedCompare(a, b)
   if (!a.confirmed && b.confirmed) return -1;
   return 0;
 }
-
-GT.sortFunction = [
-  myCallCompare,
-  myGridCompare,
-  myModeCompare,
-  myDxccCompare,
-  myTimeCompare,
-  myBandCompare,
-  myConfirmedCompare
-];
-
-GT.lastSortIndex = 4;
-
-GT.qsoPages = 1;
-GT.qsoPage = 0;
-GT.lastSortType = 0;
-GT.searchWB = "";
-GT.gridSearch = "";
-GT.filterBand = "Mixed";
-GT.filterMode = "Mixed";
-GT.filterDxcc = 0;
-GT.filterQSL = "All";
-
-GT.lastSearchSelection = null;
 
 function resetSearch()
 {
@@ -7989,8 +8030,6 @@ function newDistanceObject(start = 0)
   distance.confirmed_hash = null;
   return distance;
 }
-
-GT.statBoxTimer = null;
 
 function showStatBox(resize)
 {
@@ -10709,8 +10748,6 @@ function loadMaidenHeadData()
   initAdifWorker();
 }
 
-GT.timezoneLayer = null;
-
 function toggleTimezones()
 {
   GT.settings.map.timezonesEnable ^= 1;
@@ -11108,7 +11145,7 @@ function loadMapSettings()
   setSpotImage();
 
   timezoneImg.style.filter = GT.settings.map.timezonesEnable == 1 ? "" : "grayscale(1)";
-  radarImg.style.filter = GT.settings.map.usNexrad ? "" : "grayscale(1)";
+  radarImg.style.filter = GT.settings.map.usRadar ? "" : "grayscale(1)";
   predImg.src = GT.predImageArray[GT.settings.map.predMode];
   predImg.style.filter = GT.settings.map.predMode > 0 ? "" : "grayscale(1)";
   gridOverlayImg.style.filter = GT.settings.map.showAllGrids ? "" : "grayscale(1)";
@@ -11261,7 +11298,6 @@ function resetLegendColors()
   redrawGrids();
 }
 
-GT.redrawFromLegendTimeoutHandle = null;
 function changeLegendColor(source)
 {
   var newColor = source.value;
@@ -11838,7 +11874,6 @@ function startupEventsAndTimers()
   nodeTimers.setInterval(oamsBandActivityCheck, 300000);
 }
 
-GT.finishedLoading = false;
 function postInit()
 {
   let section = "mapViewFilters";
@@ -11853,8 +11888,8 @@ function postInit()
     updateForwardListener();
     section = "LastTraffic";
     addLastTraffic("GridTracker2</br>" + gtShortVersion);
-    section = "NexradInit";
-    displayNexrad();
+    section = "displayRadar";
+    displayRadar();
     section = "PredictionInit";
     predInit();
     section = "PredictionLayer";
@@ -11907,9 +11942,6 @@ function postInit()
 
   GT.finishedLoading = true;
 }
-
-GT.defaultButtons = [];
-GT.movingButton = null;
 
 function buttonPanelInit()
 {
@@ -12100,33 +12132,6 @@ document.addEventListener("drop", function (event)
   if (GT.finishedLoading == true) dropHandler(event);
 });
 
-GT.startupTable = [
-  [loadI18n, "Loading Locales", "gt.startupTable.loadi18n"],
-  [callsignServicesInit, "Callsign Services Initialized", "gt.startupTable.callsigns"],
-  [loadMapSettings, "Map Settings Initialized", "gt.startupTable.mapSettings"],
-  [initMap, "Loaded Map", "gt.startupTable.loadMap"],
-  [setPins, "Created Pins", "gt.startupTable.setPins"],
-  [loadViewSettings, "Loaded View Settings", "gt.startupTable.viewSettings"],
-  [loadMsgSettings, "Loaded Messaging Settings", "gt.startupTable.msgSettings"],
-  [setFileSelectors, "Set File Selectors", "gt.startupTable.fileSelectors"],
-  [loadMaidenHeadData, "Loaded Maidenhead Dataset", "gt.startupTable.maidenheadData"],
-  [updateBasedOnIni, "Updated from WSJT-X", "gt.startupTable.updateINI"],
-  [loadAdifSettings, "Loaded ADIF Settings", "gt.startupTable.loadADIF"],
-  [startupButtonsAndInputs, "Buttons and Inputs Initialized", "gt.startupTable.initButtons"],
-  [initSpeech, "Speech Initialized", "gt.startupTable.initSpeech"],
-  [initSoundCards, "Sounds Initialized", "gt.startupTable.initSounds"],
-  [loadPortSettings, "Loaded Network Settings", "gt.startupTable.loadPorts"],
-  [loadLookupDetails, "Callsign Lookup Details Loaded", "gt.startupTable.loadLookup"],
-  [renderLocale, "Rendering Locale", "gt.startupTable.loadi18n"],
-  [startupEventsAndTimers, "Set Events and Timers", "gt.startupTable.eventTimers"],
-  [registerHotKeys, "Registered Hotkeys", "gt.startupTable.regHotkeys"],
-  [gtChatSystemInit, "Chat System Initialized", "gt.startupTable.initOams"],
-  [initPota, "POTA Initialized", "gt.startupTable.loadPOTA"],
-  [downloadAcknowledgements, "Contributor Acknowledgements Loaded", "gt.startupTable.getAcks"],
-  [postInit, "Finalizing System", "gt.startupTable.postInit"],
-  [undefined, "Completed", "gt.startupEngine.completed"]
-];
-
 function init()
 {
   initQSOdata();
@@ -12189,12 +12194,6 @@ function loadPortSettings()
   udpForwardEnable.checked = GT.settings.app.wsjtForwardUdpEnable;
   setUdpForwardEnable(udpForwardEnable);
 }
-
-GT.wsjtCurrentPort = -1;
-GT.wsjtUdpServer = null;
-GT.wsjtUdpSocketReady = false;
-GT.wsjtUdpSocketError = false;
-GT.qtToSplice = 0;
 
 function decodeQUINT8(byteArray)
 {
@@ -12285,8 +12284,6 @@ function encodeQDOUBLE(byteArray, offset, value)
   return byteArray.writeDoubleBE(value, offset);
 }
 
-GT.forwardUdpServer = null;
-
 function updateForwardListener()
 {
   if (GT.forwardUdpServer != null)
@@ -12363,15 +12360,6 @@ function checkWsjtxListener()
   updateWsjtxListener(GT.settings.app.wsjtUdpPort);
 }
 
-GT.instances = {};
-GT.instancesIndex = Array();
-
-GT.activeInstance = "";
-GT.activeIndex = 0;
-
-GT.currentID = null;
-GT.lastWsjtMessageByPort = {};
-
 function updateWsjtxListener(port)
 {
   if (port == GT.wsjtCurrentPort && GT.settings.app.wsjtIP == GT.wsjtCurrentIP) { return; }
@@ -12403,7 +12391,6 @@ function updateWsjtxListener(port)
   {
     GT.wsjtUdpServer.on("listening", function ()
     {
-      var address = GT.wsjtUdpServer.address();
       GT.wsjtUdpServer.setBroadcast(true);
       GT.wsjtUdpServer.setMulticastTTL(3);
       var interfaces = os.networkInterfaces();
@@ -12826,8 +12813,6 @@ function lookupValueChanged(what)
     }
   }
 }
-GT.lastLookupCallsign = "";
-GT.lookupTimeout = null;
 
 function lookupCallsign(callsign, gridPass, useCache = true)
 {
@@ -13000,10 +12985,6 @@ function callookResults(buffer, gridPass)
   }
   else setLookupDiv("lookupInfoDiv", "Unknown Lookup Error");
 }
-GT.qrzLookupSessionId = null;
-GT.qrzLookupCallsign = "";
-GT.qrzLookupGrid = "";
-GT.sinceLastLookup = 0;
 
 function GetSessionID(resultTd, useCache)
 {
@@ -14023,7 +14004,7 @@ function newOption(value, text = null, selected = null)
   return option;
 }
 
-GT.rosterSpot = false;
+
 function setRosterSpot(enabled)
 {
   GT.rosterSpot = enabled;
@@ -14058,7 +14039,6 @@ function loadReceptionReports()
   }
 }
 
-GT.redrawSpotsTimeout = null;
 
 function addNewOAMSSpot(cid, db, frequency, band, mode)
 {
@@ -14142,8 +14122,6 @@ function spotFeature(center)
     )
   );
 }
-
-GT.spotTotalCount = 0;
 
 function createSpot(report, key, fromPoint, addToLayer = true)
 {
@@ -14288,9 +14266,6 @@ function updateSpotCountDiv()
 {
   spotCountDiv.innerHTML = "Spots: " + GT.spotTotalCount;
 }
-
-GT.spotFlightColor = "#FFFFFFBB";
-GT.spotNightFlightColor = "#FFFFFFBB";
 
 function changeSpotValues()
 {

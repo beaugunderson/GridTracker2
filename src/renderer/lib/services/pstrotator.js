@@ -15,7 +15,7 @@ function pstrotatorServiceChanged()
   GT.settings.pstrotator.port = pstrotatorPortInput.value;
 
   
-  if (GT.rosterInitialized)
+  if (GT.callRosterWindowInitialized)
   {
     GT.callRosterWindowHandle.window.setPstrotatorEnable(GT.settings.pstrotator.enable);
   }

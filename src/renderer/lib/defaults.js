@@ -135,7 +135,7 @@ const def_settings = {
     graylineOpacity: 0.1,
     splitQSL: true,
     trafficDecode: true,
-    usNexrad: false,
+    usRadar: false,
     timezonesEnable: 0,
     showAllGrids: false,
     trophyOverlay: 0,

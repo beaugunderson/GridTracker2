@@ -152,7 +152,7 @@
     "controlPanel.ClubLog.hover": "Log laden von ClubLog",
     "controlPanel.LocalAIDF.hover": "Lokales Log aus ADIF-Datei laden",
     "controlPanel.Timezone.hover": "Zeitzonen-Layer umschalten",
-    "controlPanel.Radar.hover": "US-Nexrad-Radar-Layer umschalten",
+    "controlPanel.Radar.hover": "US-Radar-Layer umschalten",
     "controlPanel.AllGrids.hover": "Gesamt-Locator Overlay umschalten",
     "controlPanel.GTFlags.hover": "GridTracker Benutzeranzeige umschalten",
     "controlPanel.Chat.hover": "Nachrichtenfenster",

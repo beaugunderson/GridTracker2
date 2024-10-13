@@ -213,19 +213,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               onclick="openInfoTab('calbox', 'callsignBoxDiv', showCallsignBox)" title="Callsigns Heard" align="right">
               Rx Calls
             </td>
-            <td style="cursor: pointer" onclick="openInfoTab('calbox', 'callsignBoxDiv', showCallsignBox)"
+            <td align="center"><div style="cursor: pointer" onclick="openInfoTab('calbox', 'callsignBoxDiv', showCallsignBox)"
               title="Callsigns Heard" class="roundBorderValue" align="center">
               <div id="callsignCount">0</div>
+              </div>
             </td>
             <td data-i18n="quickStats.QSO.label" style="cursor: pointer"
               onclick="resetSearch(); openInfoTab('qsobox', 'workedBoxDiv', showWorkedBox);" title="Worked Stations"
               align="right">
               QSO
             </td>
-            <td style="cursor: pointer" class="roundBorderValue"  
-              onclick="resetSearch(); openInfoTab('qsobox', 'workedBoxDiv', showWorkedBox);" title="Worked Stations"
-              align="center">
+            <td align="center"><div style="cursor: pointer" class="roundBorderValue"  
+              onclick="resetSearch(); openInfoTab('qsobox', 'workedBoxDiv', showWorkedBox);" title="Worked Stations">
               <div id="qsoCount">0</div>
+              </div>
             </td>
           </tr>
           <tr>
@@ -233,26 +234,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               onclick="openInfoTab('calbox', 'callsignBoxDiv', showCallsignBox);" title="DXCC Heard" align="right">
               Rx DXCC
             </td>
-            <td style="cursor: pointer" class="roundBorderValue"
+            <td><div style="cursor: pointer" class="roundBorderValue"
               onclick="openInfoTab('calbox', 'callsignBoxDiv', showCallsignBox);" title="DXCC Heard" align="center">
               <div id="countryCount">0</div>
+              </div>
             </td>
             <td data-i18n="quickStats.QSL.label" style="cursor: pointer"
               onclick="resetSearch(); GT.filterQSL='true'; openInfoTab('qsobox', 'workedBoxDiv', showWorkedBox)"
               title="Show Confirmed List" align="right">
               QSL
             </td>
-            <td style="cursor: pointer" class="roundBorderValue" 
+            <td><div style="cursor: pointer" class="roundBorderValue" 
               onclick="resetSearch(); GT.filterQSL='true'; openInfoTab('qsobox', 'workedBoxDiv', showWorkedBox)"
               title="Show Confirmed List" align="center">
               <div id="qslCount">0</div>
-            </td>
+            </div></td>
           </tr>
           <tr id="rowsFilteredTr">
-            <td colspan=4 style="cursor: pointer; background-color: #000; color: orange;" class="roundBorderValue" 
+            <td colspan=4><div style="cursor: pointer; background-color: #000; color: orange;" class="roundBorderValue" 
               onclick="openLogbookSettings()"
               title="ADIF Log records have been filtered based on your settings" align="center">
               Log Entries Filtered
+              </div>
             </td>
           </tr>
           <tr>
@@ -439,7 +442,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <div id="modeModeDiv" onclick="toggleOffline()" class="iconButton" title="Toggle Online/Offline Mode">
           <img id="offlineImg" src="" class="buttonImg" />
         </div>
-        <div id="radarButton" onclick="toggleNexrad()" class="iconButton" title="Toggle US Nexrad">
+        <div id="radarButton" onclick="toggleRadar()" class="iconButton" title="Toggle US Radar">
           <img id="radarImg" src="img/radar-button.png" class="buttonImg" />
         </div>
         <div id="predButton" onclick="cyclePredLayer()" class="iconButton" title="Cycle Prediction Layer">
@@ -742,7 +745,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                   <tr>
                     <td id="multicastTD" >
                       <label data-i18n="settings.general.UDP.IP.label" for="multicastIpInput">IP</label>
-                      <input id="multicastIpInput" type="text" class="inputTextValue" maxlength="255" size="16"
+                      <input id="multicastIpInput" type="text" class="inputTextValue" maxlength="15" size="11"
                         onkeypress="return validIpKeys(event.charCode);"
                         oninput=" if ( ValidateMulticast(this) ) setMulticastIp();   " />
                     </td>
@@ -770,7 +773,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                   <tr>
                     <td>
                       <label data-i18n="settings.general.Fwd.IP.label" for="udpForwardIpInput">IP</label>
-                      <input id="udpForwardIpInput" type="text" class="inputTextValue" maxlength="255" size="16"
+                      <input id="udpForwardIpInput" type="text" class="inputTextValue" maxlength="15" size="11"
                         onkeypress="return validIpKeys(event.charCode);"
                         oninput=" if ( ValidateIPaddress(this, udpForwardEnable) ) setForwardIp();   " />
                     </td>
@@ -2212,7 +2215,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </td>
             <td>
               <label data-i18n="settings.logging.N1MM.details.IP" for="N1MMIpInput">IP</label>
-              <input id="N1MMIpInput" type="text" class="inputTextValue" maxlength="15" size="15"
+              <input id="N1MMIpInput" type="text" class="inputTextValue" maxlength="15" size="11"
                 onkeypress='return validIpKeys(event.charCode);' oninput="ValidateIPaddress(this,buttonN1MMCheckBox);
                   n1mmLoggerChanged(); " />
               <label data-i18n="settings.logging.N1MM.details.Port" for="N1MMPortInput">Port</label>
@@ -2233,7 +2236,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </td>
             <td>
               <label data-i18n="settings.logging.Log4OM.details.IP" for="log4OMIpInput">IP</label>
-              <input id="log4OMIpInput" type="text" class="inputTextValue" maxlength="15" size="15"
+              <input id="log4OMIpInput" type="text" class="inputTextValue" maxlength="15" size="11"
                 onkeypress='return validIpKeys(event.charCode);'
                 oninput="ValidateIPaddress(this,buttonLog4OMCheckBox); log4OMLoggerChanged(); " />
               <label data-i18n="settings.logging.Log4OM.details.Port" for="log4OMPortInput">Port</label>
@@ -2254,7 +2257,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </td>
             <td>
               <label data-i18n="settings.logging.N3FJP.details.IP" for="acLogIpInput">IP</label>
-              <input id="acLogIpInput" type="text" class="inputTextValue" maxlength="15" size="15"
+              <input id="acLogIpInput" type="text" class="inputTextValue" maxlength="15" size="11"
                 onkeypress='return validIpKeys(event.charCode);' oninput="ValidateIPaddress(this,buttonacLogCheckBox);
                   acLogLoggerChanged(); " />
               <label data-i18n="settings.logging.N3FJP.details.Port" for="acLogPortInput">Port</label>
@@ -2275,7 +2278,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </td>
             <td>
               <label data-i18n="settings.logging.DXKeeper.details.IP" for="dxkLogIpInput">IP</label>
-              <input id="dxkLogIpInput" type="text" class="inputTextValue" maxlength="15" size="15"
+              <input id="dxkLogIpInput" type="text" class="inputTextValue" maxlength="15" size="11"
                 onkeypress='return validIpKeys(event.charCode);'
                 oninput="ValidateIPaddress(this,buttondxkLogCheckBox); dxkLogLoggerChanged(); " />
               <label data-i18n="settings.logging.DXKeeper.details.Port" for="dxkLogPortInput">Port</label>
@@ -2296,7 +2299,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </td>
             <td>
               <label data-i18n="settings.logging.HRDLogbook.details.IP" for="hrdLogbookIpInput">IP</label>
-              <input id="hrdLogbookIpInput" type="text" class="inputTextValue" maxlength="15" size="15"
+              <input id="hrdLogbookIpInput" type="text" class="inputTextValue" maxlength="15" size="11"
                 onkeypress='return validIpKeys(event.charCode);'
                 oninput="ValidateIPaddress(this,buttonHrdLogbookCheckBox); hrdLogbookLoggerChanged(); " />
               <label data-i18n="settings.logging.HRDLogbook.details.Port" for="hrdLogbookPortInput">Port</label>
@@ -2323,7 +2326,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </td>
             <td>
               <label data-i18n="settings.logging.pstrotator.details.IP" for="pstrotatorIpInput">IP</label>
-              <input id="pstrotatorIpInput" type="text" class="inputTextValue" maxlength="15" size="15"
+              <input id="pstrotatorIpInput" type="text" class="inputTextValue" maxlength="15" size="11"
                 onkeypress='return validIpKeys(event.charCode);'
                 oninput="ValidateIPaddress(this, pstrotatorCheckBox); pstrotatorServiceChanged(); " />
               <label data-i18n="settings.logging.pstrotator.details.Port" for="pstrotatorPortInput">UDP Port</label>

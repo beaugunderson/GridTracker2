@@ -787,7 +787,7 @@ function setVisualHunting()
 {
   setVisualAudioAlerts();
 
-  if (GT.rosterInitialized)
+  if (GT.callRosterWindowInitialized)
   {
     try
     {
@@ -805,7 +805,7 @@ function setVisualHunting()
 // Syncronized call with roster.js!
 function huntingValueChanged(element)
 {
-  if (GT.rosterInitialized)
+  if (GT.callRosterWindowInitialized)
   {
     let value = (element.type == "checkbox") ? element.checked : element.value;
     GT.callRosterWindowHandle.window.huntingValueChangedFromAudioAlerts(element.id, value);
@@ -838,7 +838,7 @@ function huntingValueChangedFromCallRoster(id, value)
 
 function openExceptions()
 {
-  if (GT.rosterInitialized)
+  if (GT.callRosterWindowInitialized)
   {
     GT.callRosterWindowHandle.window.openExceptions();
     electron.ipcRenderer.send("showWin", "gt_roster");
@@ -1040,7 +1040,7 @@ function wantedMediaSpeechChanged(event)
 
 function openWatcher()
 {
-  if (GT.rosterInitialized)
+  if (GT.callRosterWindowInitialized)
   {
     try
     {

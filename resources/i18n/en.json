@@ -151,7 +151,7 @@
     "controlPanel.ClubLog.hover": "Load log from ClubLog",
     "controlPanel.LocalAIDF.hover": "Load Local ADIF Files",
     "controlPanel.Timezone.hover": "Toggle Timezone Layer",
-    "controlPanel.Radar.hover": "Toggle US Nexrad Radar",
+    "controlPanel.Radar.hover": "Toggle US Radar",
     "controlPanel.AllGrids.hover": "Toggle All Grid Overlay",
     "controlPanel.GTFlags.hover": "Toggle View GridTracker Users",
     "controlPanel.Chat.hover": "Messaging Window",

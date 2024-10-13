@@ -1479,7 +1479,7 @@ function init()
 
   createActiveAwardsFromSettings();
 
-  window.opener.GT.rosterInitialized = true;
+  window.opener.GT.callRosterWindowInitialized = true;
 }
 
 function toggleShowControls()
