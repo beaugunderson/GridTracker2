@@ -47,7 +47,7 @@ select {
   text-overflow: "";
   padding: 2px;
   padding-right: 3px;
-  background-color: darkgreen;
+  background-color: darkblue;
   color: #ff0;
   cursor: pointer;
 }

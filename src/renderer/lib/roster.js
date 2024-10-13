@@ -1475,6 +1475,14 @@ function init()
   // callback to addControls();
   loadRosterI18n();
 
+  var x = document.querySelectorAll("input[type='range']");
+  for (var i = 0; i < x.length; i++)
+  {
+    if (x[i].title.length > 0) x[i].title += "\n";
+    x[i].title += "(Use Arrow Keys For Smaller Increments)";
+  }
+
+  
   setRosterTop();
 
   createActiveAwardsFromSettings();
@@ -3047,7 +3055,7 @@ function ValidateTextInput(inputText, validDiv = null)
     if (passed)
     {
       inputText.style.color = "#FF0";
-      inputText.style.backgroundColor = "darkgreen";
+      inputText.style.backgroundColor = "darkblue";
       if (validDiv) validDiv.innerHTML = "";
       return true;
     }
@@ -3079,7 +3087,7 @@ function watcherNameValidate()
   if (watcherName.value.length == 0 || (watcherName.value in CR.watchers && watcherName.value != CR.watcherEditKey))
   {
     watcherName.style.color = "#000";
-    watcherName.style.backgroundColor = "orange";
+    watcherName.style.backgroundColor = "rgb(199, 113, 0)";
     return false;
   }
   else
@@ -3167,7 +3175,7 @@ function watcherTextValidate(testCallsign = false)
   if (watcherText.value.length == 0)
   {
     watcherText.style.color = "#FFF";
-    watcherText.style.backgroundColor = "orange";
+    watcherText.style.backgroundColor = "rgb(199, 113, 0)";
     return false;
   }
   else

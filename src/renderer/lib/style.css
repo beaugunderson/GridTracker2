@@ -562,32 +562,26 @@ input[type="checkbox"] {
 input[type="range"]::-webkit-slider-runnable-track {
   -webkit-appearance: none;
   height: 4px;
-  background: #000;
-  border-style: solid;
-  border-width: 1px;
-  border-color: #fff;
-  color: Fuchsia;
-  background-color: #111;
+  border: 1px solid  #888;
+  background: linear-gradient(to right, #111, #888);
   -webkit-border-radius: 10px;
 }
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  border: 1px solid #003;
+  border: 1px solid rgba(0, 0, 136, 0.514);
   height: 14px;
   width: 14px;
   -webkit-border-radius: 25%;
-  background: goldenrod;
+  background:linear-gradient(#1100a7, #00f7ff);
   margin-top: -6px;
 }
 
 input[type="range"]:focus {
   outline: none;
-  background: #000;
 }
 
 input[type="range"]:focus::-webkit-slider-runnable-track {
-  background: #000;
   outline: none;
 }
 
@@ -600,7 +594,7 @@ select {
   min-width: 30px;
   padding: 1px;
   margin: 1px;
-  background-color: darkgreen;
+  background-color: darkblue;
   color: #ff0;
   cursor: pointer;
   font-size: 12px;

@@ -10082,7 +10082,7 @@ function ValidateCallsigns(inputText)
   if (passed)
   {
     inputText.style.color = "#FF0";
-    inputText.style.backgroundColor = "darkgreen";
+    inputText.style.backgroundColor = "darkblue";
   }
   else
   {
@@ -10121,7 +10121,7 @@ function ValidateGrids(inputText)
   if (passed)
   {
     inputText.style.color = "#FF0";
-    inputText.style.backgroundColor = "darkgreen";
+    inputText.style.backgroundColor = "darkblue";
   }
   else
   {
@@ -10145,7 +10145,7 @@ function ValidateCallsign(inputText, validDiv)
     if (passed)
     {
       inputText.style.color = "#FF0";
-      inputText.style.backgroundColor = "darkgreen";
+      inputText.style.backgroundColor = "darkblue";
       if (validDiv) validDiv.innerHTML = "Valid!";
       return true;
     }
@@ -10181,7 +10181,7 @@ function ValidateGridsquareOnly4(inputText, validDiv)
     if (gridSquare != "")
     {
       inputText.style.color = "#FF0";
-      inputText.style.backgroundColor = "darkgreen";
+      inputText.style.backgroundColor = "darkblue";
       inputText.value = gridSquare;
       if (validDiv) validDiv.innerHTML = "Valid!";
       return true;
@@ -10189,7 +10189,7 @@ function ValidateGridsquareOnly4(inputText, validDiv)
     else
     {
       inputText.style.color = "#FFF";
-      inputText.style.backgroundColor = "orange";
+      inputText.style.backgroundColor = "rgb(199, 113, 0)";
       if (validDiv) validDiv.innerHTML = "Invalid!";
       return false;
     }
@@ -10230,7 +10230,7 @@ function ValidateGridsquare(inputText, validDiv)
     if (gridSquare != "")
     {
       inputText.style.color = "#FF0";
-      inputText.style.backgroundColor = "darkgreen";
+      inputText.style.backgroundColor = "darkblue";
       inputText.value = gridSquare;
       if (validDiv) validDiv.innerHTML = "Valid!";
       return true;
@@ -10238,7 +10238,7 @@ function ValidateGridsquare(inputText, validDiv)
     else
     {
       inputText.style.color = "#FFF";
-      inputText.style.backgroundColor = "orange";
+      inputText.style.backgroundColor = "rgb(199, 113, 0)";
       if (validDiv) validDiv.innerHTML = "Invalid!";
       return false;
     }
@@ -10246,7 +10246,7 @@ function ValidateGridsquare(inputText, validDiv)
   else
   {
     inputText.style.color = "#FFF";
-    inputText.style.backgroundColor = "orange";
+    inputText.style.backgroundColor = "rgb(199, 113, 0)";
     if (validDiv) validDiv.innerHTML = "Invalid!";
     return false;
   }
@@ -10284,28 +10284,28 @@ function ValidateMulticast(inputText)
         else
         {
           inputText.style.color = "#FF0";
-          inputText.style.backgroundColor = "darkgreen";
+          inputText.style.backgroundColor = "darkblue";
         }
         return true;
       }
       else
       {
         inputText.style.color = "#FFF";
-        inputText.style.backgroundColor = "orange";
+        inputText.style.backgroundColor = "rgb(199, 113, 0)";
         return false;
       }
     }
     else
     {
       inputText.style.color = "#FFF";
-      inputText.style.backgroundColor = "orange";
+      inputText.style.backgroundColor = "rgb(199, 113, 0)";
       return false;
     }
   }
   else
   {
     inputText.style.color = "#FFF";
-    inputText.style.backgroundColor = "orange";
+    inputText.style.backgroundColor = "rgb(199, 113, 0)";
     return false;
   }
 }
@@ -10318,13 +10318,13 @@ function ValidateIPaddress(inputText, checkBox)
     if (inputText.value != "0.0.0.0" && inputText.value != "255.255.255.255")
     {
       inputText.style.color = "#FF0";
-      inputText.style.backgroundColor = "darkgreen";
+      inputText.style.backgroundColor = "darkblue";
       return true;
     }
     else
     {
       inputText.style.color = "#FFF";
-      inputText.style.backgroundColor = "orange";
+      inputText.style.backgroundColor = "rgb(199, 113, 0)";
       if (checkBox) checkBox.checked = false;
       return false;
     }
@@ -10332,7 +10332,7 @@ function ValidateIPaddress(inputText, checkBox)
   else
   {
     inputText.style.color = "#FFF";
-    inputText.style.backgroundColor = "orange";
+    inputText.style.backgroundColor = "rgb(199, 113, 0)";
     if (checkBox) checkBox.checked = false;
     return false;
   }
@@ -10353,7 +10353,7 @@ function ValidatePort(inputText, checkBox, callBackCheck)
     else
     {
       inputText.style.color = "#FF0";
-      inputText.style.backgroundColor = "darkgreen";
+      inputText.style.backgroundColor = "darkblue";
       return true;
     }
   }

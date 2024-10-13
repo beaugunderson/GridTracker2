@@ -97,7 +97,7 @@ function ValidateCallsign(inputText, validDiv)
     if (passed)
     {
       inputText.style.color = "#FF0";
-      inputText.style.backgroundColor = "darkgreen";
+      inputText.style.backgroundColor = "darkblue";
       if (validDiv) validDiv.innerHTML = I18N("stats.Validate.Valid");
       return true;
     }

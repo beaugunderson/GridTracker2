@@ -552,21 +552,21 @@ function ValidateQrzApi(inputText)
     if (passed)
     {
       inputText.style.color = "#FF0";
-      inputText.style.backgroundColor = "darkgreen";
+      inputText.style.backgroundColor = "darkblue";
 
       return true;
     }
     else
     {
       inputText.style.color = "white";
-      inputText.style.backgroundColor = "orange";
+      inputText.style.backgroundColor = "rgb(199, 113, 0)";
       return false;
     }
   }
   else
   {
     inputText.style.color = "white";
-    inputText.style.backgroundColor = "orange";
+    inputText.style.backgroundColor = "rgb(199, 113, 0)";
 
     return false;
   }
@@ -577,13 +577,13 @@ function ValidateText(inputText)
   if (inputText.value.length > 0)
   {
     inputText.style.color = "#FF0";
-    inputText.style.backgroundColor = "darkgreen";
+    inputText.style.backgroundColor = "darkblue";
     return true;
   }
   else
   {
     inputText.style.color = "white";
-    inputText.style.backgroundColor = "orange";
+    inputText.style.backgroundColor = "rgb(199, 113, 0)";
     return false;
   }
 }
@@ -801,11 +801,11 @@ GT.tqslFileSelector.onchange = function ()
 
     if (GT.settings.trustedQsl.binaryFileValid == true)
     {
-      tqslFileDiv.style.backgroundColor = "blue";
+      tqslFileDiv.style.backgroundColor = "darkblue";
     }
     else
     {
-      tqslFileDiv.style.backgroundColor = "orange";
+      tqslFileDiv.style.backgroundColor = "rgb(199, 113, 0)";
     }
 
     tqslFileDiv.innerHTML = "<b>" + start_and_end(this.files[0].path) + "</b>";
@@ -1089,11 +1089,11 @@ function setAdifStartup(checkbox)
 
   if (GT.settings.trustedQsl.binaryFileValid == true)
   {
-    tqslFileDiv.style.backgroundColor = "blue";
+    tqslFileDiv.style.backgroundColor = "darkblue";
   }
   else
   {
-    tqslFileDiv.style.backgroundColor = "orange";
+    tqslFileDiv.style.backgroundColor = "rgb(199, 113, 0)";
   }
   tqslFileDiv.innerHTML =
     "<b>" + start_and_end(GT.settings.trustedQsl.binaryFile) + "</b>";
@@ -2278,12 +2278,12 @@ function CloudlogTestApiKey(buffer, flag)
         if (rights[0].childNodes[0].nodeValue == "r")
         {
           CloudlogTestResult.innerHTML = "Read Only!";
-          CloudlogTestResult.style.backgroundColor = "orange";
+          CloudlogTestResult.style.backgroundColor = "rgb(199, 113, 0)";
         }
         else if (rights[0].childNodes[0].nodeValue == "rw")
         {
           CloudlogTestResult.innerHTML = "OK";
-          CloudlogTestResult.style.backgroundColor = "darkgreen";
+          CloudlogTestResult.style.backgroundColor = "darkblue";
           CloudlogGetProfiles();
         }
       }
@@ -2293,7 +2293,7 @@ function CloudlogTestApiKey(buffer, flag)
         {
           message = xmlDoc.getElementsByTagName("message");
           CloudlogTestResult.innerHTML = "Error: " + message[0].childNodes[0].nodeValue;
-          CloudlogTestResult.style.backgroundColor = "orange";
+          CloudlogTestResult.style.backgroundColor = "rgb(199, 113, 0)";
         }
       }
     }
@@ -2325,7 +2325,7 @@ function CloudlogFillProfiles(buffer, flag)
         if (item.station_id == GT.settings.adifLog.text.CloudlogStationProfileID)
         {
           opt.style.color = "yellow";
-          opt.style.backgroundColor = "darkgreen";
+          opt.style.backgroundColor = "darkblue";
           opt.selected = "selected";
         }
         opt.innerHTML = item.station_profile_name + " (" + item.station_id + ")";
