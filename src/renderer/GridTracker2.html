@@ -706,8 +706,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           onclick="openSettingsTab(event, 'gridSettingsDiv')">Grids</button>
         <button data-i18n="settings.Logging.label" class="settingsTablinks"
           onclick="openSettingsTab(event, 'logSettingsDiv')">Logging</button>
-        <button data-i18n="settings.Alerts.label" class="settingsTablinks"
-          onclick="openSettingsTab(event, 'alertsDiv')">Alerts</button>
+        <button data-i18n="settings.alerts.AudioAlert.label" class="settingsTablinks"
+          onclick="openSettingsTab(event, 'audioAlertsDiv')">Audio Alerts</button>
+        <button data-i18n="settings.alerts.CustomAlerts.label" class="settingsTablinks"
+          onclick="openSettingsTab(event, 'customAlertsDiv')">Custom Alerts</button>
         <button data-i18n="settings.OAMS.label" class="settingsTablinks"
           onclick="openSettingsTab(event, 'chatSettingsDiv')">OAMS</button>
         <button data-i18n="settings.Logbook.label" id="logbut" class="settingsTablinks"
@@ -728,7 +730,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     <td id="lastMsgTimeDiv">No messages yet.</td>
                   </tr>
                   <tr>
-                    <td id="secondsAgoMsg" class="roundBorderValue">Never</td>
+                    <td><div id="secondsAgoMsg" class="roundBorderValue">Never</div></td>
                   </tr>
                   <tr>
                     <td>
@@ -2332,22 +2334,207 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </tr>
         </table>
     </div>
-    <div id="alertsDiv" class="settingsTabcontent">
-      <div id="alertMatrixDiv" style="display: inline-block">
-        <table class="roundBorder" align="left" style="border: 1px solid #066; margin: auto; padding: 1px">
-          <tr>
-            <th data-i18n="settings.alerts.AudioAlert.label" colspan="5">Audio Alerts</th>
-          </tr>
-         
-          
-          
-          
-         
-    
-        </table>
-
+    <div id="audioAlertsDiv" class="settingsTabcontent">
+      <div id="alertMatrixDiv">
+        <div id="SecondaryAudioAlertControls">
+           <div id="huntingMatrixDiv" class="secondaryControlGroup">
+            <h3 data-i18n="settings.alerts.AudioAlert.label">Alerts</h3>
+            <table class="audioAlertsTable">
+              <tr>
+                <th></th>
+                <th>Entity</th>
+                <th>Type</th>
+                <th>On Single</th>
+                <th>On Multiple</th>
+              </tr>
+              <tr>
+                <td>
+                <input type="checkbox" id="huntCallsign" onchange="wantedChanged(this);" />
+                </td>
+                <td>
+                <label data-i18n="roster.secondary.wanted.callsign" for="huntCallsign">Callsign</label>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                <input type="checkbox" id="huntGrid" onchange="wantedChanged(this);" />
+              </td>
+              <td>
+                <label data-i18n="roster.secondary.wanted.grid" for="huntGrid">Grid</label>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="checkbox" id="huntDXCC" onchange="wantedChanged(this);" />
+              </td>
+              <td>
+                <label data-i18n="roster.secondary.wanted.dxcc" for="huntDXCC">DXCC</label>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="checkbox" id="huntPX" onchange="wantedChanged(this);" />
+              </td>
+              <td>
+                <label data-i18n="roster.secondary.wanted.wpx" for="huntPX">WPX</label>
+              </td>
+            </tr>
+              <tr id="huntingMatrixPotaRow">
+              <td>
+                <input type="checkbox" id="huntPOTA" onchange="wantedChanged(this);" />
+              </td>
+              <td>
+                <label data-i18n="roster.secondary.wanted.pota" for="huntPOTA" title="Parks On The Air">POTA</label>
+             </td>
+              </tr>
+              <tr id="huntingMatrixOAMSRow">
+              <td>
+                <input type="checkbox" id="huntOAMS" onchange="wantedChanged(this);" />
+              </td>
+              <td>
+                <label data-i18n="roster.secondary.wanted.OAMS" for="huntOAMS" title="Off-Air Message Service Users">OAMS</label>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="checkbox" id="huntCQz" onchange="wantedChanged(this);" />
+              </td>
+              <td>
+                <label data-i18n="roster.secondary.wanted.cqzone" for="huntCQz" title="CQ Zones">CQz</label>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="checkbox" id="huntITUz" onchange="wantedChanged(this);" />
+              </td>
+              <td>
+                <label data-i18n="roster.secondary.wanted.ituzone" for="huntITUz" title="ITU Zones">ITUz</label>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="checkbox" id="huntMarathon" onchange="wantedChanged(this);" />
+              </td>
+              <td>
+                <label data-i18n="roster.secondary.wanted.marathon" for="huntMarathon" title="CQ DX Marathon">Marathon</label>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="checkbox" id="huntState" onchange="wantedChanged(this);" />
+              </td>
+              <td>
+                <label data-i18n="roster.secondary.wanted.state" for="huntState" title="State">State</label>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="checkbox" id="huntCounty" onchange="wantedChanged(this);" />
+              </td>
+              <td>
+                <label data-i18n="roster.secondary.wanted.county" for="huntCounty" title="County">County</label>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="checkbox" id="huntCont" onchange="wantedChanged(this);" />
+              </td>
+              <td>
+                <label data-i18n="roster.secondary.wanted.cont" for="huntCont" title="Continent">Continent</label>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input  type="checkbox" id="huntWatcher" onchange="wantedChanged(this);" />
+              </td>
+              <td>
+                <label data-i18n="roster.watcher.label" class="flexButton" for="huntWatcher" onclick="openWatcher();">Watcher</label>
+                </td>
+              </tr>
+              <tr id="huntMultipleTr">
+                <td>
+                  <input type="checkbox" id="huntMultiple" style="visibility: hidden;" />
+                </td>
+                <td>
+                  <label style="font-weight: bold;">Multiple</label>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="columns">
+          <div id="ReferenceAudioAlertControls" class="secondaryControlGroup">
+            <h3 data-i18n="settings.alerts.AudioAlert.Reference.label">Reference</h3>
+            <div class="columns">
+              <div id="LogbookControls">
+                <label data-i18n="roster.controls.logbook.label" for="referenceNeed">Logbook</label>
+                <select id="referenceNeed" onchange="huntingValueChanged(this);">
+                  <option data-i18n="roster.controls.logbook.awardTracker" value="6">Award Tracker</option>
+                  <option data-i18n="roster.controls.logbook.liveBandMode" value="0" selected="true">Live Band &amp; Mode</option>
+                  <option data-i18n="roster.controls.logbook.liveBandMixMode" value="1">Live Band, Mix Modes</option>
+                  <option data-i18n="roster.controls.logbook.liveBandDigiMode" value="2">Live Band, Digi Modes</option>
+                  <option data-i18n="roster.controls.logbook.mixBandLiveMode" value="3">Mix Band, Live Mode</option>
+                  <option data-i18n="roster.controls.logbook.mixBandMode" value="4">Mix Band &amp; Modes</option>
+                  <option data-i18n="roster.controls.logbook.mixBandDigiMode" value="5">Mix Band &amp; Digi Modes</option>
+                </select>
+              </div>
+              <div id="HuntModeControls">
+                <label data-i18n="roster.controls.hunting.label" for="huntNeed">Hunting</label>
+                <select id="huntNeed" onchange="huntingValueChanged(this);">
+                  <option data-i18n="roster.controls.huntNeed.worked" value="worked">New</option>
+                  <option data-i18n="roster.controls.huntNeed.confirmed" value="confirmed">New+Unconfirmed</option>
+                  <option data-i18n="roster.controls.huntNeed.mixed" value="mixed">Mixed</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div id="exceptionDiv" class="secondaryControlGroup">
+            <h3 data-i18n="roster.exceptions.label">Exceptions</h3>
+            <div class="columns">
+              <div>
+                <input type="checkbox" id="cqOnly" onchange="huntingValueChanged(this);" />
+                <label data-i18n="roster.secondary.exceptions.cqOnly" for="cqOnly">CQ Only</label>
+              </div>
+              <div>
+                <input type="checkbox" id="wantRRCQ" onchange="huntingValueChanged(this);" />
+                <label data-i18n="roster.secondary.exceptions.wantRRCQ" for="wantRRCQ">RR73 as CQ</label>
+              </div>
+              <div id="allOnlyNewDiv">
+                <input type="checkbox" id="allOnlyNew" onchange="huntingValueChanged(this);" />
+                <label data-i18n="roster.secondary.exceptions.allOnlyNew" for="allOnlyNew">New Calls</label>
+              </div>
+              <div>
+                <input type="checkbox" id="wantGrid" onchange="huntingValueChanged(this);" />
+                <label data-i18n="roster.secondary.exceptions.hasGrid" for="wantGrid">Has Grid</label>
+              </div>
+              <div>
+                <input type="checkbox" id="noMyDxcc" onchange="onlyMyDxcc.checked=false; huntingValueChanged(onlyMyDxcc); huntingValueChanged(this);" />
+                <label data-i18n="roster.secondary.exceptions.noMyDXCC" for="noMyDxcc">Not My DXCC</label>
+              </div>
+              <div>
+                <input type="checkbox" id="onlyMyDxcc" onchange="noMyDxcc.checked=false; huntingValueChanged(noMyDxcc); huntingValueChanged(this);" />
+                <label data-i18n="roster.secondary.exceptions.onlyMyDXCC" for="onlyMyDxcc">Only My DXCC</label>
+              </div>   
+              <div id="onlySpotDiv">
+                <input type="checkbox" id="onlySpot" onchange="huntingValueChanged(this);" />
+                <label data-i18n="roster.secondary.exceptions.spottedMe" for="onlySpot">Spotted Me</label>
+              </div>
+              <div id="useseQSLDiv">
+                <input type="checkbox" id="useseQSL" onchange="huntingValueChanged(this);" />
+                <label data-i18n="roster.secondary.exceptions.useseQSL" for="useseQSL">Uses eQSL</label>
+              </div>
+              <div id="usesOQRSDiv">
+                <input type="checkbox" id="usesOQRS" onchange="huntingValueChanged(this);" />
+                <label data-i18n="roster.secondary.exceptions.usesOQRS" for="usesOQRS">Uses OQRS</label>
+              </div>
+              <div class="flexButton"  style="margin-left: 18px;font-weight: bolder;" onclick="openExceptions()">&nbsp;. . .&nbsp;</div>
+            </div>
+          </div>
+        </div>
+        </div>
       </div>
-      <br />
+    </div>
+    <div id="customAlertsDiv" class="settingsTabcontent">
+      <div>
       <div id="alertFormDiv" style="display: inline-block">
         <table align="center" class="roundBorder" style="border: 3px groove darkred; margin: 0 auto">
           <th data-i18n="settings.alerts.CustomAlerts.label" colspan="8">Custom Alerts</th>
@@ -2396,8 +2583,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               </select>
             </td>
             <td id="addButton">
-              <div data-i18n="settings.alerts.CustomAlerts.new.addButton" class="button"
-                style="min-width: 26px; width: 26px" onclick="addNewAlert();">ADD</div>
+              <div data-i18n="settings.alerts.CustomAlerts.new.addButton" class="flexButton" onclick="addNewAlert();">ADD</div>
             </td>
             <td id="addError" style="color: red"></td>
           </tr>
@@ -2405,6 +2591,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       </div>
       <br />
       <div id="alertListDiv" style="margin: 4px; padding: 4px"></div>
+      </div>
     </div>
     <div id="chatSettingsDiv" class="settingsTabcontent">
       <div class="mapItem">

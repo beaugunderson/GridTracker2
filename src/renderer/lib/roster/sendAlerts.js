@@ -10,8 +10,8 @@ function sendAlerts(callRoster, rosterSettings)
   {
     let callObj = callRoster[entry].callObj;
 
-    // chrbayer: what does the tx field mean? no alerts are generated (at all) if this is in place...
-    // if it's "not visible in the roster, don't put it in the report!"
+    // if it's not visible in the roster, we don't want to send a report with it, 
+    // otherwise the entire roster will be sent out, including all the ones that were filtered by exceptions
     if (callRoster[entry].tx == false) continue;
 
     let call = callObj.DEcall;
@@ -66,7 +66,7 @@ function sendAlerts(callRoster, rosterSettings)
     {
       try
       {
-        fs.writeFileSync(path.join(dirPath, "cr-alert.json"), JSON.stringify(CR.scriptReport, null, 2));
+        fs.writeFileSync(path.join(dirPath, "cr-alert.json"), JSON.stringify(CR.scriptReport, null, 2), { flush: true });
 
         let thisProc = path.join(dirPath, script);
         let cp = require("child_process");

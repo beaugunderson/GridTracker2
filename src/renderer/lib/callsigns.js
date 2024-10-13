@@ -181,8 +181,8 @@ function lotwValuesChanged()
     lotwSettingsDisplay();
   }
 
-  goProcessRoster();
-  if (GT.rosterInitialized) GT.callRosterWindowHandle.window.resize();
+  setVisualHunting();
+
 }
 
 function lotwDownload(fromSettings)
@@ -474,9 +474,7 @@ function oqrsValuesChanged()
     oqrsSettingsDisplay();
   }
 
-
-  goProcessRoster();
-  if (GT.rosterInitialized) GT.callRosterWindowHandle.window.resize();
+  setVisualHunting();
 }
 
 function oqrsDownload(fromSettings)
@@ -605,8 +603,7 @@ function eqslValuesChanged()
     eqslSettingsDisplay();
   }
 
-  goProcessRoster();
-  if (GT.rosterInitialized) GT.callRosterWindowHandle.window.resize();
+  setVisualHunting();
 }
 
 function eqslDownload(fromSettings)
@@ -780,9 +777,7 @@ function ulsValuesChanged()
     ulsCountTd.innerHTML = 0;
   }
   
-
-  goProcessRoster();
-  if (GT.rosterInitialized) GT.callRosterWindowHandle.window.resize();
+  setVisualHunting();
 }
 
 function ulsDownload()

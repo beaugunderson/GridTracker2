@@ -552,7 +552,7 @@ function ValidateQrzApi(inputText)
     if (passed)
     {
       inputText.style.color = "#FF0";
-      inputText.style.backgroundColor = "green";
+      inputText.style.backgroundColor = "darkgreen";
 
       return true;
     }
@@ -577,7 +577,7 @@ function ValidateText(inputText)
   if (inputText.value.length > 0)
   {
     inputText.style.color = "#FF0";
-    inputText.style.backgroundColor = "green";
+    inputText.style.backgroundColor = "darkgreen";
     return true;
   }
   else
@@ -2283,7 +2283,7 @@ function CloudlogTestApiKey(buffer, flag)
         else if (rights[0].childNodes[0].nodeValue == "rw")
         {
           CloudlogTestResult.innerHTML = "OK";
-          CloudlogTestResult.style.backgroundColor = "green";
+          CloudlogTestResult.style.backgroundColor = "darkgreen";
           CloudlogGetProfiles();
         }
       }
@@ -2325,7 +2325,7 @@ function CloudlogFillProfiles(buffer, flag)
         if (item.station_id == GT.settings.adifLog.text.CloudlogStationProfileID)
         {
           opt.style.color = "yellow";
-          opt.style.backgroundColor = "green";
+          opt.style.backgroundColor = "darkgreen";
           opt.selected = "selected";
         }
         opt.innerHTML = item.station_profile_name + " (" + item.station_id + ")";

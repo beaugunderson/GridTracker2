@@ -204,7 +204,6 @@ GT.colorBands = [
 ];
 
 GT.non_us_bands = [
-  "630m",
   "160m",
   "80m",
   "60m",
@@ -221,7 +220,6 @@ GT.non_us_bands = [
 ];
 
 GT.us_bands = [
-  "630m",
   "160m",
   "80m",
   "60m",
@@ -441,6 +439,7 @@ GT.viewInfo[7] = ["us48Data", "US Continental Grids", 0, 0, 488];
 GT.viewInfo[8] = ["wacpZones", "CA Provinces", 0, 0, 13];
 GT.soundCard = GT.settings.app.soundCard;
 GT.gridAlpha = "88";
+GT.mediaFiles = null;
 
 function saveAllSettings()
 {
@@ -757,6 +756,7 @@ function toggleOffline()
 
   loadMapSettings();
   changeMapValues();
+  setVisualHunting();
   goProcessRoster();
 }
 
@@ -9373,6 +9373,7 @@ function toggleGtShareEnable()
   else GT.settings.app.gtShareEnable = true;
 
   setGtShareButtons();
+  setVisualHunting();
   goProcessRoster();
 }
 
@@ -9581,14 +9582,15 @@ function setMsgEnable(checkbox)
       }
     }
   }
-  goProcessRoster();
   GT.gtLiveStatusUpdate = true;
   setMsgSettingsView();
+  setVisualHunting();
+  goProcessRoster();
 }
 
 function newMessageSetting(whichSetting)
 {
-  if (whichSetting.id in GT.settings.msg)
+  if (whichSetting.id in GT.settings.msg && whichSetting.value != "none")
   {
     GT.settings.msg[whichSetting.id] = whichSetting.value;
     setMsgSettingsView();
@@ -10041,7 +10043,7 @@ function ValidateCallsigns(inputText)
   if (passed)
   {
     inputText.style.color = "#FF0";
-    inputText.style.backgroundColor = "green";
+    inputText.style.backgroundColor = "darkgreen";
   }
   else
   {
@@ -10080,7 +10082,7 @@ function ValidateGrids(inputText)
   if (passed)
   {
     inputText.style.color = "#FF0";
-    inputText.style.backgroundColor = "green";
+    inputText.style.backgroundColor = "darkgreen";
   }
   else
   {
@@ -10104,7 +10106,7 @@ function ValidateCallsign(inputText, validDiv)
     if (passed)
     {
       inputText.style.color = "#FF0";
-      inputText.style.backgroundColor = "green";
+      inputText.style.backgroundColor = "darkgreen";
       if (validDiv) validDiv.innerHTML = "Valid!";
       return true;
     }
@@ -10140,7 +10142,7 @@ function ValidateGridsquareOnly4(inputText, validDiv)
     if (gridSquare != "")
     {
       inputText.style.color = "#FF0";
-      inputText.style.backgroundColor = "green";
+      inputText.style.backgroundColor = "darkgreen";
       inputText.value = gridSquare;
       if (validDiv) validDiv.innerHTML = "Valid!";
       return true;
@@ -10189,7 +10191,7 @@ function ValidateGridsquare(inputText, validDiv)
     if (gridSquare != "")
     {
       inputText.style.color = "#FF0";
-      inputText.style.backgroundColor = "green";
+      inputText.style.backgroundColor = "darkgreen";
       inputText.value = gridSquare;
       if (validDiv) validDiv.innerHTML = "Valid!";
       return true;
@@ -10243,7 +10245,7 @@ function ValidateMulticast(inputText)
         else
         {
           inputText.style.color = "#FF0";
-          inputText.style.backgroundColor = "green";
+          inputText.style.backgroundColor = "darkgreen";
         }
         return true;
       }
@@ -10277,7 +10279,7 @@ function ValidateIPaddress(inputText, checkBox)
     if (inputText.value != "0.0.0.0" && inputText.value != "255.255.255.255")
     {
       inputText.style.color = "#FF0";
-      inputText.style.backgroundColor = "green";
+      inputText.style.backgroundColor = "darkgreen";
       return true;
     }
     else
@@ -10312,7 +10314,7 @@ function ValidatePort(inputText, checkBox, callBackCheck)
     else
     {
       inputText.style.color = "#FF0";
-      inputText.style.backgroundColor = "green";
+      inputText.style.backgroundColor = "darkgreen";
       return true;
     }
   }
@@ -11882,17 +11884,20 @@ function postInit()
     showMessaging(false);
     section = "RosterWindow";
     openCallRosterWindow(false);
+    section = "loadAudioAlertSettings"
+    loadAudioAlertSettings();
+    section = "ButtonPanelInit";
+    buttonPanelInit();
+    projectionImg.style.filter = GT.settings.map.projection == "AEQD" ? "" : "grayscale(1)";
+    section = "MouseTrack";
+    displayMouseTrack();
+    section = "FileSelectorHandles";
+    createFileSelectorHandlers();
   }
   catch (e)
   {
     alert("!Init Failed Section!: " + section + "\nPlease report failed section");
   }
-
-  buttonPanelInit();
-  displayMouseTrack();
-
-  projectionImg.style.filter = GT.settings.map.projection == "AEQD" ? "" : "grayscale(1)";
-  createFileSelectorHandlers();
 
   nodeTimers.setInterval(saveAllSettings, 900000); // Every 10 minutes, save our settings as a safety
   nodeTimers.setInterval(removeFlightPathsAndDimSquares, 2000); // Every 2 seconds
@@ -12738,7 +12743,7 @@ function updateWsjtxListener(port)
           newMessage.remote = remote;
           newMessage.instance = instanceId;
 
-          lastMsgTimeDiv.innerHTML = I18N("gt.newMesg.Recvd") + newMessage.Id;
+          lastMsgTimeDiv.innerHTML = I18N("gt.newMesg.Recvd") + " " + newMessage.Id;
 
           GT.wsjtHandlers[newMessage.type](newMessage);
           GT.lastTimeSinceMessageInSeconds = parseInt(Date.now() / 1000);
@@ -13979,12 +13984,12 @@ function mediaCheck()
   GT.clublogLogFile = path.join(GT.appData, "clublog.adif");
 
   logEventMedia.appendChild(newOption("none", "None"));
-  alertMediaSelect.appendChild(newOption("none", "Select File"));
+  msgAlertMedia.appendChild(newOption("none", "Select File"));
   alertMediaSelect.appendChild(newOption("none", "Select File"));
 
-  let mediaFiles = fs.readdirSync(GT.gtMediaDir);
+  GT.mediaFiles = fs.readdirSync(GT.gtMediaDir);
 
-  mediaFiles.forEach((filename) =>
+  GT.mediaFiles.forEach((filename) =>
   {
     let noExt = path.parse(filename).name;
     logEventMedia.appendChild(newOption(filename, noExt));
@@ -14008,12 +14013,13 @@ function mediaCheck()
   GT.rowsFiltered = 0;
 }
 
-function newOption(value, text)
+function newOption(value, text = null, selected = null)
 {
-  if (typeof text == "undefined") text = value;
-  var option = document.createElement("option");
+  if (text == null) text = value;
+  let option = document.createElement("option");
   option.value = value;
   option.text = text;
+  if (selected != null) option.selected = selected;
   return option;
 }
 

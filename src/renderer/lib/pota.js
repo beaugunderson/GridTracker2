@@ -113,8 +113,8 @@ function changePotaEnable()
   {
     getPotaParks();
   }
-  
-  
+
+  setVisualHunting();
   goProcessRoster();
 }
 

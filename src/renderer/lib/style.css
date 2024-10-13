@@ -267,11 +267,11 @@ html, body {
 }
 
 .graph {
-  padding: 2px;
+  padding: 1px;
   border: 1px solid #aeaeae;
 }
 .myBand {
-  padding: 0px;
+  padding: 1px;
   margin-top: -1px;
 
   border: 1px solid yellow;
@@ -300,18 +300,23 @@ html, body {
   background-color: #1e90ff;
   vertical-align: baseline;
 }
+
 .inputTextValue {
   -webkit-border-radius: 6px;
   border: 1px solid #999;
   outline: none;
   margin: 2px;
   padding: 1px;
-  border-style: inset;
+  border-style: outset;
+  font-size: 12px;
 }
+
 .inputTextValue:hover {
   border-color: #fff;
-  border-style: outset;
+  border-style: inset;
+  cursor: auto;
 }
+
 .roundBorderValue {
   border: 1px solid white;
   -webkit-border-radius: 6px;
@@ -586,17 +591,20 @@ input[type="range"]:focus::-webkit-slider-runnable-track {
   outline: none;
 }
 
+
 select {
   -webkit-appearance: none;
   -webkit-border-radius: 6px;
+  border: 1px solid #999;
   text-indent: 0.2px;
-  text-overflow: "";
   min-width: 30px;
-  padding: 2px;
+  padding: 1px;
+  margin: 2px;
   background-color: darkgreen;
   color: #ff0;
   cursor: pointer;
   font-size: 12px;
+  border-style: outset;
 }
 
 select:focus {
@@ -605,6 +613,7 @@ select:focus {
 
 select:hover {
   border-color: #fff;
+  border-style: inset;
 }
 
 select:disabled {
@@ -997,4 +1006,85 @@ input[type="color"]::-webkit-color-swatch {
 
 .flexButton:hover {
   border-color: #fff;
+}
+
+#alertMatrixDiv {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+
+#SecondaryAudioAlertControls {
+  display: flex;
+  flex: auto;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin-right: 1px;
+  margin-bottom: 4px;
+}
+
+#huntingMatrixDiv {
+  flex:auto;
+}
+
+#exceptionDiv {
+  flex:auto;
+}
+
+.secondaryControlGroup {
+  flex: auto;
+  margin-left: 2px;
+  padding: 0px;
+}
+
+.secondaryControlGroup h3 {
+  text-align: left;
+  font-size: 12px;
+  margin: 0px;
+  margin-bottom: 2px;
+  padding: 0;
+}
+
+#huntingMatrixDiv h3 {
+  color: rgb(206, 134, 0);
+  border-bottom: 2px solid rgb(206, 134, 0);
+  margin-bottom: 3px;
+}
+
+#exceptionDiv h3 {
+  color: rgb(206, 89, 89);
+  border-bottom: 2px solid rgb(206, 89, 89);
+  margin-bottom: 3px;
+}
+
+#ReferenceAudioAlertControls h3 {
+  color: rgb(89, 206, 206);
+  border-bottom: 2px solid rgb(89, 206, 206);
+  margin-bottom: 3px;
+}
+
+.secondaryControlGroup .columns {
+  /* column-count: 2; */
+  /* max-height: 100px; */
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: left;
+  align-items: flex-start;
+  padding-bottom: 15px;
+}
+
+.secondaryControlGroup .columns div {
+  text-align: left;
+  vertical-align: bottom;
+  margin-top: 3px;
+  margin-right: 0px;
+}
+
+.audioAlertsTable {
+  text-align: left;
 }

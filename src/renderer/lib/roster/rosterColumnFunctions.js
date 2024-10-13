@@ -63,8 +63,6 @@ function setRosterSorting(column)
     CR.rosterSettings.sortReverse = false
   }
 
-  writeRosterSettings();
-
   viewRoster();
 }
 
@@ -125,7 +123,6 @@ function validateRosterColumnOrder(columns)
 function changeRosterColumnOrder(columns)
 {
   CR.rosterSettings.columnOrder = validateRosterColumnOrder(columns);
-  writeRosterSettings();
   viewRoster();
 }
 
@@ -162,7 +159,7 @@ function toggleColumn(target, column = null)
   {
     window.opener.setRosterSpot(CR.rosterSettings.columns.Spot);
   }
-  writeRosterSettings();
+
   viewRoster();
   resize();
 }

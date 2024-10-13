@@ -655,7 +655,7 @@
     "adif.HRDLogNetFailed": "Fail log to HRDLOG.net",
     "COMMENT_alerts.js": "",
     "alerts.addNew.Added": "Added",
-    "alerts.addNew.SelectFile": "Select File!",
+    "alerts.addNew.SelectFile": "Select File",
     "alerts.addNew.InvalidCall": "Invalid Callsign",
     "alerts.addnew.Duplicate": "Duplicate!",
     "alerts.callsign.speech": "Callsign",

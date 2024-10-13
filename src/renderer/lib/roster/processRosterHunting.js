@@ -935,7 +935,6 @@ function processWatchers(callObj)
           // Don't call deleteWatcher() as it calls the roster renderer
           delete CR.watchers[key];
           delete CR.watchersTest[key];
-          writeRosterSettings();
           wantRenderWatchersTab();
         }
         else

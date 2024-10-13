@@ -314,7 +314,7 @@
       <div id="exceptionsBoxDiv" class="infoTabcontent">
         <div class="exceptionTab">
         <div>
-          <input type="checkbox" id="wantMinDB" onchange="valuesChanged();" />
+          <input type="checkbox" id="wantMinDB" onchange="huntingValueChanged(this);" />
           <label data-i18n="roster.secondary.exceptions.minDB" for="wantMinDB">Min dB</label>
           <span id="minDbView" class="roundBorderValue">-24</span>
           <p>
@@ -325,11 +325,11 @@
             step="1"
             class="slider"
             id="minDb"
-            oninput="valuesChanged();"
+            oninput="huntingValueChanged(this);"
           />
         </div>
         <div>
-          <input type="checkbox" id="wantMaxDT" onchange="valuesChanged();" />
+          <input type="checkbox" id="wantMaxDT" onchange="huntingValueChanged(this);" />
           <label data-i18n="roster.secondary.exceptions.maxDT" for="wantMaxDT">Max DT</label>
           <span id="maxDTView" class="roundBorderValue">.5</span>
           <p>
@@ -340,11 +340,11 @@
             step="0.1"
             class="slider"
             id="maxDT"
-            oninput="valuesChanged();"
+            oninput="huntingValueChanged(this);"
           />
         </div>
         <div>
-          <input type="checkbox" id="wantMinFreq" onchange="valuesChanged();" />
+          <input type="checkbox" id="wantMinFreq" onchange="huntingValueChanged(this);" />
           <label data-i18n="roster.secondary.exceptions.minFreq" for="wantMinFreq">Min freq</label>
           <span id="minFreqView" class="roundBorderValue">400</span>
           <p>
@@ -355,11 +355,11 @@
             step="10"
             class="slider"
             id="minFreq"
-            oninput="valuesChanged();"
+            oninput="huntingValueChanged(this);"
           />
         </div>
         <div>
-          <input type="checkbox" id="wantMaxFreq" onchange="valuesChanged();" />
+          <input type="checkbox" id="wantMaxFreq" onchange="huntingValueChanged(this);" />
           <label data-i18n="roster.secondary.exceptions.maxFreq" for="wantMaxFreq">Max freq</label>
           <span id="maxFreqView" class="roundBorderValue">3500</span>
           <p>
@@ -370,11 +370,11 @@
             step="10"
             class="slider"
             id="maxFreq"
-            oninput="valuesChanged();"
+            oninput="huntingValueChanged(this);"
           />
         </div>
         <div id="usesLoTWDiv">
-          <input type="checkbox" id="usesLoTW" onchange="valuesChanged();" />
+          <input type="checkbox" id="usesLoTW" onchange="huntingValueChanged(this);" />
           <label data-i18n="roster.secondary.exceptions.usesLoTW" for="usesLoTW">Uses LoTW</label>
           <span id="maxLoTWView" class="roundBorderValue" style="width: 35px;">3</span>
           <p>
@@ -386,7 +386,7 @@
             step="3"
             class="slider"
             id="maxLoTW"
-            oninput="valuesChanged();"
+            oninput="huntingValueChanged(this);"
           />
           
         </div>
@@ -447,7 +447,7 @@
         <div id="MainRosterControls">
           <div id="LogbookControls">
             <label data-i18n="roster.controls.logbook.label" for="referenceNeed">Logbook</label>
-            <select id="referenceNeed" onchange="valuesChanged();">
+            <select id="referenceNeed" onchange="huntingValueChanged(this);">
               <option data-i18n="roster.controls.logbook.awardTracker" value="6">Award Tracker</option>
               <option data-i18n="roster.controls.logbook.liveBandMode" value="0" selected="true">Live Band &amp; Mode</option>
               <option data-i18n="roster.controls.logbook.liveBandMixMode" value="1">Live Band, Mix Modes</option>
@@ -461,7 +461,7 @@
           <div id="HuntModeControls">
             <label data-i18n="roster.controls.hunting.label" for="huntNeed">Hunting</label>
 
-            <select id="huntNeed" onchange="valuesChanged();">
+            <select id="huntNeed" onchange="huntingValueChanged(this);">
               <option data-i18n="roster.controls.huntNeed.worked" value="worked">New</option>
               <option data-i18n="roster.controls.huntNeed.confirmed" value="confirmed">New+Unconfirmed</option>
               <option data-i18n="roster.controls.huntNeed.mixed" value="mixed">Mixed</option>
@@ -571,44 +571,44 @@
             <h3 data-i18n="roster.exceptions.label">Exceptions</h3>
             <div class="columns">
               <div id="onlyHitsDiv">
-                <input type="checkbox" id="onlyHits" onchange="valuesChanged();" />
+                <input type="checkbox" id="onlyHits" onchange="huntingValueChanged(this);" />
               <label data-i18n="roster.controls.callsigns.hits" for="onlyHits">Only Wanted</label>
               </div>
               <div>
-                <input type="checkbox" id="cqOnly" onchange="valuesChanged();" />
+                <input type="checkbox" id="cqOnly" onchange="huntingValueChanged(this);" />
               <label data-i18n="roster.secondary.exceptions.cqOnly" for="cqOnly">CQ Only</label>
               </div>
               <div>
-                <input type="checkbox" id="wantRRCQ" onchange="valuesChanged();" />
+                <input type="checkbox" id="wantRRCQ" onchange="huntingValueChanged(this);" />
                 <label data-i18n="roster.secondary.exceptions.wantRRCQ" for="wantRRCQ">RR73 as CQ</label>
               </div>
               <div id="allOnlyNewDiv">
-                <input type="checkbox" id="allOnlyNew" onchange="valuesChanged();" />
+                <input type="checkbox" id="allOnlyNew" onchange="huntingValueChanged(this);" />
                 <label data-i18n="roster.secondary.exceptions.allOnlyNew" for="allOnlyNew">New Calls</label>
               </div>
               <div>
-                <input type="checkbox" id="wantGrid" onchange="valuesChanged();" />
+                <input type="checkbox" id="wantGrid" onchange="huntingValueChanged(this);" />
                 <label data-i18n="roster.secondary.exceptions.hasGrid" for="wantGrid">Has Grid</label>
             </div>
               <div>
-                <input type="checkbox" id="noMyDxcc" onchange="onlyMyDxcc.checked=false; valuesChanged();" />
+                <input type="checkbox" id="noMyDxcc" onchange="onlyMyDxcc.checked=false; huntingValueChanged(this);" />
                 <label data-i18n="roster.secondary.exceptions.noMyDXCC" for="noMyDxcc">Not My DXCC</label>
               </div>
               <div>
-                <input type="checkbox" id="onlyMyDxcc" onchange="noMyDxcc.checked=false; valuesChanged();" />
+                <input type="checkbox" id="onlyMyDxcc" onchange="noMyDxcc.checked=false; huntingValueChanged(this);" />
                 <label data-i18n="roster.secondary.exceptions.onlyMyDXCC" for="onlyMyDxcc">Only My DXCC</label>
               </div>   
 
              <div id="onlySpotDiv">
-              <input type="checkbox" id="onlySpot" onchange="valuesChanged();" />
+              <input type="checkbox" id="onlySpot" onchange="huntingValueChanged(this);" />
               <label data-i18n="roster.secondary.exceptions.spottedMe" for="onlySpot">Spotted Me</label>
             </div>
             <div id="useseQSLDiv">
-              <input type="checkbox" id="useseQSL" onchange="valuesChanged();" />
+              <input type="checkbox" id="useseQSL" onchange="huntingValueChanged(this);" />
               <label data-i18n="roster.secondary.exceptions.useseQSL" for="useseQSL">Uses eQSL</label>
             </div>
             <div id="usesOQRSDiv">
-              <input type="checkbox" id="usesOQRS" onchange="valuesChanged();" />
+              <input type="checkbox" id="usesOQRS" onchange="huntingValueChanged(this);" />
               <label data-i18n="roster.secondary.exceptions.usesOQRS" for="usesOQRS">Uses OQRS</label>
             </div>
             <div class="flexButton"  style="margin-left: 18px;font-weight: bolder;" onclick="openExceptions()">&nbsp;. . .&nbsp;</div>           

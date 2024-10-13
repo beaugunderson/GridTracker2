@@ -346,6 +346,7 @@ body.roster {
   flex-wrap: wrap;
   justify-content: flex-start;
   align-items: left;
+  padding-bottom: 0px;
 }
 
 .secondaryControlGroup .columns div {

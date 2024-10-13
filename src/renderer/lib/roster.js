@@ -94,35 +94,16 @@ document.addEventListener("drop", function (event)
 
 window.addEventListener("message", receiveMessage, false);
 
-if (!("awardTracker" in GT.settings))
-{
-  GT.settings.awardTracker = {};
-  CR.rosterSettings = {};
-  writeRosterSettings();
-}
-
 // awardTrackersActive is a much smaller object than awardTracker
 CR.awardTrackersActive = GT.settings.awardTracker;
 CR.awardTracker = {};
 
-if ("ignoredCalls" in  GT.settings)
-{
-  CR.ignoredCalls = GT.settings.ignoredCalls;
-  CR.ignoredDxcc = GT.settings.ignoredDxcc;
-  CR.ignoredGrid = GT.settings.ignoredGrid;
-  CR.ignoredCQz = GT.settings.ignoredCQz;
-  CR.ignoredITUz = GT.settings.ignoredITUz;
-  CR.ignoredCQ = GT.settings.ignoredCQ;
-}
-else
-{
-  GT.settings.ignoredCalls = "{}";
-  GT.settings.ignoredDxcc = "{}";
-  GT.settings.ignoredGrid = "{}";
-  GT.settings.ignoredCQz = "{}";
-  GT.settings.ignoredITUz = "{}";
-  GT.settings.ignoredCQ = "{}";
-}
+CR.ignoredCalls = GT.settings.ignoredCalls;
+CR.ignoredDxcc = GT.settings.ignoredDxcc;
+CR.ignoredGrid = GT.settings.ignoredGrid;
+CR.ignoredCQz = GT.settings.ignoredCQz;
+CR.ignoredITUz = GT.settings.ignoredITUz;
+CR.ignoredCQ = GT.settings.ignoredCQ;
 
 function storeBlocks(render = true)
 {
@@ -175,7 +156,6 @@ function loadSettings()
     }
   }
 
-  writeRosterSettings();
   // Code reducer
   CR.watchers = CR.rosterSettings.watchers;
 }
@@ -542,12 +522,10 @@ function addAwardTracker(sponsor, name, enabled)
 
 function updateAwardList(target = null)
 {
-  let worker =
-    "<table id='awardTable' class='awardTableCSS' >";
+  let worker = "<table id='awardTable' class='awardTableCSS' >";
   worker += "<tr>";
   worker += "<th align='left'>Name</th><th>Award</th><th>Track</th><th></th>";
   worker += "</tr>";
-
   worker += "</table>";
 
   AwardWantedList.innerHTML = worker;
@@ -557,7 +535,6 @@ function updateAwardList(target = null)
   for (const key in keys)
   {
     let award = CR.awardTracker[keys[key]];
-    let rule = CR.awards[award.sponsor].awards[award.name].rule;
     let row = awardTable.insertRow();
     row.id = keys[key];
     let baseAward = false;
@@ -626,8 +603,7 @@ function updateAwardList(target = null)
 
 function deleteAwardTracker(sender)
 {
-  let id = sender.parentNode.parentNode.id;
-  delete CR.awardTracker[id];
+  delete CR.awardTracker[sender.parentNode.parentNode.id];
   storeAwardTracker();
   resetAwardAdd();
   updateAwardList();
@@ -636,30 +612,19 @@ function deleteAwardTracker(sender)
 
 function awardCheckboxChanged(sender)
 {
-  let awardId = sender.target.parentNode.parentNode.id;
-  CR.awardTracker[sender.target.parentNode.parentNode.id][sender.target.name] =
-    sender.target.checked;
+  CR.awardTracker[sender.target.parentNode.parentNode.id][sender.target.name] = sender.target.checked;
   storeAwardTracker();
   viewRoster();
 }
 
 function awardValueChanged(sender)
 {
-  let awardId = sender.target.parentNode.parentNode.id;
-  CR.awardTracker[sender.target.parentNode.parentNode.id][sender.target.name] =
-    sender.target.value;
+  CR.awardTracker[sender.target.parentNode.parentNode.id][sender.target.name] = sender.target.value;
   storeAwardTracker();
   viewRoster();
 }
 
-function createCell(
-  row,
-  target,
-  value,
-  data = null,
-  title = null,
-  checkbox = false
-)
+function createCell(row, target, value, data = null, title = null, checkbox = false)
 {
   let cell = row.insertCell();
   if (data == null) cell.innerHTML = value;
@@ -732,15 +697,12 @@ function closeAwardPopup()
 function toggleMoreControls()
 {
   CR.rosterSettings.controlsExtended = !CR.rosterSettings.controlsExtended;
-  writeRosterSettings();
 
   setVisual();
 }
 
 function setVisual()
 {
-  huntNeed.style.display = "none";
-
   if (CR.rosterSettings.controls)
   {
     if (CR.rosterSettings.controlsExtended)
@@ -763,9 +725,11 @@ function setVisual()
   // Award Hunter
   if (referenceNeed.value == LOGBOOK_AWARD_TRACKER)
   {
+    huntNeed.style.display = "none";
     onlyHitsDiv.style.display = "none";
     HuntModeControls.style.display = "none";
     huntingMatrixDiv.style.display = "none";
+
     AwardTrackerControls.style.display = "";
     AwardWantedList.style.display = "";
     updateAwardList();
@@ -778,25 +742,31 @@ function setVisual()
       {
         document.getElementById(key).checked = CR.rosterSettings.wanted[key];
       }
+      else
+      {
+        // No longer supported, get rid of it.
+        delete CR.rosterSettings.wanted[key];
+      }
     }
 
     AwardTrackerControls.style.display = "none";
     AwardWantedList.style.display = "none";
-    HuntModeControls.style.display = "";
-
     closeAwardPopup();
 
+    HuntModeControls.style.display = "";
     huntingMatrixDiv.style.display = "";
     huntNeed.style.display = "";
     onlyHitsDiv.style.display = "";
   }
 
-  usesLoTWDiv.style.display = (window.opener.GT.settings.callsignLookups.lotwUseEnable == true) ? "" : "none";
-  useseQSLDiv.style.display = (window.opener.GT.settings.callsignLookups.eqslUseEnable == true) ? "" : "none";
-  usesOQRSDiv.style.display = (window.opener.GT.settings.callsignLookups.oqrsUseEnable == true) ? "" : "none";
-  onlySpotDiv.style.display = (CR.rosterSettings.columns.Spot == true) ? "" : "none";
+  usesLoTWDiv.style.display = (GT.settings.callsignLookups.lotwUseEnable) ? "" : "none";
+  useseQSLDiv.style.display = (GT.settings.callsignLookups.eqslUseEnable) ? "" : "none";
+  usesOQRSDiv.style.display = (GT.settings.callsignLookups.oqrsUseEnable) ? "" : "none";
+  onlySpotDiv.style.display = (CR.rosterSettings.columns.Spot) ? "" : "none";
+  huntingMatrixOAMSDiv.style.display = (window.opener.oamsCanMsg()) ? "" : "none";
+  huntingMatrixPotaDiv.style.display = (GT.settings.app.potaEnabled == 1 && GT.settings.map.offlineMode == false) ? "" : "none";
   rosterBody.style.display = "block";
-
+  
   resize();
 }
 
@@ -818,56 +788,67 @@ function wantedChanged(element)
     }
   }
 
+  resetAlertReporting();
   setVisual();
-
-  writeRosterSettings();
-
-  CR.scriptReport = Object();
-  for (const callHash in window.opener.GT.callRoster)
-  {
-    window.opener.GT.callRoster[callHash].callObj.alerted = false;
-  }
   viewRoster();
 }
 
-function valuesChanged()
+// Incoming from GT window
+function huntingValueChangedFromAudioAlerts(id, value)
 {
-  CR.rosterSettings.huntNeed = huntNeed.value;
-  CR.rosterSettings.requireGrid = wantGrid.checked;
+  if (id in window)
+  {
+    if (window[id].type == "checkbox")
+    {
+      CR.rosterSettings[id] = window[id].checked = value;
+    }
+    else
+    {
+      CR.rosterSettings[id] = window[id].value = value;
+    }
+    resetAlertReporting();
+    setVisual();
+    viewRoster();
+  }
+}
 
-  CR.rosterSettings.wantMaxDT = wantMaxDT.checked;
-  CR.rosterSettings.wantMinDB = wantMinDB.checked;
-  CR.rosterSettings.wantMinFreq = wantMinFreq.checked;
-  CR.rosterSettings.wantMaxFreq = wantMaxFreq.checked;
-  CR.rosterSettings.wantRRCQ = wantRRCQ.checked;
+function huntingValueChanged(element)
+{
+  let id = element.id
+  
+  if (id in CR.rosterSettings)
+  {
+    let value;
+    if (element.type == "checkbox")
+    {
+      value = CR.rosterSettings[id] = element.checked;
+    }
+    else
+    {
+      value = CR.rosterSettings[id] = element.value;
+      let view = id + "View";
+      if (view in window)
+      {
+        window[view].innerHTML = element.value;
+      }
+    }
+    window.opener.huntingValueChangedFromCallRoster(id, value);
+  }
 
-  maxDTView.innerHTML = CR.rosterSettings.maxDT = maxDT.value;
-  minDbView.innerHTML = CR.rosterSettings.minDb = minDb.value;
-  minFreqView.innerHTML = CR.rosterSettings.minFreq = minFreq.value;
-  maxFreqView.innerHTML = CR.rosterSettings.maxFreq = maxFreq.value;
-  CR.rosterSettings.maxLoTW = maxLoTW.value;
   maxLoTWView.innerHTML = CR.rosterSettings.maxLoTW < 27 ? toYM(Number(CR.rosterSettings.maxLoTW)) : "<b>&infin;</b>";
-  CR.rosterSettings.maxLoTW = maxLoTW.value;
-  CR.rosterSettings.onlyHits = onlyHits.checked;
-  CR.rosterSettings.cqOnly = cqOnly.checked;
-  CR.rosterSettings.noMyDxcc = noMyDxcc.checked;
-  CR.rosterSettings.onlyMyDxcc = onlyMyDxcc.checked;
-  CR.rosterSettings.usesLoTW = usesLoTW.checked;
-  CR.rosterSettings.useseQSL = useseQSL.checked;
-  CR.rosterSettings.usesOQRS = usesOQRS.checked;
-  CR.rosterSettings.onlySpot = onlySpot.checked;
-  CR.rosterSettings.reference = referenceNeed.value;
-  CR.rosterSettings.allOnlyNew = allOnlyNew.checked;
 
-  writeRosterSettings();
+  resetAlertReporting();
+  setVisual();
+  viewRoster();
+}
 
+function resetAlertReporting()
+{
   CR.scriptReport = Object();
   for (const callHash in window.opener.GT.callRoster)
   {
     window.opener.GT.callRoster[callHash].callObj.alerted = false;
   }
-
-  setVisual();
 }
 
 function loadFilterSettings()
@@ -1469,6 +1450,8 @@ function resize()
 
   wantRenderWatchersTab();
 
+  viewRoster();
+  // tagdo, why?
   window.opener.goProcessRoster();
 }
 
@@ -1502,7 +1485,6 @@ function init()
 function toggleShowControls()
 {
   CR.rosterSettings.controls = !CR.rosterSettings.controls;
-  writeRosterSettings();
   setVisual();
 }
 
@@ -1595,7 +1577,6 @@ function setCompactView()
 function compactModeChanged()
 {
   CR.rosterSettings.compact = !CR.rosterSettings.compact;
-  writeRosterSettings();
   setCompactView();
   viewRoster();
 }
@@ -1603,21 +1584,18 @@ function compactModeChanged()
 function compactEntityChanged()
 {
   CR.rosterSettings.compactEntity = compactEntitySelect.value;
-  writeRosterSettings();
   viewRoster();
 }
 
 function clearRosterOnBandChangeValueChanged(what)
 {
   CR.rosterSettings.clearRosterOnBandChange = clearRosterOnBandChange.checked;
-  writeRosterSettings();
 }
 
 function rosterDelayOnFocusValueChanged(what)
 {
   CR.rosterSettings.rosterDelayOnFocus = rosterDelayOnFocus.checked;
   displayDelayOnFocus();
-  writeRosterSettings();
 }
 
 function displayDelayOnFocus()
@@ -1638,14 +1616,12 @@ function changeRosterDelayTime()
 {
   CR.rosterSettings.rosterDelayTime = rosterDelayTime.value;
   rosterDelayTimeTd.innerHTML = rosterDelayTime.value + "ms";
-  writeRosterSettings();
 }
 
 function changeRosterTime()
 {
   CR.rosterSettings.rosterTime = rosterTime.value;
   setRosterTimeView();
-  writeRosterSettings();
   viewRoster();
 }
 
@@ -3071,7 +3047,7 @@ function ValidateTextInput(inputText, validDiv = null)
     if (passed)
     {
       inputText.style.color = "#FF0";
-      inputText.style.backgroundColor = "green";
+      inputText.style.backgroundColor = "darkgreen";
       if (validDiv) validDiv.innerHTML = "";
       return true;
     }
@@ -3292,7 +3268,6 @@ function saveWatcher()
   }
   CR.watchers[watcherName.value] = entry;
   CR.watchersTest[watcherName.value] = null;
-  writeRosterSettings();
   openWatchersTab();
   window.opener.goProcessRoster();
 }
@@ -3310,7 +3285,6 @@ function addWatcher(value, type)
     CR.watchers[value] = entry;
     CR.watchersTest[value] = null;
     CR.rosterSettings.wanted.huntWatcher = huntWatcher.checked = true;
-    writeRosterSettings();
     window.opener.goProcessRoster();
     wantRenderWatchersTab();
   }
@@ -3331,7 +3305,6 @@ function clearWatcher()
 function toggleWatcher(key)
 {
   CR.watchers[key].watch = !CR.watchers[key].watch;
-  writeRosterSettings();
   wantRenderWatchersTab();
   window.opener.goProcessRoster();
 }
@@ -3340,7 +3313,6 @@ function deleteWatcher(key)
 {
   delete CR.watchers[key];
   delete CR.watchersTest[key];
-  writeRosterSettings();
   wantRenderWatchersTab();
   window.opener.goProcessRoster();
 }
@@ -3457,7 +3429,6 @@ function createMenuHide()
     {
       CR.rosterSettings.realtime = item.checked;
       CR.menuShow.items[2].checked = item.checked;
-      writeRosterSettings();
       viewRoster();
     }
   });
@@ -3488,7 +3459,6 @@ function createMenuShow()
     {
       CR.rosterSettings.realtime = item.checked;
       CR.menuHide.items[2].checked = item.checked;
-      writeRosterSettings();
       viewRoster();
     }
   });

@@ -1,66 +1,13 @@
 function renderRoster(callRoster, rosterSettings)
 {
   let columnOverrides = {
-    Callsign: true
+    Callsign: true,
+    eQSL: GT.settings.callsignLookups.eqslUseEnable,
+    OQRS: GT.settings.callsignLookups.oqrsUseEnable,
+    LoTW: GT.settings.callsignLookups.lotwUseEnable,
+    OAMS: rosterSettings.canMsg,
+    POTA: (GT.settings.app.potaEnabled == 1 && GT.settings.map.offlineMode == false)
   }
-
-  if (window.opener.GT.settings.callsignLookups.eqslUseEnable == true)
-  {
-    useseQSLDiv.style.display = "";
-  }
-  else
-  {
-    columnOverrides.eQSL = false;
-    useseQSLDiv.style.display = "none";
-  }
-
-  if (window.opener.GT.settings.callsignLookups.oqrsUseEnable == true)
-  {
-    usesOQRSDiv.style.display = "";
-  }
-  else
-  {
-    columnOverrides.OQRS = false;
-    usesOQRSDiv.style.display = "none";
-  }
-
-  if (window.opener.GT.settings.callsignLookups.lotwUseEnable == true)
-  {
-    usesLoTWDiv.style.display = "";
-  }
-  else
-  {
-    columnOverrides.LoTW = false;
-    usesLoTWDiv.style.display = "none";
-  }
-
-  if (rosterSettings.canMsg == true)
-  {
-    huntingMatrixOAMSDiv.style.display = "";
-  }
-  else
-  {
-    huntingMatrixOAMSDiv.style.display = "none";
-    columnOverrides.OAMS = false;
-  }
-
-  if (window.opener.GT.settings.app.potaEnabled == 1 && window.opener.GT.settings.map.offlineMode == false)
-  {
-    huntingMatrixPotaDiv.style.display = "";
-  }
-  else
-  {
-    huntingMatrixPotaDiv.style.display = "none";
-    columnOverrides.POTA = false;
-  }
-  
-  // dealing with spots
-  if (CR.rosterSettings.columns.Spot == true) onlySpotDiv.style.display = "";
-  else onlySpotDiv.style.display = "none";
-  
-  // Show the roster count in the window title
-
-  // let visibleCallList = callRoster.filter(entry => entry.tx);
 
   let visibleCallList = [];
   for (const entry in callRoster)

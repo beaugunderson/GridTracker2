@@ -9,16 +9,12 @@ function loadAlerts()
   logEventMedia.value = GT.settings.app.logEventMedia;
 
   loadClassicAlertView();
-
-
-  
 }
 
 function newLogEventSetting(obj)
 {
   GT.settings.app.logEventMedia = obj.value;
 }
-
 
 function setAudioView()
 {
@@ -547,7 +543,7 @@ function alertNotifyChanged(who = "")
   if (alertNotifySelect.value == 0)
   {
     alertMediaSelect.style.display = "block";
-    if (who == "media")
+    if (who == "media" && alertMediaSelect.value != "none")
     {
       playAlertMediaFile(alertMediaSelect.value);
     }
@@ -698,6 +694,16 @@ function loadClassicAlertView()
 
 function wantedChanged(what)
 {
+
+  if (what.id in GT.settings.audioAlerts.wanted)
+  {
+    GT.settings.audioAlerts.wanted[what.id] = what.checked;
+  }
+  else if (what.id in GT.settings.audioAlerts.media)
+  {
+    GT.settings.audioAlerts.media[what.id] = what.value;
+  }
+
  /* if (what.type == "select-one" || what.type == "text")
   {
     GT.settings.classicAlerts[what.id] = what.value;
@@ -769,3 +775,265 @@ function processClassicAlerts()
   GT.classic_alert_counts = Object.assign({}, GT.classic_alert_count_template);*/
 }
 
+const LOGBOOK_LIVE_BAND_LIVE_MODE = "0";
+const LOGBOOK_LIVE_BAND_MIX_MODE = "1";
+const LOGBOOK_LIVE_BAND_DIGI_MODE = "2";
+const LOGBOOK_MIX_BAND_LIVE_MODE = "3";
+const LOGBOOK_MIX_BAND_MIX_MODE = "4";
+const LOGBOOK_MIX_BAND_DIGI_MODE = "5";
+const LOGBOOK_AWARD_TRACKER = "6";
+
+function setVisualHunting()
+{
+  setVisualAudioAlerts();
+
+  if (GT.rosterInitialized)
+  {
+    try
+    {
+      GT.callRosterWindowHandle.window.setVisual();
+    }
+    catch (e)
+    {
+      console.log("Call Roster setVisual");
+      console.log(e.message);
+    }
+  }
+}
+
+
+// Syncronized call with roster.js!
+function huntingValueChanged(element)
+{
+  if (GT.rosterInitialized)
+  {
+    let value = (element.type == "checkbox") ? element.checked : element.value;
+    GT.callRosterWindowHandle.window.huntingValueChangedFromAudioAlerts(element.id, value);
+  }
+  else
+  {
+    console.log("Well this is odd.");
+  }
+}
+
+function huntingValueChangedFromCallRoster(id, value)
+{
+  if (id in window)
+  {
+    if (window[id].type == "checkbox")
+    {
+      window[id].checked =value;
+    }
+    else
+    {
+      window[id].value = value;
+      let view = id + "View";
+      if (view in window)
+      {
+        window[view].innerHTML = value;
+      }
+    }
+  }
+}
+
+function openExceptions()
+{
+  if (GT.rosterInitialized)
+  {
+    GT.callRosterWindowHandle.window.openExceptions();
+    electron.ipcRenderer.send("showWin", "gt_roster");
+  }
+  else
+  {
+    console.log("Well this is odd too.");
+  }
+}
+
+function setVisualAudioAlerts()
+{
+  if (referenceNeed.value == LOGBOOK_AWARD_TRACKER)
+  {
+    HuntModeControls.style.display = "none";
+    huntingMatrixDiv.style.display = "none";
+    huntNeed.style.display = "none";
+  }
+  else
+  {
+    HuntModeControls.style.display = "";
+    huntingMatrixDiv.style.display = "";
+    huntNeed.style.display = "";
+  }
+
+  useseQSLDiv.style.display = (GT.settings.callsignLookups.eqslUseEnable) ? "" : "none";
+  usesOQRSDiv.style.display = (GT.settings.callsignLookups.oqrsUseEnable) ? "" : "none";
+  onlySpotDiv.style.display = (GT.settings.roster.columns.Spot) ? "" : "none";
+  huntingMatrixOAMSRow.style.display = (oamsCanMsg()) ? "" : "none";
+  huntingMatrixPotaRow.style.display = (GT.settings.app.potaEnabled == 1 && GT.settings.map.offlineMode == false) ? "" : "none";
+}
+
+function loadAudioAlertSettings()
+{
+  referenceNeed.value = GT.settings.roster.reference;
+  huntNeed.value = GT.settings.roster.huntNeed;
+  wantGrid.checked = GT.settings.roster.requireGrid;
+  wantRRCQ.checked = GT.settings.roster.wantRRCQ;
+  cqOnly.checked = GT.settings.roster.cqOnly;
+  noMyDxcc.checked = GT.settings.roster.noMyDxcc;
+  onlyMyDxcc.checked = GT.settings.roster.onlyMyDxcc;
+  useseQSL.checked = GT.settings.roster.useseQSL;
+  onlySpot.checked = GT.settings.roster.onlySpot;
+  usesOQRS.checked = GT.settings.roster.usesOQRS;
+  allOnlyNew.checked = GT.settings.roster.allOnlyNew;
+
+  for (const key in GT.settings.audioAlerts.wanted)
+  {
+    if (key in window)
+    {
+      window[key].checked = GT.settings.audioAlerts.wanted[key];
+    }
+  }
+
+  for (const key in GT.settings.audioAlerts.wanted)
+  {
+    if (key in window)
+    {
+      let row = window[key].parentNode.parentNode;
+      let parent = row.insertCell();
+      let select = document.createElement("select");
+      let id = key + "Type";
+      let value = GT.settings.audioAlerts.media[id];
+      let mediaType = value;
+      select.id = id;
+      select.addEventListener("change", wantedChanged.bind(null, select), false);
+  
+      let option;
+      option = newOption("tts", I18N("settings.OAMS.message.newAlert.textToSpeech"), value == "tts");
+      select.appendChild(option);
+      option = newOption("media", I18N("settings.OAMS.message.newAlert.mediaFile"), value == "media");
+      select.appendChild(option);
+      parent.appendChild(select);
+      select.addEventListener("change", wantedMediaTypeChanged, false);
+
+      select.value = value;
+
+      parent = row.insertCell();
+
+      select = null;
+      select = document.createElement("select");
+      id = key + "FileSingle";
+      value = GT.settings.audioAlerts.media[id];
+      select.id = id;
+      select.appendChild(newOption("none", I18N("alerts.addNew.SelectFile")), value == "none");
+
+      GT.mediaFiles.forEach((filename) =>
+      {
+        let noExt = path.parse(filename).name;
+        select.appendChild(newOption(filename, noExt, value == filename));
+      });
+
+      select.addEventListener("change", wantedMediaFileChanged, false);
+      parent.appendChild(select);
+      select.value = value;
+      select.style.display = (mediaType == "tts") ? "none" : "";
+
+      let input = document.createElement("input");
+      input.id = id = key + "SpeechSingle";
+      input.type = "text";
+      input.size = 16;
+      input.value = GT.settings.audioAlerts.media[id];
+      input.className = "inputTextValue";
+      parent.appendChild(input);
+      input.addEventListener("change", wantedMediaSpeechChanged, false);
+      ValidateText(input);
+      input.style.display = (mediaType == "media") ? "none" : "";
+
+      parent = row.insertCell();
+
+      id = key + "FileMulti";
+      // just so huntMutli doesn't get an "On Multiple" field
+      if (id in GT.settings.audioAlerts.media)
+      {
+        select = null;
+        select = document.createElement("select");
+        
+        value = GT.settings.audioAlerts.media[id];
+        select.id = id;
+        select.appendChild(newOption("none", I18N("alerts.addNew.SelectFile")), value == "none");
+
+        GT.mediaFiles.forEach((filename) =>
+        {
+          let noExt = path.parse(filename).name;
+          select.appendChild(newOption(filename, noExt, value == filename));
+        });
+
+        select.addEventListener("change", wantedMediaFileChanged, false);
+        parent.appendChild(select);
+        select.value = value;
+        select.style.display = (mediaType == "tts") ? "none" : "";
+
+        input = document.createElement("input");
+        input.id = id = key + "SpeechMulti";
+        input.type = "text";
+        input.size = 16;
+        input.value = GT.settings.audioAlerts.media[id];
+        input.className = "inputTextValue";
+        parent.appendChild(input);
+        input.addEventListener("change", wantedMediaSpeechChanged, false);
+        ValidateText(input);
+        input.style.display = (mediaType == "media") ? "none" : "";
+      }
+    }
+  }
+
+  setVisualAudioAlerts();
+}
+
+function wantedMediaTypeChanged(event)
+{
+  let element = event.target;
+  GT.settings.audioAlerts.media[element.id] = element.value;
+  let rootName = element.id.replace("Type", "");
+  if (element.value == "tts")
+  {
+    window[rootName + "SpeechSingle"].style.display = "";
+    window[rootName + "FileSingle"].style.display = "none";
+    if (rootName + "FileMulti" in window)
+    {
+      window[rootName + "SpeechMulti"].style.display = "";
+      window[rootName + "FileMulti"].style.display = "none";
+    }
+  }
+  else
+  {
+    window[rootName + "SpeechSingle"].style.display = "none";
+    window[rootName + "FileSingle"].style.display = "";
+    if (rootName + "FileMulti" in window)
+    {
+      window[rootName + "SpeechMulti"].style.display = "none";
+      window[rootName + "FileMulti"].style.display = "";
+    }
+  }
+  GT.settings.audioAlerts.media[element.id] = element.value;
+}
+
+function wantedMediaFileChanged(event)
+{
+  let element = event.target;
+  if (element.value != "none")
+  {
+    playAlertMediaFile(element.value);
+  }
+  GT.settings.audioAlerts.media[element.id] = element.value;
+}
+
+function wantedMediaSpeechChanged(event)
+{
+  let element = event.target;
+  element.value = element.value.trim();
+  ValidateText(element);
+  if (element.value != "")
+  {
+    speakAlertString(element.value);
+  }
+  GT.settings.audioAlerts.media[element.id] = element.value;
+}
