@@ -86,6 +86,7 @@ const def_settings = {
     sixWideMode: 0,
     soundCard: "default",
     spotView: 0,
+    windowTheme: "dark",
     useLocalTime: 0,
     wsjtForwardUdpEnable: false,
     wsjtForwardUdpIp: "127.0.0.1",

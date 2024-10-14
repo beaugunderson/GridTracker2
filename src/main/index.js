@@ -24,7 +24,6 @@ if (!singleInstanceLock) {
   app.quit();
 }
 
-nativeTheme.themeSource = 'dark';
 // Needed for direct accsess to Menu and MenuItem
 remoteMain.initialize();
 
@@ -302,6 +301,10 @@ ipcMain.on('saveZoom', (event, zoom) => {
   if (event.sender.id in windowIdToAllowedWindows) {
     allowedWindows[windowIdToAllowedWindows[event.sender.id]].options.zoom = zoom;
   }
+});
+
+ipcMain.on('setTheme', (event, theme) => {
+  nativeTheme.themeSource = theme;
 });
 
 ipcMain.on('restartGridTracker2', (event, resetWindowPositions = false) => {

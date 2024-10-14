@@ -910,12 +910,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </tr>
           <tr>
             <td>
+              <div class="mapItem">
+                <table align="center">
+                  <tr>
+                    <td title="Window Theme">Window Theme</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <select id="windowTheme" value="dark" onchange="changeWindowTheme();">
+                        <option value="dark">Dark</option>
+                        <option value="light">Light</option>
+                        <option value="system">System</option>
+                      </select>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+            <td>
               <div class="mapItem" style="display: flex; justify-content: center; align-items: center;" >
                 <div data-i18n="settings.general.ResetButtonPanel.label" class="flexButton" onclick="setButtonPanelOrder(GT.defaultButtons)">
                   Reset-Button-Panel
                  </div>
               </div>
             </td>
+        </tr>
+      </table>
+      <table align="center">
+        <tr>
           <td>
             <div class="mapItem">
               <table align="center">
@@ -940,10 +962,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               </table>
             </div>
           </td>
-        </tr>
-      </table>
-      <table align="center">
-        <tr>
           <td>
             <div class="mapItem">
               <table align="center">

@@ -108,6 +108,8 @@ function loadAllSettings()
       delete GT.settings[key];
     }
   }
+
+  setWindowTheme();
 }
 
 loadAllSettings();
@@ -692,6 +694,22 @@ window.addEventListener("beforeunload", function ()
 {
   saveAndCloseApp();
 });
+
+function setWindowTheme()
+{
+  electron.ipcRenderer.send("setTheme", GT.settings.app.windowTheme);
+}
+
+function setWindowThemeSelector()
+{
+  windowTheme.value = GT.settings.app.windowTheme;
+}
+
+function changeWindowTheme()
+{
+  GT.settings.app.windowTheme = windowTheme.value;
+  setWindowTheme();
+}
 
 function toggleMapViewFiltersCollapse()
 {
@@ -11809,6 +11827,7 @@ function startupButtonsAndInputs()
 {
   try
   {
+    setWindowThemeSelector();
     GT.pushPinMode = !(GT.settings.app.pushPinMode == true);
     togglePushPinMode();
     udpForwardEnable.checked = GT.settings.app.wsjtForwardUdpEnable;
@@ -14729,6 +14748,7 @@ function captureScreenshot()
 {
   electron.ipcRenderer.send("capturePageToClipboard", "GridTracker2");
   addLastTraffic("<font style='color:lightgreen;'>Screenshot Captured</font>");
+  playAlertMediaFile("Camera Click 1.mp3");
 }
 
 function createFileSelectorHandlers()
