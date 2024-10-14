@@ -414,7 +414,7 @@ const def_settings = {
   ignoredITUz: {},
   roster: {
     onlyHits: false,
-    huntNeed: "confirmed",
+    huntNeed: "mixed",
     requireGrid: false,
     animateCQGT: true,
     wantMaxDT: false,
@@ -481,7 +481,7 @@ const def_settings = {
       Life: false,
       OAMS: true,
       Age: true,
-      UTC: true
+      UTC: false
     },
     displayFilters: {
       brightness: 100,
@@ -491,7 +491,7 @@ const def_settings = {
       sepia: 0,
       huerotate: 0
     },
-    reference: 4, // New users should start out Mixed Band & Mode to match GT Map View initial
+    referenceNeed: "4", // New users should start out Mixed Band & Mode to match GT Map View initial
     controls: true,
     controlsExtended: true,
     compact: false,

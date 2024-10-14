@@ -873,7 +873,7 @@ function setVisualAudioAlerts()
 
 function loadAudioAlertSettings()
 {
-  referenceNeed.value = GT.settings.roster.reference;
+  referenceNeed.value = GT.settings.roster.referenceNeed;
   huntNeed.value = GT.settings.roster.huntNeed;
   wantGrid.checked = GT.settings.roster.requireGrid;
   wantRRCQ.checked = GT.settings.roster.wantRRCQ;

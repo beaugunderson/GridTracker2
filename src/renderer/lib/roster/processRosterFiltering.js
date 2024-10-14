@@ -208,7 +208,7 @@ function processRosterFiltering(callRoster, rosterSettings)
     if (rosterSettings.isAwardTracker)
     {
       let tx = false;
-      let baseHash = hashMaker("", callObj, CR.rosterSettings.reference);
+      let baseHash = hashMaker(callObj, CR.rosterSettings.referenceNeed);
 
       for (const award in CR.awardTracker)
       {

@@ -54,7 +54,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
   // TODO: Hunting results might be used to filter, based on the "Callsigns: Only Wanted" option,
   //       so maybe we can move this loop first, and add a check to the filtering loop?
   
-  let isAwardTracker = (CR.rosterSettings.reference == LOGBOOK_AWARD_TRACKER);
+  let isAwardTracker = (CR.rosterSettings.referenceNeed == LOGBOOK_AWARD_TRACKER);
   let hunt = {};
   if (!isAwardTracker)
   {
@@ -109,13 +109,13 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
       let workHashSuffix, layeredHashSuffix;
       if (rosterSettings.layeredMode)
       {
-        workHashSuffix = hashMaker("", callObj, rosterSettings.layeredMode);
-        layeredHashSuffix = hashMaker("", callObj, CR.rosterSettings.reference);
+        workHashSuffix = hashMaker(callObj, rosterSettings.layeredMode);
+        layeredHashSuffix = hashMaker(callObj, CR.rosterSettings.referenceNeed);
       }
       else
       {
-        workHashSuffix = hashMaker("", callObj, CR.rosterSettings.reference);
-        layeredHashSuffix = false
+        workHashSuffix = hashMaker(callObj, CR.rosterSettings.referenceNeed);
+        layeredHashSuffix = false;
       }
       let workHash = workHashSuffix; // TODO: Remove after replacing all occurrences with Suffix
 
@@ -246,7 +246,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
 
           if (rosterSettings.huntIndex && !(hash in rosterSettings.huntIndex.call))
           {
-            shouldAlert |= true;
+            shouldAlert ||= true;
             callObj.reason.push("call");
 
             if (rosterSettings.workedIndex && hash in rosterSettings.workedIndex.call)
@@ -299,7 +299,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
 
         if (hunt.Watcher)
         {
-          shouldAlert |= processWatchers(callObj);
+          shouldAlert ||= processWatchers(callObj);
         }
 
         // Hunting for "stations calling you"
@@ -850,13 +850,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
       colorObject.ituz = "style='" + ituzConf + "background-color:" + ituzBg + ";color:" + ituz + "'";
       colorObject.px = "style='" + wpxConf + "background-color:" + wpxBg + ";color:" + wpx + "'";
 
-      // callObj.shouldAlert ||= shouldAlert; // eslint doesn't like this, why?
-      // If alert was set (award tracker), don't clear it
-      if (!callObj.shouldAlert)
-      {
-        callObj.shouldAlert = shouldAlert;
-      }
-
+      callObj.shouldAlert ||= shouldAlert;
       callObj.style = colorObject;
 
       rosterSettings.modes[callObj.mode] = true;

@@ -77,10 +77,15 @@ const LOGBOOK_MIX_BAND_MIX_MODE = "4";
 const LOGBOOK_MIX_BAND_DIGI_MODE = "5";
 const LOGBOOK_AWARD_TRACKER = "6";
 
-const LAYERED_MODE_FOR = {}
+const LAYERED_MODE_FOR = {};
+LAYERED_MODE_FOR[LOGBOOK_LIVE_BAND_LIVE_MODE] = false;
+LAYERED_MODE_FOR[LOGBOOK_LIVE_BAND_MIX_MODE] = false;
+LAYERED_MODE_FOR[LOGBOOK_LIVE_BAND_DIGI_MODE] = false;
 LAYERED_MODE_FOR[LOGBOOK_MIX_BAND_LIVE_MODE] = LOGBOOK_LIVE_BAND_LIVE_MODE;
 LAYERED_MODE_FOR[LOGBOOK_MIX_BAND_MIX_MODE] = LOGBOOK_LIVE_BAND_MIX_MODE;
 LAYERED_MODE_FOR[LOGBOOK_MIX_BAND_DIGI_MODE] = LOGBOOK_LIVE_BAND_DIGI_MODE;
+LAYERED_MODE_FOR[LOGBOOK_AWARD_TRACKER] = false;
+
 
 document.addEventListener("dragover", function (event)
 {
@@ -193,21 +198,21 @@ function timeNowSec()
   return parseInt(Date.now() / 1000);
 }
 
-function hashMaker(start, callObj, reference)
+function hashMaker(callObj, reference)
 {
-  if (reference == LOGBOOK_LIVE_BAND_LIVE_MODE) return `${start}${callObj.band}${callObj.mode}`;
+  if (reference == LOGBOOK_LIVE_BAND_LIVE_MODE) return `${callObj.band}${callObj.mode}`;
 
-  if (reference == LOGBOOK_AWARD_TRACKER) return `${start}${callObj.band}${callObj.mode}`;
+  if (reference == LOGBOOK_AWARD_TRACKER) return `${callObj.band}${callObj.mode}`;
 
-  if (reference == LOGBOOK_LIVE_BAND_MIX_MODE) return `${start}${callObj.band}`;
+  if (reference == LOGBOOK_LIVE_BAND_MIX_MODE) return callObj.band;
 
-  if (reference == LOGBOOK_LIVE_BAND_DIGI_MODE) return `${start}${callObj.band}dg`;
+  if (reference == LOGBOOK_LIVE_BAND_DIGI_MODE) return `${callObj.band}dg`;
 
-  if (reference == LOGBOOK_MIX_BAND_LIVE_MODE) return `${start}${callObj.mode}`;
+  if (reference == LOGBOOK_MIX_BAND_LIVE_MODE) return callObj.mode;
 
-  if (reference == LOGBOOK_MIX_BAND_MIX_MODE) return `${start}`;
+  if (reference == LOGBOOK_MIX_BAND_MIX_MODE) return "";
 
-  if (reference == LOGBOOK_MIX_BAND_DIGI_MODE) return `${start}dg`;
+  if (reference == LOGBOOK_MIX_BAND_DIGI_MODE) return "dg";
 
   return "";
 }
@@ -1475,14 +1480,6 @@ function init()
   // callback to addControls();
   loadRosterI18n();
 
-  var x = document.querySelectorAll("input[type='range']");
-  for (var i = 0; i < x.length; i++)
-  {
-    if (x[i].title.length > 0) x[i].title += "\n";
-    x[i].title += "(Use Arrow Keys For Smaller Increments)";
-  }
-
-  
   setRosterTop();
 
   createActiveAwardsFromSettings();
@@ -1557,7 +1554,7 @@ function addControls()
   onlySpot.checked = CR.rosterSettings.onlySpot;
   usesOQRS.checked = CR.rosterSettings.usesOQRS;
 
-  referenceNeed.value = CR.rosterSettings.reference;
+  referenceNeed.value = CR.rosterSettings.referenceNeed;
   allOnlyNew.checked = CR.rosterSettings.allOnlyNew;
 
   clearRosterOnBandChange.checked = CR.rosterSettings.clearRosterOnBandChange;
@@ -3055,7 +3052,7 @@ function ValidateTextInput(inputText, validDiv = null)
     if (passed)
     {
       inputText.style.color = "#FF0";
-      inputText.style.backgroundColor = "darkblue";
+      inputText.style.backgroundColor = "darkgreen";
       if (validDiv) validDiv.innerHTML = "";
       return true;
     }
@@ -3087,7 +3084,7 @@ function watcherNameValidate()
   if (watcherName.value.length == 0 || (watcherName.value in CR.watchers && watcherName.value != CR.watcherEditKey))
   {
     watcherName.style.color = "#000";
-    watcherName.style.backgroundColor = "rgb(199, 113, 0)";
+    watcherName.style.backgroundColor = "orange";
     return false;
   }
   else
@@ -3175,7 +3172,7 @@ function watcherTextValidate(testCallsign = false)
   if (watcherText.value.length == 0)
   {
     watcherText.style.color = "#FFF";
-    watcherText.style.backgroundColor = "rgb(199, 113, 0)";
+    watcherText.style.backgroundColor = "orange";
     return false;
   }
   else

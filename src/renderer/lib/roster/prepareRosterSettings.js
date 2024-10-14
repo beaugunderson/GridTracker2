@@ -4,6 +4,7 @@ function prepareRosterSettings()
     bands: {},
     modes: {},
     onlyHits: CR.rosterSettings.onlyHits,
+    canMsg: window.opener.oamsCanMsg(),
     isAwardTracker: false,
     now: timeNowSec()
   }
@@ -15,13 +16,11 @@ function prepareRosterSettings()
     CR.rosterSettings.huntNeed = huntNeed.value = "confirmed";
   }
 
-  rosterSettings.canMsg = window.opener.oamsCanMsg();
-  
   if (CR.rosterSettings.huntNeed == "mixed")
   {
     rosterSettings.huntIndex = CR.tracker.confirmed;
     rosterSettings.workedIndex = CR.tracker.worked;
-    rosterSettings.layeredMode = LAYERED_MODE_FOR[String(CR.rosterSettings.reference)];
+    rosterSettings.layeredMode = LAYERED_MODE_FOR[CR.rosterSettings.referenceNeed];
   }
   else if (CR.rosterSettings.huntNeed == "worked")
   {
