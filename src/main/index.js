@@ -10,6 +10,7 @@ const {
   Menu,
   screen,
   clipboard,
+  nativeTheme,
 } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const { electronApp, optimizer } = require('@electron-toolkit/utils');
@@ -23,6 +24,7 @@ if (!singleInstanceLock) {
   app.quit();
 }
 
+nativeTheme.themeSource = 'dark';
 // Needed for direct accsess to Menu and MenuItem
 remoteMain.initialize();
 
@@ -95,7 +97,12 @@ const template = [
 
 const menu = Menu.buildFromTemplate(template);
 
-Menu.setApplicationMenu(menu);
+if (isMac || !app.isPackaged) {
+  Menu.setApplicationMenu(menu);
+}
+else {
+  Menu.setApplicationMenu(null);
+}
 
 // Every window accounted for here
 const allowedWindows = {
