@@ -466,6 +466,10 @@ app.whenReady().then(() => {
             if (windowId != 1) {
               allowedWindows[windowIdToAllowedWindows[windowId]].window.close();
             }
+            if (allowedWindows[windowIdToAllowedWindows[windowId]].boundsUpdateTimer) {
+              timers.clearTimeout(allowedWindows[windowIdToAllowedWindows[windowId]].boundsUpdateTimer);
+              allowedWindows[windowIdToAllowedWindows[windowId]].boundsUpdateTimer = null;
+            }
           }
           // save!
           allowedWindows['GridTracker2'].options = {
