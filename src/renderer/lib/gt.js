@@ -7628,11 +7628,11 @@ function showZonesBox()
   var worker = getCurrentBandModeHTML();
 
   worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'>" + "<b>" + I18N("gt.CQZoneBox.Worked") + "</b><br/>";
-  worker += displayItemList(GT.cqZones, "#FFFFFF");
+  worker += displayItemList(GT.cqZones, "#FFA500");
   worker += "</div>";
 
   worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'>" + "<b>" + I18N("gt.ITUZoneBox.Worked") + "</b><br/>";
-  worker += displayItemList(GT.ituZones, "#FFFFFF");
+  worker += displayItemList(GT.ituZones, "#00DDDD");
   worker += "</div>";
 
   worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.WASWACBox.WAC") + "</b><br/>";
@@ -9178,14 +9178,14 @@ function redrawGrids()
           let name = state;
           if (name in GT.wasZones)
           {
-            GT.wasZones[name].worked |= worked;
+            GT.wasZones[name].worked ||= worked;
             if (worked)
             {
               GT.wasZones[name].worked_bands[band] = ~~GT.wasZones[name].worked_bands[band] + 1;
               GT.wasZones[name].worked_modes[mode] = ~~GT.wasZones[name].worked_modes[mode] + 1;
             }
 
-            GT.wasZones[name].confirmed |= didConfirm;
+            GT.wasZones[name].confirmed ||= didConfirm;
             if (didConfirm)
             {
               GT.wasZones[name].confirmed_bands[band] = ~~GT.wasZones[name].confirmed_bands[band] + 1;
@@ -9194,14 +9194,14 @@ function redrawGrids()
           }
           else if (name in GT.wacpZones)
           {
-            GT.wacpZones[name].worked |= worked;
+            GT.wacpZones[name].worked ||= worked;
             if (worked)
             {
               GT.wacpZones[name].worked_bands[band] = ~~GT.wacpZones[name].worked_bands[band] + 1;
               GT.wacpZones[name].worked_modes[mode] = ~~GT.wacpZones[name].worked_modes[mode] + 1;
             }
 
-            GT.wacpZones[name].confirmed |= didConfirm;
+            GT.wacpZones[name].confirmed ||= didConfirm;
             if (didConfirm)
             {
               GT.wacpZones[name].confirmed_bands[band] = ~~GT.wacpZones[name].confirmed_bands[band] + 1;
@@ -9215,14 +9215,14 @@ function redrawGrids()
       {
         if (cnty in GT.cntyToCounty)
         {
-          GT.countyData[cnty].worked |= worked;
+          GT.countyData[cnty].worked ||= worked;
           if (worked)
           {
             GT.countyData[cnty].worked_bands[band] = ~~GT.countyData[cnty].worked_bands[band] + 1;
             GT.countyData[cnty].worked_modes[mode] = ~~GT.countyData[cnty].worked_modes[mode] + 1;
           }
 
-          GT.countyData[cnty].confirmed |= didConfirm;
+          GT.countyData[cnty].confirmed ||= didConfirm;
           if (didConfirm)
           {
             GT.countyData[cnty].confirmed_bands[band] = ~~GT.countyData[cnty].confirmed_bands[band] + 1;
@@ -9238,14 +9238,14 @@ function redrawGrids()
 
           if (name in GT.wacZones)
           {
-            GT.wacZones[name].worked |= worked;
+            GT.wacZones[name].worked ||= worked;
             if (worked)
             {
               GT.wacZones[name].worked_bands[band] = ~~GT.wacZones[name].worked_bands[band] + 1;
               GT.wacZones[name].worked_modes[mode] = ~~GT.wacZones[name].worked_modes[mode] + 1;
             }
 
-            GT.wacZones[name].confirmed |= didConfirm;
+            GT.wacZones[name].confirmed ||= didConfirm;
             if (didConfirm)
             {
               GT.wacZones[name].confirmed_bands[band] = ~~GT.wacZones[name].confirmed_bands[band] + 1;
@@ -9255,14 +9255,14 @@ function redrawGrids()
         }
       }
 
-      GT.dxccInfo[finalDxcc].worked |= worked;
+      GT.dxccInfo[finalDxcc].worked ||= worked;
       if (worked)
       {
         GT.dxccInfo[finalDxcc].worked_bands[band] = ~~GT.dxccInfo[finalDxcc].worked_bands[band] + 1;
         GT.dxccInfo[finalDxcc].worked_modes[mode] = ~~GT.dxccInfo[finalDxcc].worked_modes[mode] + 1;
       }
 
-      GT.dxccInfo[finalDxcc].confirmed |= didConfirm;
+      GT.dxccInfo[finalDxcc].confirmed ||= didConfirm;
       if (didConfirm)
       {
         GT.dxccInfo[finalDxcc].confirmed_bands[band] = ~~GT.dxccInfo[finalDxcc].confirmed_bands[band] + 1;
@@ -9271,14 +9271,14 @@ function redrawGrids()
 
       if (cqz && cqz.length > 0)
       {
-        GT.cqZones[cqz].worked |= worked;
+        GT.cqZones[cqz].worked ||= worked;
         if (worked)
         {
           GT.cqZones[cqz].worked_bands[band] = ~~GT.cqZones[cqz].worked_bands[band] + 1;
           GT.cqZones[cqz].worked_modes[mode] = ~~GT.cqZones[cqz].worked_modes[mode] + 1;
         }
 
-        GT.cqZones[cqz].confirmed |= didConfirm;
+        GT.cqZones[cqz].confirmed ||= didConfirm;
         if (didConfirm)
         {
           GT.cqZones[cqz].confirmed_bands[band] = ~~GT.cqZones[cqz].confirmed_bands[band] + 1;
@@ -9288,14 +9288,14 @@ function redrawGrids()
 
       if (ituz && ituz.length > 0)
       {
-        GT.ituZones[ituz].worked |= worked;
+        GT.ituZones[ituz].worked ||= worked;
         if (worked)
         {
           GT.ituZones[ituz].worked_bands[band] = ~~GT.ituZones[ituz].worked_bands[band] + 1;
           GT.ituZones[ituz].worked_modes[mode] = ~~GT.ituZones[ituz].worked_modes[mode] + 1;
         }
 
-        GT.ituZones[ituz].confirmed |= didConfirm;
+        GT.ituZones[ituz].confirmed ||= didConfirm;
         if (didConfirm)
         {
           GT.ituZones[ituz].confirmed_bands[band] = ~~GT.ituZones[ituz].confirmed_bands[band] + 1;
@@ -9309,7 +9309,7 @@ function redrawGrids()
 
         if (gridCheck in GT.us48Data)
         {
-          GT.us48Data[gridCheck].worked |= worked;
+          GT.us48Data[gridCheck].worked ||= worked;
 
           if (worked)
           {
@@ -9317,7 +9317,7 @@ function redrawGrids()
             GT.us48Data[gridCheck].worked_modes[mode] = ~~GT.us48Data[gridCheck].worked_modes[mode] + 1;
           }
 
-          GT.us48Data[gridCheck].confirmed |= didConfirm;
+          GT.us48Data[gridCheck].confirmed ||= didConfirm;
 
           if (didConfirm)
           {
@@ -9332,14 +9332,14 @@ function redrawGrids()
         var grid = GT.QSOhash[i].vucc_grids[key].substr(0, 4);
         if (grid in GT.us48Data)
         {
-          GT.us48Data[grid].worked |= worked;
+          GT.us48Data[grid].worked ||= worked;
           if (worked)
           {
             GT.us48Data[grid].worked_bands[band] = ~~GT.us48Data[grid].worked_bands[band] + 1;
             GT.us48Data[grid].worked_modes[mode] = ~~GT.us48Data[grid].worked_modes[mode] + 1;
           }
 
-          GT.us48Data[grid].confirmed |= didConfirm;
+          GT.us48Data[grid].confirmed ||= didConfirm;
           if (didConfirm)
           {
             GT.us48Data[grid].confirmed_bands[band] = ~~GT.us48Data[grid].confirmed_bands[band] + 1;
