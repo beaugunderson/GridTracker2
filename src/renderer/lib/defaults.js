@@ -414,9 +414,8 @@ const def_settings = {
   ignoredITUz: {},
   roster: {
     onlyHits: false,
-    huntNeed: "mixed",
+    huntNeed: "confirmed",
     requireGrid: false,
-    animateCQGT: true,
     wantMaxDT: false,
     wantMinDB: false,
     wantMinFreq: false,

@@ -34,20 +34,20 @@ const AWARD_HUNT_EMPTY = {
   Watcher: false
 };
 
+const kInversionAlpha = "DD";
+const kRow = "#000000";
+const kBold = "#000000;font-weight: bold;";
+const kUnconf = "background-clip:padding-box;box-shadow: 0 0 7px 3px inset ";
+const kLayeredAlpha = "77";
+const kLayeredInversionAlpha = "66";
+const kLayeredUnconf = "background-clip:padding-box;box-shadow: 0 0 4px 2px inset ";
+const kLayeredUnconfAlpha = "AA";
+
 function processRosterHunting(callRoster, rosterSettings, awardTracker)
 {
   // these lets, do they rely on anything between the top and here?
   // if not could they be put in the let list at the beginning?
   let hasGtPin = false;
-  let inversionAlpha = "DD";
-  let row = "#000000";
-  let bold = "#000000;font-weight: bold;";
-  let unconf = "background-clip:padding-box;box-shadow: 0 0 7px 3px inset ";
-  let layeredAlpha = "77";
-  let layeredInversionAlpha = "66";
-  let layeredUnconf = "background-clip:padding-box;box-shadow: 0 0 4px 2px inset ";
-  let layeredUnconfAlpha = "AA";
-
   const currentYear = new Date().getFullYear();
   const currentYearSuffix = `&rsquo;${currentYear - 2000}`;
   const potaEnabled = (window.opener.GT.settings.app.potaEnabled == 1 && window.opener.GT.settings.map.offlineMode == false);
@@ -129,9 +129,9 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
       callObj.msgHTML = null;
       callObj.gridHTML = null;
 
-      let colorObject = Object();
+      let colorObject = {};
 
-      let callPointer = callObj.CQ == true ? "cursor:pointer" : "";
+      let callPointer = (callObj.CQ == true) ? "cursor:pointer" : "";
 
       let call = "#FFFF00";
       let grid = "#00FFFF";
@@ -147,10 +147,10 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
 
       hasGtPin = false;
       let shouldAlert = false;
-      let callBg, gridBg, callingBg, dxccBg, stateBg, cntyBg, contBg, potaBg, cqzBg, ituzBg, wpxBg, gtBg;
+      let callBg, gridBg, callingBg, dxccBg, stateBg, cntyBg, contBg, potaBg, cqzBg, ituzBg, wpxBg;
       let callConf, gridConf, callingConf, dxccConf, stateConf, cntyConf, contConf, potaConf, cqzConf, ituzConf, wpxConf;
 
-      callBg = gridBg = callingBg = dxccBg = stateBg = cntyBg = contBg = potaBg = cqzBg = ituzBg = wpxBg = gtBg = row;
+      callBg = gridBg = callingBg = dxccBg = stateBg = cntyBg = contBg = potaBg = cqzBg = ituzBg = wpxBg = kRow;
       callConf = gridConf = callingConf = dxccConf = stateConf = cntyConf = contConf = potaConf = cqzConf = ituzConf = wpxConf = "";
 
       let cntyPointer = (callObj.cnty && callObj.qual == false) ? "cursor: pointer;" : "";
@@ -162,7 +162,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
       {
         callObj.callFlags.worked = true;
         didWork = true;
-        callConf = `${unconf}${call}${inversionAlpha};`;
+        callConf = `${kUnconf}${call}${kInversionAlpha};`;
 
         if (hash in CR.tracker.confirmed.call)
         {
@@ -242,7 +242,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         if (hunt.Callsign)
         {
           let hash = callsign + workHashSuffix;
-          let layeredHash = rosterSettings.layeredMode && (callsign + layeredHashSuffix)
+          let layeredHash = rosterSettings.layeredMode && (callsign + layeredHashSuffix);
 
           if (rosterSettings.huntIndex && !(hash in rosterSettings.huntIndex.call))
           {
@@ -254,24 +254,14 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
               if (rosterSettings.layeredMode && layeredHash in rosterSettings.huntIndex.call)
               {
                 callObj.hunting.call = "worked-and-mixed";
-                callConf = `${layeredUnconf}${call}${layeredUnconfAlpha};`;
-                callBg = `${call}${layeredInversionAlpha}`;
-                call = bold;
+                callConf = `${kLayeredUnconf}${call}${kLayeredUnconfAlpha};`;
+                callBg = `${call}${kLayeredInversionAlpha}`;
+                call = kBold;
               }
-              // /* Currently we don't have a way to figure out
-              //  * if the call is worked only in this band or also others,
-              //  * so we cannot cover this particular combination
-              //  * and have to default to just showing it as plain "worked"
-              //  */
-              // else if (rosterSettings.layeredMode && layeredHash in rosterSettings.workedIndex.call)
-              // {
-              //   callObj.hunting.call = "worked-and-mixed-worked";
-              //   callConf = `${layeredUnconf}${call}${layeredAlpha};`;
-              // }
               else
               {
                 callObj.hunting.call = "worked";
-                callConf = `${unconf}${call}${inversionAlpha};`;
+                callConf = `${kUnconf}${call}${kInversionAlpha};`;
               }
             }
             else
@@ -279,19 +269,19 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
               if (rosterSettings.layeredMode && layeredHash in rosterSettings.huntIndex.call)
               {
                 callObj.hunting.call = "mixed";
-                callBg = `${call}${layeredAlpha};`;
-                call = bold;
+                callBg = `${call}${kLayeredAlpha};`;
+                call = kBold;
               }
               else if (rosterSettings.layeredMode && layeredHash in rosterSettings.workedIndex.call)
               {
                 callObj.hunting.call = "mixed-worked";
-                callConf = `${unconf}${call}${layeredAlpha};`;
+                callConf = `${kUnconf}${call}${kLayeredAlpha};`;
               }
               else
               {
                 callObj.hunting.call = "hunted";
-                callBg = `${call}${inversionAlpha};`;
-                call = bold;
+                callBg = `${call}${kInversionAlpha};`;
+                call = kBold;
               }
             }
           }
@@ -335,14 +325,14 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
               if (rosterSettings.layeredMode && layeredHash in rosterSettings.huntIndex.grid)
               {
                 callObj.hunting.grid = "worked-and-mixed";
-                gridConf = `${layeredUnconf}${grid}${layeredUnconfAlpha};`;
-                gridBg = `${grid}${layeredInversionAlpha}`;
-                grid = bold;
+                gridConf = `${kLayeredUnconf}${grid}${kLayeredUnconfAlpha};`;
+                gridBg = `${grid}${kLayeredInversionAlpha}`;
+                grid = kBold;
               }
               else
               {
                 callObj.hunting.grid = "worked";
-                gridConf = `${unconf}${grid}${inversionAlpha};`;
+                gridConf = `${kUnconf}${grid}${kInversionAlpha};`;
               }
             }
             else
@@ -350,19 +340,19 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
               if (rosterSettings.layeredMode && layeredHash in rosterSettings.huntIndex.grid)
               {
                 callObj.hunting.grid = "mixed";
-                gridBg = `${grid}${layeredAlpha};`;
-                grid = bold;
+                gridBg = `${grid}${kLayeredAlpha};`;
+                grid = kBold;
               }
               else if (rosterSettings.layeredMode && layeredHash in rosterSettings.workedIndex.grid)
               {
                 callObj.hunting.grid = "mixed-worked";
-                gridConf = `${unconf}${grid}${layeredAlpha};`;
+                gridConf = `${kUnconf}${grid}${kLayeredAlpha};`;
               }
               else
               {
                 callObj.hunting.grid = "hunted";
-                gridBg = `${grid}${inversionAlpha};`;
-                grid = bold;
+                gridBg = `${grid}${kInversionAlpha};`;
+                grid = kBold;
               }
             }
           }
@@ -384,14 +374,14 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
               if (rosterSettings.layeredMode && layeredHash in rosterSettings.huntIndex.dxcc)
               {
                 callObj.hunting.dxcc = "worked-and-mixed";
-                dxccConf = `${layeredUnconf}${dxcc}${layeredUnconfAlpha};`;
-                dxccBg = `${dxcc}${layeredInversionAlpha}`;
-                dxcc = bold;
+                dxccConf = `${kLayeredUnconf}${dxcc}${kLayeredUnconfAlpha};`;
+                dxccBg = `${dxcc}${kLayeredInversionAlpha}`;
+                dxcc = kBold;
               }
               else
               {
                 callObj.hunting.dxcc = "worked";
-                dxccConf = `${unconf}${dxcc}${inversionAlpha};`;
+                dxccConf = `${kUnconf}${dxcc}${kInversionAlpha};`;
               }
             }
             else
@@ -399,19 +389,19 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
               if (rosterSettings.layeredMode && layeredHash in rosterSettings.huntIndex.dxcc)
               {
                 callObj.hunting.dxcc = "mixed";
-                dxccBg = `${dxcc}${layeredAlpha};`;
-                dxcc = bold;
+                dxccBg = `${dxcc}${kLayeredAlpha};`;
+                dxcc = kBold;
               }
               else if (rosterSettings.layeredMode && layeredHash in rosterSettings.workedIndex.dxcc)
               {
                 callObj.hunting.dxcc = "mixed-worked";
-                dxccConf = `${unconf}${dxcc}${layeredAlpha};`;
+                dxccConf = `${kUnconf}${dxcc}${kLayeredAlpha};`;
               }
               else
               {
                 callObj.hunting.dxcc = "hunted";
-                dxccBg = `${dxcc}${inversionAlpha};`;
-                dxcc = bold;
+                dxccBg = `${dxcc}${kInversionAlpha};`;
+                dxcc = kBold;
               }
             }
           }
@@ -431,7 +421,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
                 callObj.hunting.dxccMarathon = "hunted";
                 if (!callObj.hunting.dxcc)
                 {
-                  dxccConf = `${unconf}${dxcc}${layeredAlpha};`;
+                  dxccConf = `${kUnconf}${dxcc}${kLayeredAlpha};`;
                 }
               }
             }
@@ -457,14 +447,14 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
                 if (rosterSettings.layeredMode && layeredHash in rosterSettings.huntIndex.state)
                 {
                   callObj.hunting.state = "worked-and-mixed";
-                  stateConf = `${layeredUnconf}${state}${layeredUnconfAlpha};`;
-                  stateBg = `${state}${layeredInversionAlpha}`;
-                  state = bold;
+                  stateConf = `${kLayeredUnconf}${state}${kLayeredUnconfAlpha};`;
+                  stateBg = `${state}${kLayeredInversionAlpha}`;
+                  state = kBold;
                 }
                 else
                 {
                   callObj.hunting.state = "worked";
-                  stateConf = `${unconf}${state}${inversionAlpha};`;
+                  stateConf = `${kUnconf}${state}${kInversionAlpha};`;
                 }
               }
               else
@@ -472,19 +462,19 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
                 if (rosterSettings.layeredMode && layeredHash in rosterSettings.huntIndex.state)
                 {
                   callObj.hunting.state = "mixed";
-                  stateBg = `${state}${layeredAlpha};`;
-                  state = bold;
+                  stateBg = `${state}${kLayeredAlpha};`;
+                  state = kBold;
                 }
                 else if (rosterSettings.layeredMode && layeredHash in rosterSettings.workedIndex.state)
                 {
                   callObj.hunting.state = "mixed-worked";
-                  stateConf = `${unconf}${state}${layeredAlpha};`;
+                  stateConf = `${kUnconf}${state}${kLayeredAlpha};`;
                 }
                 else
                 {
                   callObj.hunting.state = "hunted";
-                  stateBg = `${state}${inversionAlpha};`;
-                  state = bold;
+                  stateBg = `${state}${kInversionAlpha};`;
+                  state = kBold;
                 }
               }
             }
@@ -529,13 +519,13 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
                 if (rosterSettings.workedIndex && hash in rosterSettings.workedIndex.cnty)
                 {
                   callObj.hunting.cnty = "worked";
-                  cntyConf = `${unconf}${cnty}${inversionAlpha};`;
+                  cntyConf = `${kUnconf}${cnty}${kInversionAlpha};`;
                 }
                 else
                 {
                   callObj.hunting.cnty = "hunted";
-                  cntyBg = `${cnty}${inversionAlpha}`;
-                  cnty = bold;
+                  cntyBg = `${cnty}${kInversionAlpha}`;
+                  cnty = kBold;
                 }
               }
             }
@@ -555,17 +545,17 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
             callObj.hunting.pota = "hunted";
             if (parkHash in CR.tracker.worked.pota)
             {
-              potaConf = `${unconf}${pota}${inversionAlpha};`;
+              potaConf = `${kUnconf}${pota}${kInversionAlpha};`;
             }
             else
             {
-              potaBg = `${pota}${inversionAlpha};`;
-              pota = bold;
+              potaBg = `${pota}${kInversionAlpha};`;
+              pota = kBold;
             }
           }
           else if (parkHash in CR.tracker.worked.pota)
           {
-            potaConf = `${unconf}${pota}${inversionAlpha};`;
+            potaConf = `${kUnconf}${pota}${kInversionAlpha};`;
           }
         }
 
@@ -598,14 +588,14 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
               if (rosterSettings.layeredMode && layeredFound == huntTotal)
               {
                 callObj.hunting.cqz = "worked-and-mixed";
-                cqzConf = `${layeredUnconf}${cqz}${layeredUnconfAlpha};`;
-                cqzBg = `${cqz}${layeredInversionAlpha}`;
-                cqz = bold;
+                cqzConf = `${kLayeredUnconf}${cqz}${kLayeredUnconfAlpha};`;
+                cqzBg = `${cqz}${kLayeredInversionAlpha}`;
+                cqz = kBold;
               }
               else
               {
                 callObj.hunting.cqz = "worked";
-                cqzConf = `${unconf}${cqz}${inversionAlpha};`;
+                cqzConf = `${kUnconf}${cqz}${kInversionAlpha};`;
               }
             }
             else
@@ -613,19 +603,19 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
               if (rosterSettings.layeredMode && layeredFound == huntTotal)
               {
                 callObj.hunting.cqz = "mixed";
-                cqzBg = `${cqz}${layeredAlpha};`;
-                cqz = bold;
+                cqzBg = `${cqz}${kLayeredAlpha};`;
+                cqz = kBold;
               }
               else if (rosterSettings.layeredMode && layeredWorkedFound == huntTotal)
               {
                 callObj.hunting.cqz = "mixed-worked";
-                cqzConf = `${unconf}${cqz}${layeredAlpha};`;
+                cqzConf = `${kUnconf}${cqz}${kLayeredAlpha};`;
               }
               else
               {
                 callObj.hunting.cqz = "hunted";
-                cqzBg = `${cqz}${inversionAlpha};`;
-                cqz = bold;
+                cqzBg = `${cqz}${kInversionAlpha};`;
+                cqz = kBold;
               }
             }
           }
@@ -642,7 +632,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
               callObj.hunting.cqzMarathon = "hunted";
               if (!callObj.hunting.cqz)
               {
-                cqzConf = `${unconf}${cqz}${layeredAlpha};`;
+                cqzConf = `${kUnconf}${cqz}${kLayeredAlpha};`;
               }
             }
           }
@@ -671,14 +661,14 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
               if (rosterSettings.layeredMode && layeredFound == huntTotal)
               {
                 callObj.hunting.ituz = "worked-and-mixed";
-                ituzConf = `${layeredUnconf}${ituz}${layeredUnconfAlpha};`;
-                ituzBg = `${ituz}${layeredInversionAlpha}`;
-                ituz = bold;
+                ituzConf = `${kLayeredUnconf}${ituz}${kLayeredUnconfAlpha};`;
+                ituzBg = `${ituz}${kLayeredInversionAlpha}`;
+                ituz = kBold;
               }
               else
               {
                 callObj.hunting.ituz = "worked";
-                ituzConf = `${unconf}${ituz}${inversionAlpha};`;
+                ituzConf = `${kUnconf}${ituz}${kInversionAlpha};`;
               }
             }
             else
@@ -686,19 +676,19 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
               if (rosterSettings.layeredMode && layeredFound == huntTotal)
               {
                 callObj.hunting.ituz = "mixed";
-                ituzBg = `${ituz}${layeredAlpha};`;
-                ituz = bold;
+                ituzBg = `${ituz}${kLayeredAlpha};`;
+                ituz = kBold;
               }
               else if (rosterSettings.layeredMode && layeredWorkedFound == huntTotal)
               {
                 callObj.hunting.ituz = "mixed-worked";
-                ituzConf = `${unconf}${ituz}${layeredAlpha};`;
+                ituzConf = `${kUnconf}${ituz}${kLayeredAlpha};`;
               }
               else
               {
                 callObj.hunting.ituz = "hunted";
-                ituzBg = `${ituz}${inversionAlpha};`;
-                ituz = bold;
+                ituzBg = `${ituz}${kInversionAlpha};`;
+                ituz = kBold;
               }
             }
           }
@@ -707,8 +697,8 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         // Hunting for WPX (Prefixes)
         if ((hunt.PX) && callObj.px)
         {
-          let hash = String(callObj.px) + workHashSuffix;
-          let layeredHash = rosterSettings.layeredMode && (String(callObj.px) + layeredHashSuffix)
+          let hash = callObj.px + workHashSuffix;
+          let layeredHash = rosterSettings.layeredMode && (callObj.px + layeredHashSuffix)
 
           if (rosterSettings.huntIndex && !(hash in rosterSettings.huntIndex.px))
           {
@@ -720,14 +710,14 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
               if (rosterSettings.layeredMode && layeredHash in rosterSettings.huntIndex.px)
               {
                 callObj.hunting.wpx = "worked-and-mixed";
-                wpxConf = `${layeredUnconf}${wpx}${layeredUnconfAlpha};`;
-                wpxBg = `${wpx}${layeredInversionAlpha}`;
-                wpx = bold;
+                wpxConf = `${kLayeredUnconf}${wpx}${kLayeredUnconfAlpha};`;
+                wpxBg = `${wpx}${kLayeredInversionAlpha}`;
+                wpx = kBold;
               }
               else
               {
                 callObj.hunting.wpx = "worked";
-                wpxConf = `${unconf}${wpx}${inversionAlpha};`;
+                wpxConf = `${kUnconf}${wpx}${kInversionAlpha};`;
               }
             }
             else
@@ -735,19 +725,19 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
               if (rosterSettings.layeredMode && layeredHash in rosterSettings.huntIndex.px)
               {
                 callObj.hunting.wpx = "mixed";
-                wpxBg = `${wpx}${layeredAlpha};`;
-                wpx = bold;
+                wpxBg = `${wpx}${kLayeredAlpha};`;
+                wpx = kBold;
               }
               else if (rosterSettings.layeredMode && layeredHash in rosterSettings.workedIndex.px)
               {
                 callObj.hunting.wpx = "mixed-worked";
-                wpxConf = `${unconf}${wpx}${layeredAlpha};`;
+                wpxConf = `${kUnconf}${wpx}${kLayeredAlpha};`;
               }
               else
               {
                 callObj.hunting.wpx = "hunted";
-                wpxBg = `${wpx}${inversionAlpha};`;
-                wpx = bold;
+                wpxBg = `${wpx}${kInversionAlpha};`;
+                wpx = kBold;
               }
             }
           }
@@ -756,8 +746,8 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         // Hunting for Continents
         if ((hunt.Cont) && callObj.cont)
         {
-          let hash = String(callObj.cont) + workHashSuffix;
-          let layeredHash = rosterSettings.layeredMode && (String(callObj.cont) + layeredHashSuffix)
+          let hash = callObj.cont + workHashSuffix;
+          let layeredHash = rosterSettings.layeredMode && (callObj.cont + layeredHashSuffix)
 
           if (rosterSettings.huntIndex && !(hash in rosterSettings.huntIndex.cont))
           {
@@ -769,14 +759,14 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
               if (rosterSettings.layeredMode && layeredHash in rosterSettings.huntIndex.cont)
               {
                 callObj.hunting.cont = "worked-and-mixed";
-                contConf = `${layeredUnconf}${cont}${layeredUnconfAlpha};`;
-                contBg = `${cont}${layeredInversionAlpha}`;
-                cont = bold;
+                contConf = `${kLayeredUnconf}${cont}${kLayeredUnconfAlpha};`;
+                contBg = `${cont}${kLayeredInversionAlpha}`;
+                cont = kBold;
               }
               else
               {
                 callObj.hunting.cont = "worked";
-                contConf = `${unconf}${cont}${inversionAlpha};`;
+                contConf = `${kUnconf}${cont}${kInversionAlpha};`;
               }
             }
             else
@@ -784,19 +774,19 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
               if (rosterSettings.layeredMode && layeredHash in rosterSettings.huntIndex.cont)
               {
                 callObj.hunting.cont = "mixed";
-                contBg = `${cont}${layeredAlpha};`;
-                cont = bold;
+                contBg = `${cont}${kLayeredAlpha};`;
+                cont = kBold;
               }
               else if (rosterSettings.layeredMode && layeredHash in rosterSettings.workedIndex.cont)
               {
                 callObj.hunting.cont = "mixed-worked";
-                contConf = `${unconf}${cont}${layeredAlpha};`;
+                contConf = `${kUnconf}${cont}${kLayeredAlpha};`;
               }
               else
               {
                 callObj.hunting.cont = "hunted";
-                contBg = `${cont}${inversionAlpha};`;
-                cont = bold;
+                contBg = `${cont}${kInversionAlpha};`;
+                cont = kBold;
               }
             }
           }
@@ -806,41 +796,26 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
       // Station is calling us
       if (callObj.DXcall == window.opener.GT.settings.app.myCall)
       {
-        callingBg = "#0000FF" + inversionAlpha;
+        callingBg = "#0000FF" + kInversionAlpha;
         calling = "#FFFF00;text-shadow: 0px 0px 2px #FFFF00";
       }
       else if ((callObj.CQ == true || (CR.rosterSettings.wantRRCQ && callObj.RR73 == true)) && !CR.rosterSettings.cqOnly)
       {
-        callingBg = calling + inversionAlpha;
-        calling = bold;
+        callingBg = calling + kInversionAlpha;
+        calling = kBold;
         // If treating RR73/73 as CQ, soften highlighting to help differentiate foreshadow from an actual CQ
         if (CR.rosterSettings.wantRRCQ && callObj.RR73 == true)
         {
-          callingConf = `${unconf}#90EE90${inversionAlpha};`;
-          calling = `#90EE90${inversionAlpha};`
+          callingConf = `${kUnconf}#90EE90${kInversionAlpha};`;
+          calling = `#90EE90${kInversionAlpha};`
           callingBg = "#000000"
         }
       }
-
-      let huzzah = "";
-      // Uncomment to test
-      // callObj.DXcall = "CQ GT";
-      if (CR.rosterSettings.animateCQGT == true && callObj.CQ == true && (callObj.DXcall == "CQ GT" || callObj.DXcall == "GridTracker"))
-      {
-        huzzah = "class='huzzah' ";
-        callObj.DXcall = "GridTracker";
-        calling = "white";
-      }
-      else if (CR.rosterSettings.animateCQGT == false && callObj.DXcall == "GridTracker")
-      {
-        callObj.DXcall = "CQ GT";
-      }
-   
+  
       // Assemble all styles
-      colorObject.call = "style='" + callConf + "background-color:" + callBg + ";color:" +
-        call + ";" + callPointer + "'";
+      colorObject.call = "style='" + callConf + "background-color:" + callBg + ";color:" + call + ";" + callPointer + "'";
       colorObject.grid = "style='" + gridConf + "background-color:" + gridBg + ";color:" + grid + ";cursor:pointer'";
-      colorObject.calling = huzzah + "style='" + callingConf + "background-color:" + callingBg + ";color:" + calling + "'";
+      colorObject.calling = "style='" + callingConf + "background-color:" + callingBg + ";color:" + calling + "'";
       colorObject.dxcc = "style='" + dxccConf + "background-color:" + dxccBg + ";color:" + dxcc + "'";
       colorObject.state = "style='" + stateConf + "background-color:" + stateBg + ";color:" + state + "'";
       colorObject.cnty = "style='" + cntyConf + "background-color:" + cntyBg + ";color:" + cnty + ";" + cntyPointer + "'";

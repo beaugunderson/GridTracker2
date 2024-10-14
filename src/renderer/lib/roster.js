@@ -1559,7 +1559,6 @@ function addControls()
 
   clearRosterOnBandChange.checked = CR.rosterSettings.clearRosterOnBandChange;
   rosterAlwaysOnTop.checked = CR.rosterSettings.rosterAlwaysOnTop;
-  animateCQGT.checked = CR.rosterSettings.animateCQGT;
   rosterDelayOnFocus.checked = CR.rosterSettings.rosterDelayOnFocus;
   displayDelayOnFocus();
   rosterDelayTime.value = CR.rosterSettings.rosterDelayTime;
@@ -1627,12 +1626,6 @@ function changeRosterTime()
 {
   CR.rosterSettings.rosterTime = rosterTime.value;
   setRosterTimeView();
-  viewRoster();
-}
-
-function changeAnimateCQGT(butt)
-{
-  CR.rosterSettings.animateCQGT = butt.checked;
   viewRoster();
 }
 
