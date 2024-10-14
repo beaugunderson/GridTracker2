@@ -875,7 +875,7 @@ function loadAudioAlertSettings()
 {
   referenceNeed.value = GT.settings.roster.referenceNeed;
   huntNeed.value = GT.settings.roster.huntNeed;
-  wantGrid.checked = GT.settings.roster.requireGrid;
+  requireGrid.checked = GT.settings.roster.requireGrid;
   wantRRCQ.checked = GT.settings.roster.wantRRCQ;
   cqOnly.checked = GT.settings.roster.cqOnly;
   noMyDxcc.checked = GT.settings.roster.noMyDxcc;

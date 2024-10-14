@@ -1528,7 +1528,7 @@ function addControls()
   clearRestOfMenus();
 
   huntNeed.value = CR.rosterSettings.huntNeed;
-  wantGrid.checked = CR.rosterSettings.requireGrid;
+  requireGrid.checked = CR.rosterSettings.requireGrid;
 
   wantMaxDT.checked = CR.rosterSettings.wantMaxDT;
   wantMinDB.checked = CR.rosterSettings.wantMinDB;

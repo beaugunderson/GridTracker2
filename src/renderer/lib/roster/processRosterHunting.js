@@ -45,15 +45,11 @@ const kLayeredUnconfAlpha = "AA";
 
 function processRosterHunting(callRoster, rosterSettings, awardTracker)
 {
-  // these lets, do they rely on anything between the top and here?
-  // if not could they be put in the let list at the beginning?
   let hasGtPin = false;
   const currentYear = new Date().getFullYear();
   const currentYearSuffix = `&rsquo;${currentYear - 2000}`;
   const potaEnabled = (window.opener.GT.settings.app.potaEnabled == 1 && window.opener.GT.settings.map.offlineMode == false);
-  // TODO: Hunting results might be used to filter, based on the "Callsigns: Only Wanted" option,
-  //       so maybe we can move this loop first, and add a check to the filtering loop?
-  
+
   let isAwardTracker = (CR.rosterSettings.referenceNeed == LOGBOOK_AWARD_TRACKER);
   let hunt = {};
   if (!isAwardTracker)
@@ -75,7 +71,6 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
       Watcher: huntWatcher.checked
     };
   }
-
  
   // Second loop, hunting and highlighting
   for (const callHash in callRoster)
@@ -130,9 +125,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
       callObj.gridHTML = null;
 
       let colorObject = {};
-
       let callPointer = (callObj.CQ == true) ? "cursor:pointer" : "";
-
       let call = "#FFFF00";
       let grid = "#00FFFF";
       let calling = "#90EE90";
@@ -144,8 +137,6 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
       let cqz = "#DDDDDD";
       let ituz = "#DDDDDD";
       let wpx = "#FFFF00";
-
-      hasGtPin = false;
       let shouldAlert = false;
       let callBg, gridBg, callingBg, dxccBg, stateBg, cntyBg, contBg, potaBg, cqzBg, ituzBg, wpxBg;
       let callConf, gridConf, callingConf, dxccConf, stateConf, cntyConf, contConf, potaConf, cqzConf, ituzConf, wpxConf;
@@ -176,6 +167,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
       if (callsign in window.opener.GT.gtCallsigns)
       {
         callObj.gt = 0;
+        hasGtPin = false;
         for (const cid in window.opener.GT.gtCallsigns[callsign])
         {
           if (cid in window.opener.GT.gtFlagPins && window.opener.GT.gtFlagPins[cid].canmsg == true)
@@ -194,6 +186,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
       else
       {
         callObj.gt = 0;
+        hasGtPin = false;
       }
 
     
@@ -302,7 +295,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for stations with OAMS
-        if (hunt.OAMS && hasGtPin == true)
+        if (hunt.OAMS && hasGtPin)
         {
           callObj.hunting.oams = "hunted";
           shouldAlert = true;
@@ -824,10 +817,8 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
       colorObject.cqz = "style='" + cqzConf + "background-color:" + cqzBg + ";color:" + cqz + "'";
       colorObject.ituz = "style='" + ituzConf + "background-color:" + ituzBg + ";color:" + ituz + "'";
       colorObject.px = "style='" + wpxConf + "background-color:" + wpxBg + ";color:" + wpx + "'";
-
-      callObj.shouldAlert ||= shouldAlert;
       callObj.style = colorObject;
-
+      callObj.shouldAlert ||= shouldAlert;
       rosterSettings.modes[callObj.mode] = true;
       rosterSettings.bands[callObj.band] = true;
     }
