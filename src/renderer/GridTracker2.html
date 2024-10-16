@@ -2361,29 +2361,48 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <div id="SecondaryAudioAlertControls">
            <div id="huntingMatrixDiv" class="secondaryControlGroup">
             <h3 data-i18n="settings.alerts.AudioAlert.label">Alerts</h3>
-            <table class="audioAlertsTable">
+            <table class="audioAlertsTale" id="audioAlertsAwardTable">
               <tr>
                 <th></th>
                 <th>Entity</th>
+                <th>Count</th>
                 <th>Type</th>
                 <th>On Single</th>
                 <th>On Multiple</th>
               </tr>
               <tr>
                 <td>
-                <input type="checkbox" id="huntCallsign" onchange="wantedChanged(this);" />
+                  <input type="checkbox" id="huntAward" onchange="wantedChanged(this);" />
                 </td>
                 <td>
-                <label data-i18n="roster.secondary.wanted.callsign" for="huntCallsign">Callsign</label>
+                  <label data-i18n="roster.award.Award" for="huntAward">Award</label>
+                </td>
+              </tr>
+            </table> 
+            <table class="audioAlertsTable" id="audioAlertsWantedTable">
+              <tr>
+                <th></th>
+                <th>Entity</th>
+                <th>Count</th>
+                <th>Type</th>
+                <th>On Single</th>
+                <th>On Multiple</th>
+              </tr>
+              <tr>
+                <td>
+                  <input type="checkbox" id="huntCallsign" onchange="wantedChanged(this);" />
+                </td>
+                <td>
+                  <label data-i18n="roster.secondary.wanted.callsign" for="huntCallsign">Callsign</label>
                 </td>
               </tr>
               <tr>
                 <td>
-                <input type="checkbox" id="huntGrid" onchange="wantedChanged(this);" />
-              </td>
-              <td>
-                <label data-i18n="roster.secondary.wanted.grid" for="huntGrid">Grid</label>
-              </td>
+                 <input type="checkbox" id="huntGrid" onchange="wantedChanged(this);" />
+                </td>
+                <td>
+                  <label data-i18n="roster.secondary.wanted.grid" for="huntGrid">Grid</label>
+                </td>
             </tr>
             <tr>
               <td>

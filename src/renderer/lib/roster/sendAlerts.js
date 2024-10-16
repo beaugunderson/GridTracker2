@@ -58,7 +58,7 @@ function sendAlerts()
         multi++;
       }
     }
-    audioAlertCounts.huntMulti = multi;
+    audioAlertCounts.huntMultiple = multi;
     window.opener.processAudioAlertsFromRoster(audioAlertCounts);
   }
 

@@ -34,6 +34,7 @@ function processRosterFiltering(callRoster, rosterSettings)
     callObj.shouldRosterAlert = false;
     callObj.shouldAudioAlert = false;
     callObj.shouldOAMS = false;
+    callObj.AH = {};
     callObj.audioAlertReason = {};
 
     // The awardReason is the "tooltip" on the callsign in the roster, if we're not award tracking
@@ -229,7 +230,10 @@ function processRosterFiltering(callRoster, rosterSettings)
             callObj.awardReason = CR.awards[x.sponsor].awards[x.name].tooltip + " (" + CR.awards[x.sponsor].sponsor + ")";
             callObj.awardType = CR.awards[x.sponsor].awards[x.name].rule.type;
             callObj.shouldRosterAlert = true;
-            callObj.shouldAudioAlert = true;
+            if (window.opener.GT.settings.audioAlerts.wanted.huntAward)
+            {
+              callObj.AH = { huntAward: 1 };
+            }
             break;
           }
         }

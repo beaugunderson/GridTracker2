@@ -315,6 +315,7 @@ const def_settings = {
       huntPOTA: false,
       huntOAMS: false,
       huntWatcher: false,
+      huntAward: false,
       huntMultiple: false,
     },
     media: {
@@ -330,6 +331,7 @@ const def_settings = {
       huntPOTAType: "tts",
       huntOAMSType: "tts",
       huntWatcherType: "tts",
+      huntAwardType: "tts",
       huntMultipleType: "tts",
 
       huntCallsignFileSingle: "none",
@@ -344,6 +346,7 @@ const def_settings = {
       huntPOTAFileSingle: "none",
       huntOAMSFileSingle: "none",
       huntWatcherFileSingle: "none",
+      huntAwardFileSingle: "none",
       huntMultipleFileSingle: "none",
 
       huntCallsignFileMulti: "none",
@@ -358,6 +361,7 @@ const def_settings = {
       huntPOTAFileMulti: "none",
       huntOAMSFileMulti: "none",
       huntWatcherFileMulti: "none",
+      huntAwardFileMulti: "none",
       huntMultipleFileMulti: "none",
 
       huntCallsignSpeechSingle: "Wanted Callsign",
@@ -372,6 +376,7 @@ const def_settings = {
       huntPOTASpeechSingle: "Wanted Park",
       huntOAMSSpeechSingle: "Wanted Ohms User",
       huntWatcherSpeechSingle: "Wanted Watcher",
+      huntAwardSpeechSingle: "Wanted Award",
       huntMultipleSpeechSingle: "not visible",
 
       huntCallsignSpeechMulti: "Many Callsigns",
@@ -386,6 +391,7 @@ const def_settings = {
       huntPOTASpeechMulti: "Many Parks",
       huntOAMSSpeechMulti: "Many Ohms Users",
       huntWatcherSpeechMulti: "Many Watchers",
+      huntAwardSpeechMulti: "Many Awards",
       huntMultipleSpeechMulti: "Many Wanted Entities",
     }
   },

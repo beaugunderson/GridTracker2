@@ -655,6 +655,7 @@ function wantedChanged(what)
 {
   if (what.id in GT.settings.audioAlerts.wanted)
   {
+    window.speechSynthesis.cancel();
     GT.settings.audioAlerts.wanted[what.id] = what.checked;
 
     if (GT.callRosterWindowInitialized)
@@ -670,8 +671,14 @@ function wantedChanged(what)
 
 function processAudioAlertsFromRoster(wantedAlerts)
 {
-;
-  if (wantedAlerts.huntMulti > 1)
+  for (const key in wantedAlerts)
+  {
+    if (key in window)
+    {
+      window[key + "Count"].innerHTML = wantedAlerts[key];
+    }
+  }
+  if (wantedAlerts.huntMultiple > 1)
   {
     if (GT.settings.audioAlerts.media.huntMultipleType == "tts")
     {
@@ -687,32 +694,35 @@ function processAudioAlertsFromRoster(wantedAlerts)
   }
   else
   {
-    delete wantedAlerts.huntMulti;
+    delete wantedAlerts.huntMultiple;
     for (const key in wantedAlerts)
     {
-      let type = key + "Type";
-      if (wantedAlerts[key] == 1)
+      if (key in window)
       {
-        if (GT.settings.audioAlerts.media[type] == "tts")
+        let type = key + "Type";
+        if (wantedAlerts[key] == 1)
         {
-          speakAlertString(GT.settings.audioAlerts.media[key + "SpeechSingle"]);
-        }
-        else
-        {
-          playAlertMediaFile(GT.settings.audioAlerts.media[key + "FileSingle"]);
-        }
-      }
-      else if (wantedAlerts[key] > 1)
-      {
-        if (GT.settings.audioAlerts.media[type] == "tts")
-        {
-          speakAlertString(GT.settings.audioAlerts.media[key + "SpeechMulti"]);
-        }
-        else
-        {
-          if (GT.settings.audioAlerts.media[key + "FileMulti"] != "none")
+          if (GT.settings.audioAlerts.media[type] == "tts")
           {
-            playAlertMediaFile(GT.settings.audioAlerts.media[key + "FileMulti"]);
+            speakAlertString(GT.settings.audioAlerts.media[key + "SpeechSingle"]);
+          }
+          else
+          {
+            playAlertMediaFile(GT.settings.audioAlerts.media[key + "FileSingle"]);
+          }
+        }
+        else if (wantedAlerts[key] > 1)
+        {
+          if (GT.settings.audioAlerts.media[type] == "tts")
+          {
+            speakAlertString(GT.settings.audioAlerts.media[key + "SpeechMulti"]);
+          }
+          else
+          {
+            if (GT.settings.audioAlerts.media[key + "FileMulti"] != "none")
+            {
+              playAlertMediaFile(GT.settings.audioAlerts.media[key + "FileMulti"]);
+            }
           }
         }
       }
@@ -749,8 +759,10 @@ function huntingValueChanged(element)
 {
   if (GT.callRosterWindowInitialized)
   {
+    window.speechSynthesis.cancel();
     let value = (element.type == "checkbox") ? element.checked : element.value;
     GT.callRosterWindowHandle.window.huntingValueChangedFromAudioAlerts(element.id, value);
+    setVisualAudioAlerts();
   }
   else
   {
@@ -775,6 +787,7 @@ function huntingValueChangedFromCallRoster(id, value)
         window[view].innerHTML = value;
       }
     }
+    setVisualAudioAlerts();
   }
 }
 
@@ -795,15 +808,15 @@ function setVisualAudioAlerts()
 {
   if (referenceNeed.value == LOGBOOK_AWARD_TRACKER)
   {
+    audioAlertsAwardTable.style.display = "";
+    audioAlertsWantedTable.style.display = "none";
     HuntModeControls.style.display = "none";
-    huntingMatrixDiv.style.display = "none";
-    huntNeed.style.display = "none";
   }
   else
   {
+    audioAlertsAwardTable.style.display = "none";
+    audioAlertsWantedTable.style.display = "";
     HuntModeControls.style.display = "";
-    huntingMatrixDiv.style.display = "";
-    huntNeed.style.display = "";
   }
 
   useseQSLDiv.style.display = (GT.settings.callsignLookups.eqslUseEnable) ? "" : "none";
@@ -847,8 +860,17 @@ function loadAudioAlertSettings()
       let visibility = window[key].style.visibility;
       let row = window[key].parentNode.parentNode;
       let parent = row.insertCell();
+      let newDiv = document.createElement("div");
+      let id = key + "Count";
+      newDiv.id = id;
+      newDiv.className = "roundBorderValue";
+      newDiv.innerHTML = "0";
+      parent.style.textAlign = "center";
+      parent.appendChild(newDiv);
+      parent = row.insertCell();
+
       let select = document.createElement("select");
-      let id = key + "Type";
+      id = key + "Type";
       let value = GT.settings.audioAlerts.media[id];
       let mediaType = value;
       select.id = id;

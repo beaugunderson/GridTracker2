@@ -47,7 +47,8 @@ const AUDIO_ALERT_HUNT_ZERO = {
   huntITUz: 0,
   huntPX: 0,
   huntCont: 0,
-  huntWatcher: 0
+  huntWatcher: 0,
+  huntAward: 0
 };
 
 const kInversionAlpha = "DD";
@@ -67,10 +68,10 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
   const potaEnabled = (window.opener.GT.settings.app.potaEnabled == 1 && window.opener.GT.settings.map.offlineMode == false);
 
   let isAwardTracker = (CR.rosterSettings.referenceNeed == LOGBOOK_AWARD_TRACKER);
-  // R == Roster Hunting
-  let R = CR.rosterSettings.wanted;
-  // A == Audio Alert Hunting
-  let A = GT.settings.audioAlerts.wanted;
+  // Rw == Roster Wanted
+  let RW = CR.rosterSettings.wanted;
+  // AAW == Audio Alert Wanted
+  let AAW = GT.settings.audioAlerts.wanted;
  
   // Second loop, hunting and highlighting
   for (const callHash in callRoster)
@@ -100,7 +101,8 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
     if (entry.tx == true)
     {
       // AH = Audio Hunting Counts
-      let AH = { ...AUDIO_ALERT_HUNT_ZERO };
+      let AH = (isAwardTracker) ? callObj.AH : { ...AUDIO_ALERT_HUNT_ZERO };
+
       // In layered mode ("Hunting: mixed") the workHashSuffix becomes a more stricter 'live band',
       // while the layered suffix is a broader 'mixed band'
       let workHashSuffix, layeredHashSuffix;
@@ -225,25 +227,24 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
 
         if (isAwardTracker)
         {
-          R = { ...AWARD_HUNT_EMPTY };
+          RW = { ...AWARD_HUNT_EMPTY };
           if (callObj.awardType in AWT_MAP)
           {
-            R[AWT_MAP[callObj.awardType]] = true;
+            RW[AWT_MAP[callObj.awardType]] = true;
           }
-          R.QRZ = CR.rosterSettings.wanted.huntQRZ;
-          R.Watcher = CR.rosterSettings.wanted.huntWatcher;
+          RW.huntQRZ = true;
         }
 
         // Hunting for callsigns
-        if (R.huntCallsign || A.huntCallsign)
+        if (RW.huntCallsign || AAW.huntCallsign)
         {
           let hash = callsign + workHashSuffix;
           let layeredHash = rosterSettings.layeredMode && (callsign + layeredHashSuffix);
 
           if (rosterSettings.huntIndex && !(hash in rosterSettings.huntIndex.call))
           {
-            if (A.huntCallsign) AH.huntCallsign++;
-            if (R.huntCallsign)
+            if (AAW.huntCallsign) AH.huntCallsign++;
+            if (RW.huntCallsign)
             {
               shouldRosterAlert = true;
 
@@ -286,33 +287,29 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
           }
         }
 
-        if (R.huntWatcher || A.huntWatcher)
+        if (RW.huntWatcher || AAW.huntWatcher)
         {
           let alert = processWatchers(callObj);
           if (alert)
           {
-            if (A.huntWatcher) AH.huntWatcher++;
-            if (R.huntWatcher) shouldRosterAlert = true;
+            if (AAW.huntWatcher) AH.huntWatcher++;
+            if (RW.huntWatcher) shouldRosterAlert = true;
           }
         }
 
-        // Hunting for "stations calling you"
-        if ((R.huntQRZ || A.huntQRZ) && callObj.qrz == true)
+        // Hunting for "stations calling you", only applies to the Roster
+        if ((RW.huntQRZ) && callObj.qrz == true)
         {
-          if (A.huntQRZ) AH.huntQRZ++;
-          if (R.huntQRZ)
-          {
-            callObj.callFlags.calling = true;
-            callObj.hunting.qrz = "hunted";
-            shouldRosterAlert = true;
-          }
+          callObj.callFlags.calling = true;
+          callObj.hunting.qrz = "hunted";
+          shouldRosterAlert = true;
         }
 
         // Hunting for stations with OAMS
-        if ((R.huntOAMS || A.huntOAMS) && hasGtPin)
+        if ((RW.huntOAMS || AAW.huntOAMS) && hasGtPin)
         {
-          if (A.huntOAMS) AH.huntOAMS++;
-          if (R.huntOAMS)
+          if (AAW.huntOAMS) AH.huntOAMS++;
+          if (RW.huntOAMS)
           {
             callObj.hunting.oams = "hunted";
             shouldRosterAlert = true;
@@ -321,15 +318,15 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for grids
-        if ((R.huntGrid || A.huntGrid) && callObj.grid.length > 1)
+        if ((RW.huntGrid || AAW.huntGrid) && callObj.grid.length > 1)
         {
           let hash = callObj.grid.substr(0, 4) + workHashSuffix;
           let layeredHash = rosterSettings.layeredMode && (callObj.grid.substr(0, 4) + layeredHashSuffix)
 
           if (rosterSettings.huntIndex && !(hash in rosterSettings.huntIndex.grid))
           {
-            if (A.huntGrid) AH.huntGrid++;
-            if (R.huntGrid)
+            if (AAW.huntGrid) AH.huntGrid++;
+            if (RW.huntGrid)
             {
               shouldRosterAlert = true;
 
@@ -373,15 +370,15 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for DXCC
-        if (R.huntDXCC || A.huntDXCC)
+        if (RW.huntDXCC || AAW.huntDXCC)
         {
           let hash = String(callObj.dxcc) + "|" + workHashSuffix;
           let layeredHash = rosterSettings.layeredMode && (String(callObj.dxcc) + "|" + layeredHashSuffix)
 
           if (rosterSettings.huntIndex && !(hash in rosterSettings.huntIndex.dxcc))
           {
-            if (A.huntDXCC) AH.huntDXCC++;
-            if (R.huntDXCC)
+            if (AAW.huntDXCC) AH.huntDXCC++;
+            if (RW.huntDXCC)
             {
               shouldRosterAlert = true;
 
@@ -428,7 +425,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for Known States
-        if (R.huntState || A.huntState)
+        if (RW.huntState || AAW.huntState)
         {
           let stateSearch = callObj.state;
           if (stateSearch in window.opener.GT.StateData)
@@ -438,8 +435,8 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
 
             if (rosterSettings.huntIndex && !(hash in rosterSettings.huntIndex.state))
             {
-              if (A.huntState) AH.huntState++;
-              if (R.huntState)
+              if (AAW.huntState) AH.huntState++;
+              if (RW.huntState)
               {
                 shouldRosterAlert = true;
 
@@ -484,7 +481,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for US Counties
-        if ((R.huntCounty || A.huntCounty) && window.opener.GT.settings.callsignLookups.ulsUseEnable == true)
+        if ((RW.huntCounty || AAW.huntCounty) && window.opener.GT.settings.callsignLookups.ulsUseEnable == true)
         {
           let finalDxcc = callObj.dxcc;
           if (callObj.cnty && (finalDxcc == 291 || finalDxcc == 110 || finalDxcc == 6 || finalDxcc == 202) && callObj.cnty.length > 0)
@@ -517,8 +514,8 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
 
               if (shouldAlert)
               {
-                if (A.huntCounty) AH.huntCounty++;
-                if (R.huntCounty)
+                if (AAW.huntCounty) AH.huntCounty++;
+                if (RW.huntCounty)
                 {
                   shouldRosterAlert = true; 
 
@@ -540,15 +537,15 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for POTAs
-        if (potaEnabled && (R.huntPOTA || A.huntPOTA) && callObj.pota)
+        if (potaEnabled && (RW.huntPOTA || AAW.huntPOTA) && callObj.pota)
         {
           let hash = CR.dayAsString + callsign + callObj.pota + (rosterSettings.layeredMode ? layeredHashSuffix : workHashSuffix);
           let parkHash = callObj.pota + (rosterSettings.layeredMode ? layeredHashSuffix : workHashSuffix);
           // POTA is only in the worked list
           if (!(hash in CR.tracker.worked.pota))
           {
-            if (A.huntPOTA) AH.huntPOTA++;
-            if (R.huntPOTA)
+            if (AAW.huntPOTA) AH.huntPOTA++;
+            if (RW.huntPOTA)
             {
               shouldRosterAlert = true;
               callObj.hunting.pota = "hunted";
@@ -570,7 +567,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for CQ Zones
-        if ((R.huntCQz || A.huntCQz) && callObj.cqz)
+        if ((RW.huntCQz || AAW.huntCQz) && callObj.cqz)
         {
           let huntTotal = 1;
           let huntFound = 0, layeredFound = 0, workedFound = 0, layeredWorkedFound = 0;
@@ -585,8 +582,8 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
     
           if (huntFound != huntTotal)
           {
-            if (A.huntCQz) AH.huntCQz++;
-            if (R.huntCQz)
+            if (AAW.huntCQz) AH.huntCQz++;
+            if (RW.huntCQz)
             {
               shouldRosterAlert = true;
 
@@ -632,7 +629,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for ITU Zones
-        if ((R.huntITUz || A.huntCQz) && callObj.ituz)
+        if ((RW.huntITUz || AAW.huntCQz) && callObj.ituz)
         {
           let huntTotal = 1;
           let huntFound = 0, layeredFound = 0, workedFound = 0, layeredWorkedFound = 0;
@@ -646,8 +643,8 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
 
           if (huntFound != huntTotal)
           {
-            if (A.huntITUz) AH.huntITUz++;
-            if (R.huntITUz)
+            if (AAW.huntITUz) AH.huntITUz++;
+            if (RW.huntITUz)
             {
               shouldRosterAlert = true;
 
@@ -691,15 +688,15 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for WPX (Prefixes)
-        if ((R.huntPX || A.huntPX) && callObj.px)
+        if ((RW.huntPX || AAW.huntPX) && callObj.px)
         {
           let hash = callObj.px + workHashSuffix;
           let layeredHash = rosterSettings.layeredMode && (callObj.px + layeredHashSuffix)
 
           if (rosterSettings.huntIndex && !(hash in rosterSettings.huntIndex.px))
           {
-            if (A.huntPX) AH.huntPX++;
-            if (R.huntPX)
+            if (AAW.huntPX) AH.huntPX++;
+            if (RW.huntPX)
             {
               shouldRosterAlert = true;
 
@@ -743,15 +740,15 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
         }
 
         // Hunting for Continents
-        if ((R.huntCont || A.huntCont) && callObj.cont)
+        if ((RW.huntCont || AAW.huntCont) && callObj.cont)
         {
           let hash = callObj.cont + workHashSuffix;
           let layeredHash = rosterSettings.layeredMode && (callObj.cont + layeredHashSuffix)
 
           if (rosterSettings.huntIndex && !(hash in rosterSettings.huntIndex.cont))
           {
-            if (A.huntCont) AH.huntCont++;
-            if (R.huntCont)
+            if (AAW.huntCont) AH.huntCont++;
+            if (RW.huntCont)
             {
               shouldRosterAlert = true;
 
