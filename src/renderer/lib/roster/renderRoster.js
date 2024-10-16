@@ -1,12 +1,7 @@
 function renderRoster(callRoster, rosterSettings)
 {
   let columnOverrides = {
-    Callsign: true,
-    eQSL: GT.settings.callsignLookups.eqslUseEnable,
-    OQRS: GT.settings.callsignLookups.oqrsUseEnable,
-    LoTW: GT.settings.callsignLookups.lotwUseEnable,
-    OAMS: rosterSettings.canMsg,
-    POTA: (GT.settings.app.potaEnabled == 1 && GT.settings.map.offlineMode == false)
+    Callsign: true
   }
 
   let visibleCallList = [];
@@ -68,7 +63,7 @@ function renderRoster(callRoster, rosterSettings)
     let callObj = visibleCallList[x].callObj;
 
     // TODO: This is filtering
-    if (callObj.shouldAlert == false && rosterSettings.onlyHits == true && callObj.qrz == false)
+    if (callObj.shouldRosterAlert == false && rosterSettings.onlyHits == true && callObj.qrz == false)
     { continue; }
 
     if (callObj.DEcall.match("^[KNW][0-9][A-W|Y|Z](/w+)?$"))

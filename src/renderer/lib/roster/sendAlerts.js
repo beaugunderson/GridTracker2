@@ -1,49 +1,82 @@
-function sendAlerts(callRoster, rosterSettings)
+function sendAlerts()
 {
-  let dirPath = window.opener.GT.scriptDir;
+  CR.alertTimer = null;
+  const callRoster = CR.callRoster;
+  let scriptPath = window.opener.GT.scriptPath;
+  let dirPath = path.dirname(scriptPath);
   let scriptExists = false;
-  let script = "cr-alert.sh";
-
-  let shouldAlert = 0;
+  let shouldRosterAlert = 0;
+  let shouldAudioAlert = 0;
+  let audioAlertCounts = { ...AUDIO_ALERT_HUNT_ZERO };
+  let scriptReport = {};
 
   for (const entry in callRoster)
   {
-    let callObj = callRoster[entry].callObj;
+    const callObj = callRoster[entry].callObj;
 
     // if it's not visible in the roster, we don't want to send a report with it, 
     // otherwise the entire roster will be sent out, including all the ones that were filtered by exceptions
     if (callRoster[entry].tx == false) continue;
 
     let call = callObj.DEcall;
-    CR.scriptReport[call] = Object.assign({}, callObj);
-    CR.scriptReport[call].dxccName = window.opener.GT.dxccToAltName[callObj.dxcc];
-    CR.scriptReport[call].distance = (callObj.distance > 0) ? parseInt(callObj.distance * MyCircle.validateRadius(window.opener.distanceUnit.value)) : 0;
+    scriptReport[call] = Object.assign({}, callObj);
+    scriptReport[call].dxccName = window.opener.GT.dxccToAltName[callObj.dxcc];
+    scriptReport[call].distance = (callObj.distance > 0) ? parseInt(callObj.distance * MyCircle.validateRadius(window.opener.distanceUnit.value)) : 0;
 
-    delete CR.scriptReport[call].DEcall;
-    delete CR.scriptReport[call].style;
-    delete CR.scriptReport[call].wspr;
-    delete CR.scriptReport[call].qso;
-    delete CR.scriptReport[call].instance;
+    delete scriptReport[call].DEcall;
+    delete scriptReport[call].style;
+    delete scriptReport[call].wspr;
+    delete scriptReport[call].qso;
+    delete scriptReport[call].instance;
 
-    if (callObj.alerted == false && callObj.shouldAlert == true)
+    if (callObj.rosterAlerted == false && callObj.shouldRosterAlert == true)
     {
-      callObj.alerted = true;
-      shouldAlert++;
+      callObj.rosterAlerted = true;
+      shouldRosterAlert++;
     }
+    callObj.shouldRosterAlert = false;
 
-    callObj.shouldAlert = false;
+    if (callObj.audioAlerted == false && callObj.shouldAudioAlert == true)
+      {
+        callObj.audioAlerted = true;
+        for (const key in callObj.audioAlertReason)
+        {
+          audioAlertCounts[key] += callObj.audioAlertReason[key];
+        }
+        shouldAudioAlert++;
+      }
+    callObj.shouldAudioAlert = false;
+  }
+
+  if (shouldAudioAlert > 0)
+  {
+    let multi = 0;
+    for (const key in audioAlertCounts)
+    {
+      if (audioAlertCounts[key] > 0)
+      {
+        multi++;
+      }
+    }
+    audioAlertCounts.huntMulti = multi;
+    window.opener.processAudioAlertsFromRoster(audioAlertCounts);
   }
 
   // NOTE: Ring alerts if needed
-  try
+  if (shouldRosterAlert > 0)
   {
-    if (fs.existsSync(dirPath))
+    if (window.opener.GT.settings.msg.msgPushover && window.opener.GT.settings.msg.msgPushoverRoster)
     {
-      if (window.opener.GT.platform == "windows")
-      {
-        script = "cr-alert.bat";
-      }
-      if (fs.existsSync(path.join(dirPath, script)))
+      sendPushOverAlert(parseCRJson(scriptReport));
+    }
+    if (window.opener.GT.settings.msg.msgSimplepush && window.opener.GT.settings.msg.msgSimplepushRoster)
+    {
+      sendSimplePushMessage(parseCRJson(scriptReport));
+    }
+
+    try
+    {
+      if (fs.existsSync(scriptPath))
       {
         scriptExists = true;
         scriptIcon.innerHTML = "<div class='buttonScript' onclick='window.opener.toggleCRScript();'>"
@@ -56,41 +89,15 @@ function sendAlerts(callRoster, rosterSettings)
       {
         scriptIcon.style.display = "none";
       }
-    }
-  }
-  catch (e) {}
-
-  if (shouldAlert > 0)
-  {
-    if (scriptExists && window.opener.GT.crScript == 1)
-    {
-      try
+  
+      if (scriptExists && window.opener.GT.crScript == 1)
       {
-        fs.writeFileSync(path.join(dirPath, "cr-alert.json"), JSON.stringify(CR.scriptReport, null, 2), { flush: true });
-
-        let thisProc = path.join(dirPath, script);
-        let cp = require("child_process");
-        let child = cp.spawn(thisProc, [], {
-          detached: true,
-          cwd: dirPath,
-          stdio: ["ignore", "ignore", "ignore"]
-        });
-        child.unref();
-      }
-      catch (e)
-      {
-        conosle.log(e);
+        fs.writeFileSync(path.join(dirPath, "cr-alert.json"), JSON.stringify(scriptReport, null, 2), { flush: true });
+        electron.ipcRenderer.send("spawnScript", scriptPath);
       }
     }
-    if (window.opener.GT.settings.msg.msgPushover && window.opener.GT.settings.msg.msgPushoverRoster)
-    {
-      sendPushOverAlert(parseCRJson(CR.scriptReport));
+    catch (e) {
     }
-    if (window.opener.GT.settings.msg.msgSimplepush && window.opener.GT.settings.msg.msgSimplepushRoster)
-    {
-      sendSimplePushMessage(parseCRJson(CR.scriptReport));
-    }
-    CR.scriptReport = Object();
   }
 }
 
@@ -140,7 +147,7 @@ function parseCRJson(data)
   let message = "";
   for (let callsign in data)
   {
-    if (data[callsign].shouldAlert === true && data[callsign].alerted === false)
+    if (data[callsign].shouldRosterAlert == true && data[callsign].rosterAlerted == false)
     {
       let wanted = " (" + wantedColumnParts(data[callsign]) + ")";
 

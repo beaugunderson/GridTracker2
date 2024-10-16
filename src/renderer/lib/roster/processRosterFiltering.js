@@ -31,11 +31,10 @@ function processRosterFiltering(callRoster, rosterSettings)
     let call = entry.DEcall;
 
     entry.tx = true;
-    callObj.shouldAlert = false;
-    callObj.reason = [];
-
+    callObj.shouldRosterAlert = false;
     callObj.shouldAudioAlert = false;
-    callObj.audioAlertReason = [];
+    callObj.shouldOAMS = false;
+    callObj.audioAlertReason = {};
 
     // The awardReason is the "tooltip" on the callsign in the roster, if we're not award tracking
     // It's always "Callsign"
@@ -66,7 +65,8 @@ function processRosterFiltering(callRoster, rosterSettings)
     if (rosterSettings.now - callObj.age > CR.rosterSettings.rosterTime)
     {
       entry.tx = false;
-      entry.alerted = false;
+      entry.rosterAlerted = false;
+      entry.audioAlerted = false;
       callObj.qrz = false;
       callObj.reset = true;
       continue;
@@ -228,7 +228,8 @@ function processRosterFiltering(callRoster, rosterSettings)
             // TODO: Move award reason out of exclusions code?
             callObj.awardReason = CR.awards[x.sponsor].awards[x.name].tooltip + " (" + CR.awards[x.sponsor].sponsor + ")";
             callObj.awardType = CR.awards[x.sponsor].awards[x.name].rule.type;
-            callObj.shouldAlert = true;
+            callObj.shouldRosterAlert = true;
+            callObj.shouldAudioAlert = true;
             break;
           }
         }

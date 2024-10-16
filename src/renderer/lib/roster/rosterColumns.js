@@ -7,25 +7,6 @@ const DEFAULT_COLUMN_ORDER = [
   "Life", "Spot", "OAMS", "Age", "UTC"
 ]
 
-const LEGACY_COLUMN_SORT_ID = {
-  0: "Callsign",
-  1: "Grid",
-  2: "dB",
-  3: "DT",
-  4: "Freq",
-  5: "DXCC",
-  7: "Dist",
-  8: "Azim",
-  9: "State",
-  10: "Calling",
-  11: "PX",
-  12: "Life",
-  13: "Spot",
-  14: "OAMS",
-  15: "County",
-  16: "Cont"
-}
-
 const getterSimpleComparer = (getter) => (a, b) =>
 {
   const aVal = getter(a);
@@ -337,7 +318,7 @@ const ROSTER_COLUMNS = {
     {
       if (callObj.gt != 0)
       {
-        if (callObj.reason.includes("oams"))
+        if (callObj.shouldOAMS)
         {
           return {
             align: "center",
@@ -454,7 +435,7 @@ function potaColumnHover(callObj)
   return value;
 }
 
-WANTED_ORDER = ["call", "qrz", "watcher", "cont", "dxcc", "cqz", "ituz", "dxccMarathon", "cqzMarathon", "state", "pota", "grid", "cnty", "wpx", "oams"];
+WANTED_ORDER = ["call", "qrz", "watcher", "cont", "dxcc", "cqz", "ituz",  "state", "pota", "grid", "cnty", "wpx", "oams"];
 WANTED_LABELS = {};
 
 function wantedColumnParts(callObj, options)

@@ -11,7 +11,6 @@ CR.ignoredDxcc = {};
 CR.ignoredGrid = {};
 CR.ignoredCQz = {};
 CR.ignoredITUz = {};
-CR.scriptReport = {};
 CR.modes = {};
 CR.modes_phone = {};
 CR.rosterSettings = {};
@@ -41,6 +40,7 @@ CR.MsgMenu = null;
 CR.targetCQ = "";
 CR.targetCQz = null;
 CR.timerInterval = null;
+CR.alertTimer = null;
 CR.awards = {};
 CR.awardTypes = {};
 CR.awardTracker = {};
@@ -236,9 +236,9 @@ function rosterNoFocus()
   }
 }
 
-function processRoster(roster)
+function processRoster()
 {
-  CR.callRoster = roster;
+  CR.callRoster = window.opener.GT.callRoster;
   if (CR.rosterTimeout != null)
   {
     nodeTimers.clearTimeout(CR.rosterTimeout);
@@ -264,7 +264,14 @@ function viewRoster()
   processRosterFiltering(CR.callRoster, rosterSettings);
   processRosterHunting(CR.callRoster, rosterSettings, CR.awardTracker);
   renderRoster(CR.callRoster, rosterSettings);
-  sendAlerts(CR.callRoster, rosterSettings);
+
+  if (CR.alertTimer != null)
+  {
+    nodeTimers.clearTimeout(CR.alertTimer);
+    CR.alertTimer = null;
+  }
+
+  CR.alertTimer = nodeTimers.setTimeout(sendAlerts, 250);
 }
 
 function realtimeRoster()
@@ -743,9 +750,17 @@ function setVisual()
   {
     for (const key in CR.rosterSettings.wanted)
     {
-      if (document.getElementById(key))
+      if (key in window)
       {
-        document.getElementById(key).checked = CR.rosterSettings.wanted[key];
+        window[key].checked = CR.rosterSettings.wanted[key];
+        if (GT.settings.audioAlerts.wanted[key] == true)
+        {
+          window[key].nextElementSibling.nextElementSibling.innerHTML = "<font style='font-size:smaller;'>&#128276;</font>";
+        }
+        else
+        {
+          window[key].nextElementSibling.nextElementSibling.innerHTML = "";
+        }
       }
       else
       {
@@ -781,19 +796,28 @@ function wantedChanged(element)
 
   if (element.checked == true)
   {
-    let t = element.id.replace("hunt", "");
+    let id = element.id.replace("hunt", "");
 
-    if (t in CR.rosterSettings.columns)
+    if (id in CR.rosterSettings.columns)
     {
-      CR.rosterSettings.columns[t] = true;
-      if (t in CR.columnMembers)
+      CR.rosterSettings.columns[id] = true;
+      if (id in CR.columnMembers)
       {
-        CR.columnMembers[t].checked = true;
+        CR.columnMembers[id].checked = true;
       }
     }
   }
 
-  resetAlertReporting();
+  resetAlertReporting(true, false);
+  setVisual();
+  viewRoster();
+}
+
+
+// Incoming from GT window
+function wantedValuesChangedFromAudioAlerts()
+{
+  resetAlertReporting(false, true);
   setVisual();
   viewRoster();
 }
@@ -811,7 +835,7 @@ function huntingValueChangedFromAudioAlerts(id, value)
     {
       CR.rosterSettings[id] = window[id].value = value;
     }
-    resetAlertReporting();
+    resetAlertReporting(true, true);
     setVisual();
     viewRoster();
   }
@@ -842,17 +866,17 @@ function huntingValueChanged(element)
 
   maxLoTWView.innerHTML = CR.rosterSettings.maxLoTW < 27 ? toYM(Number(CR.rosterSettings.maxLoTW)) : "<b>&infin;</b>";
 
-  resetAlertReporting();
+  resetAlertReporting(true, true);
   setVisual();
   viewRoster();
 }
 
-function resetAlertReporting()
+function resetAlertReporting(clearRoster, clearAudio)
 {
-  CR.scriptReport = Object();
-  for (const callHash in window.opener.GT.callRoster)
+  for (const callHash in CR.callRoster)
   {
-    window.opener.GT.callRoster[callHash].callObj.alerted = false;
+    if (clearRoster) window.opener.GT.callRoster[callHash].callObj.rosterAlerted = false;
+    if (clearAudio) window.opener.GT.callRoster[callHash].callObj.audioAlerted = false;
   }
 }
 
@@ -1501,8 +1525,7 @@ function addControls()
     cqz: I18N("rosterColumns.Wanted.cqz"),
     ituz: I18N("rosterColumns.Wanted.ituz"),
     dxcc: I18N("rosterColumns.Wanted.dxcc"),
-    dxccMarathon: I18N("rosterColumns.Wanted.dxccMarathon"),
-    cqzMarathon: I18N("rosterColumns.Wanted.cqzMarathon"),
+
     state: I18N("rosterColumns.Wanted.state"),
     grid: I18N("rosterColumns.Wanted.grid"),
     cnty: I18N("rosterColumns.Wanted.cnty"),
@@ -1525,7 +1548,7 @@ function addControls()
   createMenuShow();
   createCompactMenuHide();
   createCompactMenuShow();
-  clearRestOfMenus();
+  createRestOfMenus();
 
   huntNeed.value = CR.rosterSettings.huntNeed;
   requireGrid.checked = CR.rosterSettings.requireGrid;
@@ -3491,7 +3514,7 @@ function createCompactMenuShow()
   CR.compactMenuShow.append(item);
 }
 
-function clearRestOfMenus()
+function createRestOfMenus()
 {
   CR.callMenu = new Menu();
   let item = new MenuItem({

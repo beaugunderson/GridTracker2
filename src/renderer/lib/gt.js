@@ -24,7 +24,7 @@ if (GT.platform.indexOf("darwin") > -1)
 
 function loadAllSettings()
 {
-  GT.scriptDir = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Call Roster Scripts");
+  GT.scriptPath = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Call Roster Scripts");
   GT.appData = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Ginternal");
   GT.qsoBackupDir = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Backup Logs");
   GT.dxccInfoPath = path.join(GT.appData, "dxcc-info.json");
@@ -36,7 +36,7 @@ function loadAllSettings()
     var tryDirectory = "";
     var userdirs = [
       GT.appData,
-      GT.scriptDir,
+      GT.scriptPath,
       GT.qsoBackupDir
     ];
     for (var dir of userdirs)
@@ -52,6 +52,8 @@ function loadAllSettings()
   {
     alert("Unable to create or access " + tryDirectory + " folder.\r\nPermission violation, GT cannot continue");
   }
+
+  GT.scriptPath = path.join(GT.scriptPath, (GT.platform == "windows") ? "cr-alert.bat" : "cr-alert.sh");
 
   let importLegacy = GT.settings.importLegacy;
   // Apply defaults once if not applied
@@ -1132,9 +1134,11 @@ function addLiveCallsign(
     newCallsign.DXcall = finalDEcall;
     newCallsign.wspr = wspr;
     newCallsign.state = finalState;
-    newCallsign.alerted = false;
-    newCallsign.instance = null;
-    newCallsign.shouldAlert = false;
+     newCallsign.instance = null;
+    newCallsign.rosterAlerted = false;
+    newCallsign.shouldRosterAlert = false;
+    newCallsign.audioAlerted = false;
+    newCallsign.shouldAudioAlert = false;
     newCallsign.zipcode = null;
     newCallsign.qrz = false;
     newCallsign.vucc_grids = [];
@@ -5086,8 +5090,10 @@ function setHomeGridsquare()
   newCallsign.cnty = null;
   newCallsign.qual = false;
   newCallsign.instance = null;
-  newCallsign.alerted = false;
-  newCallsign.shouldAlert = false;
+  newCallsign.rosterAlerted = false;
+  newCallsign.shouldRosterAlert = false;
+  newCallsign.audioAlerted = false;
+  newCallsign.shouldAudioAlert = false;
   newCallsign.locked = true;
 
   GT.myDXCC = newCallsign.dxcc = callsignToDxcc(GT.settings.app.myCall);
@@ -5699,7 +5705,6 @@ function handleWsjtxStatus(newMessage)
   if (newMessage.Decoding == 0)
   {
     goProcessRoster();
-    processClassicAlerts();
   }
 }
 
@@ -5988,8 +5993,10 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
       if (newCallsign.dxcc in GT.dxccCount) GT.dxccCount[newCallsign.dxcc]++;
       else GT.dxccCount[newCallsign.dxcc] = 1;
 
-      newCallsign.alerted = false;
-      newCallsign.shouldAlert = false;
+      newCallsign.rosterAlerted = false;
+      newCallsign.shouldRosterAlert = false;
+      newCallsign.audioAlerted = false;
+      newCallsign.shouldAudioAlert = false;
       GT.liveCallsigns[hash] = newCallsign;
       callsign = newCallsign;
     }
@@ -6444,8 +6451,10 @@ function goProcessRoster()
   {
     if (now - GT.callRoster[call].callObj.age > 300)
     {
-      GT.callRoster[call].callObj.alerted = false;
-      GT.callRoster[call].callObj.shouldAlert = false;
+      GT.callRoster[call].callObj.rosterAlerted = false;
+      GT.callRoster[call].callObj.shouldRosterAlert = false;
+      GT.callRoster[call].callObj.audioAlerted = false;
+      GT.callRoster[call].callObj.shouldAudioAlert = false;
       delete GT.callRoster[call];
       continue;
     }
@@ -6454,7 +6463,7 @@ function goProcessRoster()
   {
     try
     {
-      GT.callRosterWindowHandle.window.processRoster(GT.callRoster);
+      GT.callRosterWindowHandle.window.processRoster();
     }
     catch (e)
     {
@@ -11938,8 +11947,6 @@ function postInit()
     showMessaging(false);
     section = "RosterWindow";
     openCallRosterWindow(false);
-    section = "loadAudioAlertSettings"
-    loadAudioAlertSettings();
     section = "ButtonPanelInit";
     buttonPanelInit();
     projectionImg.style.filter = GT.settings.map.projection == "AEQD" ? "" : "grayscale(1)";

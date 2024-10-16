@@ -14,6 +14,7 @@ const {
 } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const { electronApp, optimizer } = require('@electron-toolkit/utils');
+const path = require('path');
 const { join } = require('path');
 
 const singleInstanceLock = app.requestSingleInstanceLock();
@@ -305,6 +306,22 @@ ipcMain.on('saveZoom', (event, zoom) => {
 
 ipcMain.on('setTheme', (event, theme) => {
   nativeTheme.themeSource = theme;
+});
+
+ipcMain.on('spawnScript', (event, scriptPath) => {
+  try {
+    const cp = require("child_process");
+    let dirPath = path.dirname(scriptPath);
+    let child = cp.spawn(scriptPath, [], {
+      detached: true,
+      cwd: dirPath,
+      shell: true,
+      stdio: ["ignore", "ignore", "ignore"]
+    });
+    child.unref();
+  }
+  catch (e) {
+  }
 });
 
 ipcMain.on('restartGridTracker2', (event, resetWindowPositions = false) => {

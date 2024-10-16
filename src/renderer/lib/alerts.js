@@ -8,7 +8,7 @@ function loadAlerts()
 {
   logEventMedia.value = GT.settings.app.logEventMedia;
 
-  loadClassicAlertView();
+  loadAudioAlertSettings();
 }
 
 function newLogEventSetting(obj)
@@ -60,9 +60,7 @@ function changeSpeechValues()
 
   speechVolumeTd.innerText = speechVolume.value;
   speechPitchTd.innerText = speechPitch.value;
-  speechRateTd.innerText = speechRate.value;
-
-  
+  speechRateTd.innerText = speechRate.value; 
 }
 
 function addNewAlert()
@@ -142,7 +140,6 @@ function addAlert(value, type, notify, repeat, filename, shortname)
 function deleteAlert(key)
 {
   delete GT.settings.customAlerts[key];
-  
   displayAlerts();
 }
 
@@ -654,125 +651,73 @@ function displayAlerts()
   alertListDiv.innerHTML = worker;
 }
 
-function loadClassicAlertView()
-{
- /* for (node in GT.settings.classicAlerts)
-  {
-    what = document.getElementById(node);
-    if (what != null)
-    {
-      if (what.type == "select-one" || what.type == "text")
-      {
-        what.value = GT.settings.classicAlerts[node];
-        if (what.id.endsWith("Notify"))
-        {
-          var mediaNode = document.getElementById(what.id + "Media");
-          var wordNode = document.getElementById(what.id + "Word");
-          if (what.value == "0")
-          {
-            mediaNode.style.display = "block";
-            wordNode.style.display = "none";
-          }
-          else
-          {
-            mediaNode.style.display = "none";
-            wordNode.style.display = "block";
-          }
-        }
-        if (what.type == "text")
-        {
-          ValidateText(what);
-        }
-      }
-      else if (what.type == "checkbox")
-      {
-        what.checked = GT.settings.classicAlerts[node];
-      }
-    }
-  }*/
-}
-
 function wantedChanged(what)
 {
-
   if (what.id in GT.settings.audioAlerts.wanted)
   {
     GT.settings.audioAlerts.wanted[what.id] = what.checked;
+
+    if (GT.callRosterWindowInitialized)
+    {
+      GT.callRosterWindowHandle.window.wantedValuesChangedFromAudioAlerts();
+    }
   }
   else if (what.id in GT.settings.audioAlerts.media)
   {
     GT.settings.audioAlerts.media[what.id] = what.value;
   }
-
- /* if (what.type == "select-one" || what.type == "text")
-  {
-    GT.settings.classicAlerts[what.id] = what.value;
-    if (what.id.endsWith("Notify"))
-    {
-      var mediaNode = document.getElementById(what.id + "Media");
-      var wordNode = document.getElementById(what.id + "Word");
-      if (what.value == "0")
-      {
-        mediaNode.style.display = "block";
-        wordNode.style.display = "none";
-      }
-      else
-      {
-        mediaNode.style.display = "none";
-        wordNode.style.display = "block";
-      }
-    }
-    if (what.id.endsWith("Media"))
-    {
-      if (what.value != "none") playAlertMediaFile(what.value);
-    }
-  }
-  else if (what.type == "checkbox")
-  {
-    GT.settings.classicAlerts[what.id] = what.checked;
-  }*/
 }
 
-GT.classic_alert_count_template = {
-  huntCallsign: 0,
-  huntGrid: 0,
-  huntDXCC: 0,
-  huntCQz: 0,
-  huntITUz: 0,
-  huntStates: 0
-};
-
-GT.classic_alert_counts = Object.assign({}, GT.classic_alert_count_template);
-
-
-GT.classic_alert_words = {
-  huntCallsign: "Call",
-  huntGrid: "Grid",
-  huntDXCC: "DXCC",
-  huntCQz: "CQ Zone",
-  huntITUz: "I-T-U Zone",
-  huntStates: "State"
-};
-
-function processClassicAlerts()
+function processAudioAlertsFromRoster(wantedAlerts)
 {
- /* for (key in GT.classic_alert_counts)
+;
+  if (wantedAlerts.huntMulti > 1)
   {
-    if (document.getElementById(key).checked == true && GT.classic_alert_counts[key] > 0)
+    if (GT.settings.audioAlerts.media.huntMultipleType == "tts")
     {
-      var notify = document.getElementById(key + "Notify").value;
-      if (notify == "0")
+      speakAlertString(GT.settings.audioAlerts.media.huntMultipleSpeechMulti);
+    }
+    else
+    {
+      if (GT.settings.audioAlerts.media.huntMultipleFileMulti != "none")
       {
-        var media = document.getElementById(key + "Notify" + "Media").value;
-        if (media != "none") playAlertMediaFile(media);
-      }
-      else if (notify == "1")
-      {
-        speakAlertString(document.getElementById(key + "Notify" + "Word").value);
+        playAlertMediaFile(GT.settings.audioAlerts.media.huntMultipleFileMulti);
       }
     }
   }
-  GT.classic_alert_counts = Object.assign({}, GT.classic_alert_count_template);*/
+  else
+  {
+    delete wantedAlerts.huntMulti;
+    for (const key in wantedAlerts)
+    {
+      let type = key + "Type";
+      if (wantedAlerts[key] == 1)
+      {
+        if (GT.settings.audioAlerts.media[type] == "tts")
+        {
+          speakAlertString(GT.settings.audioAlerts.media[key + "SpeechSingle"]);
+        }
+        else
+        {
+          playAlertMediaFile(GT.settings.audioAlerts.media[key + "FileSingle"]);
+        }
+      }
+      else if (wantedAlerts[key] > 1)
+      {
+        if (GT.settings.audioAlerts.media[type] == "tts")
+        {
+          speakAlertString(GT.settings.audioAlerts.media[key + "SpeechMulti"]);
+        }
+        else
+        {
+          if (GT.settings.audioAlerts.media[key + "FileMulti"] != "none")
+          {
+            playAlertMediaFile(GT.settings.audioAlerts.media[key + "FileMulti"]);
+          }
+        }
+      }
+    }
+  }
 }
 
 const LOGBOOK_LIVE_BAND_LIVE_MODE = "0";
@@ -795,12 +740,9 @@ function setVisualHunting()
     }
     catch (e)
     {
-      console.log("Call Roster setVisual");
-      console.log(e.message);
     }
   }
 }
-
 
 // Syncronized call with roster.js!
 function huntingValueChanged(element)
@@ -822,7 +764,7 @@ function huntingValueChangedFromCallRoster(id, value)
   {
     if (window[id].type == "checkbox")
     {
-      window[id].checked =value;
+      window[id].checked = value;
     }
     else
     {
@@ -891,12 +833,18 @@ function loadAudioAlertSettings()
     {
       window[key].checked = GT.settings.audioAlerts.wanted[key];
     }
+    else
+    {
+      // No longer supported, get rid of it.
+      delete GT.settings.audioAlerts.wanted[key];
+    }
   }
 
   for (const key in GT.settings.audioAlerts.wanted)
   {
     if (key in window)
     {
+      let visibility = window[key].style.visibility;
       let row = window[key].parentNode.parentNode;
       let parent = row.insertCell();
       let select = document.createElement("select");
@@ -935,6 +883,7 @@ function loadAudioAlertSettings()
       parent.appendChild(select);
       select.value = value;
       select.style.display = (mediaType == "tts") ? "none" : "";
+      select.style.visibility = visibility;
 
       let input = document.createElement("input");
       input.id = id = key + "SpeechSingle";
@@ -946,42 +895,40 @@ function loadAudioAlertSettings()
       input.addEventListener("change", wantedMediaSpeechChanged, false);
       ValidateText(input);
       input.style.display = (mediaType == "media") ? "none" : "";
+      input.style.visibility = visibility;
 
       parent = row.insertCell();
 
       id = key + "FileMulti";
-      // just so huntMutli doesn't get an "On Multiple" field
-      if (id in GT.settings.audioAlerts.media)
+
+      select = null;
+      select = document.createElement("select");
+      
+      value = GT.settings.audioAlerts.media[id];
+      select.id = id;
+      select.appendChild(newOption("none", I18N("alerts.addNew.SelectFile")), value == "none");
+
+      GT.mediaFiles.forEach((filename) =>
       {
-        select = null;
-        select = document.createElement("select");
-        
-        value = GT.settings.audioAlerts.media[id];
-        select.id = id;
-        select.appendChild(newOption("none", I18N("alerts.addNew.SelectFile")), value == "none");
+        let noExt = path.parse(filename).name;
+        select.appendChild(newOption(filename, noExt, value == filename));
+      });
 
-        GT.mediaFiles.forEach((filename) =>
-        {
-          let noExt = path.parse(filename).name;
-          select.appendChild(newOption(filename, noExt, value == filename));
-        });
+      select.addEventListener("change", wantedMediaFileChanged, false);
+      parent.appendChild(select);
+      select.value = value;
+      select.style.display = (mediaType == "tts") ? "none" : "";
 
-        select.addEventListener("change", wantedMediaFileChanged, false);
-        parent.appendChild(select);
-        select.value = value;
-        select.style.display = (mediaType == "tts") ? "none" : "";
-
-        input = document.createElement("input");
-        input.id = id = key + "SpeechMulti";
-        input.type = "text";
-        input.size = 16;
-        input.value = GT.settings.audioAlerts.media[id];
-        input.className = "inputTextValue";
-        parent.appendChild(input);
-        input.addEventListener("change", wantedMediaSpeechChanged, false);
-        ValidateText(input);
-        input.style.display = (mediaType == "media") ? "none" : "";
-      }
+      input = document.createElement("input");
+      input.id = id = key + "SpeechMulti";
+      input.type = "text";
+      input.size = 16;
+      input.value = GT.settings.audioAlerts.media[id];
+      input.className = "inputTextValue";
+      parent.appendChild(input);
+      input.addEventListener("change", wantedMediaSpeechChanged, false);
+      ValidateText(input);
+      input.style.display = (mediaType == "media") ? "none" : "";
     }
   }
 
@@ -1049,8 +996,6 @@ function openWatcher()
     }
     catch (e)
     {
-      console.log("Call Roster openWatcher");
-      console.log(e.message);
     }
   }
 }
