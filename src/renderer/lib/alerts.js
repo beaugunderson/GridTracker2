@@ -657,7 +657,11 @@ function wantedChanged(what)
   {
     window.speechSynthesis.cancel();
     GT.settings.audioAlerts.wanted[what.id] = what.checked;
-
+    if (GT.settings.audioAlerts.wanted[what.id] == false)
+    {
+      window[what.id + "Count"].innerHTML = 0;
+      window.huntMultipleCount.innerHTML = 0;
+    }
     if (GT.callRosterWindowInitialized)
     {
       GT.callRosterWindowHandle.window.wantedValuesChangedFromAudioAlerts();
