@@ -102,7 +102,7 @@ function validateRosterColumnOrder(columns)
 {
   let correctedColumnOrder = (columns || DEFAULT_COLUMN_ORDER || []).slice();
 
-  // Aappend columns not included in the suggested list.
+  // Append columns not included in the suggested list.
   DEFAULT_COLUMN_ORDER.forEach(column =>
   {
     if (!correctedColumnOrder.includes(column)) correctedColumnOrder.push(column);

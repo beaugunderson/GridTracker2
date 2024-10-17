@@ -36,7 +36,8 @@ function processRosterFiltering(callRoster, rosterSettings)
     callObj.shouldOAMS = false;
     callObj.AH = {};
     callObj.audioAlertReason = {};
-
+    callObj.dxm = null;
+    
     // The awardReason is the "tooltip" on the callsign in the roster, if we're not award tracking
     // It's always "Callsign"
     callObj.awardReason = "Callsign";

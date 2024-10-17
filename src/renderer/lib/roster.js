@@ -262,7 +262,7 @@ function viewRoster()
   rosterDelayDiv.style.display = "none";
   let rosterSettings = prepareRosterSettings();
   processRosterFiltering(CR.callRoster, rosterSettings);
-  processRosterHunting(CR.callRoster, rosterSettings, CR.awardTracker);
+  processRosterHunting(CR.callRoster, rosterSettings);
   renderRoster(CR.callRoster, rosterSettings);
 
   if (CR.alertTimer != null)
@@ -761,11 +761,6 @@ function setVisual()
         {
           window[key].nextElementSibling.nextElementSibling.innerHTML = "";
         }
-      }
-      else
-      {
-        // No longer supported, get rid of it.
-        delete CR.rosterSettings.wanted[key];
       }
     }
 
@@ -1525,7 +1520,7 @@ function addControls()
     cqz: I18N("rosterColumns.Wanted.cqz"),
     ituz: I18N("rosterColumns.Wanted.ituz"),
     dxcc: I18N("rosterColumns.Wanted.dxcc"),
-
+    dxm: I18N("rosterColumns.Wanted.dxm"),
     state: I18N("rosterColumns.Wanted.state"),
     grid: I18N("rosterColumns.Wanted.grid"),
     cnty: I18N("rosterColumns.Wanted.cnty"),
@@ -1540,8 +1535,10 @@ function addControls()
 
   for (const key in CR.rosterSettings.wanted)
   {
-    if (document.getElementById(key))
-    { document.getElementById(key).checked = CR.rosterSettings.wanted[key]; }
+    if (key in window)
+    { 
+      window[key].checked = CR.rosterSettings.wanted[key]; 
+    }
   }
 
   createMenuHide();

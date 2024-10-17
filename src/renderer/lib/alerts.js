@@ -850,11 +850,6 @@ function loadAudioAlertSettings()
     {
       window[key].checked = GT.settings.audioAlerts.wanted[key];
     }
-    else
-    {
-      // No longer supported, get rid of it.
-      delete GT.settings.audioAlerts.wanted[key];
-    }
   }
 
   for (const key in GT.settings.audioAlerts.wanted)

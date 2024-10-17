@@ -1,7 +1,7 @@
 const DEFAULT_COLUMN_ORDER = [
   "Callsign", "Band", "Mode", "Calling", "Rig", "Wanted", "Grid", "Msg",
-  "POTA", "DXCC", "Flag", "State", "County", "Cont",
-  "dB", "Freq", "DT", "Dist", "Azim",
+  "POTA", "DXCC", "Flag", "DXM", "State", "County", "Cont",
+  "dB", "Freq", "DT", "Dist", "Azim", 
   "CQz", "ITUz", "PX",
   "LoTW", "eQSL", "OQRS",
   "Life", "Spot", "OAMS", "Age", "UTC"
@@ -111,7 +111,16 @@ const ROSTER_COLUMNS = {
       title: window.opener.GT.dxccInfo[callObj.dxcc].pp,
       name: `DXCC (${callObj.dxcc})`,
       rawAttrs: callObj.style.dxcc,
-      html: (callObj.dxccSuffix ? [window.opener.GT.dxccToAltName[callObj.dxcc], callObj.dxccSuffix].join("&nbsp;") : window.opener.GT.dxccToAltName[callObj.dxcc])
+      html: window.opener.GT.dxccToAltName[callObj.dxcc]
+    })
+  },
+
+  DXM: {
+    compare: callObjSimpleComparer("dxm"),
+    tableData: (callObj) => ({
+      align: "center",
+      rawAttrs: callObj.style.dxm,
+      html: callObj.dxm ? callObj.dxm : "&nbsp;"
     })
   },
 
@@ -434,8 +443,7 @@ function potaColumnHover(callObj)
   
   return value;
 }
-
-WANTED_ORDER = ["call", "qrz", "watcher", "cont", "dxcc", "cqz", "ituz",  "state", "pota", "grid", "cnty", "wpx", "oams"];
+WANTED_ORDER = ["call", "qrz", "watcher", "cont", "dxcc", "cqz", "ituz", "dxm", "state", "pota", "grid", "cnty", "wpx", "oams"];
 WANTED_LABELS = {};
 
 function wantedColumnParts(callObj, options)

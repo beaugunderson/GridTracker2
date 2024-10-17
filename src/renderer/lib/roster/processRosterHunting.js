@@ -20,14 +20,14 @@ const AWT_MAP = {
 
 const AWARD_HUNT_EMPTY = {
   huntCallsign: false,
-  huntQRZ: false,
   huntOAMS: false,
   huntGrid: false,
   huntDXCC: false,
+  huntCQz: false,
+  huntDXM: false,
   huntState: false,
   huntCounty: false,
   huntPOTA: false,
-  huntCQz: false,
   huntITUz: false,
   huntPX: false,
   huntCont: false,
@@ -36,7 +36,6 @@ const AWARD_HUNT_EMPTY = {
 
 const AUDIO_ALERT_HUNT_ZERO = {
   huntCallsign: 0,
-  huntQRZ: 0,
   huntOAMS: 0,
   huntGrid: 0,
   huntDXCC: 0,
@@ -48,8 +47,10 @@ const AUDIO_ALERT_HUNT_ZERO = {
   huntPX: 0,
   huntCont: 0,
   huntWatcher: 0,
-  huntAward: 0
+  huntAward: 0,
+  huntDXM: 0
 };
+
 
 const kInversionAlpha = "DD";
 const kRow = "#000000";
@@ -60,11 +61,10 @@ const kLayeredInversionAlpha = "66";
 const kLayeredUnconf = "background-clip:padding-box;box-shadow: 0 0 4px 2px inset ";
 const kLayeredUnconfAlpha = "AA";
 
-function processRosterHunting(callRoster, rosterSettings, awardTracker)
+function processRosterHunting(callRoster, rosterSettings)
 {
   let hasGtPin = false;
-  // const currentYear = new Date().getFullYear();
-  // const currentYearSuffix = `&rsquo;${currentYear - 2000}`;
+  const currentYear = new Date().getFullYear();
   const potaEnabled = (window.opener.GT.settings.app.potaEnabled == 1 && window.opener.GT.settings.map.offlineMode == false);
 
   let isAwardTracker = (CR.rosterSettings.referenceNeed == LOGBOOK_AWARD_TRACKER);
@@ -141,13 +141,14 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
       let cqz = "#DDDDDD";
       let ituz = "#DDDDDD";
       let wpx = "#FFFF00";
+      let dxm = "#7398FF";
       let shouldRosterAlert = false;
    
-      let callBg, gridBg, callingBg, dxccBg, stateBg, cntyBg, contBg, potaBg, cqzBg, ituzBg, wpxBg;
-      let callConf, gridConf, callingConf, dxccConf, stateConf, cntyConf, contConf, potaConf, cqzConf, ituzConf, wpxConf;
+      let callBg, gridBg, callingBg, dxccBg, stateBg, cntyBg, contBg, potaBg, cqzBg, ituzBg, wpxBg, dxmBg;
+      let callConf, gridConf, callingConf, dxccConf, stateConf, cntyConf, contConf, potaConf, cqzConf, ituzConf, wpxConf, dxmConf;
 
-      callBg = gridBg = callingBg = dxccBg = stateBg = cntyBg = contBg = potaBg = cqzBg = ituzBg = wpxBg = kRow;
-      callConf = gridConf = callingConf = dxccConf = stateConf = cntyConf = contConf = potaConf = cqzConf = ituzConf = wpxConf = "";
+      callBg = gridBg = callingBg = dxccBg = stateBg = cntyBg = contBg = potaBg = cqzBg = ituzBg = wpxBg = dxmBg = kRow;
+      callConf = gridConf = callingConf = dxccConf = stateConf = cntyConf = contConf = potaConf = cqzConf = ituzConf = wpxConf = dxmConf = "";
 
       let cntyPointer = (callObj.cnty && callObj.qual == false) ? "cursor: pointer;" : "";
       let didWork = false;
@@ -225,6 +226,14 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
           }
         }
 
+        // "stations calling you", only applies to the Roster
+        if (callObj.qrz == true)
+        {
+          callObj.callFlags.calling = true;
+          callObj.hunting.qrz = "hunted";
+          shouldRosterAlert = true;
+        }
+
         if (isAwardTracker)
         {
           RW = { ...AWARD_HUNT_EMPTY };
@@ -232,7 +241,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
           {
             RW[AWT_MAP[callObj.awardType]] = true;
           }
-          RW.huntQRZ = true;
+
         }
 
         // Hunting for callsigns
@@ -295,14 +304,6 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
             if (AAW.huntWatcher) AH.huntWatcher++;
             if (RW.huntWatcher) shouldRosterAlert = true;
           }
-        }
-
-        // Hunting for "stations calling you", only applies to the Roster
-        if ((RW.huntQRZ) && callObj.qrz == true)
-        {
-          callObj.callFlags.calling = true;
-          callObj.hunting.qrz = "hunted";
-          shouldRosterAlert = true;
         }
 
         // Hunting for stations with OAMS
@@ -419,9 +420,37 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
               }
             }
           }
+        }
 
-          // for marthon
-          callObj.dxccSuffix = null;
+        // Hunting for DX Marathon
+        if (RW.huntDXM || AAW.huntDXM)
+        {
+          let hash = `${callObj.dxcc}-${currentYear}`;
+          let count = 0;
+          let what;
+          if (callObj.dxcc > 0 && !(hash in CR.tracker.worked.dxcc))
+          {
+            count++;
+            what = "DXCC";
+          }
+          hash = `${callObj.cqz}-${currentYear}`;
+          if (callObj.cqz && !(hash in CR.tracker.worked.cqz))
+          {
+            count++;
+            what = "CQz";
+          }
+          if (count > 0)
+          {
+            if (AAW.huntDXM) AH.huntDXM++;
+            if (RW.huntDXM)
+            {
+              shouldRosterAlert = true;
+              callObj.dxm = (count == 1) ? what : "DX+CQz";
+              callObj.hunting.dxm = "hunted";
+              dxmBg = `${dxm}${kInversionAlpha};`;
+              dxm = kBold;
+            }
+          }
         }
 
         // Hunting for Known States
@@ -823,6 +852,7 @@ function processRosterHunting(callRoster, rosterSettings, awardTracker)
       colorObject.cqz = "style='" + cqzConf + "background-color:" + cqzBg + ";color:" + cqz + "'";
       colorObject.ituz = "style='" + ituzConf + "background-color:" + ituzBg + ";color:" + ituz + "'";
       colorObject.px = "style='" + wpxConf + "background-color:" + wpxBg + ";color:" + wpx + "'";
+      colorObject.dxm = "style='" + dxmConf + "background-color:" + dxmBg + ";color:" + dxm + "'";
       callObj.style = colorObject;
       callObj.shouldRosterAlert ||= shouldRosterAlert;
       callObj.shouldAudioAlert ||= testShouldAudioAlert(callObj, AH);
@@ -955,41 +985,3 @@ function processWatchers(callObj)
   }
   return false;
 }
-
-/*  marathon code, save for later
-
-          callObj.cqzSuffix = null;
-          if (huntMarathon.checked && callObj.hunting.cqz != "hunted" && callObj.hunting.cqz != "worked")
-          {
-            if (marathonFound != huntTotal)
-            {
-
-              callObj.cqzSuffix = currentYearSuffix;
-
-              callObj.hunting.cqzMarathon = "hunted";
-              if (!callObj.hunting.cqz)
-              {
-                cqzConf = `${kUnconf}${cqz}${kLayeredAlpha};`;
-              }
-            }
-          }
-
- if (hunt.Marathon && callObj.hunting.dxcc != "hunted" && callObj.hunting.dxcc != "checked")
-          {
-
-            let hash = `${callObj.dxcc}-${currentYear}`;
-            if (rosterSettings.huntIndex && !(hash in rosterSettings.huntIndex.dxcc))
-            {
-              if (!rosterSettings.workedIndex || !(hash in rosterSettings.workedIndex.dxcc))
-              {
-                callObj.dxccSuffix = currentYearSuffix;
-
-                callObj.hunting.dxccMarathon = "hunted";
-                if (!callObj.hunting.dxcc)
-                {
-                  dxccConf = `${kUnconf}${dxcc}${kLayeredAlpha};`;
-                }
-              }
-            }
-          }
-*/
