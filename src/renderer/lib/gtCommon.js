@@ -216,6 +216,7 @@ function initQSOdata()
   GT.tracker.worked.field = {};
   GT.tracker.worked.dxcc = {};
   GT.tracker.worked.cqz = {};
+  GT.tracker.worked.dxm = {};
   GT.tracker.worked.ituz = {};
   GT.tracker.worked.state = {};
   GT.tracker.worked.px = {};
@@ -228,6 +229,7 @@ function initQSOdata()
   GT.tracker.confirmed.field = {};
   GT.tracker.confirmed.dxcc = {};
   GT.tracker.confirmed.cqz = {};
+  GT.tracker.confirmed.dxm = {};
   GT.tracker.confirmed.ituz = {};
   GT.tracker.confirmed.state = {};
   GT.tracker.confirmed.px = {};
@@ -306,7 +308,7 @@ function trackQSO(details, currentYear)
     }
     if (isCurrentYear)
     {
-      GT.tracker.worked.cqz[`${details.cqz}-${currentYear}`] = true;
+      GT.tracker.worked.dxm[`${details.cqz}z${currentYear}`] = true;
     }
   }
 
@@ -328,7 +330,7 @@ function trackQSO(details, currentYear)
     }
     if (isCurrentYear)
     {
-      GT.tracker.worked.dxcc[`${sDXCC}-${currentYear}`] = true;
+      GT.tracker.worked.dxm[`${sDXCC}c${currentYear}`] = true;
     }
   }
 

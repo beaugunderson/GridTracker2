@@ -425,16 +425,16 @@ function processRosterHunting(callRoster, rosterSettings)
         // Hunting for DX Marathon
         if (RW.huntDXM || AAW.huntDXM)
         {
-          let hash = `${callObj.dxcc}-${currentYear}`;
+          let hash = `${callObj.dxcc}c${currentYear}`;
           let count = 0;
           let what;
-          if (callObj.dxcc > 0 && !(hash in CR.tracker.worked.dxcc))
+          if (callObj.dxcc > 0 && !(hash in CR.tracker.worked.dxm))
           {
             count++;
             what = "DXCC";
           }
-          hash = `${callObj.cqz}-${currentYear}`;
-          if (callObj.cqz && !(hash in CR.tracker.worked.cqz))
+          hash = `${callObj.cqz}z${currentYear}`;
+          if (callObj.cqz && !(hash in CR.tracker.worked.dxm))
           {
             count++;
             what = "CQz";
