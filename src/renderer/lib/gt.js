@@ -4194,7 +4194,7 @@ function createGeoJsonLayer(name, url, color, stroke)
   var layerSource = new ol.source.Vector({
     url: url,
     format: new ol.format.GeoJSON({ geometryName: name }),
-    overlaps: false
+    overlaps: true
   });
 
   var layerVector = new ol.layer.Vector({
