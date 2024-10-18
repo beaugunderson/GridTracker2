@@ -64,7 +64,7 @@ const kLayeredUnconfAlpha = "AA";
 function processRosterHunting(callRoster, rosterSettings)
 {
   let hasGtPin = false;
-  const currentYear = new Date().getFullYear();
+  const currentYear = new Date().getUTCFullYear();
   const potaFeatureEnabled = (window.opener.GT.settings.app.potaFeatureEnabled && window.opener.GT.settings.map.offlineMode == false);
 
   let isAwardTracker = (CR.rosterSettings.referenceNeed == LOGBOOK_AWARD_TRACKER);

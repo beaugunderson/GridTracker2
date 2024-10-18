@@ -24,7 +24,7 @@ onmessage = (event) =>
 function processQSOs(task)
 {
   initQSOdata();
-  var currentYear = new Date().getFullYear();
+  var currentYear = new Date().getUTCFullYear();
   for (let hash in task.QSOhash)
   {
     trackQSO(task.QSOhash[hash], currentYear);

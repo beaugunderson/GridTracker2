@@ -4089,6 +4089,8 @@ function getCurrentBandModeHTML()
 function displayTime()
 {
   GT.timeNow = timeNowSec();
+  GT.fullYear = new Date().getUTCFullYear();
+
   if (menuDiv.className == "menuDivStart" && GT.menuShowing == true)
   {
     menuDiv.className = "menuDivEnd";
@@ -7453,10 +7455,10 @@ function searchWorked(dxcc, band, mode)
 
 function getBandSlots()
 {
-  var worker = "";
-  var bands = (GT.myDXCC in GT.callsignDatabaseUSplus) ? GT.us_bands : GT.non_us_bands;
-  var bandslots = {};
-  var total = 0;
+  let worker = "";
+  let bands = (GT.myDXCC in GT.callsignDatabaseUSplus) ? GT.us_bands : GT.non_us_bands;
+  let bandslots = {};
+  let total = 0;
   bandslots.Mixed = 0;
   bandslots.Phone = 0;
   bandslots.Digital = 0;
@@ -7513,6 +7515,27 @@ function getBandSlots()
   return worker;
 }
 
+function getDXMarathon()
+{
+  const keysThatContain  = (obj, text) => {
+    return Object.keys(obj).filter(key => key.includes(text)).length;
+  };
+
+  let worker = "<h1>" +I18N("rosterColumns.Wanted.dxm") + " " + GT.fullYear + "</h1>";
+
+  worker += "<table class='darkTable' align=center>";
+  worker += "<tr><th><font color='orange'>";
+  worker +=  I18N("gt.viewInfo.worldGeoData");
+  worker += "</font></th><th><font color='cyan'>";
+  worker +=  I18N("gt.viewInfo.cqZones");
+  worker += "</font></th><th><font color='yellow'>Total</font></th></tr>";
+  worker += "<td style='color:white;'>" + keysThatContain(GT.tracker.worked.dxm, "c" + GT.fullYear) + "</td>";
+  worker += "<td style='color:white;'>" + keysThatContain(GT.tracker.worked.dxm, "z" + GT.fullYear) + "</td>";
+  worker += "<td style='font-weight:bold;color:white;'>" + keysThatContain(GT.tracker.worked.dxm, GT.fullYear) + "</td></table>";
+
+  return worker;
+}
+
 function showDXCCsBox()
 {
   var worker = getBandSlots();
@@ -7525,7 +7548,7 @@ function showDXCCsBox()
   var List = {};
   var ListConfirmed = {};
   var ListNotWorked = {};
-  for (var key in GT.dxccInfo)
+  for (const key in GT.dxccInfo)
   {
     if (key != -1 && Number(GT.dxccInfo[key].dxcc) > 0)
     {
@@ -7562,7 +7585,7 @@ function showDXCCsBox()
   if (worked > 0)
   {
     worker +=
-      "<div  style='vertical-align:top;display:inline-block;margin-right:2px;overflow:auto;overflow-x:hidden;height:" +
+      "<div  style='vertical-align:top;display:inline-block;margin-right:5px;overflow:auto;overflow-x:hidden;height:" +
       Math.min(Object.keys(List).length * 23, getStatsWindowHeight() - 70) +
       "px;'><table class='darkTable' align=center>" +
         "<tr><th colspan=5 style='font-weight:bold'>" +
@@ -7586,7 +7609,7 @@ function showDXCCsBox()
   if (confirmed > 0)
   {
     worker +=
-      "<div  style='padding:0px;vertical-align:top;display:inline-block;margin-right:2px;overflow:auto;overflow-x:hidden;height:" +
+      "<div  style='padding:0px;vertical-align:top;display:inline-block;margin-right:5px;overflow:auto;overflow-x:hidden;height:" +
       Math.min(Object.keys(ListConfirmed).length * 23, getStatsWindowHeight() - 70) +
         "px;'><table class='darkTable' align=center>" +
         "<tr><th colspan=5 style='font-weight:bold'>" + I18N("gt.dxccBox.Confirmed") +
@@ -8664,6 +8687,11 @@ function renderStatsBox()
     worker += "</tr>";
     worker += "</table>";
     worker += "</br>";
+
+    scoreSection = "DX Marathon";
+
+    worker += getDXMarathon();
+
     worker += "<h1>" + I18N("gt.AwardTypes") + "</h1>";
 
     scoreSection = "Award Types";
@@ -14512,24 +14540,6 @@ function changeGridOpacity()
   showOpacityTd.innerHTML = parseInt((GT.settings.map.gridAlpha / 255) * 100) + "%";
   GT.gridAlpha = parseInt(GT.settings.map.gridAlpha).toString(16);
   
-}
-
-function currentTimeStampString()
-{
-  var now = new Date();
-  return (
-    now.getFullYear() +
-    "-" +
-    (now.getMonth() + 1) +
-    "-" +
-    now.getDate() +
-    " " +
-    padNumber(now.getHours()) +
-    "." +
-    padNumber(now.getMinutes()) +
-    "." +
-    padNumber(now.getSeconds())
-  );
 }
 
 function openBackupLogsFolder()

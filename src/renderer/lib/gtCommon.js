@@ -241,7 +241,7 @@ function initQSOdata()
 function trackQSO(details, currentYear)
 {
   let qsoDate = new Date(1970, 0, 1); qsoDate.setSeconds(details.time);
-  let isCurrentYear = (qsoDate.getFullYear() == currentYear);
+  let isCurrentYear = (qsoDate.getUTCFullYear() == currentYear);
   let dayAsString = String(parseInt(details.time / 86400));
   let fourGrid = details.grid.substring(0, 4);
   let isDigi = details.digital;
