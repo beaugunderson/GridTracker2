@@ -121,6 +121,7 @@ const gtUserAgent = "GridTracker/" + gtVersionStr;
 const k_frequencyBucket = 10000;
 const backupAdifHeader = "GridTracker v" + gtVersion + " <EOH>\r\n";
 
+GT.currentYear = new Date().getUTCFullYear();
 GT.popupWindowHandle = null;
 GT.popupWindowInitialized = false;
 GT.callRosterWindowHandle = null;
@@ -4081,7 +4082,7 @@ function getCurrentBandModeHTML()
 function displayTime()
 {
   GT.timeNow = timeNowSec();
-  GT.fullYear = new Date().getUTCFullYear();
+  GT.currentYear = new Date().getUTCFullYear();
 
   if (menuDiv.className == "menuDivStart" && GT.menuShowing == true)
   {
@@ -7513,7 +7514,7 @@ function getDXMarathon()
     return Object.keys(obj).filter(key => key.includes(text)).length;
   };
 
-  let worker = "<h1>" +I18N("rosterColumns.Wanted.dxm") + " " + GT.fullYear + "</h1>";
+  let worker = "<h1>" +I18N("rosterColumns.Wanted.dxm") + " " + GT.currentYear + "</h1>";
 
   worker += "<table class='darkTable' align=center>";
   worker += "<tr><th><font color='orange'>";
@@ -7521,9 +7522,9 @@ function getDXMarathon()
   worker += "</font></th><th><font color='cyan'>";
   worker +=  I18N("gt.viewInfo.cqZones");
   worker += "</font></th><th><font color='yellow'>Total</font></th></tr>";
-  worker += "<td style='color:white;'>" + keysThatContain(GT.tracker.worked.dxm, "c" + GT.fullYear) + "</td>";
-  worker += "<td style='color:white;'>" + keysThatContain(GT.tracker.worked.dxm, "z" + GT.fullYear) + "</td>";
-  worker += "<td style='font-weight:bold;color:white;'>" + keysThatContain(GT.tracker.worked.dxm, GT.fullYear) + "</td></table>";
+  worker += "<td style='color:white;'>" + keysThatContain(GT.tracker.worked.dxm, "c" + GT.currentYear) + "</td>";
+  worker += "<td style='color:white;'>" + keysThatContain(GT.tracker.worked.dxm, "z" + GT.currentYear) + "</td>";
+  worker += "<td style='font-weight:bold;color:white;'>" + keysThatContain(GT.tracker.worked.dxm, GT.currentYear) + "</td></table>";
 
   return worker;
 }

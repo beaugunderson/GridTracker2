@@ -26,7 +26,7 @@ function processQSOs(task)
   initQSOdata();
   for (let hash in task.QSOhash)
   {
-    trackQSO(task.QSOhash[hash], GT.fullYear);
+    trackQSO(task.QSOhash[hash], GT.currentYear);
   }
   var task = {};
   task.type = "processed";
