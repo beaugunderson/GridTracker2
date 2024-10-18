@@ -1,45 +1,7 @@
 // GridTracker Copyright © 2024 GridTracker.org
 // All rights reserved.
 // See LICENSE for more information.
-
 GT.selectStartupLink = null;
-
-function dragOverHandler(ev)
-{
-  // Prevent default behavior (Prevent file from being opened)
-  ev.preventDefault();
-}
-
-function dropHandler(ev)
-{
-  // Prevent default behavior (Prevent file from being opened)
-  ev.preventDefault();
-  if (ev.dataTransfer.items)
-  {
-    // Use DataTransferItemList interface to access the file(s)
-    for (var i = 0; i < ev.dataTransfer.items.length; i++)
-    {
-      // If dropped items aren't files, reject them
-      Entry = ev.dataTransfer.items[i].webkitGetAsEntry();
-      if (Entry && "isFile" in Entry && Entry.isFile == true)
-      {
-        var filename = ev.dataTransfer.items[i].getAsFile().path;
-        var test = filename.toLowerCase();
-        var valid = test.endsWith(".adi")
-          ? true
-          : test.endsWith(".adif")
-            ? true
-            : test.endsWith(".log")
-              ? true
-              : !!test.endsWith(".txt");
-        if (valid && fs.existsSync(filename))
-        {
-          addLogToStartupList(ev.dataTransfer.items[i].getAsFile());
-        }
-      }
-    }
-  }
-}
 
 GT.confSrcNames = {
   C: "Clublog",
@@ -629,7 +591,6 @@ function adifTextValueChange(what)
 {
   what.value = what.value.trim();
   GT.settings.adifLog.text[what.id] = what.value;
-
 }
 
 GT.wsjtLogFileSelector = document.createElement("input");
