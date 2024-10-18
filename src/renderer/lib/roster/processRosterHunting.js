@@ -65,7 +65,7 @@ function processRosterHunting(callRoster, rosterSettings)
 {
   let hasGtPin = false;
   const currentYear = new Date().getFullYear();
-  const potaEnabled = (window.opener.GT.settings.app.potaEnabled == 1 && window.opener.GT.settings.map.offlineMode == false);
+  const potaFeatureEnabled = (window.opener.GT.settings.app.potaFeatureEnabled && window.opener.GT.settings.map.offlineMode == false);
 
   let isAwardTracker = (CR.rosterSettings.referenceNeed == LOGBOOK_AWARD_TRACKER);
   // Rw == Roster Wanted
@@ -566,7 +566,7 @@ function processRosterHunting(callRoster, rosterSettings)
         }
 
         // Hunting for POTAs
-        if (potaEnabled && (RW.huntPOTA || AAW.huntPOTA) && callObj.pota)
+        if (potaFeatureEnabled && (RW.huntPOTA || AAW.huntPOTA) && callObj.pota)
         {
           let hash = CR.dayAsString + callsign + callObj.pota + (rosterSettings.layeredMode ? layeredHashSuffix : workHashSuffix);
           let parkHash = callObj.pota + (rosterSettings.layeredMode ? layeredHashSuffix : workHashSuffix);

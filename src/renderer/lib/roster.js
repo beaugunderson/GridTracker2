@@ -779,7 +779,7 @@ function setVisual()
   usesOQRSDiv.style.display = (GT.settings.callsignLookups.oqrsUseEnable) ? "" : "none";
   onlySpotDiv.style.display = (CR.rosterSettings.columns.Spot) ? "" : "none";
   huntingMatrixOAMSDiv.style.display = (window.opener.oamsCanMsg()) ? "" : "none";
-  huntingMatrixPotaDiv.style.display = (GT.settings.app.potaEnabled == 1 && GT.settings.map.offlineMode == false) ? "" : "none";
+  huntingMatrixPotaDiv.style.display = (GT.settings.app.potaFeatureEnabled && GT.settings.map.offlineMode == false) ? "" : "none";
   rosterBody.style.display = "block";
   
   resize();

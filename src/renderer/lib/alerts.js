@@ -827,7 +827,7 @@ function setVisualAudioAlerts()
   usesOQRSDiv.style.display = (GT.settings.callsignLookups.oqrsUseEnable) ? "" : "none";
   onlySpotDiv.style.display = (GT.settings.roster.columns.Spot) ? "" : "none";
   huntingMatrixOAMSRow.style.display = (oamsCanMsg()) ? "" : "none";
-  huntingMatrixPotaRow.style.display = (GT.settings.app.potaEnabled == 1 && GT.settings.map.offlineMode == false) ? "" : "none";
+  huntingMatrixPotaRow.style.display = (GT.settings.app.potaFeatureEnabled && GT.settings.map.offlineMode == false) ? "" : "none";
 }
 
 function loadAudioAlertSettings()

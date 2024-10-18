@@ -876,7 +876,7 @@ function toggleOffline()
     mapNightSelect.style.display = "";
     offlineMapSelect.style.display = "none";
     offlineMapNightSelect.style.display = "none";
-    potaButton.style.display = (GT.settings.app.potaEnabled == 1 && GT.settings.app.potaShowMenu) ? "" : "none";
+    potaButton.style.display = (GT.settings.app.potaFeatureEnabled) ? "" : "none";
 
     if (GT.settings.app.gtShareEnable == true)
     {
@@ -4156,10 +4156,7 @@ function createGlobalHeatmapLayer(name, blur, radius)
 function createGlobalMapLayer(name, maxResolution, minResolution)
 {
   GT.layerSources[name] = new ol.source.Vector({});
-  if (
-    typeof maxResolution == "undefined" &&
-    typeof minResolution == "undefined"
-  )
+  if (typeof maxResolution == "undefined" && typeof minResolution == "undefined")
   {
     var zIndex = Object.keys(GT.layerVectors).length + 1;
 
@@ -6054,7 +6051,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
       callsign.heading = MyCircle.bearing(GT.myLat, GT.myLon, LL.a, LL.o);
     }
 
-    if (GT.settings.app.potaEnabled == 1)
+    if (GT.settings.app.potaFeatureEnabled)
     {
       callsign.pota = null;
       if (callsign.DEcall in GT.pota.callSpots || callsign.DEcall in GT.pota.callSchedule)
