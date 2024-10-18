@@ -24,9 +24,10 @@ onmessage = (event) =>
 function processQSOs(task)
 {
   initQSOdata();
-  for (let hash in task.QSOhash)
+  var currentYear = new Date().getUTCFullYear();
+  for (const hash in task.QSOhash)
   {
-    trackQSO(task.QSOhash[hash], GT.currentYear);
+    trackQSO(task.QSOhash[hash], currentYear);
   }
   var task = {};
   task.type = "processed";
