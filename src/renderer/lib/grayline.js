@@ -420,8 +420,6 @@ var moonLayer = {
     if (GT.settings.app.moonTrack == 1)
     {
       now = timeNowSec();
-      if (GT.settings.app.moonPath == 1)
-      { this.vectorSource.addFeature(this.future(now)); }
       this.pin = iconFeature(
         ol.proj.fromLonLat(subLunar(now).ll),
         this.icon,

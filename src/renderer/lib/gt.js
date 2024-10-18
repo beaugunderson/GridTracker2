@@ -2055,7 +2055,6 @@ function registerHotKeys()
   registerHotKey("Toggle All Grid Overlay", "KeyB", toggleAllGrids, null, null, "ctrlKey");
   registerHotKey("Open Conditions Windows", "KeyC", showConditionsBox, null, null, "ctrlKey");
   registerHotKey("Toggle Moon Tracking", "KeyD", toggleMoon, null, null, "ctrlKey");
-  registerHotKey("Toggle 24h Moon Trajectory", "KeyE", toggleMoonTrack, null, null, "ctrlKey");
   registerHotKey("Toggle Spot Paths", "KeyF", toggleSpotPaths, null, null, "ctrlKey");
   registerHotKey("Toggle GridTracker Users", "KeyG", toggleGtMap, null, null, "ctrlKey");
   registerHotKey("Toggle Timezone Overlay", "KeyH", toggleTimezones, null, null, "ctrlKey");
@@ -2191,13 +2190,6 @@ function toggleMoon()
   {
     moonLayer.hide();
   }
-}
-
-function toggleMoonTrack()
-{
-  GT.settings.app.moonPath ^= 1;
-
-  moonLayer.refresh();
 }
 
 function toggleFullscreen()
