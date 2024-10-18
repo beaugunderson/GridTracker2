@@ -190,8 +190,7 @@ function adifParseLiveComplete(task)
   GT.adifLogCount--;
   GT.QSOhash[task.details.hash] = task.details;
 
-
-  trackQSO(GT.QSOhash[task.details.hash], GT.currentYear);
+  trackQSO(GT.QSOhash[task.details.hash], GT.fullYear);
   applyQSOs(null);
 
   tryNextTask(task);

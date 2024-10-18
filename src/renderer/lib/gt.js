@@ -106,7 +106,7 @@ function loadAllSettings()
   {
     if (validSettings.indexOf(key) == -1)
     {
-      console.log("Removing unknown setting: ",key);
+      console.log("Removing unknown setting: ", key);
       delete GT.settings[key];
     }
   }
