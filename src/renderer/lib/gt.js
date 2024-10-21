@@ -562,7 +562,7 @@ GT.statBoxTimer = null;
 GT.timezoneLayer = null;
 GT.redrawFromLegendTimeoutHandle = null;
 GT.defaultButtons = [];
-GT.movingButton = null;
+
 GT.finishedLoading = false;
 GT.wsjtCurrentPort = -1;
 GT.wsjtUdpServer = null;
@@ -1929,21 +1929,7 @@ function onMyKeyDown(event)
     helpDiv.style.display = "none";
     GT.helpShow = false;
   }
-  if (GT.movingButton != null)
-  {
-    if (event.key == "ArrowRight")
-    {
-      panelRightArrow();
-    }
-    else if (event.key == "ArrowLeft")
-    {
-      panelLeftArrow();
-    }
-    else if (event.keyCode == 27 || event.keyCode == 13)
-    {
-      buttonPanelMouseLeave();
-    }
-  }
+
   if (rootSettingsDiv.style.display == "none")
   {
     if (event.code in GT.hotKeys)
@@ -11989,16 +11975,14 @@ function postInit()
 
 function buttonPanelInit()
 {
-  buttonsDiv.addEventListener("mouseleave", buttonPanelMouseLeave);
-  buttonsDiv.addEventListener("wheel", buttonPanelWheelMove);
-
   let iconButtons = buttonsDiv.querySelectorAll(".iconButton");
 
   for (let i = 0; i < iconButtons.length; i++)
   {
     GT.defaultButtons[i] = iconButtons[i].id;
-    iconButtons[i].addEventListener("contextmenu", buttonPanelRightClick);
-    iconButtons[i].addEventListener("click", buttonPanelMouseLeave);
+
+    iconButtons[i].addEventListener("dragstart", buttonDragStart);
+    iconButtons[i].draggable = true;
   }
 
   if (GT.settings.app.buttonPanelOrder.length > 0)
@@ -12054,106 +12038,60 @@ function setButtonPanelOrder(which)
   saveButtonOrder();
 }
 
-function buttonPanelRightClick(event)
+function buttonDragStart(event)
 {
-  if (GT.movingButton == null && event.shiftKey == true)
-  {
-    event.preventDefault();
-    GT.movingButton = this;
-    this.className = "iconButtonMoving";
-    return false;
-  }
-  else if (GT.movingButton == this)
-  {
-    // cancel
-    event.preventDefault();
-    this.className = "iconButton";
-    GT.movingButton = null;
-    return false;
-  }
-  else if (GT.movingButton)
-  {
-    // Our target is *this*
-    event.preventDefault();
-    GT.movingButton.className = "iconButton";
-
-    elementSwap(GT.movingButton, this);
-    GT.movingButton = null;
-
-    saveButtonOrder();
-    return false;
-  }
+  event.dataTransfer.setData("Button", event.target.id);
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.dropEffect = "move";
 }
 
-function buttonPanelMouseLeave()
+function onButtonDrop(event)
 {
-  if (GT.movingButton)
+  if (event.target.draggable)
   {
-    GT.movingButton.className = "iconButton";
-    GT.movingButton = null;
-  }
-}
-
-function buttonPanelWheelMove(event)
-{
-  if (GT.movingButton)
-  {
-    const delta = Math.sign(event.deltaY);
-    (delta == -1) ? panelLeftArrow() : panelRightArrow();
-  }
-}
-
-function panelLeftArrow()
-{
-  let element = GT.movingButton.previousElementSibling;
-  while (element && element.style.display == "none")
-  {
-    element = element.previousElementSibling;
-  }
-  if (element)
-  {
-    GT.movingButton = elementSwap(GT.movingButton, element);
-    saveButtonOrder();
-  }
-}
-
-function panelRightArrow()
-{
-  let element = GT.movingButton.nextElementSibling;
-  while (element && element.style.display == "none")
-  {
-    element = element.nextElementSibling;
-  }
-  if (element)
-  {
-    GT.movingButton = elementSwap(GT.movingButton, element);
-    saveButtonOrder();
-  }
-}
-
-function elementSwap(node1, node2)
-{
-  const afterNode1 = node1.previousElementSibling
-  const afterNode2 = node2.nextElementSibling;
-  const parent = node2.parentNode;
-  node1.replaceWith(node2);
-  if (afterNode2)
-  {
-    if (afterNode2 == node1)
+    let dragElement = document.getElementById( event.dataTransfer.getData("Button"));
+    let target = event.target;
+    let parent = event.target.parentNode;
+    while (parent != buttonsDiv)
     {
-      parent.insertBefore(node1, afterNode1);
+      target = parent;
+      parent = target.parentNode;
+    }
+
+    let movingButton = GT.settings.app.buttonPanelOrder.indexOf(dragElement.id);
+    let targetButton = GT.settings.app.buttonPanelOrder.indexOf(target.id);
+
+
+    if (target.nextElementSibling)
+    {
+      if (movingButton < targetButton)
+      {
+        parent.insertBefore(dragElement, target.nextElementSibling);
+      }
+      else
+      {
+        parent.insertBefore(dragElement, target);
+      }
     }
     else
     {
-      parent.insertBefore(node1, afterNode2);
+      parent.appendChild(dragElement);
     }
+
+    saveButtonOrder();
+
+    event.preventDefault();
   }
-  else
-  {
-    parent.appendChild(node1);
-  }
-  return node1;
 }
+
+document.addEventListener("drop", onButtonDrop);
+document.addEventListener("dragover", function(event) {
+  if (event.target.draggable)
+  {
+    event.preventDefault();
+  }
+});
+
 
 function saveButtonOrder()
 {

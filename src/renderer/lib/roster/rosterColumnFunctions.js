@@ -6,11 +6,58 @@ function rosterColumnList(settings = {}, overrides = {})
   });
 }
 
+function dragStart(event)
+{
+  event.dataTransfer.setData("Column", event.target.attributes.name.nodeValue);
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.dropEffect = "move";
+}
+
+function onDrop(event)
+{
+  event.preventDefault();
+
+  if (event.target.draggable && event.target.nodeName == "TH")
+  {
+    let dragName = event.dataTransfer.getData("Column");
+    let columns = rosterColumnList(CR.rosterSettings.columns, { Callsign: true });
+    const movingColumn = columns.indexOf(dragName);
+    const targetColumn = columns.indexOf(event.target.attributes.name.nodeValue);
+  
+    if (movingColumn < targetColumn)
+    {
+      columns.splice(targetColumn + 1, 0 ,dragName);
+      columns.splice(movingColumn, 1);
+    }
+    else
+    {
+      columns.splice(movingColumn, 1);
+      columns.splice(targetColumn, 0 , dragName);
+    }
+
+    changeRosterColumnOrder(columns);
+  }
+}
+
+document.addEventListener("drop", onDrop);
+document.addEventListener("dragover", function(event) {
+  if (event.target.draggable && event.target.nodeName == "TH")
+  {
+    event.preventDefault();
+  }
+});
+
 function renderHeaderForColumn(column)
 {
   const columnInfo = ROSTER_COLUMNS[column];
 
   let attrs = (columnInfo && columnInfo.tableHeader && columnInfo.tableHeader()) || {};
+
+  if (column != "Callsign")
+  {
+    attrs.draggable = "true";
+    attrs.ondragstart ="dragStart(event)";
+  }
 
   attrs.name = column;
   attrs.html = attrs.html || column;
@@ -111,10 +158,8 @@ function validateRosterColumnOrder(columns)
   // Exclude any unexpected values
   correctedColumnOrder = correctedColumnOrder.filter(column => !!ROSTER_COLUMNS[column])
 
-  // Ensure the first three columns are always the same
-  correctedColumnOrder = correctedColumnOrder.filter(column => column != "Callsign" && column != "Band" && column != "Mode");
-  correctedColumnOrder.unshift("Mode");
-  correctedColumnOrder.unshift("Band");
+  // Ensure the first column is always Callsign
+  correctedColumnOrder = correctedColumnOrder.filter(column => column != "Callsign");
   correctedColumnOrder.unshift("Callsign");
 
   return correctedColumnOrder;
@@ -124,30 +169,6 @@ function changeRosterColumnOrder(columns)
 {
   CR.rosterSettings.columnOrder = validateRosterColumnOrder(columns);
   viewRoster();
-}
-
-function moveColumnLeft(column)
-{
-  const columns = rosterColumnList(CR.rosterSettings.columns, { Callsign: true });
-  const pos = columns.indexOf(column);
-  if (pos > 1)
-  {
-    columns[pos] = columns[pos - 1];
-    columns[pos - 1] = column;
-  }
-  changeRosterColumnOrder(columns);
-}
-
-function moveColumnRight(column)
-{
-  const columns = rosterColumnList(CR.rosterSettings.columns, { Callsign: true });
-  const pos = columns.indexOf(column);
-  if (pos > 0 && pos + 1 < Object.keys(columns).length)
-  {
-    columns[pos] = columns[pos + 1];
-    columns[pos + 1] = column;
-  }
-  changeRosterColumnOrder(columns);
 }
 
 function toggleColumn(target, column = null)

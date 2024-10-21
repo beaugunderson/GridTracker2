@@ -27,8 +27,7 @@ CR.callingMenuRotator = null;
 CR.ageMenu = null;
 CR.compactMenuHide = null;
 CR.compactMenuShow = null;
-CR.menuItemForMoveLeftColumn = null;
-CR.menuItemForMoveRightColumn = null;
+
 CR.currentColumnName = null;
 CR.targetHash = "";
 CR.dxccMenu = null;
@@ -86,16 +85,6 @@ LAYERED_MODE_FOR[LOGBOOK_MIX_BAND_MIX_MODE] = LOGBOOK_LIVE_BAND_MIX_MODE;
 LAYERED_MODE_FOR[LOGBOOK_MIX_BAND_DIGI_MODE] = LOGBOOK_LIVE_BAND_DIGI_MODE;
 LAYERED_MODE_FOR[LOGBOOK_AWARD_TRACKER] = false;
 
-
-document.addEventListener("dragover", function (event)
-{
-  event.preventDefault();
-});
-
-document.addEventListener("drop", function (event)
-{
-  event.preventDefault();
-});
 
 window.addEventListener("message", receiveMessage, false);
 
@@ -1243,12 +1232,6 @@ function openIgnores()
   settingsDiv.style.display = "inline-block";
 }
 
-function openColumns()
-{
-  openInfoTab("columnsbox", "columnsBoxDiv", renderColumnsTab);
-  settingsDiv.style.display = "inline-block";
-}
-
 function closeSettings()
 {
   settingsDiv.style.display = "none";
@@ -1354,68 +1337,6 @@ function renderIgnoresTab()
   }
 }
 
-function renderColumnsTab()
-{
-  let worker = "";
-  let renderHeight = 230;
-  worker += "<div id='columnEnabledView' class='columnEditView'>";
-  worker += "<div class='columnEditRowHeader'>Enabled</div>";
-  const columns = rosterColumnList(CR.rosterSettings.columns, { Callsign: false });
-  let enabled = {};
-  for (let x = 0; x != columns.length; x++)
-  {
-    let column = columns[x];
-    enabled[column] = true;
-    worker += "<div class='columnEditRow'>";
-    if (x > 0)
-    {
-      worker += `<div style='cursor:pointer' onclick='moveColumnLeft("${column}");renderColumnsTab();'>▲</div>`;
-    }
-    else
-    {
-      worker += "<div>&nbsp</div>"
-    }
-   
-    worker += `<div><input type='checkbox' checked onchange='toggleColumn(this, "${column}");renderColumnsTab();'></div>`
-    worker += "<div>" + column + "</div>";
-    if (x + 1 != columns.length)
-    {
-      worker += `<div style='cursor:pointer' onclick='moveColumnRight("${column}");renderColumnsTab();'>▼</div>`;
-    }
-    else
-    {
-      worker += "<div>&nbsp</div>";
-    }
-    worker += "</div>";
-  }
-  worker += "</div>";
-  worker += "<div id='columnAvailableView' class='columnEditView'>";
-
-  let available = [...CR.rosterSettings.columnOrder];
-  available.sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1);
-  for (let x = 0; x != available.length; x++)
-  {
-    let column = available[x];
-    if (column == "Callsign") continue;
-    if (column == "eQSL" && window.opener.GT.settings.callsignLookups.eqslUseEnable == false) continue;
-    if (column == "LoTW" && window.opener.GT.settings.callsignLookups.lotwUseEnable == false) continue;
-    if (column == "OQRS" && window.opener.GT.settings.callsignLookups.oqrsUseEnable == false) continue;
-
-    if (!(column in enabled))
-    {
-      worker += "<div class='columnAvailableRow'>";
-      worker += `<div><input type='checkbox' onchange='toggleColumn(this, "${column}");renderColumnsTab();'></div>`;
-      worker += "<div>" + column + "</div>";
-      worker += "</div>";
-    }
-  }
-  worker += "</div>";
-
-  columnsEditView.innerHTML = worker;
-  renderHeight = Math.max(window.innerHeight - 200, 150);
-  columnEnabledView.style.height = renderHeight + "px";
-  columnAvailableView.style.height = renderHeight + "px";
-}
 
 function onMyKeyDown(event)
 {
@@ -1466,10 +1387,6 @@ function resize()
   if (ignoresBoxDiv.style.display != "none")
   {
     renderIgnoresTab();
-  }
-  if (columnsBoxDiv.style.display != "none")
-  {
-    renderColumnsTab();
   }
 
   wantRenderWatchersTab();
@@ -1596,8 +1513,8 @@ function setCompactView()
 {
   compactModeDiv.innerHTML = CR.rosterSettings.compact ? I18N("roster.menu.RosterMode") : I18N("roster.menu.CompactMode");
   compactEnityDiv.style.display = CR.rosterSettings.compact ? "" : "none";
-  columnsBoxDiv.style.display = columnsbox.style.display = CR.rosterSettings.compact ? "none" : "";
 }
+
 function compactModeChanged()
 {
   CR.rosterSettings.compact = !CR.rosterSettings.compact;
@@ -1749,27 +1666,7 @@ function handleContextMenu(ev)
       {
         if (target.tagName == "TH" && target.getAttribute("name"))
         {
-          CR.menuItemForMoveLeftColumn.enabled = true;
-          CR.menuItemForMoveRightColumn.enabled = true;
-
           CR.currentColumnName = target.getAttribute("name");
-
-          const columns = rosterColumnList(CR.rosterSettings.columns, { Callsign: true });
-          const pos = columns.indexOf(CR.currentColumnName);
-          if (pos == 0)
-          {
-            CR.menuItemForMoveLeftColumn.enabled = false;
-            CR.menuItemForMoveRightColumn.enabled = false;
-          }
-          else if (pos == 1)
-          {
-            CR.menuItemForMoveLeftColumn.enabled = false;
-          }
-          if (pos + 1 == Object.keys(columns).length)
-          {
-            CR.menuItemForMoveRightColumn.enabled = false;
-          }
-
           CR.columnMenu.popup();
         }
         else
@@ -3634,29 +3531,6 @@ function createRestOfMenus()
   CR.callingMenu.append(CR.callingMenuRotator);
 
   CR.columnMenu = new Menu();
-
-  CR.menuItemForMoveLeftColumn = new MenuItem({
-    type: "normal",
-    label: I18N("roster.menu.MoveLeft"),
-    click: function ()
-    {
-      moveColumnLeft(CR.currentColumnName);
-    }
-  })
-  CR.columnMenu.append(CR.menuItemForMoveLeftColumn)
-
-  CR.menuItemForMoveRightColumn = new MenuItem({
-    type: "normal",
-    label: I18N("roster.menu.MoveRight"),
-    click: function ()
-    {
-      moveColumnRight(CR.currentColumnName);
-    }
-  })
-  CR.columnMenu.append(CR.menuItemForMoveRightColumn)
-
-  item = new MenuItem({ type: "separator" });
-  CR.columnMenu.append(item);
 
   for (const columnIndex in CR.rosterSettings.columnOrder)
   {
