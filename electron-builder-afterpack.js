@@ -1,7 +1,11 @@
 const fs = require('fs');
+const path = require('path');
+
 const {exec} = require('child_process');
 
 exports.default = async function(context) {
+
+    const appOutDir = context.appOutDir;
 
     const requirePath = (path) => {
         if (!fs.existsSync(path)) {
@@ -9,8 +13,7 @@ exports.default = async function(context) {
         }
     };
 
-    const isLinux =
-        context.targets.find(target => ['appImage', 'deb', 'snap', 'tar.gz'].includes(target.name));
+    const isLinux = context.targets.find(target => ['appImage', 'rpm', 'deb', 'snap', 'pacman', 'tar.gz'].includes(target.name));
 
     console.log({isLinux});
 
@@ -19,13 +22,13 @@ exports.default = async function(context) {
         return;
     }
 
-    console.log("Configuring gridtracker2 for --no-sandbox");
+    console.log("Configuring for --no-sandbox");
 
-    const pathGridTracker2 = "dist/linux-unpacked/gridtracker2";
-    const pathGridTracker2Bin = "dist/linux-unpacked/gridtracker2.bin";
+    const pathGridTracker2 = path.join(appOutDir, "gridtracker2");
+    const pathGridTracker2Bin = path.join(appOutDir, "gridtracker2.bin");
 
     requirePath(pathGridTracker2);
-    requirePath("dist/linux-unpacked/chrome-sandbox");
+    requirePath(path.join(appOutDir, "chrome-sandbox"));
 
     fs.renameSync(pathGridTracker2, pathGridTracker2Bin);
 
