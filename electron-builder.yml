@@ -7,7 +7,6 @@ files:
   - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
 asar: true
-afterPack: "./electron-builder-afterpack.js"
 win:
   executableName: GridTracker2
   target:

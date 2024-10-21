@@ -18,6 +18,8 @@ const { electronApp, optimizer } = require('@electron-toolkit/utils');
 const path = require('path');
 const { join } = require('path');
 
+app.commandLine.appendSwitch('--no-sandbox');
+
 const singleInstanceLock = app.requestSingleInstanceLock();
 
 const isMac = process.platform === 'darwin';
