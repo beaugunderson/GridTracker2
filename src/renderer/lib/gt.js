@@ -121,7 +121,6 @@ const gtUserAgent = "GridTracker/" + gtVersionStr;
 const k_frequencyBucket = 10000;
 const backupAdifHeader = "GridTracker v" + gtVersion + " <EOH>\r\n";
 
-GT.currentYear = new Date().getUTCFullYear();
 GT.popupWindowHandle = null;
 GT.popupWindowInitialized = false;
 GT.callRosterWindowHandle = null;
@@ -265,6 +264,8 @@ GT.QSOcount = 0;
 GT.rowsFiltered = 0;
 GT.ignoreMessages = 0;
 GT.lastTimeSinceMessageInSeconds = timeNowSec();
+GT.currentYear = new Date().getUTCFullYear();
+GT.currentDay = GT.lastTimeSinceMessageInSeconds / 86400;
 GT.loadQSOs = false;
 GT.mainBorderColor = "#222222FF";
 GT.pushPinMode = false;
@@ -4068,6 +4069,7 @@ function getCurrentBandModeHTML()
 function displayTime()
 {
   GT.timeNow = timeNowSec();
+  GT.currentDay = GT.timeNow / 86400;
   GT.currentYear = new Date().getUTCFullYear();
 
   if (menuDiv.className == "menuDivStart" && GT.menuShowing == true)

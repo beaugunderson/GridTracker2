@@ -238,11 +238,11 @@ function initQSOdata()
   GT.tracker.confirmed.pota = {};
 }
 
-function trackQSO(details, currentYear)
+function trackQSO(details, currentYear, currentDay)
 {
   let qsoDate = new Date(1970, 0, 1); qsoDate.setSeconds(details.time);
   let isCurrentYear = (qsoDate.getUTCFullYear() == currentYear);
-  let dayAsString = String(parseInt(details.time / 86400));
+  let isCurrentDay = (parseInt(details.time / 86400) == currentDay);
   let fourGrid = details.grid.substring(0, 4);
   let isDigi = details.digital;
   let isPhone = details.phone;
@@ -395,18 +395,19 @@ function trackQSO(details, currentYear)
     }
   }
 
-  if (details.pota)
+  if (isCurrentDay && details.pota)
   {
-    var potas = details.pota.split(",");
+    let day = String(currentDay);
+    let potas = details.pota.split(",");
     for (let x in potas)
     {
       let pota = potas[x].trim();
-      GT.tracker.worked.pota[dayAsString + details.DEcall + pota] = true;
-      GT.tracker.worked.pota[dayAsString + details.DEcall + pota + details.mode] = true;
-      GT.tracker.worked.pota[dayAsString + details.DEcall + pota + details.band] = true;
-      GT.tracker.worked.pota[dayAsString + details.DEcall + pota + details.band + details.mode] = true;
+      GT.tracker.worked.pota[day + details.DEcall + pota] = true;
+      GT.tracker.worked.pota[day + details.DEcall + pota + details.mode] = true;
+      GT.tracker.worked.pota[day + details.DEcall + pota + details.band] = true;
+      GT.tracker.worked.pota[day + details.DEcall + pota + details.band + details.mode] = true;
 
-      GT.tracker.worked.pota[dayAsString + pota + details.band + details.mode] = true;
+      GT.tracker.worked.pota[day + pota + details.band + details.mode] = true;
 
       GT.tracker.worked.pota[pota] = true;
       GT.tracker.worked.pota[pota + details.mode] = true;
@@ -415,8 +416,8 @@ function trackQSO(details, currentYear)
 
       if (isDigi == true)
       {
-        GT.tracker.worked.pota[dayAsString + details.DEcall + pota + "dg"] = true;
-        GT.tracker.worked.pota[dayAsString + details.DEcall + pota + details.band + "dg"] = true;
+        GT.tracker.worked.pota[day + details.DEcall + pota + "dg"] = true;
+        GT.tracker.worked.pota[day + details.DEcall + pota + details.band + "dg"] = true;
 
         GT.tracker.worked.pota[pota + "dg"] = true;
         GT.tracker.worked.pota[pota + details.band + "dg"] = true;

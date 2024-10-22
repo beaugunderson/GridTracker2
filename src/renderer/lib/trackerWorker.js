@@ -25,9 +25,10 @@ function processQSOs(task)
 {
   initQSOdata();
   var currentYear = new Date().getUTCFullYear();
+  var currentDay = (parseInt(Date.now() / 1000) / 86400);
   for (const hash in task.QSOhash)
   {
-    trackQSO(task.QSOhash[hash], currentYear);
+    trackQSO(task.QSOhash[hash], currentYear, currentDay);
   }
   var task = {};
   task.type = "processed";

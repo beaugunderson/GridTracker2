@@ -272,32 +272,34 @@ function realtimeRoster()
   if (CR.rosterSettings.realtime == false) return;
 
   let timeCols = document.getElementsByClassName("timeCol");
-  for (const x in timeCols)
+  for (let x = 0; x < timeCols.length; x++)
   {
-    if ((typeof timeCols[x].id != "undefined") && (typeof CR.callRoster[timeCols[x].id.substr(2)] != "undefined"))
+    let id = timeCols[x].id.substring(2);
+    if (id in CR.callRoster)
     {
-      let when = now - CR.callRoster[timeCols[x].id.substr(2)].callObj.age;
-      timeCols[x].innerHTML = toDHMS(when);
-    }
-  }
-  let lifeCols = document.getElementsByClassName("lifeCol");
-  for (const x in lifeCols)
-  {
-    if ((typeof lifeCols[x].id != "undefined") && (typeof CR.callRoster[lifeCols[x].id.substr(2)] != "undefined"))
-    {
-      let when = now - CR.callRoster[lifeCols[x].id.substr(2)].callObj.life;
-      lifeCols[x].innerHTML = toDHMS(when);
+      timeCols[x].innerHTML = toDHMS(now - CR.callRoster[id].callObj.age);
     }
   }
 
+  let lifeCols = document.getElementsByClassName("lifeCol");
+  for (let x = 0; x < lifeCols.length; x++)
+  {
+    let id = lifeCols[x].id.substring(2);
+    if (id in CR.callRoster)
+    {
+      lifeCols[x].innerHTML = toDHMS(now - CR.callRoster[id].callObj.life);
+    }
+  }
+  
   if (CR.rosterSettings.columns.Spot)
   {
     let spotCols = document.getElementsByClassName("spotCol");
-    for (const x in spotCols)
+    for (let x = 0; x < spotCols.length; x++)
     {
-      if ((typeof spotCols[x].id != "undefined") && (typeof CR.callRoster[spotCols[x].id.substr(2)] != "undefined"))
+      let id = spotCols[x].id.substring(2);
+      if (id in CR.callRoster)
       {
-        spotCols[x].innerHTML = getSpotString(CR.callRoster[spotCols[x].id.substr(2)].callObj);
+        spotCols[x].innerHTML = getSpotString(CR.callRoster[id].callObj);
       }
     }
   }
