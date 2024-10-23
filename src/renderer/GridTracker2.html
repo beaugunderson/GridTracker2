@@ -76,23 +76,107 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <div id="main" style="display: none;">
     <div id="mapDiv" class="mapDivEnd"></div>
     <div id="mouseTrackDiv" class="mouseTrack"></div>
-    <div id="spotsDiv"
-      style="display: none;"
-      class="spotsDivEnd">
-      <table align="center">
-        <tr>
-          <td colspane="2" id="spotCountDiv">Spots: 0</td>
-        </tr>
-        <tr>
-          <td colspan="2" align="center" id="spotHistoryTimeTd"></td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <input type="range" min="5" max="1440" value="15" step="5" class="slider" id="spotHistoryTimeValue"
-              oninput="changeSpotValues();" onkeyup="redrawSpots();" onmouseup="redrawSpots();" />
-          </td>
-        </tr>
-      </table>
+    <div id="legendDiv" class="legendDivEnd">
+      <div id="spotsDiv" style="border: 1px solid yellow; background-color: black;width:fit-content;padding:2px;" class="roundBorder">
+        <table align="center">
+          <tr>
+            <td colspane="2" id="spotCountDiv">Spots: 0</td>
+          </tr>
+          <tr>
+            <td colspan="2" align="center" id="spotHistoryTimeTd"></td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <input type="range" min="5" max="1440" value="15" step="5" class="slider" id="spotHistoryTimeValue"
+                oninput="changeSpotValues();" onkeyup="redrawSpots();" onmouseup="redrawSpots();" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div id="predDiv" style="border: 1px solid rgb(0, 247, 255); width:fit-content; background-color: black; margin-top: 1px; padding:2px;" class="roundBorder">
+        <table align="center">
+          <tr style="font-weight: bold;">
+            <td id="mufTitle"  colspan="3">Maximum Usable Frequency</td>
+            <td id="fof2Title" colspan="3">Critical Frequency NVIS</td>
+            <td id="epiTitle"  colspan="3">Es Probability Index</td>
+            <td id="aufTitle"  colspan="3">Probability of Aurora</td>
+          </tr>
+          <tr id="epiTimeTr"><td colspan="3" align="center" id="epiTimeTd"></td></tr>
+          <tr id="aufForTimeTr" style="color: cyan">
+            <td colspan="3" align="center" id="aufForTimeTd"></td>
+          </tr>
+          <tr id="epiTimeOffsetTr">
+            <td id="epiTimeOffsetTd">0</td>
+            <td colspan="2">
+              <input type="range" min="-11" max="11" value="0" step="1" style="width: auto" id="epiTimeValue"
+                oninput="changeEpiTimeValue();" />
+            </td>
+          </tr>
+          <tr id="epiBarTr">
+            <td colspan="3" style="background: rgb(0,0,0);
+                      background: linear-gradient(90deg,
+                      rgb(114,136,144) 0%,
+                      rgb(57,221,206) 11%,
+                      rgb(77,152,23) 23%,
+                      rgb(247,245,0) 34%,
+                      rgb(251,184,0) 46%,
+                      rgb(219,45,1) 57%,
+                      rgb(112,48,160) 69%,
+                      rgb(242,242,242) 80%,
+                      rgb(92,92,97) 100%);" class="barGraph"></td>
+          </tr>
+          <tr id="epiRangeTr">
+            <td align="left">Poor</td>
+            <td></td>
+            <td align="right">Good</td>
+          </tr>
+          <tr id="mufBarTr">
+            <td colspan="3" style="background: linear-gradient(90deg,
+                      rgb(184,159,190) 0%,
+                      rgb(170,219,209) 50%,
+                      rgb(253,246,171) 100%);width: 170px;" class="barGraph"></td>
+          </tr>
+          <tr id="fof2BarTr">
+            <td colspan="3" style="background: linear-gradient(90deg,
+                      rgb(184,159,190) 0%,
+                      rgb(170,219,209) 50%,
+                      rgb(253,246,171) 100%);width: 170px;" class="barGraph"></td>
+          </tr>
+          <tr id="aufPercentTr" style="color: yellow; margin-bottom:-8px;">
+            <td align="center">10%</td>
+            <td align="center">50%</td>
+            <td align="center">90%</td>
+          </tr>
+          <tr id="aufBarTr">
+            <td colspan="3" class="barGraph"><img style="width:170px; height:8px" src="img/auf_bar.png" /></td>
+          </tr>
+          <tr id="mufRangeTr">
+            <td align="left">&lt;5</td>
+            <td align="right">14</td>
+            <td align="right">&gt;28</td>
+          </tr>
+          <tr id="fof2RangeTr">
+            <td align="left">&lt;1</td>
+            <td align="right">5</td>
+            <td align="right">&gt;14</td>
+          </tr>
+          <tr id="aufRangeTr">
+            <td colspan="3">
+              <table align="center" style="width:195px; margin-top:-8px">
+              <tr>
+              <td>0</td>
+              <td style="padding-left:7px">1</td>
+              <td style="padding-left:7px">2</td>
+              <td style="padding-left:7px">3</td>
+              <td style="padding-left:7px">4</td>
+              <td alight="right">&gt;4</td>
+              </tr>
+              <tr><td colspan="6" align="center">ergs/cm2</td></tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
     </div>
     <div id="chevronDiv" class="chevronDivStart" title="Click to show menu" onclick="collapseMenu(false)">≤</div>
     <div id="menuDiv" class="menuDivEnd">
@@ -484,90 +568,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <div id="msgButton" onclick="toggleMessaging();" class="iconButton" title="Messaging Window">
           <img id="msgImg" src="img/gt_chat.png" class="buttonImg" />
         </div>
-      </div>
-      <div id="predDiv" style="border: 1px solid rgb(0, 247, 255); margin: 1px; margin-bottom: 1px; margin-top: 2px;" class="roundBorder">
-        <table align="center">
-          <tr style="font-weight: bold;">
-            <td id="mufTitle"  colspan="3">Maximum Usable Frequency</td>
-            <td id="fof2Title" colspan="3">Critical Frequency NVIS</td>
-            <td id="epiTitle"  colspan="3">Es Probability Index</td>
-            <td id="aufTitle"  colspan="3">Probability of Aurora</td>
-          </tr>
-          <tr id="epiTimeTr"><td colspan="3" align="center" id="epiTimeTd"></td></tr>
-          <tr id="aufForTimeTr" style="color: cyan">
-            <td colspan="3" align="center" id="aufForTimeTd"></td>
-          </tr>
-          <tr id="epiTimeOffsetTr">
-            <td id="epiTimeOffsetTd">0</td>
-            <td colspan="2">
-              <input type="range" min="-11" max="11" value="0" step="1" style="width: auto" id="epiTimeValue"
-                oninput="changeEpiTimeValue();" />
-            </td>
-          </tr>
-          <tr id="epiBarTr">
-            <td colspan="3" style="background: rgb(0,0,0);
-                      background: linear-gradient(90deg,
-                      rgb(114,136,144) 0%,
-                      rgb(57,221,206) 11%,
-                      rgb(77,152,23) 23%,
-                      rgb(247,245,0) 34%,
-                      rgb(251,184,0) 46%,
-                      rgb(219,45,1) 57%,
-                      rgb(112,48,160) 69%,
-                      rgb(242,242,242) 80%,
-                      rgb(92,92,97) 100%);" class="barGraph"></td>
-          </tr>
-          <tr id="epiRangeTr">
-            <td align="left">Poor</td>
-            <td></td>
-            <td align="right">Good</td>
-          </tr>
-          <tr id="mufBarTr">
-            <td colspan="3" style="background: linear-gradient(90deg,
-                      rgb(184,159,190) 0%,
-                      rgb(170,219,209) 50%,
-                      rgb(253,246,171) 100%);width: 170px;" class="barGraph"></td>
-          </tr>
-          <tr id="fof2BarTr">
-            <td colspan="3" style="background: linear-gradient(90deg,
-                      rgb(184,159,190) 0%,
-                      rgb(170,219,209) 50%,
-                      rgb(253,246,171) 100%);width: 170px;" class="barGraph"></td>
-          </tr>
-          <tr id="aufPercentTr" style="color: yellow; margin-bottom:-8px;">
-            <td align="center">10%</td>
-            <td align="center">50%</td>
-            <td align="center">90%</td>
-          </tr>
-          <tr id="aufBarTr">
-            <td colspan="3" class="barGraph"><img style="width:170px; height:8px" src="img/auf_bar.png" /></td>
-          </tr>
-          <tr id="mufRangeTr">
-            <td align="left">&lt;5</td>
-            <td align="right">14</td>
-            <td align="right">&gt;28</td>
-          </tr>
-          <tr id="fof2RangeTr">
-            <td align="left">&lt;1</td>
-            <td align="right">5</td>
-            <td align="right">&gt;14</td>
-          </tr>
-          <tr id="aufRangeTr">
-            <td colspan="3">
-              <table align="center" style="width:195px; margin-top:-8px">
-              <tr>
-              <td>0</td>
-              <td style="padding-left:7px">1</td>
-              <td style="padding-left:7px">2</td>
-              <td style="padding-left:7px">3</td>
-              <td style="padding-left:7px">4</td>
-              <td alight="right">&gt;4</td>
-              </tr>
-              <tr><td colspan="6" align="center">ergs/cm2</td></tr>
-              </table>
-            </td>
-          </tr>
-        </table>
       </div>
       <div id="trafficDiv" class="roundBorder" style="
             position: relative;

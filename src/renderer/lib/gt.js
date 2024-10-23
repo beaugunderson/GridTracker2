@@ -4076,7 +4076,7 @@ function displayTime()
   {
     menuDiv.className = "menuDivEnd";
     mapDiv.className = "mapDivEnd";
-    spotsDiv.className = "spotsDivEnd";
+    legendDiv.className = "legendDivEnd";
     GT.map.updateSize();
   }
 
@@ -4857,7 +4857,7 @@ function collapseMenu(shouldCollapse)
     GT.menuShowing = false;
     mapDiv.className = "mapDivStart";
     menuDiv.className = "menuDivStart";
-    spotsDiv.className = "spotsDivStart";
+    legendDiv.className = "legendDivStart";
     chevronDiv.className = "chevronDivEnd";
   }
   else
@@ -14421,7 +14421,7 @@ function updateSpotView(leaveCount = true)
       GT.layerVectors.pskHeat.setVisible(true);
     }
 
-    spotsDiv.style.display = "block";
+    spotsDiv.style.display = "";
   }
   else
   {
@@ -14572,7 +14572,7 @@ function displayPredLayer()
   predButton.style.display = (GT.settings.map.offlineMode == true) ? "none" : "";
   if (GT.settings.map.predMode > 0 && GT.settings.map.offlineMode == false)
   {
-    predDiv.style.display = "block";
+    predDiv.style.display = "";
     for (var viewIndex in GT.predViews)
     {
       for (var html in GT.predViews[viewIndex])
