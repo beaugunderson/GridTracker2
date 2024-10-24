@@ -205,8 +205,6 @@ win:upload:
     - echo "${APPNAME}-${VERSION}"
     - |
       curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-setup.exe" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-setup.exe"
-      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-x64-setup.exe" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x64-setup.exe"
-      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-ia32-setup.exe" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-ia32-setup.exe"
       curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/latest.yml" "${PACKAGE_REGISTRY_URL_YML}/latest.yml"
       echo "${PACKAGE_REGISTRY_URL_YML}/latest.yml"
 
@@ -352,12 +350,6 @@ auto-release-main:
       links:
         - name: Windows Universal $APPNAME $VERSION
           url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-setup.exe
-          link_type: package
-        - name: Windows x64 $APPNAME $VERSION
-          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x64-setup.exe
-          link_type: package
-        - name: Windows ia32 $APPNAME $VERSION
-          url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-ia32-setup.exe
           link_type: package
         - name: Windows $APPNAME $VERSION Latest
           url: ${PACKAGE_REGISTRY_URL_YML}/latest.yml

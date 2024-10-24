@@ -161,7 +161,7 @@ function makeParkFeatures()
             {
               if (GT.instances[instance].valid && GT.instances[instance].status.Band == report.band && GT.instances[instance].status.MO == report.mode)
               {
-                let hash = dayAsString + park + report.band + report.mode;
+                let hash = dayAsString + "." + park + "." + report.band + report.mode;
                 if (hash in GT.tracker.worked.pota)
                 {
                   parkIcon = GT.gtParkWorkedOnInstance;
@@ -368,7 +368,7 @@ function addParkSpotFeature(park, report)
     {
       if (GT.instances[instance].valid && GT.instances[instance].status.Band == report.band && GT.instances[instance].status.MO == report.mode)
       {
-        let hash = dayAsString + park + report.band + report.mode;
+        let hash = dayAsString + "." + park + "." + report.band + report.mode;
         if (hash in GT.tracker.worked.pota)
         {
           parkIcon = GT.gtParkWorkedOnInstance;

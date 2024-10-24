@@ -395,33 +395,20 @@ function trackQSO(details, currentYear, currentDay)
     }
   }
 
-  if (isCurrentDay && details.pota)
+  if (details.pota)
   {
     let day = String(currentDay);
     let potas = details.pota.split(",");
     for (let x in potas)
     {
       let pota = potas[x].trim();
-      GT.tracker.worked.pota[day + details.DEcall + pota] = true;
-      GT.tracker.worked.pota[day + details.DEcall + pota + details.mode] = true;
-      GT.tracker.worked.pota[day + details.DEcall + pota + details.band] = true;
-      GT.tracker.worked.pota[day + details.DEcall + pota + details.band + details.mode] = true;
 
-      GT.tracker.worked.pota[day + pota + details.band + details.mode] = true;
-
-      GT.tracker.worked.pota[pota] = true;
-      GT.tracker.worked.pota[pota + details.mode] = true;
-      GT.tracker.worked.pota[pota + details.band] = true;
-      GT.tracker.worked.pota[pota + details.band + details.mode] = true;
-
-      if (isDigi == true)
+      if (isCurrentDay)
       {
-        GT.tracker.worked.pota[day + details.DEcall + pota + "dg"] = true;
-        GT.tracker.worked.pota[day + details.DEcall + pota + details.band + "dg"] = true;
-
-        GT.tracker.worked.pota[pota + "dg"] = true;
-        GT.tracker.worked.pota[pota + details.band + "dg"] = true;
+        GT.tracker.worked.pota[day + "." + details.DEcall + "." + pota + "." + details.band + details.mode] = true;
+        GT.tracker.worked.pota[day + "." + pota + "." + details.band + details.mode] = true;
       }
+      GT.tracker.worked.pota[pota] = true;
     }
   }
 

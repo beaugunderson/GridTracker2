@@ -14,11 +14,9 @@ win:
     - target: nsis
       arch:
         - x64
-    - target: nsis
-      arch:
         - ia32
 nsis:
-  artifactName: ${name}-${version}-${arch}-setup.${ext}
+  artifactName: ${name}-${version}-setup.${ext}
   shortcutName: GridTracker2
   uninstallDisplayName: GridTracker2
   createDesktopShortcut: always
@@ -31,6 +29,8 @@ nsis:
   packElevateHelper: true
   allowElevation: true
   license: LICENSE
+  deleteAppDataOnUninstall: false
+  warningsAsErrors: false
   preCompressedFileExtensions: [".png", ".mp3"]
 mac:
   entitlementsInherit: build/entitlements.mac.plist

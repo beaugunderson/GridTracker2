@@ -568,8 +568,8 @@ function processRosterHunting(callRoster, rosterSettings)
         // Hunting for POTAs
         if (potaFeatureEnabled && (RW.huntPOTA || AAW.huntPOTA) && callObj.pota)
         {
-          let hash = CR.dayAsString + callsign + callObj.pota + (rosterSettings.layeredMode ? layeredHashSuffix : workHashSuffix);
-          let parkHash = callObj.pota + (rosterSettings.layeredMode ? layeredHashSuffix : workHashSuffix);
+          let hash = CR.dayAsString + "." + callsign + "." + callObj.pota + "." + callObj.band + callObj.mode;
+
           // POTA is only in the worked list
           if (!(hash in CR.tracker.worked.pota))
           {
@@ -578,18 +578,12 @@ function processRosterHunting(callRoster, rosterSettings)
             {
               shouldRosterAlert = true;
               callObj.hunting.pota = "hunted";
-              if (parkHash in CR.tracker.worked.pota)
-              {
-                potaConf = `${kUnconf}${pota}${kInversionAlpha};`;
-              }
-              else
-              {
-                potaBg = `${pota}${kInversionAlpha};`;
-                pota = kBold;
-              }
+
+              potaBg = `${pota}${kInversionAlpha};`;
+              pota = kBold;
             }
           }
-          else if (parkHash in CR.tracker.worked.pota)
+          else if (callObj.pota in CR.tracker.worked.pota)
           {
             potaConf = `${kUnconf}${pota}${kInversionAlpha};`;
           }

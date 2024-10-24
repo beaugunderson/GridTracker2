@@ -265,7 +265,7 @@ GT.rowsFiltered = 0;
 GT.ignoreMessages = 0;
 GT.lastTimeSinceMessageInSeconds = timeNowSec();
 GT.currentYear = new Date().getUTCFullYear();
-GT.currentDay = GT.lastTimeSinceMessageInSeconds / 86400;
+GT.currentDay = 0;
 GT.loadQSOs = false;
 GT.mainBorderColor = "#222222FF";
 GT.pushPinMode = false;
@@ -461,7 +461,6 @@ GT.MyGridIsUp = false;
 GT.animateFrame = 0;
 GT.nextDimTime = 0;
 GT.lastFrame = 0;
-GT.currentDay = 0;
 GT.nightTime = false;
 GT.currentNightState = false;
 GT.timeNow = timeNowSec();
@@ -4069,7 +4068,7 @@ function getCurrentBandModeHTML()
 function displayTime()
 {
   GT.timeNow = timeNowSec();
-  GT.currentDay = GT.timeNow / 86400;
+  GT.currentDay = parseInt(GT.timeNow / 86400);
   GT.currentYear = new Date().getUTCFullYear();
 
   if (menuDiv.className == "menuDivStart" && GT.menuShowing == true)
