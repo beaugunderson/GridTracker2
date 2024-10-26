@@ -2,9 +2,10 @@
 // All rights reserved.
 // See LICENSE for more information.
 const gtVersionStr = electron.ipcRenderer.sendSync("appVersion");
-var gtVersion = parseInt(gtVersionStr.replace(/\./g, ""));
+const gtVersion = parseInt(gtVersionStr.replace(/\./g, ""));
 
 // var GT is in screen.js
+GT.onlineDisable = false;
 GT.startingUp = true;
 GT.firstRun = false;
 
@@ -862,6 +863,8 @@ function toggleOffline()
 {
   if (GT.map == null) return;
 
+  if (GT.onlineDisable == true) return;
+
   if (GT.settings.map.offlineMode == true)
   {
     GT.settings.map.offlineMode = false;
@@ -941,7 +944,7 @@ function toggleOffline()
   }
   displayRadar();
   displayPredLayer();
-
+  updateSpotView();
   loadMapSettings();
   changeMapValues();
   setVisualHunting();
@@ -12053,6 +12056,19 @@ function checkForNewVersion()
     if (GT.lastVersionInfo == null || GT.lastVersionInfo.version != info.version)
     {
       addLastTraffic("<font style='color:lightgreen'>New Version</font></br><font style='color:cyan'>" + info.version + "</font>");
+
+      let intVersion = parseInt(info.version.replaceAll(".",""));
+      let difference = intVersion - gtVersion;
+      // It's been more than 3 months
+      if (difference > 2999)
+      {
+        addLastTraffic("<font style='color:orange'>Current Version Expired</font></br><font style='color:yellow'>Online Mode Disabled</font>");
+        if (GT.settings.map.offlineMode == false)
+        {
+          toggleOffline();
+        }
+        GT.onlineDisable = true;
+      }
     }
   }
 
@@ -14479,7 +14495,7 @@ function toggleCRScript()
 
 function updateSpotView(leaveCount = true)
 {
-  if (GT.spotView > 0)
+  if (GT.spotView > 0 && GT.settings.map.offlineMode == false)
   {
     if (GT.settings.reception.mergeSpots == false)
     {
