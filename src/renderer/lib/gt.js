@@ -10831,6 +10831,7 @@ function updateRangeRingsUI()
   let value = (distanceUnit.value != "KM") ? parseFloat(kilometerToUnit(GT.settings.map.rangeRingDistance, distanceUnit.value)).toFixed(1) : GT.settings.map.rangeRingDistance;
   value += " " + distanceUnit.value.toLowerCase();
   rangeRingDistanceTd.innerHTML = value;
+  rangeRingDistanceValue.value = GT.settings.map.rangeRingDistance;
 }
 
 function drawRangeRings()

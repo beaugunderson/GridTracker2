@@ -263,7 +263,6 @@
 
 var dayNight = {
   vectorSource: new ol.source.Vector({}),
-
   init: function ()
   {
     GT.shadowVector.setSource(this.vectorSource);
@@ -292,7 +291,6 @@ var dayNight = {
     let arr = this.vectorSource.getFeaturesAtCoordinate(point);
     return arr.length > 0;
   },
-
   show: function ()
   {
     GT.shadowVector.setVisible(true);
