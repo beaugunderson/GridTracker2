@@ -4193,13 +4193,13 @@ function createGeoJsonLayer(name, url, color, stroke)
 
 function toggleMouseTrack()
 {
-  GT.settings.app.mouseTrack ^= 1;
+  GT.settings.app.mouseTracking = !GT.settings.app.mouseTracking;
   displayMouseTrack();
 }
 
 function displayMouseTrack()
 {
-  mouseTrackDiv.style.display = (GT.settings.app.mouseTrack == 1) ? "block" : "none";
+  mouseTrackDiv.style.display = (GT.settings.app.mouseTracking) ? "block" : "none";
 }
 
 function initHoverFunctors()
@@ -4697,7 +4697,7 @@ function mapMoveEvent(event)
   onMouseUpdate(event);
 
   var mousePosition = GT.map.getEventPixel(event);
-  if (GT.settings.app.mouseTrack == 1)
+  if (GT.settings.app.mouseTracking)
   {
     var mouseLngLat = GT.map.getEventCoordinate(event);
     if (mouseLngLat)

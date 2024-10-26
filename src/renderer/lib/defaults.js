@@ -65,7 +65,7 @@ const def_settings = {
     lookupService: "CALLOOK",
     lookupCallookPreferred: false,
     moonTrack: 0,
-    mouseTrack: 0,
+    mouseTracking: true,
     multicast: false,
     myBand: "OOB",
     myGrid: "",
