@@ -101,10 +101,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td id="epiTitle"  colspan="3">Es Probability Index</td>
             <td id="aufTitle"  colspan="3">Probability of Aurora</td>
           </tr>
-          <tr id="epiTimeTr"><td colspan="3" align="center" id="epiTimeTd"></td></tr>
-          <tr id="aufForTimeTr" style="color: cyan">
-            <td colspan="3" align="center" id="aufForTimeTd"></td>
-          </tr>
           <tr id="epiTimeOffsetTr">
             <td id="epiTimeOffsetTd">0</td>
             <td colspan="2">
@@ -142,11 +138,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                       rgb(170,219,209) 50%,
                       rgb(253,246,171) 100%);width: 170px;" class="barGraph"></td>
           </tr>
-          <tr id="aufPercentTr" style="color: yellow; margin-bottom:-8px;">
-            <td align="center">10%</td>
-            <td align="center">50%</td>
-            <td align="center">90%</td>
-          </tr>
           <tr id="aufBarTr">
             <td colspan="3" class="barGraph"><img style="width:170px; height:8px" src="img/auf_bar.png" /></td>
           </tr>
@@ -160,20 +151,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td align="right">5</td>
             <td align="right">&gt;14</td>
           </tr>
-          <tr id="aufRangeTr">
-            <td colspan="3">
-              <table align="center" style="width:195px; margin-top:-8px">
-              <tr>
-              <td>0</td>
-              <td style="padding-left:7px">1</td>
-              <td style="padding-left:7px">2</td>
-              <td style="padding-left:7px">3</td>
-              <td style="padding-left:7px">4</td>
-              <td alight="right">&gt;4</td>
-              </tr>
-              <tr><td colspan="6" align="center">ergs/cm2</td></tr>
-              </table>
-            </td>
+          <tr id="aufPercentTr" style="color: yellow; margin-bottom:-8px;">
+            <td align="center">10%</td>
+            <td align="center">50%</td>
+            <td align="center">90%</td>
           </tr>
         </table>
       </div>
@@ -2527,20 +2508,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                   <option data-i18n="settings.OAMS.message.newAlert.Nothing" value="0">Do nothing</option>
                   <option data-i18n="settings.OAMS.message.newAlert.OpenWindow" value="1">Open Messaging Window</option>
                 </select>
-              </td>
-            </tr>
-          </table>
-        </div>
-        <br />
-        <div class="mapItem" id="msgAwayTextDiv">
-          <table align="center">
-            <tr>
-              <td data-i18n="settings.OAMS.message.awayText" title="Away Text">Away Text</td>
-            </tr>
-            <tr>
-              <td>
-                <input id="msgAwayText" type="text" class="inputTextValue" size="30"
-                  oninput="ValidateText(this); newMessageSetting(this);" />
               </td>
             </tr>
           </table>

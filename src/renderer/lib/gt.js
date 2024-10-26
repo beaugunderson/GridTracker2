@@ -11719,7 +11719,6 @@ function loadMsgSettings()
   msgPushoverChat.checked = GT.settings.msg.msgPushoverChat;
   msgPushoverRoster.checked = GT.settings.msg.msgPushoverRoster;
 
-  ValidateText(msgAwayText);
   setMsgSettingsView();
 }
 
@@ -14581,13 +14580,11 @@ function getCurrentPredURL()
     now = now + (GT.epiTimeValue * 3600);
     now = now - (now % 3600);
     where = "https://tagloomis.com/epi/img/" + now + ".jpg";
-    epiTimeTd.innerHTML = "<font color='lightblue'>" + userTimeString(now * 1000) + "</font>";
   }
   else if (GT.settings.map.predMode == 4)
   {
     timeOut = 361 * 1000;
     where = "https://tagloomis.com/auf/img/auf.png?" + String(now - (now % 360));
-    getAufTimes(now - (now % 360));
   }
   if (GT.predLayerTimeout != null)
   {
@@ -14637,8 +14634,8 @@ function predInit()
   GT.predViews = Array();
   GT.predViews[1] = { mufTitle, mufBarTr, mufRangeTr };
   GT.predViews[2] = { fof2Title, fof2BarTr, fof2RangeTr }
-  GT.predViews[3] = { epiTitle, epiTimeTr, epiTimeOffsetTr, epiBarTr, epiRangeTr };
-  GT.predViews[4] = { aufTitle, aufForTimeTr, aufPercentTr, aufBarTr, aufRangeTr };
+  GT.predViews[3] = { epiTitle, epiTimeOffsetTr, epiBarTr, epiRangeTr };
+  GT.predViews[4] = { aufTitle, aufPercentTr, aufBarTr };
 }
 
 function displayPredLayer()
@@ -14696,26 +14693,6 @@ function predLayerRefreh()
   }
 }
 
-function getAufTimes(now)
-{
-  getBuffer(
-    "https://tagloomis.com/auf/img/auf.json?" + String(now),
-    handleAufTimesResponse,
-    null,
-    "https",
-    443
-  );
-}
-
-function handleAufTimesResponse(data)
-{
-  let text = String(data);
-  let json = JSON.parse(text);
-  if (json && "f" in json)
-  {
-    aufForTimeTd.innerHTML = userTimeString(Date.parse(json.f));
-  }
-}
 
 function handleKpIndexJSON(json)
 {
