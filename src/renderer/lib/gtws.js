@@ -42,7 +42,7 @@ GT.gtFlagPins = Object();
 GT.gtMessages = Object();
 GT.gtUnread = Object();
 GT.gtCallsigns = Object();
-GT.gtSentAwayToCid = Object();
+
 
 GT.gtState = ChatState.none;
 GT.gtStatusCount = 0;
@@ -495,7 +495,7 @@ function gtChatNewList(jsmesg)
   GT.gtMessages = Object();
   GT.gtUnread = Object();
   GT.gtCallsigns = Object();
-  GT.gtSentAwayToCid = Object();
+
 
   for (var key in jsmesg.data.calls)
   {
@@ -694,15 +694,6 @@ function gtChatMessage(jsmesg)
         }
 
         alertChatMessage();
-      }
-
-      if (GT.settings.msg.msgAwaySelect == 1 && !(cid in GT.gtSentAwayToCid))
-      {
-        GT.gtSentAwayToCid[cid] = true;
-        gtSendMessage(
-          "Away message [ " + GT.settings.msg.msgAwayText + " ]",
-          cid
-        );
       }
     }
   }

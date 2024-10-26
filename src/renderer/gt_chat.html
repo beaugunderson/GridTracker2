@@ -84,19 +84,6 @@
             // No message history, so lets clear the div
             if (!(g_currentId in window.opener.GT.gtMessages)) messageTextDiv.innerHTML = "";
 
-            if (g_currentId in window.opener.GT.gtSentAwayToCid)
-            {
-              var thisMsg = "Returned from away.";
-              window.opener.gtSendMessage(thisMsg, g_currentId);
-              worker = makeViewMessage("self", window.opener.GT.settings.app.myCall, thisMsg);
-              messageTextDiv.innerHTML += worker;
-              delete window.opener.GT.gtSentAwayToCid[g_currentId];
-            }
-            if (window.opener.GT.settings.msg.msgAwaySelect == 1)
-            {
-              window.opener.msgAwaySelect.value = 0;
-              window.opener.newMessageSetting(window.opener.msgAwaySelect);
-            }
             window.opener.gtSendMessage(msg, g_currentId);
             worker = makeViewMessage("self", window.opener.GT.settings.app.myCall, htmlEntities(msg));
             messageTextDiv.innerHTML += worker;

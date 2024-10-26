@@ -9473,7 +9473,7 @@ function setGtShareButtons()
     GT.gtMessages = Object();
     GT.gtUnread = Object();
     GT.gtCallsigns = Object();
-    GT.gtSentAwayToCid = Object();
+
 
     conditionsButton.style.background = "";
     conditionsButton.innerHTML = "<img src=\"img/conditions.png\" class=\"buttonImg\" />";
@@ -10826,12 +10826,23 @@ function changeRangeRingDistance()
   drawRangeRings();
 }
 
+function changeRangeRingColor()
+{
+  GT.settings.map.rangeRingColor = parseInt(rangeRingColorValue.value);
+  drawRangeRings();
+}
+
 function updateRangeRingsUI()
 {
   let value = (distanceUnit.value != "KM") ? parseFloat(kilometerToUnit(GT.settings.map.rangeRingDistance, distanceUnit.value)).toFixed(1) : GT.settings.map.rangeRingDistance;
   value += " " + distanceUnit.value.toLowerCase();
   rangeRingDistanceTd.innerHTML = value;
   rangeRingDistanceValue.value = GT.settings.map.rangeRingDistance;
+
+  rangeRingColorDiv.style.color = (GT.settings.map.rangeRingColor == 0) ? "#FFF" : "#000";
+  rangeRingColorDiv.style.textShadow = (GT.settings.map.rangeRingColor == 0) ? "#000" : "0 0 2px black, 0 0 8px white";
+  rangeRingColorDiv.style.backgroundColor = GT.settings.map.rangeRingColor == 0 ? "#000" : GT.settings.map.rangeRingColor == 361 ? "#FFF" : "hsl(" + GT.settings.map.rangeRingColor + ", 100%, 50%)";
+  rangeRingColorValue.value = GT.settings.map.rangeRingColor;
 }
 
 function drawRangeRings()
@@ -10851,11 +10862,11 @@ function drawRangeRings()
   for (let x = distance; x < 20000; x += distance)
   {
     let poly = new ol.geom.Polygon.circular(center, parseInt(x * 1000), 359).transform("EPSG:4326", GT.settings.map.projection);
-    let feature = new ol.Feature( { geometry: poly, prop: "lay" } );
+    let feature = new ol.Feature( { geometry: poly, prop: "range" } );
     let featureStyle = new ol.style.Style({
       stroke: new ol.style.Stroke({
-        color: "#000000FF",
-        width: (x % (distance * 2) == 0) ? 0.4 : 0.2
+        color: rangeRingColorDiv.style.backgroundColor,
+        width: (x % (distance * 2) == 0) ? 0.2 : 0.4
       })
     });
     feature.setStyle(featureStyle);
@@ -11688,9 +11699,16 @@ function loadMsgSettings()
 
   setSpotImage();
 
-  for (var key in GT.settings.msg)
+  for (const key in GT.settings.msg)
   {
-    document.getElementById(key).value = GT.settings.msg[key];
+    if (key in window)
+    {
+      window[key].value = GT.settings.msg[key];
+    }
+    else
+    {
+      delete GT.settings.msg[key];
+    }
   }
 
   msgSimplepush.checked = GT.settings.msg.msgSimplepush;
@@ -11731,7 +11749,6 @@ function setMsgSettingsView()
     msgAlertMedia.style.display = "none";
   }
 
-  msgAwayTextDiv.style.display = (GT.settings.msg.msgAwaySelect > 0) ? "" : "none";
   simplePushDiv.style.display = GT.settings.msg.msgSimplepush ? "" : "none";
   pushOverDiv.style.display = GT.settings.msg.msgPushover ? "" : "none";
 

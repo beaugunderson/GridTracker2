@@ -1647,10 +1647,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           <input title="Animation Speed" type="range" min="1" max="20" value="10" step="1" class="slider" id="animateSpeedValue" oninput="changeAnimateSpeedValue()" />
         </div>
         <div class="flexItem">
-          <label>AEQD Range Rings</label>
+          <label>AEQD Range Ring Spacing</label>
           <input type="range" min="0" max="19500" value="2500" step="100" class="slider" id="rangeRingDistanceValue" oninput="changeRangeRingDistance()" />
           <label id="rangeRingDistanceTd">2500 km</label>
         </div> 
+        <div class="flexItem" id="rangeRingColorDiv">
+          <label>AEQD Range Ring Color</label>
+          <input type="range" min="0" max="361" value="0" class="slider" id="rangeRingColorValue" oninput="changeRangeRingColor()" />
+        </div>
         <div class="flexItem" id="spotPathColorDiv">
           <label data-i18n="settings.map.RXSpotPath.color.label">RX Spot Color</label>
           <input type="range" min="-1" max="361" value="-1" class="slider" id="spotPathColorValue" oninput="spotPathChange();" onkeyup="redrawSpots();" onmouseup="redrawSpots();" />
@@ -2473,8 +2477,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </tr>
             <tr>
               <td>
-                <select id="msgAlertSelect" name="msgAlertSelect"
-                  onchange="newMessageSetting(this); alertChatMessage();">
+                <select id="msgAlertSelect" name="msgAlertSelect" onchange="newMessageSetting(this); alertChatMessage();">
                   <option data-i18n="settings.OAMS.message.newAlert.none" value="0">None</option>
                   <option data-i18n="settings.OAMS.message.newAlert.textToSpeech" value="1">Text-to-Speech</option>
                   <option data-i18n="settings.OAMS.message.newAlert.mediaFile" value="2">Media File</option>
@@ -2523,22 +2526,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 <select id="msgActionSelect" name="msgActionSelect" onchange="newMessageSetting(this);">
                   <option data-i18n="settings.OAMS.message.newAlert.Nothing" value="0">Do nothing</option>
                   <option data-i18n="settings.OAMS.message.newAlert.OpenWindow" value="1">Open Messaging Window</option>
-                </select>
-              </td>
-            </tr>
-          </table>
-        </div>
-        <br />
-        <div class="mapItem">
-          <table align="center">
-            <tr>
-              <td data-i18n="settings.OAMS.message.awayMode" title="Away Mode">Away Mode</td>
-            </tr>
-            <tr>
-              <td>
-                <select id="msgAwaySelect" name="msgAwaySelect" onchange="newMessageSetting(this);">
-                  <option data-i18n="settings.OAMS.message.NotAway" value="0">Not Away</option>
-                  <option data-i18n="settings.OAMS.message.AmAway" value="1">I Am Away</option>
                 </select>
               </td>
             </tr>
