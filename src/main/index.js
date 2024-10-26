@@ -236,6 +236,7 @@ if (fs.existsSync(windowSettingsPath)) {
 }
 
 let mainWindowClosing = false;
+let updateAvailable = null;
 
 ipcMain.on('getResourcesPath', (event) => {
   event.returnValue = asarResourcesPath;
@@ -247,6 +248,10 @@ ipcMain.on('getPath', (event, what) => {
 
 ipcMain.on('appVersion', (event) => {
   event.returnValue = app.getVersion();
+});
+
+ipcMain.on('updateAvailable', (event) => {
+  event.returnValue = updateAvailable;
 });
 
 ipcMain.on('showWin', (event, what) => {
@@ -437,6 +442,10 @@ app.whenReady().then(() => {
     autoUpdater.logger = log;
     autoUpdater.forceDevUpdateConfig = true;
   }
+
+  autoUpdater.on('update-available', (info) => {
+    updateAvailable = info;
+  });
 
   checkForUpdates();
 

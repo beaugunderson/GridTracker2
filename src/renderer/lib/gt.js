@@ -478,7 +478,7 @@ GT.lastTransmitCallsign = {};
 GT.lastStatusCallsign = {};
 GT.lastTxMessage = null;
 GT.lastMapView = null;
-
+GT.lastVersionInfo = null;
 GT.hoverFunctors = {};
 GT.lastHover = { feature: null, functor: null };
 
@@ -2057,6 +2057,7 @@ function registerHotKeys()
   registerHotKey("Open Settings", "KeyS", showSettingsBox, null, null, "ctrlKey");
   registerHotKey("Toggle RX Spots over Grids", "KeyT", toggleSpotOverGrids, null, null, "ctrlKey");
   registerHotKey("Toggle Award Layer Merge", "KeyU", toggleMergeOverlay, null, null, "ctrlKey");
+  registerHotKey("Toggle AEQD Projection", "KeyW", changeMapProjection, null, null, "ctrlKey");
   registerHotKey("Toggle Map Position Info", "KeyX", toggleMouseTrack, null, null, "ctrlKey");
   registerHotKey("Center Map on QTH Grid", "KeyZ", setCenterQTH, null, null, "ctrlKey");
   registerHotKey("Toggle Call Roster Scripts", "Minus", toggleCRScript, null, null, "shiftKey");
@@ -3599,7 +3600,6 @@ function changeTrafficDecode()
 {
   GT.settings.map.trafficDecode = trafficDecode.checked;
   trafficDecodeView();
-  
 }
 
 function trafficDecodeView()
@@ -5777,7 +5777,6 @@ function handleWsjtxDecode(newMessage)
 
 function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
 {
-  var didAlert = false;
   var didCustomAlert = false;
   var validQTH = false;
   var CQ = false;
@@ -6073,17 +6072,11 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
 
       insertMessageInRoster(newMessage, msgDEcallsign, msgDXcallsign, callsign, hash);
 
-      if (GT.settings.map.trafficDecode && (didAlert == true || didCustomAlert == true))
+      if (GT.settings.map.trafficDecode && didCustomAlert == true)
       {
         var traffic = htmlEntities(theMessage);
-        if (didAlert == true)
-        {
-          traffic = "⚠️ " + traffic;
-        }
-        if (didCustomAlert == true)
-        {
-          traffic = traffic + " 🚩";
-        }
+
+        traffic = traffic + " 🚩";
 
         GT.lastTraffic.unshift(traffic);
         GT.lastTraffic.unshift(userTimeString(null));
@@ -12046,9 +12039,25 @@ function postInit()
   nodeTimers.setInterval(downloadCtyDat, 86400000);  // Every 24 hours
   nodeTimers.setInterval(refreshSpotsNoTx, 300000); // Redraw spots every 5 minutes, this clears old ones
   nodeTimers.setTimeout(downloadCtyDat, 300000); // In 5 minutes, when the dust settles
+  nodeTimers.setTimeout(checkForNewVersion, 60000); // Informative check
 
   GT.finishedLoading = true;
 
+}
+
+function checkForNewVersion()
+{
+  let info = electron.ipcRenderer.sendSync("updateAvailable");
+  if (info != null)
+  {
+    if (GT.lastVersionInfo == null || GT.lastVersionInfo.version != info.version)
+    {
+      addLastTraffic("<font style='color:lightgreen'>New Version</font></br><font style='color:cyan'>" + info.version + "</font>");
+    }
+  }
+
+  GT.lastVersionInfo = info;
+  nodeTimers.setTimeout(checkForNewVersion, 43200000); // Informative check in 12 hours
 }
 
 function buttonPanelInit()
