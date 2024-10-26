@@ -427,12 +427,12 @@ app.whenReady().then(() => {
   electronApp.setAppUserModelId('org.gridtracker.GridTracker2');
   app.setAppUserModelId('org.gridtracker.GridTracker2');
 
-  // if (app.isPackaged) {
-  //  dialog.showMessageBoxSync({
-  //    message: "This is an Alpha build, it is not for public release.\n\nPlease report any issues to the GridTracker.org team on Discord.\n",
-  //    type: "warning" 
-  //  });
-  // }
+  if (app.isPackaged) {
+    dialog.showMessageBoxSync({
+      message: "This is a beta release of GridTracker2.\n\nPlease report any issues to the GridTracker.org team on Discord.\n",
+      type: "warning" 
+    });
+  }
 
   if (process.env.DEBUG_AUTO_UPDATING === 'true') {
     const log = require('electron-log');
