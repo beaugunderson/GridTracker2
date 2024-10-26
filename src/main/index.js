@@ -410,6 +410,8 @@ function createMainWindow() {
 
 function checkForUpdates() {
   autoUpdater.checkForUpdatesAndNotify();
+  // Check every 12 hours
+  timers.setTimeout(checkForUpdates, 43200000);
 }
 
 // This method will be called when Electron has finished
