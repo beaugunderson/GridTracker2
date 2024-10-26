@@ -3645,13 +3645,12 @@ function changeHaltOntTxValue(check)
 function changeSplitQSL()
 {
   GT.settings.map.splitQSL = splitQSLValue.checked;
-  
   redrawGrids();
 }
 
 function setAnimateView()
 {
-  animationSpeedTd.style.display = animateValue.checked ? "" : "none";
+  animateSpeedValue.style.display = animateValue.checked ? "" : "none";
 }
 
 function toggleAnimate()
@@ -3671,7 +3670,6 @@ function changeAnimate()
 {
   GT.settings.map.animate = animateValue.checked;
   
-
   var dash = [];
   var dashOff = 0;
   if (GT.settings.map.animate == true)
@@ -3720,7 +3718,7 @@ function removeFlightPathsAndDimSquares()
   {
     if (GT.flightPaths[i].age < GT.timeNow)
     {
-      if (typeof GT.flightPaths[i].Arrow != "undefined") { GT.layerSources.flight.removeFeature(GT.flightPaths[i].Arrow); }
+      if ("Arrow" in GT.flightPaths[i]) { GT.layerSources.flight.removeFeature(GT.flightPaths[i].Arrow); }
       GT.layerSources.flight.removeFeature(GT.flightPaths[i]);
       delete GT.flightPaths[i];
       GT.flightPaths[i] = null;
@@ -4369,6 +4367,7 @@ function changeMapProjection(honorMemory = true)
   }
 
   drawAllGrids();
+  drawRangeRings();
   displayPredLayer();
   GT.timezoneLayer = null;
   displayTimezones();
@@ -4536,6 +4535,7 @@ function renderMap()
   createGlobalMapLayer("lineGrids");
   createGlobalMapLayer("longGrids", 4500);
   createGlobalMapLayer("bigGrids", 50000, 4501);
+  createGlobalMapLayer("RangeRings");
   createGlobalMapLayer("pskFlights");
   createGlobalMapLayer("pskSpots");
   createGlobalMapLayer("pskHop");
@@ -4544,7 +4544,6 @@ function renderMap()
   createGlobalMapLayer("transmit");
   createGlobalMapLayer("gtflags");
   createGlobalMapLayer("temp");
-  createGlobalMapLayer("tz");
 
   if (GT.settings.map.projection != "EPSG:3857")
   {
@@ -4574,6 +4573,7 @@ function renderMap()
       GT.layerVectors.lineGrids,
       GT.layerVectors.longGrids,
       GT.layerVectors.bigGrids,
+      GT.layerVectors.RangeRings,
       GT.layerVectors.pskFlights,
       GT.layerVectors.pskSpots,
       GT.layerVectors.pskHop,
@@ -4581,8 +4581,7 @@ function renderMap()
       GT.layerVectors.flight,
       GT.layerVectors.transmit,
       GT.layerVectors.gtflags,
-      GT.layerVectors.temp,
-      GT.layerVectors.tz
+      GT.layerVectors.temp
     ],
     interactions: ol.interaction.defaults.defaults({
       dragPan: false,
@@ -4595,8 +4594,6 @@ function renderMap()
     controls: GT.mapControl,
     view: GT.mapView
   });
-
-
 
   GT.map.on("pointerdown", function (event)
   {
@@ -4766,15 +4763,12 @@ function changeNightMapEnable(check)
 {
   if (check.checked)
   {
-    nightMapTd.style.display = "";
-    spotNightPathColorDiv.style.display = "";
     GT.settings.map.nightMapEnable = true;
     GT.nightTime = dayNight.refresh();
   }
   else
   {
-    nightMapTd.style.display = "none";
-    spotNightPathColorDiv.style.display = "none";
+
     GT.settings.map.nightMapEnable = false;
   }
   changeMapLayer();
@@ -8000,7 +7994,7 @@ function openSettingsTab(evt, tabName)
   }
   displayAlerts();
   // Show the current tab, and add an "active" class to the button that opened the tab
-  document.getElementById(tabName).style.display = "block";
+  document.getElementById(tabName).style.display = "";
   if (typeof evt.currentTarget != "undefined") { evt.currentTarget.className += " active"; }
   else evt.className += " active";
 }
@@ -10819,13 +10813,62 @@ function displayTimezones()
   }
 }
 
+function kilometerToUnit(value, unit) {
+  var r = { 'KM': 1, 'MI': 0.621371, 'NM': 0.539957, 'DG':0.008 };
+  if ( unit in r ) return r[unit] * value;
+  else return unit;
+}
+
+function changeRangeRingDistance()
+{
+  GT.settings.map.rangeRingDistance = parseInt(rangeRingDistanceValue.value);
+  drawRangeRings();
+}
+
+function updateRangeRingsUI()
+{
+  let value = (distanceUnit.value != "KM") ? parseFloat(kilometerToUnit(GT.settings.map.rangeRingDistance, distanceUnit.value)).toFixed(1) : GT.settings.map.rangeRingDistance;
+  value += " " + distanceUnit.value.toLowerCase();
+  rangeRingDistanceTd.innerHTML = value;
+}
+
+function drawRangeRings()
+{
+  updateRangeRingsUI();
+
+  GT.layerSources.RangeRings.clear();
+
+  if (GT.settings.map.showRangeRings == false || GT.settings.map.projection == "EPSG:3857")
+  {
+    return;
+  }
+
+  const center = [GT.settings.map.longitude , GT.settings.map.latitude];    
+  const distance = GT.settings.map.rangeRingDistance;
+
+  for (let x = distance; x < 20000; x += distance)
+  {
+    let poly = new ol.geom.Polygon.circular(center, parseInt(x * 1000), 359).transform("EPSG:4326", GT.settings.map.projection);
+    let feature = new ol.Feature( { geometry: poly, prop: "lay" } );
+    let featureStyle = new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: "#000000FF",
+        width: (x % (distance * 2) == 0) ? 0.4 : 0.2
+      })
+    });
+    feature.setStyle(featureStyle);
+    GT.layerSources.RangeRings.addFeature(feature);
+  }
+}
+
 function drawAllGrids()
 {
+  GT.layerSources.lineGrids.clear();
+  GT.layerSources.longGrids.clear();
+  GT.layerSources.bigGrids.clear();
+
   if (GT.settings.map.showAllGrids == false)
   {
-    GT.layerSources.lineGrids.clear();
-    GT.layerSources.longGrids.clear();
-    GT.layerSources.bigGrids.clear();
     return;
   }
 
@@ -11200,6 +11243,7 @@ function changeDistanceUnit()
 {
   GT.settings.app.distanceUnit = distanceUnit.value;
   GT.scaleLine.setUnits(GT.scaleUnits[GT.settings.app.distanceUnit]);
+  updateRangeRingsUI();
   goProcessRoster();
 }
 
@@ -11612,6 +11656,7 @@ function loadViewSettings()
   spotNightPathColorValue.value = GT.settings.reception.pathNightColor;
   spotWidthTd.innerHTML = spotWidthValue.value = GT.settings.reception.spotWidth;
 
+
   spotMergeValue.checked = GT.settings.reception.mergeSpots;
 
   lookupOnTx.checked = GT.settings.app.lookupOnTx;
@@ -11907,14 +11952,27 @@ function startupEventsAndTimers()
   nodeTimers.setInterval(oamsBandActivityCheck, 300000);
 }
 
+function initSettingsTabs()
+{
+  settingsTabcontent = document.getElementsByClassName("settingsTabcontent");
+  for (i = 0; i < settingsTabcontent.length; i++)
+  {
+    settingsTabcontent[i].style.display = "none";
+  }
+  generalSettingsDiv.style.display = "";
+}
+
 function postInit()
 {
   let section = "mapViewFilters";
   try
   {
     displayMapViewFilters();
-    section = "DrawAllGrids";
+    section = "InitSettingsTabs";
+    initSettingsTabs();
+    section = "DrawMapLines";
     drawAllGrids();
+    drawRangeRings();
     section = "Spots";
     redrawSpots();
     section = "UDPListenerForward";
@@ -11972,6 +12030,7 @@ function postInit()
   nodeTimers.setTimeout(downloadCtyDat, 300000); // In 5 minutes, when the dust settles
 
   GT.finishedLoading = true;
+
 }
 
 function buttonPanelInit()
@@ -14128,7 +14187,7 @@ function createSpot(report, key, fromPoint, addToLayer = true)
       }
     }
 
-    featureStyle = new ol.style.Style({
+    let featureStyle = new ol.style.Style({
       fill: new ol.style.Fill({
         color: spotColor
       }),
@@ -14247,7 +14306,7 @@ function changeSpotValues()
 
   if (GT.settings.reception.viewPaths)
   {
-    spotPathWidthDiv.style.display = "inline-block";
+    spotPathWidthDiv.style.display = "";
   }
   else
   {
@@ -14288,8 +14347,6 @@ function spotPathChange()
     spotPathColorDiv.style.color = "#FFF";
     spotPathColorDiv.style.backgroundColor = pathColor;
   }
-  if (GT.settings.reception.pathColor == -1) { spotPathInfoTd.innerHTML = "PSK-Reporter Palette"; }
-  else spotPathInfoTd.innerHTML = "";
 
   GT.spotFlightColor =
     GT.settings.reception.pathColor < 1
@@ -14315,8 +14372,7 @@ function spotPathChange()
     spotNightPathColorDiv.style.color = "#FFF";
     spotNightPathColorDiv.style.backgroundColor = pathNightColor;
   }
-  if (GT.settings.reception.pathNightColor == -1) { spotNightPathInfoTd.innerHTML = "PSK-Reporter Palette"; }
-  else spotNightPathInfoTd.innerHTML = "";
+
 
   GT.spotNightFlightColor =
     GT.settings.reception.pathNightColor < 1
@@ -14352,7 +14408,7 @@ function toggleSpotPaths()
 
   if (GT.settings.reception.viewPaths)
   {
-    spotPathWidthDiv.style.display = "inline-block";
+    spotPathWidthDiv.style.display = "";
   }
   else
   {

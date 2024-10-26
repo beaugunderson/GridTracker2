@@ -129,6 +129,7 @@ html, body {
   top: 0;
 }
 
+
 .legendDivStart {
   position: absolute;
   bottom: 17px;
@@ -551,7 +552,6 @@ input[type="range"]:focus::-webkit-slider-runnable-track {
   outline: none;
 }
 
-
 select {
   -webkit-appearance: none;
   -webkit-border-radius: 6px;
@@ -637,7 +637,7 @@ a {
 /* Style the tab content */
 .settingsTabcontent {
   margin: 0;
-  display: none;
+  display: block;
   background-color: black;
   padding: 6px;
   padding-bottom: 10px;
@@ -1080,4 +1080,48 @@ button:focus {
 
 .audioAlertsTable {
   text-align: left;
+}
+
+.flexSettingDiv {
+  display: grid;
+  gap: 0px;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto;
+  height: 400px;
+}
+
+.flexItem {
+  border-width: 1px;
+  border-color: #aaa;
+  border-style: inset;
+  border-radius: 4px;
+  transition: border-color;
+
+  height: fit-content;
+
+  margin: 2px;
+  padding: 2px;
+  padding-top: 3px;
+
+  display: flex;
+  flex: auto;
+  flex-direction: row;
+  justify-content: flex-start;
+  vertical-align: text-bottom;
+}
+
+.flexItem label {
+  margin-right: 3px;
+}
+
+.flexItem select {
+  margin-top: -6px;
+}
+
+.flexItem input[type="range"] {
+  margin-top: 2px;
+}
+
+.flexItem:hover {
+  border-color: #fff;
 }

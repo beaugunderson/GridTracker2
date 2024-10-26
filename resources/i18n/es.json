@@ -286,7 +286,7 @@
   "settings.map.FitMapToQRZ.hover": "Alternar Ajustar Mapa a QRZ",
   "settings.map.CQHighlight.label": "Resaltar 'CQ'",
   "settings.map.CQHighlight.hover": "Alternar Resaltar 'CQ XX'",
-  "settings.map.MissingGrid.label": "Grid Faltante en QRZ\nFallback de DXCC",
+  "settings.map.MissingGrid.label": "Grid Faltante en QRZ Fallback de DXCC",
   "settings.map.MissingGrid.hover": "Si no se conoce la Grid de una estación, use el centro del DXCC",
   "settings.map.RXSpotPath.color.label": "Color de Ruta de Spots RX",
   "settings.map.RXSpotPath.color.default": "Paleta de PSK-Reporter",

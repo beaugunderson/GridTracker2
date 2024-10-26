@@ -286,7 +286,7 @@
     "settings.map.FitMapToQRZ.hover": "Basculer à une carte QRZ",
     "settings.map.CQHighlight.label": "Mise en évidence du 'CQ'",
     "settings.map.CQHighlight.hover": "Mettre en évidence le 'CQ XX'",
-    "settings.map.MissingGrid.label": "QRZ Grille manquante\nDXCC Retour",
+    "settings.map.MissingGrid.label": "QRZ Grille manquante DXCC Retour",
     "settings.map.MissingGrid.hover": "Si la grille d'une station n'est pas connue, utilisez le centre du DXCC",
     "settings.map.RXSpotPath.color.label": "RX Spot Couleur",
     "settings.map.RXSpotPath.color.default": "PSK-Reporter Palette",

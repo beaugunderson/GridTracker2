@@ -66,7 +66,7 @@ const MyCircle = {
         else return unit;
     },
 
-    distance: function(lat1, lon1, lat2, lon2, unit) {
+     distance: function(lat1, lon1, lat2, lon2, unit) {
         if ( unit == undefined ) unit = 'KM';
         var r = this.validateRadius(unit);
         lat1 *= Math.PI / 180;
@@ -279,7 +279,8 @@ function flightFeature(line, opts, layer, canAnimate) {
 								stroke: stroke,
 								radius: 3
 							  })
-		})
+		});
+
 	featureArrow.setStyle(thisStle);
 	feature.Arrow = featureArrow;
 

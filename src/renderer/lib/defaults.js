@@ -133,6 +133,8 @@ const def_settings = {
     qrzPathColor: 1,
     graylineOpacity: 0.1,
     splitQSL: true,
+    showRangeRings: true,
+    rangeRingDistance: 2500,
     trafficDecode: true,
     usRadar: false,
     timezonesEnable: 0,

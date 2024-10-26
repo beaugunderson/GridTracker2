@@ -698,7 +698,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         " class="roundBorder">
       <div class="settingstab">
         <button data-i18n="settings.General.label" id="generalbut" class="settingsTablinks active"
-          onclick="openSettingsTab(event, 'udpSettingsDiv')">General</button>
+          onclick="openSettingsTab(event, 'generalSettingsDiv')">General</button>
         <button data-i18n="settings.Lookups.label" id="lookupbut" class="settingsTablinks"
           onclick="openSettingsTab(event, 'lookupsSettingsDiv')">Lookups</button>
         <button data-i18n="settings.Audio.label" class="settingsTablinks"
@@ -720,7 +720,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <button data-i18n="settings.About.label" class="settingsTablinks" style="margin-right: 25px"
           onclick="openSettingsTab(event, 'aboutDiv')">About</button>
       </div>
-      <div id="udpSettingsDiv" class="settingsTabcontent" style="display: block">
+      <div id="generalSettingsDiv" class="settingsTabcontent" style="display: block">
         <table align="center">
           <tr>
             <td>
@@ -1508,8 +1508,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </div>
 
       </div>
-
-      <br />
       <br />
       <div class="mapItem">
         <table align="center">
@@ -1580,352 +1578,130 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </table>
       </div>
     </div>
-    <div id="mapSettingsDiv" class="settingsTabcontent"
-      style="background-color: #00000044; text-shadow: 0 0 5px #000000ff">
-      <div class="mapItem">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.map.current.label" title="Change map">Current Map</td>
-          </tr>
-          <tr>
-            <td>
+    <div id="mapSettingsDiv" class="settingsTabcontent" style="background-color: #00000044; text-shadow: 0 0 5px #000000ff">
+      <div class="flexSettingDiv">
+        <div class="flexItem">
+            <label data-i18n="settings.map.current.label">Current Map</label>
+            <div>
               <select id="mapSelect" value="terrain-background" onchange="changeMapValues();"></select>
               <select id="offlineMapSelect" value="terrain-background" onchange="changeOfflineMap();"></select>
-            </td>
-          </tr>
-          <tr id="mapApiKeyTr">
-            <td>
-              <label data-i18n="settings.logging.QRZcom.details.apikey" for="mapApiKeyInput">API Key</label>
-              <input id="mapApiKeyInput" type="test" class="inputTextValue"  size="21" oninput="mapApiKeyInputChanged()" /><br/>
-              <div id="mapApiKeyApplyDiv" data-i18n="settings.Update.label" class="button" onclick="changeMapLayer()">Apply Changes
-              </div>
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="mapItem">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.map.animatePaths.label" colspan="1" align="center">Animate Active Paths</td>
-          </tr>
-          <tr align="center">
-            <td style="padding: 0px; margin: 0px" title="Toggle Traffic Path Animation">
-              <input type="checkbox" id="animateValue" onclick="changeAnimate()" />
-            </td>
-          </tr>
-          <tr id="animationSpeedTd">
-            <td>
-              <input title="Animation Speed" type="range" min="1" max="20" value="10" step="1" class="slider"
-                id="animateSpeedValue" oninput="changeAnimateSpeedValue()" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="mapItem">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.map.transparency.label" align="center" colspan="2">Map Settings Transparency</td>
-          </tr>
-          <tr>
-            <td align="center" id="mapTransTd">50%</td>
-          </tr>
-          <tr align="center">
-            <td colspan="2">
-              <input type="range" min="0" max="1" value="0.5" step="0.01" class="slider" id="mapTransValue"
-                oninput="mapTransChange();" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <br />
-      <div class="mapItem">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.map.QSXPath.width.label" align="center">QSX Path Width</td>
-            <td align="left" id="pathWidthTd">1.5</td>
-          </tr>
-          <tr align="center">
-            <td colspan="2">
-              <input type="range" min="0.0" max="8" value="1.5" step="0.1" class="slider" id="pathWidthValue"
-                oninput="changePathValues()" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="mapItem" id="pathColorDiv">
-        <table align="center">
-          <tr align="center">
-            <td data-i18n="settings.map.QSXPath.color.label" align="center"><b>QSX Path Color</b></td>
-          </tr>
-          <tr align="center">
-            <td colspan="2">
-              <input type="range" min="0" max="361" value="0" class="slider" id="pathColorValue"
-                oninput="changePathValues()" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="mapItem">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.map.QRZPath.width.label" align="center">QRZ Path Width</td>
-            <td align="left" id="qrzPathWidthTd">1.5</td>
-          </tr>
-          <tr align="center">
-            <td colspan="2">
-              <input type="range" min="0.0" max="10" value="1.5" step="0.1" class="slider" id="qrzPathWidthValue"
-                oninput="changePathValues()" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="mapItem" id="qrzPathColorDiv">
-        <table align="center">
-          <tr align="center">
-            <td data-i18n="settings.map.QRZPath.color.label" align="center"><b>QRZ Path Color</b></td>
-          </tr>
-          <tr align="center">
-            <td colspan="2">
-              <input type="range" min="0" max="361" value="360" class="slider" id="qrzPathColorValue"
-                oninput="changePathValues()" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <br />
-
-      <div class="mapItem">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.map.GraylineDarkness.label" align="center">Grayline Darkness</td>
-            <td align="left" id="showDarknessTd">10%</td>
-          </tr>
-          <tr align="center">
-            <td colspan="2">
-              <input type="range" min="0.03" max="0.70" value="0.1" step="0.01" class="slider" id="graylineValue"
-                oninput="changeGrayline()" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="mapItem">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.map.Brightness.label" align="center">Brightness</td>
-          </tr>
-          <tr align="center">
-            <td colspan="2">
-              <input type="range" min="0" max="1" value="1" step="0.01" class="slider" id="brightnessValue"
-                oninput="changeMapValues()" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="mapItem">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.map.MergeAward.label" align="center">Merge Award Overlay</td>
-          </tr>
-          <tr align="center">
-            <td title="Toggle Merge Award Overlay">
-              <input type="checkbox" id="mergeOverlayValue" onclick="changeMergeOverlayValue()" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="mapItem">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.map.FitMapToQRZ.label" align="center">Fit Map To QRZ</td>
-          </tr>
-          <tr align="center">
-            <td title="Toggle Fit Map To QRZ">
-              <input type="checkbox" id="fitQRZvalue" onclick="changeFitQRZvalue()" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <br />
-      <div class="mapItem">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.map.CQHighlight.label" align="center">'CQ' Highlighting</td>
-          </tr>
-          <tr align="center">
-            <td title="Toggle 'CQ XX' Highlighting">
-              <input type="checkbox" id="CqHiliteValue" onclick="changeCqHiliteValue(this);" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="mapItem">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.map.MissingGrid.label" align="center">QRZ Missing Grid<br />DXCC Fallback</td>
-          </tr>
-          <tr align="center">
-            <td title="If a station grid is not known use the DXCC">
-              <input type="checkbox" id="qrzDxccFallbackValue" onclick="changeQrzDxccFallbackValue();" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="mapItem" id="spotPathColorDiv">
-        <table align="center">
-          <tr align="center">
-            <td data-i18n="settings.map.RXSpotPath.color.label" align="center"><b>PSK-Spot Color</b></td>
-          </tr>
-          <tr align="center">
-            <td colspan="2">
-              <input type="range" min="-1" max="361" value="-1" class="slider" id="spotPathColorValue"
-                oninput="spotPathChange();" onkeyup="redrawSpots();" onmouseup="redrawSpots();" />
-            </td>
-          </tr>
-          <tr align="center">
-            <td data-i18n="settings.map.RXSpotPath.color.default" id="spotPathInfoTd">PSK-Reporter Palette</td>
-          </tr>
-        </table>
-      </div>
-      <div class="mapItem" id="spotPathsDiv">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.map.RXSpotPath.enable.label" title="Toggle flight paths to spots">PSK-Spot Paths
-            </td>
-          </tr>
-          <tr>
-            <td title="Toggle flight paths to spots">
-              <input type="checkbox" id="spotPathsValue" onclick="changeSpotValues();redrawSpots();" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <br />
-      <div class="mapItem" id="spotPathWidthDiv">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.map.RXSpotPath.width.label" align="center">PSK-Spot Path Width</td>
-            <td align="left" id="spotWidthTd">1.5</td>
-          </tr>
-          <tr align="center">
-            <td colspan="2">
-              <input type="range" min="0.0" max="5" value="1.5" step="0.05" class="slider" id="spotWidthValue"
-                oninput="spotPathChange();" onkeyup="redrawSpots();" onmouseup="redrawSpots();" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="mapItem" id="predOpacityDiv">
-        <table align="center">
-          <tr>
-            <td align="center">Prediction Layer Opacity</td>
-            <td align="left" id="predOpacityTd">0.3</td>
-          </tr>
-          <tr align="center">
-            <td colspan="2">
-              <input type="range" min="0.05" max="1" value="0.3" step="0.01" class="slider" id="predOpacityValue"
-                oninput="changePredOpacityValue();" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <br />
-      <div class="mapItem">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.map.AutoNight.enable.label" title="Night Map">Auto Night Map</td>
-          </tr>
-          <tr align="center">
-            <td title="Toggle Automatic Night Map Switching">
-              <input type="checkbox" id="nightMapEnable" onclick="changeNightMapEnable(this);" />
-            </td>
-          </tr>
-
-          <tr>
-            <td  id="nightMapTd">
-              <div class="mapItem">
-                <table align="center">
-                  <tr>
-                    <td data-i18n="settings.map.NightMap.select.label" title="Change map">Night Map</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <select id="mapNightSelect" value="18" onchange="changeMapNightValues();"></select>
-                      <select id="offlineMapNightSelect" value="terrain-background" onchange="changeOfflineNightMap();"></select>
-                    </td>
-                  </tr>
-                  <tr id="nightMapApiKeyTr">
-                    <td>
-                      <label data-i18n="settings.logging.QRZcom.details.apikey" for="nightMapApiKeyInput">API Key</label>
-                      <input id="nightMapApiKeyInput" type="test" class="inputTextValue"  size="21" oninput="nightMapApiKeyInputChanged()" /><br/>
-                      <div id="nightMapApiKeyApplyDiv" data-i18n="settings.Update.label" class="button" onclick="changeMapLayer()">Apply Changes
-                      </div>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-              <br />
-              <div class="mapItem" id="pathNightColorDiv">
-                <table align="center">
-                  <tr align="center">
-                    <td data-i18n="settings.map.NightQSXPath.color.label" align="center"><b>Night QSX Path Color</b>
-                    </td>
-                  </tr>
-                  <tr align="center">
-                    <td colspan="2">
-                      <input type="range" min="0" max="361" value="0" class="slider" id="nightPathColorValue"
-                        oninput="changeMapNightPathValues()" />
-                    </td>
-                  </tr>
-                </table>
-              </div>
-              <div class="mapItem" id="pathNightQrzColorDiv">
-                <table align="center">
-                  <tr align="center">
-                    <td data-i18n="settings.map.NightQRZPath.color.label" align="center"><b>Night QRZ Path Color</b>
-                    </td>
-                  </tr>
-                  <tr align="center">
-                    <td colspan="2">
-                      <input type="range" min="0" max="361" value="0" class="slider" id="nightQrzPathColorValue"
-                        oninput="changeMapNightPathValues()" />
-                    </td>
-                  </tr>
-                </table>
-              </div>
-              <div class="mapItem" id="spotNightPathColorDiv">
-                <table align="center">
-                  <tr align="center">
-                    <td data-i18n="settings.map.NightRXSpot.color.label" align="center"><b>Night PSK-Spot Color</b></td>
-                  </tr>
-                  <tr align="center">
-                    <td colspan="2">
-                      <input type="range" min="-1" max="361" value="-1" class="slider" id="spotNightPathColorValue"
-                        oninput="spotPathChange();" onkeyup="redrawSpots();" onmouseup="redrawSpots();" />
-                    </td>
-                  </tr>
-                  <tr align="center">
-                    <td data-i18n="settings.map.NightRXSpot.color.default" id="spotNightPathInfoTd">PSK-Reporter Palette
-                    </td>
-                  </tr>
-                </table>
-              </div>
-              <br />
-              <div class="mapItem">
-                <table align="center">
-                  <tr>
-                    <td data-i18n="settings.map.NightBrightness.label" align="center">Night Brightness</td>
-                  </tr>
-                  <tr align="center">
-                    <td colspan="2">
-                      <input type="range" min="0" max="1" value="1" step="0.01" class="slider" id="nightBrightnessValue"
-                        oninput="changeMapNightValues()" />
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </td>
-          </tr>
-        </table>
+              <br/>
+              <div id="mapApiKeyTr">
+                <label data-i18n="settings.logging.QRZcom.details.apikey" for="mapApiKeyInput">API Key</label>
+                <input id="mapApiKeyInput" type="test" class="inputTextValue"  size="21" oninput="mapApiKeyInputChanged()" /><br/>
+                <div id="mapApiKeyApplyDiv" data-i18n="settings.Update.label" class="button" onclick="changeMapLayer()">Apply Changes</div>
+            </div>
+            </div>
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.transparency.label" >Map Settings Transparency</label>
+          <input type="range" min="0" max="1" value="0.5" step="0.01" class="slider" id="mapTransValue" oninput="mapTransChange();" />
+          <label id="mapTransTd">50%</label>
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.QSXPath.width.label" >QSX Path Width</label>
+          <input type="range" min="0.0" max="8" value="1.5" step="0.1" class="slider" id="pathWidthValue" oninput="changePathValues()" />
+          <label  id="pathWidthTd">1.5</label>
+        </div>
+        <div class="flexItem" id="pathColorDiv">
+          <label data-i18n="settings.map.QSXPath.color.label">QSX Path Color</label>
+          <input type="range" min="0" max="361" value="0" class="slider" id="pathColorValue" oninput="changePathValues()" />
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.QRZPath.width.label" >QRZ Path Width</label>
+          <input type="range" min="0.0" max="10" value="1.5" step="0.1" class="slider" id="qrzPathWidthValue" oninput="changePathValues()" />
+          <label id="qrzPathWidthTd">1.5</label>
+        </div>
+        <div class="flexItem" id="qrzPathColorDiv">
+          <label data-i18n="settings.map.QRZPath.color.label" >QRZ Path Color</label>
+          <input type="range" min="0" max="361" value="360" class="slider" id="qrzPathColorValue" oninput="changePathValues()" />
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.GraylineDarkness.label">Grayline Darkness</label>
+          <input type="range" min="0.03" max="0.70" value="0.1" step="0.01" class="slider" id="graylineValue" oninput="changeGrayline()" />
+          <label id="showDarknessTd">10%</label>
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.Brightness.label">Brightness</label>
+          <input type="range" min="0" max="1" value="1" step="0.01" class="slider" id="brightnessValue" oninput="changeMapValues()" />
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.MergeAward.label" for="mergeOverlayValue">Merge Award Overlay</label>
+          <input type="checkbox" id="mergeOverlayValue" onclick="changeMergeOverlayValue()" />
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.FitMapToQRZ.label" for="fitQRZvalue" >Fit Map To QRZ</label>
+          <input type="checkbox" id="fitQRZvalue" onclick="changeFitQRZvalue()" />
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.CQHighlight.label" for="CqHiliteValue">'CQ' Highlighting</label>
+          <input type="checkbox" id="CqHiliteValue" onclick="changeCqHiliteValue(this);" />
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.MissingGrid.label" for="qrzDxccFallbackValue" >QRZ DXCC Fallback</label>
+          <input type="checkbox" id="qrzDxccFallbackValue" onclick="changeQrzDxccFallbackValue();" />
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.animatePaths.label" for="animateValue">Animate Active Paths</label>
+          <input type="checkbox" id="animateValue" onclick="changeAnimate()" />
+          <input title="Animation Speed" type="range" min="1" max="20" value="10" step="1" class="slider" id="animateSpeedValue" oninput="changeAnimateSpeedValue()" />
+        </div>
+        <div class="flexItem">
+          <label>AEQD Range Rings</label>
+          <input type="range" min="100" max="19000" value="2500" step="100" class="slider" id="rangeRingDistanceValue" oninput="changeRangeRingDistance()" />
+          <label id="rangeRingDistanceTd">2500 km</label>
+        </div> 
+        <div class="flexItem" id="spotPathColorDiv">
+          <label data-i18n="settings.map.RXSpotPath.color.label">RX Spot Color</label>
+          <input type="range" min="-1" max="361" value="-1" class="slider" id="spotPathColorValue" oninput="spotPathChange();" onkeyup="redrawSpots();" onmouseup="redrawSpots();" />
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.RXSpotPath.enable.label" for="spotPathsValue">Spot Paths</label>
+          <input type="checkbox" id="spotPathsValue" onclick="changeSpotValues();redrawSpots();" />
+        </div>
+        <div class="flexItem" id="spotPathWidthDiv">
+          <label data-i18n="settings.map.RXSpotPath.width.label" >Spot Path Width</label>
+          <input type="range" min="0.0" max="5" value="1.5" step="0.05" class="slider" id="spotWidthValue" oninput="spotPathChange();" onkeyup="redrawSpots();" onmouseup="redrawSpots();" />
+          <label id="spotWidthTd">1.5</label>
+        </div>
+        <div class="flexItem">
+          <label>Prediction Layer Opacity</label>
+          <input type="range" min="0.05" max="1" value="0.3" step="0.01" class="slider" id="predOpacityValue" oninput="changePredOpacityValue();" />
+          <label id="predOpacityTd">0.3</label>
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.AutoNight.enable.label" for="nightMapEnable">Auto Night Map</label>
+          <input type="checkbox" id="nightMapEnable" onclick="changeNightMapEnable(this);" />
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.NightMap.select.label" >Night Map</label>
+          <div>
+            <select id="mapNightSelect" value="18" onchange="changeMapNightValues();"></select>
+            <select id="offlineMapNightSelect" value="terrain-background" onchange="changeOfflineNightMap();"></select>
+            <br/>
+            <div id="nightMapApiKeyTr">
+              <label data-i18n="settings.logging.QRZcom.details.apikey" for="nightMapApiKeyInput">API Key</label>
+              <input id="nightMapApiKeyInput" type="test" class="inputTextValue"  size="21" oninput="nightMapApiKeyInputChanged()" /><br/>
+              <div id="nightMapApiKeyApplyDiv" data-i18n="settings.Update.label" class="button" onclick="changeMapLayer()">Apply Changes</div>
+            </div>
+          </div>
+        </div>
+        <div class="flexItem" id="pathNightColorDiv">
+          <label data-i18n="settings.map.NightQSXPath.color.label" >Night QSX Path Color</label>
+          <input type="range" min="0" max="361" value="0" class="slider" id="nightPathColorValue" oninput="changeMapNightPathValues()" />
+        </div>
+        <div class="flexItem" id="pathNightQrzColorDiv">
+          <label data-i18n="settings.map.NightQRZPath.color.label">Night QRZ Path Color</label>
+          <input type="range" min="0" max="361" value="0" class="slider" id="nightQrzPathColorValue"  oninput="changeMapNightPathValues()" />
+        </div>
+        <div class="flexItem" id="spotNightPathColorDiv">
+          <label data-i18n="settings.map.NightRXSpot.color.label">Night Spot Color</label>
+          <input type="range" min="-1" max="361" value="-1" class="slider" id="spotNightPathColorValue" oninput="spotPathChange();" onkeyup="redrawSpots();" onmouseup="redrawSpots();" />
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.NightBrightness.label" >Night Brightness</label>
+          <input type="range" min="0" max="1" value="1" step="0.01" class="slider" id="nightBrightnessValue" oninput="changeMapNightValues()" />
+        </div>
       </div>
     </div>
     <div id="logSettingsDiv" class="settingsTabcontent">
