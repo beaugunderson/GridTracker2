@@ -845,7 +845,7 @@ function toggleEarth()
 {
   GT.settings.app.graylineImgSrc ^= 1;
   graylineImg.src = GT.GraylineImageArray[GT.settings.app.graylineImgSrc];
-  if (GT.settings.app.graylineImgSrc == 1 || GT.useTransform == true)
+  if (GT.settings.app.graylineImgSrc == 1)
   {
     dayNight.hide();
     GT.nightTime = dayNight.refresh();
@@ -855,7 +855,6 @@ function toggleEarth()
     GT.nightTime = dayNight.refresh();
     dayNight.show();
   }
-  Grayline.style.display = (GT.useTransform) ? "none" : "";
 }
 
 function toggleOffline()
@@ -4138,11 +4137,9 @@ function createGlobalMapLayer(name, maxResolution, minResolution)
   GT.layerSources[name] = new ol.source.Vector({});
   if (typeof maxResolution == "undefined" && typeof minResolution == "undefined")
   {
-    var zIndex = Object.keys(GT.layerVectors).length + 1;
-
     GT.layerVectors[name] = new ol.layer.Vector({
       source: GT.layerSources[name],
-      zIndex: zIndex
+      zIndex: Object.keys(GT.layerVectors).length + 2
     });
   }
   else if (typeof minResolution == "undefined")
@@ -4150,7 +4147,7 @@ function createGlobalMapLayer(name, maxResolution, minResolution)
     GT.layerVectors[name] = new ol.layer.Vector({
       source: GT.layerSources[name],
       maxResolution: maxResolution,
-      zIndex: Object.keys(GT.layerVectors).length + 1
+      zIndex: Object.keys(GT.layerVectors).length + 2
     });
   }
   else
@@ -4159,7 +4156,7 @@ function createGlobalMapLayer(name, maxResolution, minResolution)
       source: GT.layerSources[name],
       maxResolution: maxResolution,
       minResolution: minResolution,
-      zIndex: Object.keys(GT.layerVectors).length + 1
+      zIndex: Object.keys(GT.layerVectors).length + 2
     });
   }
   GT.layerVectors[name].set("name", name);
@@ -4526,6 +4523,7 @@ function renderMap()
     new RotateNorthControl()
   ];
 
+  createGlobalMapLayer("rangeRings");
   createGlobalMapLayer("award");
   createGlobalHeatmapLayer("pskHeat", 20, 15);
   createGlobalMapLayer("qso");
@@ -4535,7 +4533,6 @@ function renderMap()
   createGlobalMapLayer("lineGrids");
   createGlobalMapLayer("longGrids", 4500);
   createGlobalMapLayer("bigGrids", 50000, 4501);
-  createGlobalMapLayer("RangeRings");
   createGlobalMapLayer("pskFlights");
   createGlobalMapLayer("pskSpots");
   createGlobalMapLayer("pskHop");
@@ -4560,10 +4557,14 @@ function renderMap()
     projection: GT.settings.map.projection
   });
 
+  GT.shadowVector = new ol.layer.Vector({ zIndex: 0 });
+
   GT.map = new ol.Map({
     target: "mapDiv",
     layers: [
       GT.tileLayer,
+      GT.shadowVector,
+      GT.layerVectors.rangeRings,
       GT.layerVectors.award,
       GT.layerVectors.pskHeat,
       GT.layerVectors.qso,
@@ -4573,7 +4574,6 @@ function renderMap()
       GT.layerVectors.lineGrids,
       GT.layerVectors.longGrids,
       GT.layerVectors.bigGrids,
-      GT.layerVectors.RangeRings,
       GT.layerVectors.pskFlights,
       GT.layerVectors.pskSpots,
       GT.layerVectors.pskHop,
@@ -4664,8 +4664,8 @@ function renderMap()
 
   document.getElementById("menuDiv").style.display = "block";
 
-  dayNight.init(GT.map);
-  if (GT.settings.app.graylineImgSrc == 1 || GT.useTransform == true)
+  dayNight.init();
+  if (GT.settings.app.graylineImgSrc == 1)
   {
     dayNight.hide();
   }
@@ -4673,7 +4673,6 @@ function renderMap()
   {
     GT.nightTime = dayNight.show();
   }
-  Grayline.style.display = (GT.useTransform) ? "none" : "";
 
   moonLayer.init(GT.map);
   if (GT.settings.app.moonTrack == 1)
@@ -10836,9 +10835,9 @@ function drawRangeRings()
 {
   updateRangeRingsUI();
 
-  GT.layerSources.RangeRings.clear();
+  GT.layerSources.rangeRings.clear();
 
-  if (GT.settings.map.showRangeRings == false || GT.settings.map.projection == "EPSG:3857")
+  if (GT.settings.map.showRangeRings == false || GT.settings.map.projection == "EPSG:3857" || GT.settings.map.rangeRingDistance == 0)
   {
     return;
   }
@@ -10857,7 +10856,7 @@ function drawRangeRings()
       })
     });
     feature.setStyle(featureStyle);
-    GT.layerSources.RangeRings.addFeature(feature);
+    GT.layerSources.rangeRings.addFeature(feature);
   }
 }
 

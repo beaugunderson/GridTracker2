@@ -1,3 +1,52 @@
+var nite = {
+  date: null,
+  sun_position: null,
+  earth_radius_meters: 6371008,
+
+  getShadowRadiusFromAngle: function(angle) {
+    let shadow_radius =  this.earth_radius_meters * Math.PI * 0.5;
+    let twilight_dist = ((this.earth_radius_meters * 2 * Math.PI) / 360) * angle;
+    return shadow_radius - twilight_dist;
+  },
+  getSunPosition: function() {
+    return this.sun_position;
+  },
+  getShadowPosition: function() {
+    this.sun_position = this.calculatePositionOfSun();
+    return (this.sun_position) ? [ this.sun_position[0] + 180, -this.sun_position[1] ]  : null;
+  },
+  jday: function(date) {
+      return (date.getTime() / 86400000.0) + 2440587.5;
+  },
+  calculatePositionOfSun: function() {
+      var date = new Date();
+      var rad = 0.017453292519943295;
+
+      // based on NOAA solar calculations
+      var ms_past_midnight = ((date.getUTCHours() * 60 + date.getUTCMinutes()) * 60 + date.getUTCSeconds()) * 1000 + date.getUTCMilliseconds();
+      var jc = (this.jday(date) - 2451545)/36525;
+      var mean_long_sun = (280.46646+jc*(36000.76983+jc*0.0003032)) % 360;
+      var mean_anom_sun = 357.52911+jc*(35999.05029-0.0001537*jc);
+      var sun_eq = Math.sin(rad*mean_anom_sun)*(1.914602-jc*(0.004817+0.000014*jc))+Math.sin(rad*2*mean_anom_sun)*(0.019993-0.000101*jc)+Math.sin(rad*3*mean_anom_sun)*0.000289;
+      var sun_true_long = mean_long_sun + sun_eq;
+      var sun_app_long = sun_true_long - 0.00569 - 0.00478*Math.sin(rad*125.04-1934.136*jc);
+      var mean_obliq_ecliptic = 23+(26+((21.448-jc*(46.815+jc*(0.00059-jc*0.001813))))/60)/60;
+      var obliq_corr = mean_obliq_ecliptic + 0.00256*Math.cos(rad*125.04-1934.136*jc);
+
+      var lat = Math.asin(Math.sin(rad*obliq_corr)*Math.sin(rad*sun_app_long)) / rad;
+
+      var eccent = 0.016708634-jc*(0.000042037+0.0000001267*jc);
+      var y = Math.tan(rad*(obliq_corr/2))*Math.tan(rad*(obliq_corr/2));
+      var rq_of_time = 4*((y*Math.sin(2*rad*mean_long_sun)-2*eccent*Math.sin(rad*mean_anom_sun)+4*eccent*y*Math.sin(rad*mean_anom_sun)*Math.cos(2*rad*mean_long_sun)-0.5*y*y*Math.sin(4*rad*mean_long_sun)-1.25*eccent*eccent*Math.sin(2*rad*mean_anom_sun))/rad);
+      var true_solar_time_in_deg = ((ms_past_midnight+rq_of_time*60000) % 86400000) / 240000;
+
+      var lng = -((true_solar_time_in_deg < 0) ? true_solar_time_in_deg + 180 : true_solar_time_in_deg - 180);
+
+      return [ lng, lat ];
+  }
+};
+
+
 /**
 
 **/
@@ -262,65 +311,60 @@
 });
 
 var dayNight = {
-  vectorSource: null,
-  vectorLayer: null,
+  vectorSource: new ol.source.Vector({}),
 
-  init: function (map)
+  init: function ()
   {
-    var geoJSON = new GeoJSONTerminator();
-
-    this.vectorSource = new ol.source.Vector({
-      features: new ol.format.GeoJSON().readFeatures(geoJSON, {
-        featureProjection: "EPSG:3857"
-      })
-    });
-
-    this.vectorLayer = new ol.layer.Vector({
-      source: this.vectorSource,
-      style: new ol.style.Style({
-        fill: new ol.style.Fill({
-          color: "rgb(0,0,0)"
-        }),
-        stroke: null
-      }),
-      opacity: Number(GT.settings.map.graylineOpacity),
-      zIndex: 0
-    });
-    map.getLayers().insertAt(1, this.vectorLayer);
+    GT.shadowVector.setSource(this.vectorSource);
   },
   refresh: function ()
   {
-    var circleStyle = new ol.style.Style({
+    let style = new ol.style.Style({
       fill: new ol.style.Fill({
+        color: "rgb(0,0,0)"
+      }),
+      stroke: new ol.style.Stroke({
         color: "rgb(0,0,0)"
       })
     });
-    this.vectorLayer.setStyle(circleStyle);
-    this.vectorLayer.setOpacity(Number(GT.settings.map.graylineOpacity));
+    GT.shadowVector.setStyle(style);
+    GT.shadowVector.setOpacity(Number(GT.settings.map.graylineOpacity));
+    
     this.vectorSource.clear();
 
-    this.vectorSource.addFeature(
-      new ol.format.GeoJSON().readFeature(new GeoJSONTerminator(), {
-        featureProjection: "EPSG:3857"
-      })
-    );
-    var point = ol.proj.fromLonLat([GT.myLon, GT.myLat]);
+    if (GT.useTransform == false)
+    {
+      this.vectorSource.addFeature(
+        new ol.format.GeoJSON().readFeature(new GeoJSONTerminator(), {
+          featureProjection: "EPSG:3857"
+        })
+      );
+    } 
+    else
+    {
+      let poly = new ol.geom.Polygon.circular(nite.getShadowPosition(), parseInt(nite.getShadowRadiusFromAngle(0)), 359).transform("EPSG:4326", GT.settings.map.projection);
+      let feature = new ol.Feature( { geometry: poly, prop: "shadow" } );
+
+      this.vectorSource.addFeature(feature);
+    }
+    
+    var point = ol.proj.fromLonLat([GT.myLon, GT.myLat], GT.settings.map.projection);
     var arr = this.vectorSource.getFeaturesAtCoordinate(point);
     return arr.length > 0;
   },
 
   show: function ()
   {
-    this.vectorLayer.setVisible(true);
+    GT.shadowVector.setVisible(true);
     return this.refresh();
   },
   hide: function ()
   {
-    this.vectorLayer.setVisible(false);
+    GT.shadowVector.setVisible(false);
   },
   isVisible: function ()
   {
-    return this.vectorLayer.getVisible();
+    return GT.shadowVector.getVisible();
   }
 };
 
