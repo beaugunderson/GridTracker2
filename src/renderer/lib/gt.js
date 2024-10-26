@@ -845,7 +845,7 @@ function toggleEarth()
 {
   GT.settings.app.graylineImgSrc ^= 1;
   graylineImg.src = GT.GraylineImageArray[GT.settings.app.graylineImgSrc];
-  if (GT.settings.app.graylineImgSrc == 1)
+  if (GT.settings.app.graylineImgSrc == 1 || GT.useTransform == true)
   {
     dayNight.hide();
     GT.nightTime = dayNight.refresh();
@@ -855,6 +855,7 @@ function toggleEarth()
     GT.nightTime = dayNight.refresh();
     dayNight.show();
   }
+  Grayline.style.display = (GT.useTransform) ? "none" : "";
 }
 
 function toggleOffline()
@@ -4665,7 +4666,7 @@ function renderMap()
   document.getElementById("menuDiv").style.display = "block";
 
   dayNight.init();
-  if (GT.settings.app.graylineImgSrc == 1)
+  if (GT.settings.app.graylineImgSrc == 1 || GT.useTransform == true)
   {
     dayNight.hide();
   }
@@ -4673,6 +4674,7 @@ function renderMap()
   {
     GT.nightTime = dayNight.show();
   }
+  Grayline.style.display = (GT.useTransform) ? "none" : "";
 
   moonLayer.init(GT.map);
   if (GT.settings.app.moonTrack == 1)
