@@ -14,7 +14,6 @@ win:
     - target: nsis
       arch:
         - x64
-        - ia32
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: GridTracker2

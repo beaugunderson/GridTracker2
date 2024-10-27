@@ -30,7 +30,7 @@ function loadAllSettings()
   GT.qsoBackupDir = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Backup Logs");
   GT.dxccInfoPath = path.join(GT.appData, "dxcc-info.json");
   GT.tempDxccInfoPath = path.join(GT.appData, "dxcc-info-update.json");
-  GT.spotsPath = path.join(GT.appData,"spots.json");
+  GT.spotsPath = path.join(GT.appData, "spots.json");
 
   try
   {
@@ -11481,41 +11481,49 @@ function voiceChangedValue()
 
 function timedGetVoices()
 {
-  voicesDiv.innerHTML = "";
-  GT.voices = window.speechSynthesis.getVoices();
-  if (GT.voices.length > 0)
-  {
-    var newSelect = document.createElement("select");
-    newSelect.id = "alertVoiceInput";
-    newSelect.title = "Select Voice";
-    for (var i = 0; i < GT.voices.length; i++)
+  try {
+    GT.voices = window.speechSynthesis.getVoices();
+    if (GT.voices.length > 0 &&  GT.speechAvailable == false)
     {
-      var option = document.createElement("option");
-      option.value = i;
-      option.text = GT.voices[i].name;
-      if (GT.voices[i].default)
+      alertVoiceInput.title = "Select Voice";
+      for (var i = 0; i < GT.voices.length; i++)
       {
-        option.selected = true;
+        var option = document.createElement("option");
+        option.value = i;
+        option.text = GT.voices[i].name;
+        if (GT.voices[i].default)
+        {
+          option.selected = true;
+        }
+        alertVoiceInput.appendChild(option);
       }
-      newSelect.appendChild(option);
-    }
-    newSelect.oninput = voiceChangedValue;
-    voicesDiv.appendChild(newSelect);
+      alertVoiceInput.oninput = voiceChangedValue;
+      voicesDiv.appendChild(alertVoiceInput);
 
-    if (GT.settings.audio.speechVoice > 0)
+      if (GT.settings.audio.speechVoice > 0)
+      {
+        alertVoiceInput.value = GT.settings.audio.speechVoice - 1;
+      }
+
+      GT.speechAvailable = true;
+    }
+    else
     {
-      alertVoiceInput.value = GT.settings.audio.speechVoice - 1;
+      // try again in 10 seconds
+      nodeTimers.setTimeout(timedGetVoices, 10000);
     }
   }
-  GT.speechAvailable = true;
+  catch (e)
+  {
+    // try again in 30 seconds
+    nodeTimers.setTimeout(timedGetVoices, 30000);
+  }
 }
 
 function initSpeech()
 {
-  window.speechSynthesis.onvoiceschanged = function ()
-  {
-    nodeTimers.setTimeout(timedGetVoices, 3000);
-  };
+  nodeTimers.setTimeout(timedGetVoices, 5000);
+  
   var msg = new SpeechSynthesisUtterance("\n");
   msg.lang = GT.localeString;
   window.speechSynthesis.speak(msg);
@@ -11988,6 +11996,7 @@ function postInit()
     drawAllGrids();
     drawRangeRings();
     section = "Spots";
+    loadReceptionReports();
     redrawSpots();
     section = "UDPListenerForward";
     updateForwardListener();
@@ -14327,10 +14336,6 @@ function redrawSpots()
         GT.spotTotalCount++;
       }
     }
-  }
-  if (shouldSave)
-  {
-    saveReceptionReports();
   }
 
   updateSpotCountDiv();

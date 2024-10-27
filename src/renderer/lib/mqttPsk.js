@@ -28,9 +28,6 @@ function openPskMqtt()
     const clientId = `GT2_${dottedCallsign}_${GT.settings.app.myGrid}_${Math.random().toString(16).slice(3)}`;
     const topic = `pskr/filter/v2/+/+/${dottedCallsign}/#`;
 
-    console.log("ID: ", clientId);
-    console.log("Topic: ", topic);
-
     GT.pskMqttClient = mqtt.connect(GT.pskMqttUrl, {
         clientId,
         clean: true,
@@ -39,8 +36,6 @@ function openPskMqtt()
     });
 
     GT.pskMqttClient.on('connect', () => {
-        console.log('Connected');
-        
         GT.pskMqttClient.subscribe([topic], () => {
             console.log(`Subscribe to topic '${topic}'`);
         })
@@ -63,6 +58,5 @@ function closePskMqtt()
     {
         GT.pskMqttClient.end();
         GT.pskMqttClient = null;
-        console.log("Closed");
     }
 }

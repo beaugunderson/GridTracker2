@@ -37,7 +37,7 @@ const def_settings = {
   defaultsApplied: true,
   app: {
     chatUUID: "",
-    clearOnCQ: true,
+    clearOnCQ: false,
     crScript: 0,
     distanceUnit: "MI",
     graylineImgSrc: 0,
