@@ -202,8 +202,22 @@ function processRosterHunting(callRoster, rosterSettings)
         // Questions: Move to the first loop? 
         if (allOnlyNew.checked == true && didWork && callObj.qrz == false)
         {
-          entry.tx = false;
-          continue;
+          if (potaFeatureEnabled && callObj.pota && (RW.huntPOTA || AAW.huntPOTA))
+          {
+            let hash = CR.dayAsString + "." + callsign + "." + callObj.pota + "." + callObj.band + callObj.mode;
+            // POTA is only in the worked list
+            if ((hash in CR.tracker.worked.pota))
+            {
+              entry.tx = false;
+              continue;             
+            }
+          }
+          else
+          {
+            entry.tx = false;
+            continue;
+          }
+
         }
         // Special Calls
         if (callObj.DEcall.match("^[A-Z][0-9][A-Z](/w+)?$"))
