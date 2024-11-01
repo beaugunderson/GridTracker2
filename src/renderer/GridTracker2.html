@@ -504,9 +504,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <div id="gridOverlayButton" onclick="toggleAllGrids()" class="iconButton" title="Toggle All Grid Overlay">
             <img id="gridOverlayImg" src="img/grid-overlay.png" class="buttonImg" />
         </div>
-        <div id="modeModeDiv" onclick="toggleOffline()" class="iconButton" title="Toggle Online/Offline Mode">
-          <img id="offlineImg" src="" class="buttonImg" />
-        </div>
         <div id="radarButton" onclick="toggleRadar()" class="iconButton" title="Toggle US Radar">
           <img id="radarImg" src="img/radar-button.png" class="buttonImg" />
         </div>
@@ -534,14 +531,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <div id="buttonLOTWCheckBoxDiv" onclick="if ( ValidateText(lotwLogin) && ValidateText(lotwPassword) ) {  grabLOtWLog(false); } " class="iconButton" title="Download log from Logbook of the World">
             <img id="lotwLogImg" src="img/log_LoTW.png" class="buttonImg" />
         </div>
-        <div id="buttonClubCheckBoxDiv" onclick="if ( ValidateText(clubEmail) && ValidateText(clubPassword) ) grabClubLog()" class="iconButton" title="Download log from ClubLog">
+        <div id="buttonClubCheckBoxDiv" onclick="if ( ValidateText(clubEmail) && ValidateText(clubPassword) ) { grabClubLog(); }" class="iconButton" title="Download log from ClubLog">
             <img id="ClubLogImg" src="img/log_club.png" class="buttonImg" />
         </div>
         <div id="potaButton" onClick="togglePotaMap();" class="iconButton" title="Parks On The Air">
           <img id="potaImg" src="img/pota.png" class="buttonImg" />
-        </div>
-        <div id="gtShareButton" onclick="toggleGtShareEnable();" class="iconButton" title="Share your On-Air Status with other GridTracker users">
-          <img id="gtShareFlagImg" src="img/share-off.png" class="buttonImg" />
         </div>
         <div id="gtFlagButton" onclick="toggleGtMap();" class="iconButton" title="Toggle View GridTracker Users">
           <img id="gtFlagImg" src="" class="buttonImg" />
@@ -680,6 +674,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <div class="settingstab">
         <button data-i18n="settings.General.label" id="generalbut" class="settingsTablinks active"
           onclick="openSettingsTab(event, 'generalSettingsDiv')">General</button>
+          <button id="featuresbut" class="settingsTablinks"
+          onclick="openSettingsTab(event, 'featuresSettingsDiv')">Features</button>
         <button data-i18n="settings.Lookups.label" id="lookupbut" class="settingsTablinks"
           onclick="openSettingsTab(event, 'lookupsSettingsDiv')">Lookups</button>
         <button data-i18n="settings.Audio.label" class="settingsTablinks"
@@ -694,8 +690,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           onclick="openSettingsTab(event, 'audioAlertsDiv')">Audio Alerts</button>
         <button data-i18n="settings.alerts.CustomAlerts.label" class="settingsTablinks"
           onclick="openSettingsTab(event, 'customAlertsDiv')">Custom Alerts</button>
-        <button data-i18n="settings.OAMS.label" class="settingsTablinks"
-          onclick="openSettingsTab(event, 'chatSettingsDiv')">OAMS</button>
         <button data-i18n="settings.Logbook.label" id="logbut" class="settingsTablinks"
           onclick="openSettingsTab(event, 'logbookSettingsDiv')">Logbook</button>
         <button data-i18n="settings.About.label" class="settingsTablinks" style="margin-right: 25px"
@@ -876,22 +870,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </td>
             <td>
               <div class="mapItem">
-                <table align="center" title="Enable Decode Traffic Visual in Menu">
-                  <tr>
-                    <td data-i18n="settings.general.DecodeWaterfall.label">Decode Traffic Waterfall</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <input type="checkbox" id="trafficDecode" onclick="changeTrafficDecode()" />
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <div class="mapItem">
                 <table align="center">
                   <tr>
                     <td title="Window Theme">Window Theme</td>
@@ -908,6 +886,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 </table>
               </div>
             </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="mapItem">
+                <table align="center">
+                  <tr>
+                    <td>
+                      <div data-i18n="settings.general.ExportSettings.label" class="button" id="exportSettingsButton">
+                        Export Settings</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div data-i18n="settings.general.ImportSettings.label" 
+                        id="importSettingsButton" class="button" id="importSettingsButton">
+                        Import Settings
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td id="importSettingsInfo">
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
             <td>
               <div class="mapItem" style="display: flex; justify-content: center; align-items: center;" >
                 <div data-i18n="settings.general.ResetButtonPanel.label" class="flexButton" onclick="setButtonPanelOrder(GT.defaultButtons)">
@@ -919,30 +923,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       </table>
       <table align="center">
         <tr>
-          <td>
-            <div class="mapItem">
-              <table align="center">
-                <tr>
-                  <td>
-                    <div data-i18n="settings.general.ExportSettings.label" class="button" id="exportSettingsButton">
-                      Export Settings</div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <div data-i18n="settings.general.ImportSettings.label" 
-                      id="importSettingsButton" class="button" id="importSettingsButton">
-                      Import Settings
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td id="importSettingsInfo">
-                  </td>
-                </tr>
-              </table>
-            </div>
-          </td>
           <td>
             <div class="mapItem">
               <table align="center">
@@ -965,6 +945,197 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </td>
         </tr>
       </table>
+    </div>
+    <div id="featuresSettingsDiv" class="settingsTabcontent">
+      <div id="featureControlDiv" class="mapItem"  style="border:0">
+        <div class="mapItem" style="border:0">
+          <table align="center" class="darkTable">
+            <tr>
+              <th colspan="6" style="font-weight: bold; color: cyan">Operational</th>
+            </tr>
+            <tr>
+              <td data-i18n="settings.general.DecodeWaterfall.label">Decode Traffic Waterfall</td>
+              <td>
+                <input type="checkbox" id="trafficDecode" onclick="changeTrafficDecode()" />
+              </td>
+            </tr>
+             <tr>
+              <th colspan="6" style="font-weight: bold; color: yellow">WSJT-X</th>
+            </tr>
+            <tr>
+              <td>Clear on CQ</td>
+              <td>
+                <input type="checkbox" id="clearOnCQ" onclick="changeClearOnCQ();" />
+              </td>
+            </tr>
+
+              <tr>
+                <th colspan="6" style="font-weight: bold; color: orange" data-i18n="settings.logging.otherheader.service">Service</th>
+              </tr>
+              <tr>
+                <td data-i18n="settings.logging.pstrotator.label">CatRotator / PstRotator</td>
+                <td>
+                  <input type="checkbox" checked="false" class="inputTextValue" id="pstrotatorCheckBox" onclick="
+                    ValidateIPaddress(pstrotatorIpInput, this); ValidatePort(pstrotatorPortInput, this, null ); pstrotatorServiceChanged(); " />
+                </td>
+              </tr>
+              <tr>  
+                <td colspan="2">
+                  <label data-i18n="settings.logging.pstrotator.details.IP" for="pstrotatorIpInput">IP</label>
+                  <input id="pstrotatorIpInput" type="text" class="inputTextValue" maxlength="15" size="11"
+                    onkeypress='return validIpKeys(event.charCode);'
+                    oninput="ValidateIPaddress(this, pstrotatorCheckBox); pstrotatorServiceChanged(); " />
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <label data-i18n="settings.logging.pstrotator.details.Port" for="pstrotatorPortInput">UDP Port</label>
+                  <input id="pstrotatorPortInput" type="text" class="inputTextValue" maxlength="5" size="5" onkeypress='return
+                      validNumberKeys(event.charCode);' oninput="ValidatePort(this, pstrotatorCheckBox, null );
+                      pstrotatorServiceChanged(); " />
+                </td>
+              </tr>
+
+          </table>
+        </div>
+        <div class="mapItem" style="border:0">
+          <table align="center" class="darkTable">
+          <tr>
+            <th colspan=2 style="font-weight: bold;color:yellow">Online</th>
+          </tr>
+          <tr>
+            <th>Offline Mode</th>
+            <td>
+              <input type="checkbox" id="offlineModeEnable" onclick="changeOffline()" />
+            </td>
+          </tr>
+          <tr id="potaHuntingTr">
+            <td>POTA Hunting</td>
+            <td>
+              <input type="checkbox" id="potaFeatureEnabled" onclick="changePotaEnable();" />
+            </td>
+          </tr>
+          <tr id="simplepushMsgEnableTr">
+            <td data-i18n="settings.OAMS.simplepush.enable.label" for="msgSimplepush" >Simplepush</td>
+            <td>
+              <input title="Toggle Simplepush" type="checkbox" id="msgSimplepush" onclick="setOamsSimplepush(this);" />
+            </td>
+          </tr>
+          <tr id="pushoverMsgEnableTr">
+            <td data-i18n="settings.OAMS.pushover.enable.label" for="msgPushover">Pushover</td>
+            <td>
+              <input title="Toggle Pushover" type="checkbox" id="msgPushover" onclick="setOamsPushover(this);" />
+            </td>
+          </tr>
+          <tr id="offAirServicesTr">
+            <td >Off-Air Services</td>
+            <td>
+               <input type="checkbox" id="offAirServicesEnable" onclick="changeOffAirServicesEnable();" />
+            </td>
+          </tr>
+          <tr id="spottingEnableTr">
+            <td data-i18n="settings.spotting.enable.label">Spotting</td>
+            <td>
+              <input title="Enable / Disable Spotting" type="checkbox" id="spottingEnable" onclick="setSpottingEnable(); redrawSpots();" />
+            </td>
+          </tr>
+          <tr id="spotMergeTr">
+            <td data-i18n="settings.grids.spotsOverGrids.label" title="Place Spots over Grid Layer">Spots Over Grids</td>
+            <td>
+              <input type="checkbox" id="spotMergeValue" onclick="changeSpotValues(); redrawSpots();" />
+            </td>
+          </tr>
+          <tr id="bandActivityEnableTr">
+            <td data-i18n="settings.BandActivity.enable.label">Band Activity</td>
+            <td>
+              <input  type="checkbox" id="oamsBandActivity" onclick="setOamsBandActivity(this);" />
+            </td>
+          </tr>
+          <tr id="bandActivityNeighborTr">
+            <td data-i18n="settings.BandActivity.neighbor.enable.label">Neighboring Grids</td>
+            <td>
+              <input  type="checkbox" id="oamsBandActivityNeighbors" onclick="setOamsBandActivityNeighbors(this);" />
+            </td>
+          </tr>
+          <tr id="oamsMsgEnableTr">
+            <td data-i18n="settings.OAMS.message.enable.label">Chat Messaging</td>
+            <td>
+              <input type="checkbox" id="oamsMsgEnable" onclick="setMsgEnable();" />
+            </td>
+          </tr>
+          </table>
+        </div>
+        <div class="mapItem" style="border:0">
+          <div class="mapItem" id="simplePushDiv">
+            <table>
+              <tr>
+                <td data-i18n="settings.OAMS.simplepush.apikey.label"
+              title="SimplePush API Key to forward messages to your phone">SimplePush API Key</td>
+              </tr>
+              <tr>
+                <td>
+                  <input title="SimplePush API Key to forward messages to your phone" type="text" id="msgSimplepushApiKey"
+                    class="inputTextValue" maxlength="255" size="16"
+                    oninput="ValidateText(this); newMessageSetting(this);" />
+                </td>
+              </tr>
+              <tr>
+                <td><input title="Enable / Disable Chat Message Forward" type="checkbox" id="msgSimplepushChat"
+                  onclick="setOamsSimplepushChat(this);" data-i18n="settings.OAMS.forward.chat" /> Forward Chat Messages</td>
+              </tr>
+              <tr>
+                <td><input title="Enable / Disable Roster Alert Forward" type="checkbox" id="msgSimplepushRoster"
+                  onclick="setOamsSimplepushRoster(this);" data-i18n="settings.OAMS.forward.roster" /> Forward Roster Alerts</td>
+              </tr>
+              <tr>
+                <td>
+                  <div data-i18n="settings.OAMS.simplepush.test" class="button" onclick="sendSimplePushMessage({'call' : 'Test', 'msg' : 'Test Message'});">Test</div>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <br/>
+          <div class="mapItem" id="pushOverDiv">
+            <table>
+              <tr>
+                <td data-i18n="settings.OAMS.pushover.credentials.label"
+                    title="Pushover Credentials to forward messages to your phone">Pushover Credentials</td>
+              </tr>
+              <tr>
+                <td>
+                  <label data-i18n="settings.OAMS.pushover.userkey.label" for="msgPushoverUserKey">User Key</label>
+                  <input title="Pushover User Key to forward messages to your phone" type="text" id="msgPushoverUserKey"
+                         class="inputTextValue" maxlength="255" size="16"
+                         oninput="ValidateText(this); newMessageSetting(this);" />
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label data-i18n="settings.OAMS.pushover.token.label" for="msgPushoverToken">API Token</label>
+                  <input title="Pushover API Token to forward messages to your phone" type="text" id="msgPushoverToken"
+                         class="inputTextValue" maxlength="255" size="16"
+                         oninput="ValidateText(this); newMessageSetting(this);" />
+                </td>
+              </tr>
+              <tr>
+                <td><input title="Enable / Disable Chat Message Forward" type="checkbox" id="msgPushoverChat"
+                  onclick="setOamsPushoverChat(this);" data-i18n="settings.OAMS.forward.chat" /> Forward Chat Messages</td>
+              </tr>
+              <tr>
+                <td><input title="Enable / Disable Roster Alert Forward" type="checkbox" id="msgPushoverRoster"
+                  onclick="setOamsPushoverRoster(this);" data-i18n="settings.OAMS.forward.roster" /> Forward Roster Alerts</td>
+              </tr>
+              <tr>
+                <td>
+                  <div data-i18n="settings.OAMS.pushover.test" class="button" onclick="sendPushOverMessage({'call' : 'Test', 'msg' : 'Test Message'}, true);">Test
+                  </div>
+                  <div id="pushOverTestResultsDiv"></div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
     <div id="lookupsSettingsDiv" class="settingsTabcontent">
       <div class="mapItem">
@@ -997,69 +1168,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </table>
       </div>
       <br />
-      <div class="mapItem">
-        <table align="center">
+      <div id="callsignDatabaseDiv" class="mapItem">
+        <table align="center" class="darkTable">
           <tr>
-            <td data-i18n="settings.lookup.AddData.label" align="center">Add Lookup Data to QSO Log event</td>
+            <th colspan="6" style="font-weight: bold; color: lightgreen">Lookups</th>
           </tr>
-          <tr align="center">
+          <tr>
+            <td data-i18n="settings.lookup.AddData.label">Add Lookup Data to QSO Log Event</td>
             <td title="When finsihing a QSO...&#10;add extra data from Lookup service">
               <input type="checkbox" id="lookupMerge" onclick="changeLookupMerge(this)" />
             </td>
           </tr>
-        </table>
-      </div>
-      <div class="mapItem" id="lookupMissingGridDiv">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.lookup.AddGrid.label" align="center">Add Lookup Grid if QSO Grid missing</td>
-          </tr>
-          <tr align="center">
+          <tr id="lookupMissingGridTr" disabled="true">
+            <td data-i18n="settings.lookup.AddGrid.label">Add Lookup Grid if QSO Grid missing</td>
             <td title="Add Lookup Grid if QSO Grid Missing">
               <input type="checkbox" id="lookupMissingGrid" onclick="changeLookupMerge(this)" />
             </td>
           </tr>
-        </table>
-      </div>
-      <br />
-      <div class="mapItem">
-        <table align="center">
           <tr>
-            <td data-i18n="settings.lookup.OpenOnTx.label" align="center">Open Lookup On Transmit</td>
-          </tr>
-          <tr align="center">
+            <td data-i18n="settings.lookup.OpenOnTx.label">Open Lookup On Transmit</td>
             <td title="Open Lookup Window On Transmit">
               <input type="checkbox" id="lookupOnTx" onclick="changelookupOnTx()" />
             </td>
           </tr>
-        </table>
-      </div>
-      <div class="mapItem" id="lookupCloseLogDiv">
-        <table align="center">
           <tr>
-            <td data-i18n="settings.lookup.CloseOnLog.label" align="center">Close Lookup After Logging</td>
-          </tr>
-          <tr align="center">
+            <td data-i18n="settings.lookup.CloseOnLog.label">Close Lookup After Logging</td>
             <td title="Close Lookup Window After Logging">
               <input type="checkbox" id="lookupCloseLog" onclick="changelookupOnTx()" />
             </td>
           </tr>
-        </table>
-      </div>
-      <div class="mapItem" id="lookupCallookPreferredDiv">
-        <table align="center">
           <tr>
-            <td data-i18n="settings.lookup.CallookFirst.label" align="center">Use Callook before using other service
-            </td>
-          </tr>
-          <tr align="center">
+            <td data-i18n="settings.lookup.CallookFirst.label">Use Callook first</td>
             <td title="Use Callook before using other service. Free Callook yields more data than free QRZ.">
               <input type="checkbox" id="lookupCallookPreferred" onclick="lookupValueChanged()" />
             </td>
           </tr>
         </table>
       </div>
-      <br />
       <div id="callsignDatabaseDiv" class="mapItem">
         <table align="center" class="darkTable">
           <tr>
@@ -1118,31 +1263,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </tr>
             </table>
           </div>
-          <div id="featureControlDiv" class="mapItem">
-            <table align="center" class="darkTable">
-              <tr>
-                <th colspan="6" style="font-weight: bold; color: yellow">Feature Control</th>
-              </tr>
-              <tr>
-                <th>Feature</th>
-                <th>Enabled</th>
-              </tr>
-              <tr>
-                <td>POTA</td>
-                <td>
-                  <input type="checkbox" id="potaFeatureEnabled" onclick="changePotaEnable();" />
-                </td>
-
-              </tr>
-              <tr>
-                <td>Clear on CQ</td>
-                <td>
-                  <input type="checkbox" id="clearOnCQ" onclick="changeClearOnCQ();" />
-                </td>
-              </tr>
-
-        </table>
-      </div>
+   
     </div>
     <div id="SpeechSettingsDiv" class="settingsTabcontent">
       <div class="roundBorder" style="border: 1px solid #666; margin: 2px; padding: 5px">
@@ -1333,8 +1454,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
             <tr>
               <td id="workingDateTd" title="Date/Time is UTC">
-                <label data-i18n="settings.logbook.date.date" for="workingDateValue">Date</label> <input type="date" id="workingDateValue" value="1970-01-01" style="background-color: green; color: yellow;" onchange="workingDateChanged()" />
-                <label data-i18n="settings.logbook.date.time" for="workingTimeValue">Time</label> <input type="time" id="workingTimeValue" value="00:00" style="background-color: green; color: yellow;" onchange="workingDateChanged()" />
+                <label data-i18n="settings.logbook.date.date" for="workingDateValue">UTC</label> <input type="datetime-local" id="workingDateValue" value="1970-01-01" style="background-color: green; color: yellow;" onchange="workingDateChanged()" />
               </td>
             </tr>
           </table>
@@ -1490,19 +1610,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
       </div>
       <br />
-      <div class="mapItem">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.grids.spotsOverGrids.label" title="Place RX Spots over Grid Layer">PSK-Spots Over
-              Grids</td>
-          </tr>
-          <tr>
-            <td title="Place RX Spots over Grid Layer">
-              <input type="checkbox" id="spotMergeValue" onclick="changeSpotValues();redrawSpots();" />
-            </td>
-          </tr>
-        </table>
-      </div>
+
       <div class="mapItem">
         <table align="center">
           <tr>
@@ -2088,31 +2196,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td></td>
           </tr>
         </table>
-        <h2 data-i18n="settings.logging.other.title">Other Services</h2>
-        <table class="darkTable" align="center">
-          <tr>
-            <th data-i18n="settings.logging.otherheader.service">Service</th>
-            <th data-i18n="settings.logging.otherheader.active">Active?</th>
-            <th data-i18n="settings.logging.otherheader.details">Details</th>
-          </tr>
-          <tr>
-            <td data-i18n="settings.logging.pstrotator.label">CatRotator / PstRotator</td>
-            <td>
-              <input type="checkbox" checked="false" class="inputTextValue" id="pstrotatorCheckBox"
-                onclick=" ValidateIPaddress(pstrotatorIpInput, this); ValidatePort(pstrotatorPortInput, this, null ); pstrotatorServiceChanged(); " />
-            </td>
-            <td>
-              <label data-i18n="settings.logging.pstrotator.details.IP" for="pstrotatorIpInput">IP</label>
-              <input id="pstrotatorIpInput" type="text" class="inputTextValue" maxlength="15" size="11"
-                onkeypress='return validIpKeys(event.charCode);'
-                oninput="ValidateIPaddress(this, pstrotatorCheckBox); pstrotatorServiceChanged(); " />
-              <label data-i18n="settings.logging.pstrotator.details.Port" for="pstrotatorPortInput">UDP Port</label>
-              <input id="pstrotatorPortInput" type="text" class="inputTextValue" maxlength="5" size="5" onkeypress='return
-                  validNumberKeys(event.charCode);' oninput="ValidatePort(this, pstrotatorCheckBox, null );
-                  pstrotatorServiceChanged(); " />
-            </td>
-          </tr>
-        </table>
     </div>
     <div id="audioAlertsDiv" class="settingsTabcontent">
       <div id="alertMatrixDiv">
@@ -2391,222 +2474,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       </div>
       <br />
       <div id="alertListDiv" style="margin: 4px; padding: 4px"></div>
-      </div>
-    </div>
-    <div id="chatSettingsDiv" class="settingsTabcontent">
-      <div class="mapItem">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.OAMS.message.enable.label" title="hat Messaging">Chat Messaging</td>
-          </tr>
-          <tr>
-            <td>
-              <input title="Enable / Disable Messaging" type="checkbox" id="msgEnable" onclick="setMsgEnable(this);" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="mapItem">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.OAMS.spotting.enable.label"
-              title="Send and Recieve Spot Reports through the OAMS network">Spotting</td>
-          </tr>
-          <tr>
-            <td>
-              <input title="Enable / Disable Spotting" type="checkbox" id="GTspotEnable"
-                onclick="setGTspotEnable(this);" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="mapItem">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.OAMS.BandActivity.enable.label"
-              title="Receive Band Activity Reports through the OAMS network">Band Activity</td>
-          </tr>
-          <tr>
-            <td>
-              <input title="Enable / Disable Band Activity" type="checkbox" id="oamsBandActivity"
-                onclick="setOamsBandActivity(this);" />
-            </td>
-          </tr>
-        </table>
-        <div class="mapItem" id="bandActivityNeighborDiv">
-          <table align="center">
-            <tr>
-              <td data-i18n="settings.OAMS.BandActivity.neighbor.enable.label"
-                title="Include your 8 neighboring grids in report">Neighboring Grids</td>
-            </tr>
-            <tr>
-              <td>
-                <input title="Enable / Disable Neighbor Grids" type="checkbox" id="oamsBandActivityNeighbors"
-                  onclick="setOamsBandActivityNeighbors(this);" />
-              </td>
-            </tr>
-          </table>
-        </div>
-      </div>
-      <br />
-      <div id="msgSettingsDiv" class="mapItem" style="padding: 3px">
-      <div id="msgAlertSettingsDiv" class="mapItem" style="padding: 3px">
-        <div class="mapItem">
-          <table align="center">
-            <tr>
-              <td data-i18n="settings.OAMS.message.newAlert.label" title="New Chat Message Alert">New Chat Message Alert</td>
-            </tr>
-            <tr>
-              <td>
-                <select id="msgAlertSelect" name="msgAlertSelect" onchange="newMessageSetting(this); alertChatMessage();">
-                  <option data-i18n="settings.OAMS.message.newAlert.none" value="0">None</option>
-                  <option data-i18n="settings.OAMS.message.newAlert.textToSpeech" value="1">Text-to-Speech</option>
-                  <option data-i18n="settings.OAMS.message.newAlert.mediaFile" value="2">Media File</option>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <input id="msgAlertWord" type="text" class="inputTextValue" size="14"
-                  onkeyup="if (event.keyCode == 13) {newMessageSetting(this); alertChatMessage(); }"
-                  oninput="ValidateText(this);newMessageSetting(this);" />
-                <select id="msgAlertMedia" onchange="newMessageSetting(this); alertChatMessage();"></select>
-              </td>
-            </tr>
-          </table>
-        </div>
-        <div class="mapItem" id="msgFrequencySelectDiv">
-          <table align="center">
-            <tr>
-              <td data-i18n="settings.OAMS.message.newAlert.Frequency" title="New Message Alert Frequency">Alert
-                Frequency</td>
-            </tr>
-            <tr>
-              <td>
-                <select id="msgFrequencySelect" name="msgFrequencySelect" onchange="newMessageSetting(this);">
-                  <option data-i18n="settings.OAMS.message.newAlert.Once" value="0">Once</option>
-                  <option data-i18n="settings.OAMS.message.newAlert.1min" value="1">1 minute</option>
-                  <option data-i18n="settings.OAMS.message.newAlert.3min" value="3">3 minutes</option>
-                  <option data-i18n="settings.OAMS.message.newAlert.5min" value="5">5 minutes</option>
-                  <option data-i18n="settings.OAMS.message.newAlert.10min" value="10">10 minutes</option>
-                  <option data-i18n="settings.OAMS.message.newAlert.15min" value="15">15 minutes</option>
-                  <option data-i18n="settings.OAMS.message.newAlert.30min" value="30">30 minutes</option>
-                  <option data-i18n="settings.OAMS.message.newAlert.60min" value="60">1 hour</option>
-                </select>
-              </td>
-            </tr>
-          </table>
-        </div>
-        <div class="mapItem">
-          <table align="center">
-            <tr>
-              <td data-i18n="settings.OAMS.message.newAlert.Action" title="New Chat Message Action">New Chat Message Action</td>
-            </tr>
-            <tr>
-              <td>
-                <select id="msgActionSelect" name="msgActionSelect" onchange="newMessageSetting(this);">
-                  <option data-i18n="settings.OAMS.message.newAlert.Nothing" value="0">Do nothing</option>
-                  <option data-i18n="settings.OAMS.message.newAlert.OpenWindow" value="1">Open Messaging Window</option>
-                </select>
-              </td>
-            </tr>
-          </table>
-        </div>
-        </div>
-        <br/>
-        <div class="mapItem">
-          <table align="center">
-            <tr>
-              <td>
-                <label data-i18n="settings.OAMS.simplepush.enable.label" for="msgSimplepush" >
-                  Enable / Disable Simplepush Message forwarding</label>
-              </td>
-            </tr>
-            <tr><td><input title="Enable / Disable Simplepush" type="checkbox" id="msgSimplepush"
-              onclick="setOamsSimplepush(this);" /></td></tr>
-          </table>
-          <div class="mapItem" id="simplePushDiv">
-                <table>
-                  <tr>
-                    <td data-i18n="settings.OAMS.simplepush.apikey.label"
-                  title="SimplePush API Key to forward messages to your phone">SimplePush API Key</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <input title="SimplePush API Key to forward messages to your phone" type="text" id="msgSimplepushApiKey"
-                       class="inputTextValue" maxlength="255" size="16"
-                       oninput="ValidateText(this); newMessageSetting(this);" />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><input title="Enable / Disable Chat Message Forward" type="checkbox" id="msgSimplepushChat"
-                      onclick="setOamsSimplepushChat(this);" data-i18n="settings.OAMS.forward.chat" />Forward Chat Messages</td>
-                  </tr>
-                  <tr>
-                    <td><input title="Enable / Disable Roster Alert Forward" type="checkbox" id="msgSimplepushRoster"
-                      onclick="setOamsSimplepushRoster(this);" data-i18n="settings.OAMS.forward.roster" />Forward Roster Alerts</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div data-i18n="settings.OAMS.simplepush.test" class="button" onclick="sendSimplePushMessage({'call' : 'Test', 'msg' : 'Test Message'});">Test</div>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-        </div>
-        <div class="mapItem">
-          <table align="center">
-            <tr>
-              <td>
-                <label data-i18n="settings.OAMS.pushover.enable.label" for="msgPushover">
-                  Enable / Disable Pushover Message forwarding
-                </label>
-               </td>
-            </tr>
-            <tr><td><input title="Enable / Disable Pushover" type="checkbox" id="msgPushover"
-              onclick="setOamsPushover(this);" /></td></tr>
-              </table>
-             <div class="mapItem" id="pushOverDiv">
-              <table>
-            <tr>
-              <td data-i18n="settings.OAMS.pushover.credentials.label"
-                  title="Pushover Credentials to forward messages to your phone">Pushover Credentials</td>
-            </tr>
-            <tr>
-              <td>
-                <label data-i18n="settings.OAMS.pushover.userkey.label" for="msgPushoverUserKey">User Key</label>
-                <input title="Pushover User Key to forward messages to your phone" type="text" id="msgPushoverUserKey"
-                       class="inputTextValue" maxlength="255" size="16"
-                       oninput="ValidateText(this); newMessageSetting(this);" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label data-i18n="settings.OAMS.pushover.token.label" for="msgPushoverToken">API Token</label>
-                <input title="Pushover API Token to forward messages to your phone" type="text" id="msgPushoverToken"
-                       class="inputTextValue" maxlength="255" size="16"
-                       oninput="ValidateText(this); newMessageSetting(this);" />
-              </td>
-            </tr>
-            <tr>
-              <td><input title="Enable / Disable Chat Message Forward" type="checkbox" id="msgPushoverChat"
-                onclick="setOamsPushoverChat(this);" data-i18n="settings.OAMS.forward.chat" />Forward Chat Messages</td>
-            </tr>
-            <tr>
-              <td><input title="Enable / Disable Roster Alert Forward" type="checkbox" id="msgPushoverRoster"
-                onclick="setOamsPushoverRoster(this);" data-i18n="settings.OAMS.forward.roster" />Forward Roster Alerts</td>
-            </tr>
-            <tr>
-              <td>
-                <div data-i18n="settings.OAMS.pushover.test" class="button" onclick="sendPushOverMessage({'call' : 'Test', 'msg' : 'Test Message'}, true);">Test
-                </div>
-                <div id="pushOverTestResultsDiv"></div>
-              </td>
-            </tr>
-      
-          </table>
-          </div>
-        </div>
       </div>
     </div>
     <div id="aboutDiv" class="settingsTabcontent">

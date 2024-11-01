@@ -88,7 +88,7 @@ function gtConnectChat()
 
   GT.gtChatSocket.onmessage = function (evt)
   {
-    if (GT.settings.app.gtShareEnable == true)
+    if (GT.settings.app.offAirServicesEnable == true)
     {
       let jsmesg = false;
       try
@@ -221,7 +221,7 @@ function gtStatusCheck()
 
 function sendGtJson(json, isUUIDrequest = false)
 {
-  if (GT.settings.app.gtShareEnable == true && GT.gtChatSocket != null)
+  if (GT.settings.app.offAirServicesEnable == true && GT.gtChatSocket != null)
   {
     if (GT.gtChatSocket.readyState == WebSocket.OPEN && (isUUIDrequest || GT.gtUuidValid))
     {
@@ -251,8 +251,8 @@ function gtChatSendStatus()
   msg.mode = GT.settings.app.myMode;
   msg.band = GT.settings.app.myBand;
   msg.src = "GT";
-  msg.canmsg = GT.settings.app.gtMsgEnable;
-  msg.o = GT.settings.app.gtSpotEnable == true ? 1 : 0;
+  msg.canmsg = GT.settings.app.oamsMsgEnable;
+  msg.o = GT.settings.app.spottingEnable == true ? 1 : 0;
   msg = JSON.stringify(msg);
 
   if (msg != GT.lastGtStatus)
@@ -660,7 +660,7 @@ function PushoverReply(data, isTest)
 
 function gtChatMessage(jsmesg)
 {
-  if (GT.settings.app.gtMsgEnable == true)
+  if (GT.settings.app.oamsMsgEnable == true)
   {
     var cid = jsmesg.cid;
     jsmesg.when = Date.now();
@@ -692,8 +692,6 @@ function gtChatMessage(jsmesg)
         {
           sendPushOverMessage(jsmesg);
         }
-
-        alertChatMessage();
       }
     }
   }
@@ -754,7 +752,7 @@ GT.getEngineWasRunning = false;
 
 function gtChatStateMachine()
 {
-  if (GT.settings.app.gtShareEnable == true && GT.settings.map.offlineMode == false && GT.settings.app.myCall.length > 2 && GT.settings.app.myCall != "NOCALL")
+  if (GT.settings.app.offAirServicesEnable == true && GT.settings.map.offlineMode == false && GT.settings.app.myCall.length > 2 && GT.settings.app.myCall != "NOCALL")
   {
     var now = timeNowSec();
     GT.gtStateToFunction[GT.gtState]();
@@ -765,13 +763,6 @@ function gtChatStateMachine()
     }
     else msgImg.style.webkitFilter = "";
 
-    if (GT.settings.msg.msgFrequencySelect > 0 && Object.keys(GT.gtUnread).length > 0)
-    {
-      if (now - GT.lastChatMsgAlert > GT.settings.msg.msgFrequencySelect * 60)
-      {
-        alertChatMessage();
-      }
-    }
     GT.getEngineWasRunning = true;
   }
   else
@@ -885,7 +876,6 @@ function updateChatWindow(id = null)
 function newChatMessage(id, jsmesg)
 {
   var hasFocus = false;
-  if (GT.settings.msg.msgActionSelect == 1) showMessaging();
 
   if (GT.chatWindowInitialized)
   {
@@ -899,24 +889,7 @@ function newChatMessage(id, jsmesg)
   return hasFocus;
 }
 
-GT.lastChatMsgAlert = 0;
-
-function alertChatMessage()
-{
-  if (GT.settings.msg.msgAlertSelect == 1)
-  {
-    // Text to speech
-    speakAlertString(GT.settings.msg.msgAlertWord);
-  }
-  if (GT.settings.msg.msgAlertSelect == 2)
-  {
-    // Audible
-    playAlertMediaFile(GT.settings.msg.msgAlertMedia);
-  }
-  GT.lastChatMsgAlert = timeNowSec();
-}
-
 function oamsCanMsg()
 {
-  return (GT.settings.map.offlineMode == false && GT.settings.app.gtShareEnable == true && GT.settings.app.gtMsgEnable == true);
+  return (GT.settings.map.offlineMode == false && GT.settings.app.offAirServicesEnable == true && GT.settings.app.oamsMsgEnable == true);
 }

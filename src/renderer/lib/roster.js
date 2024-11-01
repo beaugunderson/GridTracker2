@@ -548,7 +548,7 @@ function updateAwardList(target = null)
     let allEndorse = false;
 
     let tooltip = CR.awards[award.sponsor].awards[award.name].tooltip + " (" + CR.awards[award.sponsor].sponsor + ")\n";
-    tooltip += toTitleCase(award.test.qsl_req) + " QSO\n";
+    tooltip += toTitleCase(award.test.look) + " QSO\n";
     for (const mode in award.comp.counts)
     {
       tooltip += mode + "\n";
@@ -1705,9 +1705,10 @@ function getTypeFromMode(mode)
   return "";
 }
 
-function testAward(awardName, obj, baseHash)
+function testAward(awardName, obj)
 {
-  if (
+
+   if (
     CR.awardTracker[awardName].test.dxcc &&
     CR.awardTracker[awardName].rule.dxcc.indexOf(obj.dxcc) == -1
   )
@@ -1749,6 +1750,10 @@ function testAward(awardName, obj, baseHash)
   )
   { return false; }
 
+  let baseHash = "";
+  if (CR.awardTracker[awardName].test.band) baseHash += obj.band;
+  if (CR.awardTracker[awardName].test.mode) baseHash += obj.mode;
+
   return CR.awardTypes[CR.awardTracker[awardName].rule.type].test(
     CR.awardTracker[awardName],
     obj,
@@ -1774,15 +1779,15 @@ function processAward(awardName)
 
   Index = mode.indexOf("Phone");
   if (Index > -1) mode.splice(Index, 1);
-
+ 
   test.mode = mode.length > 0;
   test.confirmed = "qsl_req" in CR.awards[CR.awardTracker[awardName].sponsor].awards[CR.awardTracker[awardName].name].rule ? CR.awards[CR.awardTracker[awardName].sponsor].awards[CR.awardTracker[awardName].name].rule.qsl_req == "confirmed" : CR.awards[CR.awardTracker[awardName].sponsor].qsl_req == "confirmed";
-  test.look = "confirmed";
-  test.qsl_req = "qsl_req" in CR.awards[CR.awardTracker[awardName].sponsor].awards[CR.awardTracker[awardName].name].rule ? CR.awards[CR.awardTracker[awardName].sponsor].awards[CR.awardTracker[awardName].name].rule.qsl_req : CR.awards[CR.awardTracker[awardName].sponsor].qsl_req;
+  test.look = "qsl_req" in CR.awards[CR.awardTracker[awardName].sponsor].awards[CR.awardTracker[awardName].name].rule ? CR.awards[CR.awardTracker[awardName].sponsor].awards[CR.awardTracker[awardName].name].rule.qsl_req : CR.awards[CR.awardTracker[awardName].sponsor].qsl_req;
   test.DEcall = "call" in award.rule;
   test.band = "band" in award.rule && award.rule.band.indexOf("Mixed") == -1;
   test.dxcc = "dxcc" in award.rule;
   test.cont = "cont" in award.rule;
+  test.grid = "grid" in award.rule;
   test.prop = "propMode" in award.rule;
   test.sat = "satName" in award.rule;
 
@@ -1795,6 +1800,8 @@ function processAward(awardName)
     if (test.confirmed && !obj.confirmed) continue;
 
     if (obj.dxcc < 1) continue;
+
+    if (test.grid && award.rule.grid.indexOf(obj.grid.substring(0, 4)) == -1) continue;
 
     if (test.dxcc && award.rule.dxcc.indexOf(obj.dxcc) == -1) continue;
 
@@ -2159,7 +2166,7 @@ function scoreAgrids(award, obj)
 {
   if (obj.grid && obj.grid.length > 0)
   {
-    let grid = obj.grid.substr(0, 4);
+    let grid = obj.grid.substring(0, 4);
 
     if (!(grid in award.stat)) award.stat[grid] = newAwardCountObject();
     return workAwardObject(
@@ -2175,14 +2182,11 @@ function scoreAgrids(award, obj)
 
 function testAgrids(award, obj, baseHash)
 {
-  if (obj.grid && obj.grid + baseHash in CR.tracker[award.test.look].grid)
-  {
-    return false;
-  }
-  if (!obj.grid || obj.grid.length == 0)
-  {
-    return false;
-  }
+  let grid = obj.grid;
+  if (!grid || grid.length == 0) return false;
+  if (award.rule.grid && award.rule.grid.indexOf(grid) == -1) return false;
+  if (grid + baseHash in CR.tracker[award.test.look].grid) return false;
+
   return true;
 }
 
@@ -2646,19 +2650,6 @@ function loadAwardJson()
         if (!("unique" in CR.awards[sp].awards[aw].rule))
         { CR.awards[sp].awards[aw].rule.unique = 1; }
 
-        if (CR.awards[sp].awards[aw].rule.band[0] == "Mixed")
-        {
-          CR.awards[sp].awards[aw].rule.band.shift();
-        }
-
-        if (CR.awards[sp].awards[aw].rule.band.length == 0)
-        {
-          CR.awards[sp].awards[aw].rule.band = [];
-          for (let key in CR.awards[sp].mixed)
-          {
-            CR.awards[sp].awards[aw].rule.band.push(CR.awards[sp].mixed[key]);
-          }
-        }
         if (
           CR.awards[sp].awards[aw].rule.endorse.length == 1 &&
           CR.awards[sp].awards[aw].rule.endorse[0] == "Mixed"
@@ -2790,10 +2781,7 @@ function singleCompile(award, obj)
     }
     for (let key in obj)
     {
-      if (
-        rule.mode[mode] in obj[key].bands &&
-        Object.keys(obj[key].bands[rule.mode[mode]]).length
-      )
+      if (rule.mode[mode] in obj[key].bands && Object.keys(obj[key].bands[rule.mode[mode]]).length)
       {
         comp.modes[rule.mode[mode]] += 1;
 
@@ -2814,9 +2802,7 @@ function singleCompile(award, obj)
     {
       comp.counts[mode][rule.count[cnts]] = {
         num: comp.modes[mode],
-        per: parseInt(
-          Math.min(100, (comp.modes[mode] / rule.count[cnts]) * 100.0)
-        )
+        per: parseInt(Math.min(100, (comp.modes[mode] / rule.count[cnts]) * 100.0))
       };
     }
 

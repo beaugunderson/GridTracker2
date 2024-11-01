@@ -112,7 +112,6 @@ const allowedWindows = {
   GridTracker2: {
     window: null,
     honorVisibility: true,
-    boundsUpdateTimer: null,
     tempBounds: {},
     options: { x: 0, y: 0, width: 860, height: 652, show: true, zoom: 0 },
     static: {
@@ -124,7 +123,6 @@ const allowedWindows = {
   gt_popup: {
     window: null,
     honorVisibility: false,
-    boundsUpdateTimer: null,
     tempBounds: {},
     options: { x: 5, y: 5, width: 200, height: 200, show: false, zoom: 0 },
     static: { minWidth: 100, minHeight: 50 },
@@ -132,7 +130,6 @@ const allowedWindows = {
   gt_stats: {
     window: null,
     honorVisibility: true,
-    boundsUpdateTimer: null,
     tempBounds: {},
     options: { x: 50, y: 50, width: 640, height: 480, show: false, zoom: 0 },
     static: {
@@ -144,7 +141,6 @@ const allowedWindows = {
   gt_lookup: {
     window: null,
     honorVisibility: true,
-    boundsUpdateTimer: null,
     tempBounds: {},
     options: { x: 75, y: 75, width: 680, height: 200, show: false, zoom: 0 },
     static: {
@@ -156,7 +152,6 @@ const allowedWindows = {
   gt_bandactivity: {
     window: null,
     honorVisibility: true,
-    boundsUpdateTimer: null,
     tempBounds: {},
     options: { x: 250, y: 250, width: 198, height: 52, show: false, zoom: 0 },
     static: { minWidth: 198, minHeight: 52, frame: false, alwaysOnTop: true, skipTaskbar: true },
@@ -164,7 +159,6 @@ const allowedWindows = {
   gt_alert: {
     window: null,
     honorVisibility: false,
-    boundsUpdateTimer: null,
     tempBounds: {},
     options: { x: 5, y: 5, width: 600, height: 52, show: false, zoom: 0 },
     static: { resizable: false, alwaysOnTop: true },
@@ -172,7 +166,6 @@ const allowedWindows = {
   gt_conditions: {
     window: null,
     honorVisibility: true,
-    boundsUpdateTimer: null,
     tempBounds: {},
     options: { x: 75, y: 75, width: 492, height: 308, show: false, zoom: 0 },
     static: {
@@ -184,7 +177,6 @@ const allowedWindows = {
   gt_chat: {
     window: null,
     honorVisibility: true,
-    boundsUpdateTimer: null,
     tempBounds: {},
     options: { x: 55, y: 55, width: 640, height: 300, show: false, zoom: 0 },
     static: { minWidth: 450, minHeight: 140 },
@@ -192,7 +184,6 @@ const allowedWindows = {
   gt_roster: {
     window: null,
     honorVisibility: true,
-    boundsUpdateTimer: null,
     tempBounds: {},
     options: { x: 15, y: 15, width: 760, height: 400, show: false, zoom: 0 },
     static: {
@@ -481,14 +472,20 @@ app.whenReady().then(() => {
           'loadZoom',
           allowedWindows[windowIdToAllowedWindows[window.id]].options.zoom,
         );
+
+        // Options are being applied as bounds to the window, but if there is a scaleFactor
+        // this call corrects the sizing
+        allowedWindows[windowIdToAllowedWindows[window.id]].window.setContentBounds(
+          allowedWindows[windowIdToAllowedWindows[window.id]].options
+        );
         // Save the current bounds
         allowedWindows[windowIdToAllowedWindows[window.id]].tempBounds =
-          allowedWindows[windowIdToAllowedWindows[window.id]].window.getBounds();
+          allowedWindows[windowIdToAllowedWindows[window.id]].window.getContentBounds();
       });
 
       window.on('close', (event) => {
         // save all window(s) and position(s)
-        let bounds = window.getBounds();
+        let bounds = window.getContentBounds();
         if (window.id != 1) {
           if (mainWindowClosing == false) {
             // save, but don't close
@@ -514,10 +511,6 @@ app.whenReady().then(() => {
             if (windowId != 1) {
               allowedWindows[windowIdToAllowedWindows[windowId]].window.close();
             }
-            if (allowedWindows[windowIdToAllowedWindows[windowId]].boundsUpdateTimer) {
-              timers.clearTimeout(allowedWindows[windowIdToAllowedWindows[windowId]].boundsUpdateTimer);
-              allowedWindows[windowIdToAllowedWindows[windowId]].boundsUpdateTimer = null;
-            }
           }
           // save!
           allowedWindows['GridTracker2'].options = {
@@ -528,29 +521,11 @@ app.whenReady().then(() => {
       });
 
       window.on('move', () => {
-        if (allowedWindows[windowIdToAllowedWindows[window.id]].boundsUpdateTimer != null) {
-          timers.clearTimeout(
-            allowedWindows[windowIdToAllowedWindows[window.id]].boundsUpdateTimer,
-          );
-        }
-        allowedWindows[windowIdToAllowedWindows[window.id]].boundsUpdateTimer = timers.setTimeout(
-          displayHandler.storeBounds,
-          2000,
-          windowIdToAllowedWindows[window.id],
-        );
+        displayHandler.storeBounds(windowIdToAllowedWindows[window.id]);
       });
 
       window.on('resize', () => {
-        if (allowedWindows[windowIdToAllowedWindows[window.id]].boundsUpdateTimer != null) {
-          timers.clearTimeout(
-            allowedWindows[windowIdToAllowedWindows[window.id]].boundsUpdateTimer,
-          );
-        }
-        allowedWindows[windowIdToAllowedWindows[window.id]].boundsUpdateTimer = timers.setTimeout(
-          displayHandler.storeBounds,
-          2000,
-          windowIdToAllowedWindows[window.id],
-        );
+          displayHandler.storeBounds(windowIdToAllowedWindows[window.id]);
       });
 
       remoteMain.enable(window.webContents);
@@ -600,7 +575,6 @@ const displayHandler = {
   initialScreenCount: 0,
   screenLost: false,
   onDisplayAdded: function () {
-    displayHandler.clearAllBoundsTimers();
     if (
       displayHandler.screenLost == true &&
       displayHandler.initialScreenCount == screen.getAllDisplays().length
@@ -608,27 +582,19 @@ const displayHandler = {
       // Lets restore the positions now
       for (let win in allowedWindows) {
         if (allowedWindows[win].window != null) {
-          allowedWindows[win].window.setBounds(allowedWindows[win].tempBounds);
+          allowedWindows[win].window.setContentBounds(allowedWindows[win].tempBounds);
         }
       }
       displayHandler.screenLost = false;
     }
   },
   onDisplayRemoved: function () {
-    displayHandler.clearAllBoundsTimers();
+
     if (displayHandler.initialScreenCount != screen.getAllDisplays().length) {
       displayHandler.screenLost = true;
     }
   },
-  clearAllBoundsTimers: function () {
-    for (let win in allowedWindows) {
-      if (allowedWindows[win].boundsUpdateTimer != null) {
-        timers.clearTimeout(allowedWindows[win].boundsUpdateTimer);
-        allowedWindows[win].boundsUpdateTimer = null;
-      }
-    }
-  },
   storeBounds: function (windowName) {
-    allowedWindows[windowName].tempBounds = allowedWindows[windowName].window.getBounds();
+    allowedWindows[windowName].tempBounds = allowedWindows[windowName].window.getContentBounds();
   },
 };

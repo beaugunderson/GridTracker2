@@ -408,9 +408,6 @@ GT.GraylineImageArray[1] = "img/shadow_off_32.png";
 GT.gtFlagImageArray = Array();
 GT.gtFlagImageArray[1] = "img/flag_on.png";
 GT.gtFlagImageArray[0] = "img/flag_off.png";
-GT.gtShareFlagImageArray = Array();
-GT.gtShareFlagImageArray[1] = "img/share-on.png";
-GT.gtShareFlagImageArray[0] = "img/share-off.png";
 GT.mapImageArray = Array();
 GT.mapImageArray[1] = "img/online_map.png";
 GT.mapImageArray[0] = "img/offline_map.png";
@@ -859,40 +856,27 @@ function toggleEarth()
   Grayline.style.display = (GT.useTransform) ? "none" : "";
 }
 
-function toggleOffline()
+
+
+function changeOffline()
 {
   if (GT.map == null) return;
 
   if (GT.onlineDisable == true) return;
 
-  if (GT.settings.map.offlineMode == true)
+  GT.settings.map.offlineMode = offlineModeEnable.checked;
+
+  if (GT.settings.map.offlineMode == false)
   {
-    GT.settings.map.offlineMode = false;
-    offlineImg.src = GT.mapImageArray[1];
     conditionsButton.style.display = "";
-    gtFlagButton.style.display = "";
-    gtShareButton.style.display = "";
     lookupButton.style.display = "";
-    buttonSpotsBoxDiv.style.display = "";
+
     donateButton.style.display = (GT.settings.app.myCall in GT.acknowledgedCalls) ? "none" : "";
     radarButton.style.display = "";
     mapSelect.style.display = "";
     mapNightSelect.style.display = "";
     offlineMapSelect.style.display = "none";
     offlineMapNightSelect.style.display = "none";
-    potaButton.style.display = (GT.settings.app.potaFeatureEnabled) ? "" : "none";
-
-    if (GT.settings.app.gtShareEnable == true)
-    {
-      gtFlagButton.style.display = "";
-      if (GT.settings.app.gtMsgEnable == true) { msgButton.style.display = ""; }
-      else msgButton.style.display = "none";
-    }
-    else
-    {
-      msgButton.style.display = "none";
-      gtFlagButton.style.display = "none";
-    }
 
     for (var key in GT.settings.adifLog.menu)
     {
@@ -908,48 +892,40 @@ function toggleOffline()
         document.getElementById(where).style.display = "none";
       }
     }
-    bandActivityDiv.style.display = "block";
     if (GT.lookupWindowInitialized == false)
     {
       openLookupWindow(false);
     }
-    openPskMqtt();
   }
   else
   {
     openLookupWindow(false);
 
-    GT.settings.map.offlineMode = true;
-    offlineImg.src = GT.mapImageArray[0];
     conditionsButton.style.display = "none";
     buttonPsk24CheckBoxDiv.style.display = "none";
     buttonQRZCheckBoxDiv.style.display = "none";
     buttonLOTWCheckBoxDiv.style.display = "none";
     buttonClubCheckBoxDiv.style.display = "none";
-    gtFlagButton.style.display = "none";
-    bandActivityDiv.style.display = "none";
-    gtShareButton.style.display = "none";
-    msgButton.style.display = "none";
-    donateButton.style.display = "none";
-    potaButton.style.display = "none";
-    buttonSpotsBoxDiv.style.display = "none";
+
     lookupButton.style.display = "none";
     radarButton.style.display = "none";
     mapSelect.style.display = "none";
     mapNightSelect.style.display = "none";
     offlineMapSelect.style.display = "";
     offlineMapNightSelect.style.display = "";
-    setGtShareButtons();
-    closePskMqtt();
+
   }
+  changePotaEnable();
   displayRadar();
   displayPredLayer();
-  updateSpotView();
+  updateSpottingViews();
+  updateOffAirServicesViews();
   loadMapSettings();
   changeMapValues();
   setVisualHunting();
   goProcessRoster();
 }
+
 
 // from GridTracker.html
 function ignoreMessagesToggle()
@@ -2302,7 +2278,7 @@ function setTrophyOverlay(which)
     mapLoseFocus();
   }
 
-  if (GT.settings.app.gtFlagImgSrc > 0 && GT.settings.app.gtShareEnable == true && GT.settings.map.offlineMode == false)
+  if (GT.settings.app.gtFlagImgSrc > 0 && GT.settings.app.offAirServicesEnable == true && GT.settings.map.offlineMode == false)
   {
     GT.layerVectors.gtflags.setVisible(true);
   }
@@ -2544,7 +2520,7 @@ function setTrophyOverlay(which)
     }
   }
 
-  updateSpotView(true);
+  updateSpottingViews();
 }
 
 function gridFeature(key, objectData, propname, fillColor, borderColor, borderWidth)
@@ -4045,12 +4021,11 @@ function clearQSOcallback(clearFiles, nextFunc)
 function clearLogFilesAndCounts()
 {
   tryToDeleteLog("LogbookOfTheWorld.adif");
+  tryToDeleteLog("LoTW_QSL.adif");
   tryToDeleteLog("qrz.adif");
   tryToDeleteLog("clublog.adif");
 
-  GT.settings.adifLog.lastFetch.lotw_qso = 0;
   GT.settings.adifLog.lastFetch.lotw_qsl = 0;
-  
 }
 
 function getCurrentBandModeHTML()
@@ -5564,7 +5539,7 @@ function handleWsjtxStatus(newMessage)
         setStatsDiv("decodeLastListDiv", worker);
         setStatsDivHeight("decodeLastListDiv", getStatsWindowHeight() + 26 + "px");
 
-        if (GT.settings.app.gtShareEnable == true && Object.keys(GT.spotCollector).length > 0)
+        if (GT.settings.app.offAirServicesEnable == true && Object.keys(GT.spotCollector).length > 0)
         {
           gtChatSendSpots(GT.spotCollector, GT.spotDetailsCollector);
           GT.spotCollector = {};
@@ -6088,7 +6063,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
         lastMessageWasInfo = true;
       }
 
-      if (GT.settings.app.gtSpotEnable == true && newMessage.OF > 0)
+      if (GT.settings.app.spottingEnable == true && newMessage.OF > 0)
       {
         let freq = callsign.delta + newMessage.OF;
         if (callsign.DEcall in GT.gtCallsigns)
@@ -6572,7 +6547,7 @@ function changeLookupMerge()
 {
   GT.settings.app.lookupMerge = lookupMerge.checked;
   GT.settings.app.lookupMissingGrid = lookupMissingGrid.checked;
-  lookupMissingGridDiv.style.display = GT.settings.app.lookupMerge ? "" : "none";
+  lookupMissingGridTr.style.display = GT.settings.app.lookupMerge ? "" : "none";
 }
 
 function changelookupOnTx()
@@ -9426,25 +9401,78 @@ function togglePushPinMode()
   redrawGrids();
 }
 
-function toggleGtShareEnable()
+function changeOffAirServicesEnable()
 {
-  if (GT.settings.app.gtShareEnable == true)
-  {
-    GT.settings.app.gtShareEnable = false;
-  }
-  else GT.settings.app.gtShareEnable = true;
+  GT.settings.app.offAirServicesEnable = offAirServicesEnable.checked;
+  updateOffAirServicesViews();
+}
 
-  setGtShareButtons();
+function updateOffAirServicesViews()
+{
+  offAirServicesTr.style.display = GT.settings.map.offlineMode == true ? "none" : "";
+  updateGTFlagViews();
+  setMsgSettingsView();
+  updateChatMessagingViews();
+  updateBandActivityViews();
+  updateSpottingViews();
   setVisualHunting();
   goProcessRoster();
 }
 
-function setGtShareButtons()
+function updateChatMessagingViews()
 {
-  if (GT.settings.app.gtShareEnable == true && GT.settings.map.offlineMode == false)
+  if (GT.settings.map.offlineMode == true || GT.settings.app.offAirServicesEnable == false)
   {
-    msgButton.style.display = GT.settings.app.gtMsgEnable ? "" : "none";
+    oamsMsgEnableTr.style.display = "none";
+  }
+  else
+  {
+    oamsMsgEnableTr.style.display = "";
+  }
 
+  if (GT.settings.map.offlineMode == true || GT.settings.app.offAirServicesEnable == false || GT.settings.app.oamsMsgEnable == false)
+  {
+    msgButton.style.display = "none";
+    showMessaging(false);
+  }
+  else
+  {
+    msgButton.style.display = "";
+  }
+}
+
+function updateBandActivityViews()
+{
+  if (GT.settings.map.offlineMode == true || GT.settings.app.offAirServicesEnable == false)
+  {
+    bandActivityEnableTr.style.display = "none";
+  }
+  else
+  {
+    bandActivityEnableTr.style.display = "";
+  }
+
+  if (GT.settings.map.offlineMode == true || GT.settings.app.offAirServicesEnable == false || GT.settings.app.oamsBandActivity == false )
+  {
+    GT.oamsBandActivityData = null;
+    bandActivityNeighborTr.style.display = "none";
+    bandActivityDiv.style.display = "none";
+    openBaWindow(false);
+  }
+  else
+  {
+    bandActivityNeighborTr.style.display = "";
+    bandActivityDiv.style.display = "";
+    oamsBandActivityCheck();
+  }
+
+  renderBandActivity();
+}
+
+function updateGTFlagViews()
+{
+  if (GT.settings.app.offAirServicesEnable == true && GT.settings.map.offlineMode == false)
+  {
     gtFlagButton.style.display = "";
     if (GT.settings.app.gtFlagImgSrc > 0)
     {
@@ -9457,11 +9485,8 @@ function setGtShareButtons()
   }
   else
   {
-    GT.oamsBandActivityData = null;
-    renderBandActivity();
-
-    msgButton.style.display = "none";
     gtFlagButton.style.display = "none";
+
     GT.layerVectors.gtflags.setVisible(false);
     clearGtFlags();
     // Clear list
@@ -9470,27 +9495,12 @@ function setGtShareButtons()
     GT.gtUnread = Object();
     GT.gtCallsigns = Object();
 
-
     conditionsButton.style.background = "";
     conditionsButton.innerHTML = "<img src=\"img/conditions.png\" class=\"buttonImg\" />";
 
-    if (GT.chatWindowInitialized)
-    {
-      try
-      {
-        showMessaging(false);
-        GT.chatWindowHandle.window.allCallDiv.innerHTML = "";
-        GT.chatWindowHandle.window.updateCount();
-      }
-      catch (e)
-      {
-        console.error(e);
-      }
-    }
-    goProcessRoster();
   }
 
-  gtShareFlagImg.src = GT.gtShareFlagImageArray[GT.settings.app.gtShareEnable == false ? 0 : 1];
+  offAirServicesEnable.checked = GT.settings.app.offAirServicesEnable;
 }
 
 function setMulticastIp()
@@ -9541,34 +9551,25 @@ function setUdpForwardEnable(checkbox)
   GT.settings.app.wsjtForwardUdpEnable = checkbox.checked;
 }
 
-function setGTspotEnable(checkbox)
+function setSpottingEnable()
 {
-  GT.settings.app.gtSpotEnable = checkbox.checked;
+  GT.settings.app.spottingEnable = spottingEnable.checked;
 
-  if (GT.settings.app.gtSpotEnable == false)
+  if (GT.settings.app.spottingEnable == false)
   {
     GT.spotCollector = {};
     GT.spotDetailsCollector = {};
     GT.decodeCollector = {};
   }
   GT.gtLiveStatusUpdate = true;
+  updateSpottingViews();
 }
 
 function setOamsBandActivity(checkbox)
 {
   GT.settings.app.oamsBandActivity = checkbox.checked;
+  updateBandActivityViews();
 
-  if (GT.settings.app.oamsBandActivity == false)
-  {
-    bandActivityNeighborDiv.style.display = "none";
-    GT.oamsBandActivityData = null;
-  }
-  else
-  {
-    bandActivityNeighborDiv.style.display = "";
-    oamsBandActivityCheck();
-  }
-  renderBandActivity();
 }
 
 function setOamsBandActivityNeighbors(checkbox)
@@ -9629,22 +9630,11 @@ function setOamsPushoverRoster(checkbox)
   }
 }
 
-function setMsgEnable(checkbox)
+function setMsgEnable()
 {
-  GT.settings.app.gtMsgEnable = checkbox.checked;
-  if (GT.settings.app.gtShareEnable == true)
-  {
-    if (GT.settings.app.gtMsgEnable == true) { msgButton.style.display = ""; }
-    else
-    {
-      msgButton.style.display = "none";
-      if (GT.chatWindowInitialized)
-      {
-        showMessaging(false);
-      }
-    }
-  }
+  GT.settings.app.oamsMsgEnable = oamsMsgEnable.checked;
   GT.gtLiveStatusUpdate = true;
+  updateChatMessagingViews();
   setMsgSettingsView();
   setVisualHunting();
   goProcessRoster();
@@ -9683,6 +9673,8 @@ function downloadAcknowledgements()
 
 function renderBandActivity()
 {
+  if (GT.settings.app.oamsBandActivity == false) return;
+
   var buffer = "";
   if (typeof GT.settings.bandActivity.lines[GT.settings.app.myMode] != "undefined" || GT.oamsBandActivityData != null)
   {
@@ -9719,7 +9711,7 @@ function renderBandActivity()
       }
     }
 
-    if (GT.settings.app.gtShareEnable == true && GT.settings.app.oamsBandActivity == true && GT.oamsBandActivityData)
+    if (GT.settings.app.offAirServicesEnable == true && GT.settings.app.oamsBandActivity == true && GT.oamsBandActivityData)
     {
       for (const grid in GT.oamsBandActivityData)
       {
@@ -9762,7 +9754,7 @@ function renderBandActivity()
       let title;
       let blueBarValue;
 
-      if (GT.settings.app.gtShareEnable == true && GT.settings.app.oamsBandActivity == true)
+      if (GT.settings.app.offAirServicesEnable == true && GT.settings.app.oamsBandActivity == true)
       {
         title = "OAMS\n";
         title += "\tScore: " + bandData[band].oamsScore + "\n\tDecodes: " + bandData[band].oamsDecodes + "\n\tTX-Spots: " + bandData[band].oamsTxSpots + "\n\tRX-Spots: " + bandData[band].oamsRxSpots + "\n\tTx: " + bandData[band].oamsTx + "\tRx: " + bandData[band].oamsRx;
@@ -9817,7 +9809,8 @@ function pskBandActivityCallback(buffer, flag)
 */
 function pskGetBandActivity()
 {
-  if (GT.settings.map.offlineMode == true) return;
+  if (GT.settings.map.offlineMode == true || GT.settings.map.offAirServicesEnable == false || GT.settings.map.oamsBandActivity == false) return;
+  
   if (typeof GT.settings.bandActivity.lastUpdate[GT.settings.app.myMode] == "undefined")
   {
     GT.settings.bandActivity.lastUpdate[GT.settings.app.myMode] = 0;
@@ -10409,16 +10402,14 @@ function workingDateEnableChanged(ele)
 
 function workingDateChanged()
 {
-  if (workingTimeValue.value.length == 0)
-  {
-    workingTimeValue.value = "00:00";
-  }
+  // Date.parse(watcherEndDate.value + "Z");
+
   if (workingDateValue.value.length == 0)
   {
-    workingDateValue.value = "1970-01-01";
+    workingDateValue.value = "1970-01-01T00:00";
   }
 
-  if (workingTimeValue.value == "00:00" && workingDateValue.value == "1970-01-01")
+  if (workingDateValue.value == "1970-01-01T00:00")
   {
     workingDateEnableTd.style.display = "none";
     workingDateEnable.checked = GT.settings.app.workingDateEnable = false;
@@ -10428,18 +10419,8 @@ function workingDateChanged()
     workingDateEnableTd.style.display = "";
   }
 
-  var fields = workingDateValue.value.split("-");
-  var time = workingTimeValue.value.split(":");
+  GT.settings.app.workingDate = parseInt(Date.parse(workingDateValue.value + "Z") / 1000);
 
-  GT.settings.app.workingDate =
-    Date.UTC(
-      parseInt(fields[0]),
-      parseInt(fields[1]) - 1,
-      parseInt(fields[2]),
-      parseInt(time[0]),
-      parseInt(time[1]),
-      0
-    ) / 1000;
   displayWorkingDate();
 
   applyCallsignsAndDateDiv.style.display = "";
@@ -10448,8 +10429,7 @@ function workingDateChanged()
 function displayWorkingDate()
 {
   var date = new Date(GT.settings.app.workingDate * 1000);
-  workingDateValue.value = date.getUTCFullYear() + "-" + ("0" + ((date.getUTCMonth() + 1))).slice(-2) + "-" + ("0" + date.getUTCDate()).slice(-2);
-  workingTimeValue.value = ("0" + date.getUTCHours()).slice(-2) + ":" + ("0" + date.getUTCMinutes()).slice(-2);
+  workingDateValue.value = date.toISOString().slice(0, 16);
   workingDateString.innerHTML = dateToString(date);
 }
 
@@ -10673,7 +10653,6 @@ function loadMaidenHeadData()
         GT.us48Data[sqr].worked_modes = {};
         GT.us48Data[sqr].confirmed_modes = {};
       }
-      delete GT.dxccInfo[key].mh;
     }
   }
 
@@ -11064,22 +11043,24 @@ function getBuffer(file_url, callback, flag, mode, port, cache = null)
     port: port,
     followAllRedirects: true,
     path: NodeURL.parse(file_url).path, // eslint-disable-line node/no-deprecated-api
-    headers: { "User-Agent": gtUserAgent, "x-user-agent": gtUserAgent }
+    headers: { "User-Agent": gtUserAgent, "x-user-agent": gtUserAgent, 'Accept-Encoding': 'gzip' },
   };
 
   http.get(options, function (res)
   {
-    // var fsize = res.headers["content-length"];
-    var cookies = null;
-    if (typeof res.headers["set-cookie"] != "undefined") { cookies = res.headers["set-cookie"]; }
-    res
-      .on("data", function (data)
+    const encoding = res.headers['content-encoding'];
+    res.on("data", function (data)
       {
-        if (fileBuffer == null) fileBuffer = data;
-        else fileBuffer += data;
+        if (fileBuffer == null) fileBuffer = Buffer.from(data);
+        else fileBuffer = Buffer.concat([fileBuffer, data]);
       })
       .on("end", function ()
       {
+        if (encoding === 'gzip')
+        {
+          const zlib = require('zlib');
+          fileBuffer =  zlib.gunzipSync(fileBuffer);
+        }
         if (typeof callback == "function")
         {
           // Call it, since we have confirmed it is callable
@@ -11209,7 +11190,7 @@ function loadMapSettings()
   mouseOverValue.checked = GT.settings.map.mouseOver;
   mergeOverlayValue.checked = GT.settings.map.mergeOverlay;
 
-  offlineImg.src = GT.mapImageArray[GT.settings.map.offlineMode ? 0 : 1];
+  offlineModeEnable.checked = GT.settings.map.offlineMode;
 
   mapSelect.value = GT.settings.map.mapIndex;
   mapNightSelect.value = GT.settings.map.nightMapIndex;
@@ -11344,7 +11325,7 @@ function changeMapValues()
 {
   GT.settings.map.mapOpacity = brightnessValue.value;
   GT.settings.map.mapIndex = mapSelect.value;
-  if (GT.settings.app.gtFlagImgSrc > 0 && GT.settings.map.offlineMode == false && GT.settings.app.gtShareEnable == true)
+  if (GT.settings.app.gtFlagImgSrc > 0 && GT.settings.map.offlineMode == false && GT.settings.app.offAirServicesEnable == true)
   {
     GT.layerVectors.gtflags.setVisible(true);
   }
@@ -11684,7 +11665,7 @@ function loadViewSettings()
 
   clearOnCQ.checked = GT.settings.app.clearOnCQ;
 
-  lookupMissingGridDiv.style.display = GT.settings.app.lookupMerge ? "" : "none";
+  lookupMissingGridTr.style.display = GT.settings.app.lookupMerge ? "" : "none";
   spotPathWidthDiv.style.display = GT.settings.reception.viewPaths ? "" : "none";
   gridModeDiv.style.display = GT.pushPinMode ? "" : "none";
 
@@ -11694,8 +11675,8 @@ function loadViewSettings()
 
 function loadMsgSettings()
 {
-  msgEnable.checked = GT.settings.app.gtMsgEnable;
-  GTspotEnable.checked = GT.settings.app.gtSpotEnable;
+  oamsMsgEnable.checked = GT.settings.app.oamsMsgEnable;
+  spottingEnable.checked = GT.settings.app.spottingEnable;
 
   oamsBandActivity.checked = GT.settings.app.oamsBandActivity;
   oamsBandActivityNeighbors.checked = GT.settings.app.oamsBandActivityNeighbors;
@@ -11728,32 +11709,11 @@ function loadMsgSettings()
 
 function setMsgSettingsView()
 {
-  msgSettingsDiv.style.display = msgEnable.checked ? "" : "none";
+  simplepushMsgEnableTr.style.display = (GT.settings.map.offlineMode == false) ? "" : "none";
+  pushoverMsgEnableTr.style.display = (GT.settings.map.offlineMode == false) ? "" : "none";
 
-  if (GT.settings.msg.msgAlertSelect > 0)
-  {
-    msgFrequencySelectDiv.style.display = "";
-    if (GT.settings.msg.msgAlertSelect == 1)
-    {
-      msgAlertWord.style.display = "";
-      msgAlertMedia.style.display = "none";
-      ValidateText(msgAlertWord);
-    }
-    if (GT.settings.msg.msgAlertSelect == 2)
-    {
-      msgAlertWord.style.display = "none";
-      msgAlertMedia.style.display = "";
-    }
-  }
-  else
-  {
-    msgFrequencySelectDiv.style.display = "none";
-    msgAlertWord.style.display = "none";
-    msgAlertMedia.style.display = "none";
-  }
-
-  simplePushDiv.style.display = GT.settings.msg.msgSimplepush ? "" : "none";
-  pushOverDiv.style.display = GT.settings.msg.msgPushover ? "" : "none";
+  simplePushDiv.style.display = (GT.settings.msg.msgSimplepush && GT.settings.map.offlineMode == false) ? "" : "none";
+  pushOverDiv.style.display = (GT.settings.msg.msgPushover && GT.settings.map.offlineMode == false) ? "" : "none";
 
   ValidateText(msgSimplepushApiKey);
   ValidateText(msgPushoverUserKey);
@@ -11918,7 +11878,7 @@ function startupButtonsAndInputs()
     gtGridViewMode.value = GT.settings.app.gridViewMode;
     graylineImg.src = GT.GraylineImageArray[GT.settings.app.graylineImgSrc];
     gtFlagImg.src = GT.gtFlagImageArray[GT.settings.app.gtFlagImgSrc % 2];
-    gtShareFlagImg.src = GT.gtShareFlagImageArray[GT.settings.app.gtShareEnable == false ? 0 : 1];
+    offAirServicesEnable.checked = GT.settings.app.offAirServicesEnable;
 
     alertMuteImg.src = GT.alertImageArray[GT.settings.audio.alertMute];
     modeImg.src = GT.maidenheadModeImageArray[GT.settings.app.sixWideMode];
@@ -11937,17 +11897,14 @@ function startupButtonsAndInputs()
       buttonQRZCheckBoxDiv.style.display = "none";
       buttonLOTWCheckBoxDiv.style.display = "none";
       buttonClubCheckBoxDiv.style.display = "none";
-      gtFlagButton.style.display = "none";
-      gtShareButton.style.display = "none";
-      msgButton.style.display = "none";
+
       donateButton.style.display = "none";
-      bandActivityDiv.style.display = "none";
-      buttonSpotsBoxDiv.style.display = "none";
       potaButton.style.display = "none";
       lookupButton.style.display = "none";
       radarButton.style.display = "none";
       mapSelect.style.display = "none";
       mapNightSelect.style.display = "none";
+
     }
     else
     {
@@ -11955,7 +11912,7 @@ function startupButtonsAndInputs()
       offlineMapNightSelect.style.display = "none";
     }
 
-    setGtShareButtons();
+    updateOffAirServicesViews();
   }
   catch (e)
   {
@@ -12054,7 +12011,6 @@ function postInit()
   nodeTimers.setTimeout(checkForNewVersion, 60000); // Informative check
 
   GT.finishedLoading = true;
-
 }
 
 function checkForNewVersion()
@@ -14043,12 +13999,12 @@ function startGenMessages(call, grid, instance = null)
 
 function mediaCheck()
 {
-  GT.LoTWLogFile = path.join(GT.appData, "LogbookOfTheWorld.adif");
+  GT.LoTWLogFile = path.join(GT.appData, "LoTW_QSL.adif");
   GT.QrzLogFile = path.join(GT.appData, "qrz.adif");
   GT.clublogLogFile = path.join(GT.appData, "clublog.adif");
 
   logEventMedia.appendChild(newOption("none", "None"));
-  msgAlertMedia.appendChild(newOption("none", "Select File"));
+
   alertMediaSelect.appendChild(newOption("none", "Select File"));
 
   GT.mediaFiles = fs.readdirSync(GT.gtMediaDir);
@@ -14058,7 +14014,7 @@ function mediaCheck()
     let noExt = path.parse(filename).name;
     logEventMedia.appendChild(newOption(filename, noExt));
     alertMediaSelect.appendChild(newOption(filename, noExt));
-    msgAlertMedia.appendChild(newOption(filename, noExt));
+
   });
 
   GT.modes = requireJson("data/modes.json");
@@ -14364,7 +14320,6 @@ function changeSpotValues()
   GT.settings.reception.mergeSpots = spotMergeValue.checked;
 
   setTrophyOverlay(GT.currentOverlay);
-  updateSpotView();
   if (GT.rosterSpot) goProcessRoster();
 }
 
@@ -14480,7 +14435,6 @@ function cycleSpotsView()
   setSpotImage();
 
   setTrophyOverlay(GT.currentOverlay);
-  updateSpotView();
 }
 
 function toggleCRScript()
@@ -14498,9 +14452,36 @@ function toggleCRScript()
   goProcessRoster();
 }
 
-function updateSpotView(leaveCount = true)
+function updateSpottingViews()
 {
-  if (GT.spotView > 0 && GT.settings.map.offlineMode == false)
+  if (GT.settings.app.offAirServicesEnable == false || GT.settings.map.offlineMode == true)
+  {
+    spottingEnableTr.style.display = "none";
+  }
+  else
+  {
+    spottingEnableTr.style.display = "";
+  }
+
+  if (GT.settings.app.spottingEnable == false || GT.settings.app.offAirServicesEnable == false || GT.settings.map.offlineMode == true)
+  {
+    GT.layerVectors.pskSpots.setVisible(false);
+    GT.layerVectors.pskFlights.setVisible(false);
+    GT.layerVectors.pskHop.setVisible(false);
+    GT.layerVectors.pskHeat.setVisible(false);
+    spotsDiv.style.display = "none";
+    spotMergeTr.style.display = "none";
+    buttonSpotsBoxDiv.style.display = "none";
+    openPskMqtt();
+    return;
+  }
+  else
+  {
+    buttonSpotsBoxDiv.style.display = "";
+    spotMergeTr.style.display = "";
+  }
+
+  if (GT.spotView > 0)
   {
     if (GT.settings.reception.mergeSpots == false)
     {
@@ -14532,6 +14513,7 @@ function updateSpotView(leaveCount = true)
     GT.layerVectors.pskFlights.setVisible(false);
     GT.layerVectors.pskHop.setVisible(false);
     GT.layerVectors.pskHeat.setVisible(false);
+
     spotsDiv.style.display = "none";
   }
 
@@ -14777,7 +14759,6 @@ function createFileSelectorHandlers()
       
       const pickerOptions = {
         suggestedName: "GridTracker2 Settings.json",
-        startIn: "desktop",
         types: [
           {
             description: "GridTracker2 Settings",
@@ -14811,7 +14792,6 @@ function createFileSelectorHandlers()
             },
           },
         ],
-        startIn: "desktop",
         excludeAcceptAllOption: true,
         multiple: false,
       };

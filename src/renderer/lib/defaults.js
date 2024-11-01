@@ -33,6 +33,16 @@ const validSettings = [
   "defaultsApplied"
 ];
 
+const def_legendColors = {
+  QSO: "#EEEE00",
+  QSL: "#EE0000",
+  QSX: "#1111EE",
+  CQ: "#00FF00",
+  CQDX: "#00FFFF",
+  QRZ: "#FFFF00",
+  QTH: "#FFA600"
+};
+
 const def_settings = {
   defaultsApplied: true,
   app: {
@@ -47,9 +57,9 @@ const def_settings = {
     gtFlagImgSrc: 0,
     gtModeFilter: "",
     gtPropFilter: "mixed",
-    gtMsgEnable: true,
-    gtShareEnable: true,
-    gtSpotEnable: true,
+    oamsMsgEnable: true,
+    offAirServicesEnable: true,
+    spottingEnable: true,
     loadAdifAtStartup: false,
     locale: "en",
     lookupLoginCq: "",
@@ -77,7 +87,7 @@ const def_settings = {
     oamsBandActivity: true,
     oamsBandActivityNeighbors: false,
     pathWidthWeight: 1.0,
-    potaFeatureEnabled: true,
+    potaFeatureEnabled: false,
     potaMapEnabled: false,
     pushPinMode: false,
     qrzPathWidthWeight: 1.2,
@@ -197,16 +207,10 @@ const def_settings = {
       HamCQApiKey: ""
     },
     lastFetch: {
-      lotw_qso: 0,
       lotw_qsl: 0
     }
   },
   msg: {
-    msgAlertSelect: 1,
-    msgAlertWord: "New chat message",
-    msgAlertMedia: "none",
-    msgFrequencySelect: 0,
-    msgActionSelect: 1,
     msgSimplepush: false,
     msgSimplepushApiKey: "",
     msgSimplepushChat: true,
@@ -503,41 +507,6 @@ const def_settings = {
     compactEntity: "DXCC",
     watchers: {}
   }
-};
-
-const def_qso = {
-  band: "",
-  cnty: null,
-  confirmed: false,
-  confSrcs: {},
-  cont: null,
-  cqz: "",
-  DEcall: "",
-  delta: -1,
-  digital: false,
-  DXcall: "",
-  dxcc: -1,
-  grid: "",
-  IOTA: "",
-  ituz: "",
-  mode: "",
-  msg: "-",
-  phone: false,
-  pota: null,
-  propMode: "",
-  px: null,
-  qso: true,
-  qual: false,
-  RSTrecv: "",
-  RSTsent: "",
-  satName: "",
-  state: null,
-  time: 0,
-  vucc_grids: [],
-  worked: false,
-  zipcode: null,
-  zone: null,
-  hash: null
 };
 
 const def_mapMemory = {

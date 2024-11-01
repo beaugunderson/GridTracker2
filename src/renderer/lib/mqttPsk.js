@@ -12,7 +12,7 @@ function openPskMqtt()
         GT.pskCloseTimer = null;
     }
 
-    if (GT.spotView == 0)
+    if (GT.spotView == 0 || GT.settings.app.spottingEnable == false)
     {
         GT.pskCloseTimer = nodeTimers.setTimeout(closePskMqtt, 60000);
         return;

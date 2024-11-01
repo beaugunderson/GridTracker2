@@ -95,7 +95,9 @@ function initPota()
   GT.layerSources.pota.clear();
   GT.pota.mapParks = {};
   
-  if (GT.settings.app.potaFeatureEnabled)
+  potaHuntingTr.style.display = GT.settings.map.offlineMode ? "none" : "";
+  
+  if (GT.settings.app.potaFeatureEnabled && GT.settings.map.offlineMode == false)
   {
     getPotaParks();
   }
@@ -103,9 +105,11 @@ function initPota()
 
 function changePotaEnable()
 {
-  GT.settings.app.potaFeatureEnabled = potaFeatureEnabled.checked == true;
+  potaHuntingTr.style.display = GT.settings.map.offlineMode ? "none" : "";
+  
+  GT.settings.app.potaFeatureEnabled = potaFeatureEnabled.checked;
   potaButton.style.display = (GT.settings.app.potaFeatureEnabled && GT.settings.map.offlineMode == false) ? "" : "none";
-  if (!GT.settings.app.potaFeatureEnabled)
+  if (!GT.settings.app.potaFeatureEnabled || GT.settings.map.offlineMode == true)
   {
     GT.layerSources.pota.clear();
   }

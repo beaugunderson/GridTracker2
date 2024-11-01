@@ -197,19 +197,18 @@ function lotwDownload(fromSettings)
   );
 }
 
-function processLotwCallsigns(result, flag)
+function processLotwCallsigns(buffer, flag)
 {
-  // var result = String(buffer);
-  var lines = Array();
-  lines = result.split("\n");
+  let result = String(buffer);
+  let lines = result.split("\n");
 
-  var lotwCallsigns = Object();
+  let lotwCallsigns = Object();
   for (x in lines)
   {
-    var breakout = lines[x].split(",");
+    let breakout = lines[x].split(",");
     if (breakout.length == 3)
     {
-      var dateTime = new Date(
+      let dateTime = new Date(
         Date.UTC(
           breakout[1].substr(0, 4),
           parseInt(breakout[1].substr(5, 2)) - 1,
@@ -226,10 +225,10 @@ function processLotwCallsigns(result, flag)
   GT.settings.callsignLookups.lotwLastUpdate = timeNowSec();
   
 
-  var now = timeNowSec();
+  let now = timeNowSec();
   if (GT.lotwLoadTimer != null) nodeTimers.clearTimeout(GT.lotwLoadTimer);
 
-  var lotwWhenTimer = 86400 * 7 - (now - GT.settings.callsignLookups.lotwLastUpdate);
+  let lotwWhenTimer = 86400 * 7 - (now - GT.settings.callsignLookups.lotwLastUpdate);
   GT.lotwWhenDate = now + lotwWhenTimer;
   GT.lotwLoadTimer = nodeTimers.setTimeout(lotwDownload, lotwWhenTimer * 1000);
 
@@ -244,12 +243,12 @@ function processLotwCallsigns(result, flag)
 
 function cacLoadCallsigns()
 {
-  var now = timeNowSec();
+  let now = timeNowSec();
   if (now - GT.settings.callsignLookups.cacLastUpdate > 86400 * 7)
   { GT.settings.callsignLookups.cacLastUpdate = 0; }
   else
   {
-    var cacWhenTimer = 86400 * 7 - (now - GT.settings.callsignLookups.cacLastUpdate);
+    let cacWhenTimer = 86400 * 7 - (now - GT.settings.callsignLookups.cacLastUpdate);
     GT.cacWhenDate = now + cacWhenTimer;
     GT.cacLoadTimer = nodeTimers.setTimeout(cacDownload, cacWhenTimer * 1000);
   }
@@ -808,7 +807,6 @@ function ulsDownloadHandler(data)
 
   GT.settings.callsignLookups.ulsLastUpdate = timeNowSec();
   
-
   loadULSFile();
 }
 

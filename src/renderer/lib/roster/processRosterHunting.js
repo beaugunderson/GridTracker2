@@ -206,7 +206,7 @@ function processRosterHunting(callRoster, rosterSettings)
           {
             let hash = CR.dayAsString + "." + callsign + "." + callObj.pota + "." + callObj.band + callObj.mode;
             // POTA is only in the worked list
-            if ((hash in CR.tracker.worked.pota))
+            if (hash in CR.tracker.worked.pota)
             {
               entry.tx = false;
               continue;             

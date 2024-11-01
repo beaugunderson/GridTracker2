@@ -86,7 +86,7 @@ function onAdiLoadComplete(rawAdiBuffer, nextFunc = null, liveLog = false)
   var task = {};
   task.type = "parse";
   task.appSettings = GT.settings.app;
-  task.lotw_qso = GT.settings.adifLog.lastFetch.lotw_qso;
+
   task.lotw_qsl = GT.settings.adifLog.lastFetch.lotw_qsl;
   task.liveLog = liveLog;
 
@@ -163,9 +163,7 @@ function adifParseComplete(task)
 
   if (task.lotwTimestampUpdated == true)
   {
-    GT.settings.adifLog.lastFetch.lotw_qso = parseInt(Math.max(task.lotw_qso, GT.settings.adifLog.lastFetch.lotw_qso));
     GT.settings.adifLog.lastFetch.lotw_qsl = parseInt(Math.max(task.lotw_qsl, GT.settings.adifLog.lastFetch.lotw_qsl));
-    
   }
 
   stateCheck();
@@ -291,14 +289,10 @@ function lotwCallback(buffer, flag, cookies, url)
     else
     {
       var shouldAppend = true;
-      var adiFileName = "LogbookOfTheWorld.adif";
+      var adiFileName = "LoTW_QSL.adif";
       var eorRegEx = new RegExp("<EOR>", "i");
       var nextFunc = null;
 
-      if (url.indexOf("qso_qsl=no") != -1)
-      {
-        nextFunc = "grabLoTWQSL";
-      }
       // don't write just an empty <EOH> only result
       if (rawAdiBuffer.search(eorRegEx) > 0)
       {
@@ -361,33 +355,6 @@ function grabLOtWLog(test)
   }
 }
 
-function grabLoTWQSO()
-{
-  var qsoDate = new Date(GT.settings.adifLog.lastFetch.lotw_qso);
-  var qsoDateAsString = getUTCStringForLoTW(qsoDate);
-
-  if (GT.isGettingLOTW == false)
-  {
-    // Fetch QSOs
-    lastQSLDateString = "&qso_qsorxsince=" + qsoDateAsString;
-    getABuffer(
-      "https://lotw.arrl.org/lotwuser/lotwreport.adi?login=" +
-      lotwLogin.value +
-      "&password=" +
-      encodeURIComponent(lotwPassword.value) +
-      ((GT.settings.app.workingGridEnable == true) ? "&qso_mydetail=yes" : "") +
-      "&qso_query=1&qso_qsl=no&qso_qsldetail=yes&qso_withown=yes" +
-      lastQSLDateString,
-      lotwCallback,
-      false,
-      "https",
-      443,
-      lotwLogImg,
-      "GT.isGettingLOTW",
-      120000
-    );
-  }
-}
 
 function grabLoTWQSL()
 {
@@ -431,8 +398,8 @@ function qrzCallback(buffer, flag)
     }
     else
     {
-      var htmlString = String(buffer).replace(/&lt;/g, "<").replace(/&gt;/g, ">");
-    
+      let htmlString = buffer.toString().replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+
       tryToWriteAdifToDocFolder("qrz.adif", htmlString);
 
       onAdiLoadComplete(htmlString);
@@ -784,16 +751,14 @@ function loadLoTWLogFile()
   {
     if (GT.settings.app.workingDateEnable == true && GT.settings.app.workingDate > 0)
     {
-      GT.settings.adifLog.lastFetch.lotw_qso = GT.settings.app.workingDate * 1000;
       GT.settings.adifLog.lastFetch.lotw_qsl = GT.settings.app.workingDate * 1000;
     }
     else
     {
       // We have no history, so our dates are not valid any more
-      GT.settings.adifLog.lastFetch.lotw_qso = 0;
       GT.settings.adifLog.lastFetch.lotw_qsl = 0;
     }
-    grabLoTWQSO();
+    grabLoTWQSL();
   }
 }
 
@@ -1004,7 +969,7 @@ function handleAdifLoad(err, data)
 
 function handleAdifLoadLocalLoTW(err, data)
 {
-  onAdiLoadComplete(data, "grabLoTWQSO");
+  onAdiLoadComplete(data, "grabLoTWQSL");
   if (err)
   {
     console.log("File Read Error: " + err);
@@ -1116,25 +1081,29 @@ function startupAdifLoadCheck()
 
   if (GT.settings.map.offlineMode == false)
   {
-    if (loadLOTWCheckBox.checked == true) grabLOtWLog(false);
+    if (loadClubCheckBox.checked == true) grabClubLog(false);
 
     if (loadQRZCheckBox.checked == true) grabQrzComLog(false);
 
-    if (loadClubCheckBox.checked == true) grabClubLog(false);
+    if (loadLOTWCheckBox.checked == true) grabLOtWLog(false);
   }
 }
 
 function getABuffer(file_url, callback, flag, mode, port, imgToGray, stringOfFlag, timeoutX)
 {
-  var http = require(mode);
-  var fileBuffer = null;
-  var options = null;
-
-  options = {
+  const http = require(mode);
+  let fileBuffer = null;
+  let options = {
     host: NodeURL.parse(file_url).host, // eslint-disable-line node/no-deprecated-api
     port: port,
     path: NodeURL.parse(file_url).path, // eslint-disable-line node/no-deprecated-api
-    method: "get"
+    method: "get",
+    encoding: null,
+    followAllRedirects: true,
+    headers: {
+      'Accept-Encoding': 'gzip' // Tell the server we accept gzip compression
+    },
+    maxBufferSize: 1024 * 1024 // 1 MB
   };
 
   if (typeof stringOfFlag != "undefined") window[stringOfFlag] = true;
@@ -1145,50 +1114,53 @@ function getABuffer(file_url, callback, flag, mode, port, imgToGray, stringOfFla
     imgToGray.style.webkitFilter = "invert(100%) grayscale(1)";
   }
 
-  var req = http.request(options, function (res)
+  const req = http.request(options, function (res)
   {
-    var fsize = res.headers["content-length"];
-    var cookies = null;
-    if (typeof res.headers["set-cookie"] != "undefined")
-    { cookies = res.headers["set-cookie"]; }
+    const encoding = res.headers['content-encoding'];
+    const fsize = res.headers["content-length"];
+    res.on("data", function (data)
+    {
+      if (fileBuffer == null) fileBuffer = Buffer.from(data);
+      else fileBuffer = Buffer.concat([fileBuffer, data]);
 
-    res
-      .on("data", function (data)
+      if (typeof imgToGray != "undefined")
       {
-        if (fileBuffer == null) fileBuffer = data;
-        else fileBuffer += data;
+        let percent = 0;
+        if (fsize > 0) percent = parseInt((fileBuffer.length / fsize) * 100);
+        else percent = parseInt(((fileBuffer.length / 100000) * 100) % 100);
+        imgToGray.parentNode.style.background =
+          "linear-gradient(grey " +
+          percent +
+          "%, black " +
+          Number(percent + 10) +
+          "% 100% )";
+      }
+    });
 
-        if (typeof imgToGray != "undefined")
-        {
-          var percent = 0;
-          if (fsize > 0) percent = parseInt((fileBuffer.length / fsize) * 100);
-          else percent = parseInt(((fileBuffer.length / 100000) * 100) % 100);
-          imgToGray.parentNode.style.background =
-            "linear-gradient(grey " +
-            percent +
-            "%, black " +
-            Number(percent + 10) +
-            "% 100% )";
-        }
-      })
-      .on("end", function ()
+    res.on("end", function ()
+    {
+      if (encoding === 'gzip')
       {
-        if (typeof stringOfFlag != "undefined")
-        {
-          window[stringOfFlag] = false;
-        }
-        if (typeof imgToGray != "undefined")
-        {
-          imgToGray.parentNode.style.background = "";
-          imgToGray.style.webkitFilter = "";
-        }
-        if (typeof callback == "function")
-        {
-          // Call it, since we have confirmed it is callable
-          callback(fileBuffer, flag, cookies, file_url);
-        }
-      })
-      .on("error", function ()
+        const zlib = require('zlib');
+        fileBuffer =  zlib.gunzipSync(fileBuffer);
+      }
+      if (typeof stringOfFlag != "undefined")
+      {
+        window[stringOfFlag] = false;
+      }
+      if (typeof imgToGray != "undefined")
+      {
+        imgToGray.parentNode.style.background = "";
+        imgToGray.style.webkitFilter = "";
+      }
+      if (typeof callback == "function")
+      {
+        // Call it, since we have confirmed it is callable
+        callback(fileBuffer, flag, null, file_url);
+      }
+    });
+
+    req.on("error", function ()
       {
         if (typeof stringOfFlag != "undefined")
         {
@@ -3100,11 +3072,7 @@ function parsePSKadif(adiBuffer)
         )
       );
       var finalTime = parseInt(dateTime.getTime() / 1000);
-      if (
-        finalGrid != "" &&
-        finalDXcall != "" &&
-        validateGridFromString(finalGrid)
-      )
+      if (finalGrid != "" && finalDXcall != "" && validateGridFromString(finalGrid))
       {
         if (finalDXcall == GT.settings.app.myCall)
         {
