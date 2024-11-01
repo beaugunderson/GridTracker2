@@ -2650,6 +2650,22 @@ function loadAwardJson()
         if (!("unique" in CR.awards[sp].awards[aw].rule))
         { CR.awards[sp].awards[aw].rule.unique = 1; }
 
+        if (CR.awards[sp].awards[aw].rule.band[0] == "Mixed")
+        {
+          CR.awards[sp].awards[aw].rule.band.shift();
+        }
+
+        if (CR.awards[sp].awards[aw].rule.band[0] == "Any") CR.awards[sp].awards[aw].rule.band[0] = "Mixed";
+
+        if (CR.awards[sp].awards[aw].rule.band.length == 0)
+        {
+          CR.awards[sp].awards[aw].rule.band = [];
+          for (let key in CR.awards[sp].mixed)
+          {
+            CR.awards[sp].awards[aw].rule.band.push(CR.awards[sp].mixed[key]);
+          }
+        }
+
         if (
           CR.awards[sp].awards[aw].rule.endorse.length == 1 &&
           CR.awards[sp].awards[aw].rule.endorse[0] == "Mixed"
