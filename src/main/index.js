@@ -340,7 +340,7 @@ ipcMain.on('restartGridTracker2', (event, resetWindowPositions = false) => {
 
 function createMainWindow() {
   const mainWindow = new BrowserWindow({
-    ...allowedWindows['GridTracker2'].options,
+    //...allowedWindows['GridTracker2'].options,
     ...allowedWindows['GridTracker2'].static,
     tabbingIdentifier: 'GridTracker2',
     title: 'GridTracker2',
@@ -374,7 +374,7 @@ function createMainWindow() {
       return { action: 'allow', overrideBrowserWindowOptions: options };
     } else if (details.frameName in allowedWindows) {
       let options = {
-        ...allowedWindows[details.frameName].options,
+        //...allowedWindows[details.frameName].options,
         ...allowedWindows[details.frameName].static,
         autoHideMenuBar: true,
         backgroundColor: 'black',
@@ -461,6 +461,12 @@ app.whenReady().then(() => {
 
       // set up events here...
       window.on('ready-to-show', () => {
+        // Options are being applied as bounds to the window, but if there is a scaleFactor
+        // this call corrects the sizing
+        allowedWindows[windowIdToAllowedWindows[window.id]].window.setContentBounds(
+          allowedWindows[windowIdToAllowedWindows[window.id]].options
+        );
+
         if (
           allowedWindows[windowIdToAllowedWindows[window.id]].honorVisibility == true &&
           allowedWindows[windowIdToAllowedWindows[window.id]].options.show == true
@@ -473,11 +479,6 @@ app.whenReady().then(() => {
           allowedWindows[windowIdToAllowedWindows[window.id]].options.zoom,
         );
 
-        // Options are being applied as bounds to the window, but if there is a scaleFactor
-        // this call corrects the sizing
-        allowedWindows[windowIdToAllowedWindows[window.id]].window.setContentBounds(
-          allowedWindows[windowIdToAllowedWindows[window.id]].options
-        );
         // Save the current bounds
         allowedWindows[windowIdToAllowedWindows[window.id]].tempBounds =
           allowedWindows[windowIdToAllowedWindows[window.id]].window.getContentBounds();
@@ -486,23 +487,29 @@ app.whenReady().then(() => {
       window.on('close', (event) => {
         // save all window(s) and position(s)
         let bounds = window.getContentBounds();
+        let saveBounds = !(window.isMaximized() || window.isFullScreen());
+
         if (window.id != 1) {
           if (mainWindowClosing == false) {
             // save, but don't close
             bounds.show = window.isVisible();
             window.hide();
-            allowedWindows[windowIdToAllowedWindows[window.id]].options = {
-              ...allowedWindows[windowIdToAllowedWindows[window.id]].options,
-              ...bounds,
-            };
+            if (saveBounds) {
+              allowedWindows[windowIdToAllowedWindows[window.id]].options = {
+                ...allowedWindows[windowIdToAllowedWindows[window.id]].options,
+               ...bounds,
+              };
+            }
             event.preventDefault();
           } else {
             // save, and let it close
             bounds.show = window.isVisible();
-            allowedWindows[windowIdToAllowedWindows[window.id]].options = {
-              ...allowedWindows[windowIdToAllowedWindows[window.id]].options,
-              ...bounds,
-            };
+            if (saveBounds) {
+              allowedWindows[windowIdToAllowedWindows[window.id]].options = {
+                ...allowedWindows[windowIdToAllowedWindows[window.id]].options,
+                ...bounds,
+              };
+            }
           }
         } else {
           mainWindowClosing = true;
@@ -513,10 +520,12 @@ app.whenReady().then(() => {
             }
           }
           // save!
-          allowedWindows['GridTracker2'].options = {
-            ...allowedWindows['GridTracker2'].options,
-            ...bounds,
-          };
+          if (saveBounds) {
+            allowedWindows['GridTracker2'].options = {
+              ...allowedWindows['GridTracker2'].options,
+              ...bounds,
+            };
+          }
         }
       });
 
