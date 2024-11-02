@@ -7,7 +7,8 @@ GT.workerFunctions =
 {
   init: initGlobals,
   clear: clearQSO,
-  parse: onAdiLoadComplete
+  parse: onAdiLoadComplete,
+  parseAcLog: parseAcLog
 };
 
 onmessage = (event) =>
@@ -553,4 +554,280 @@ function parseADIFRecordStrict(line)
   }
 
   return record;
+}
+
+
+function parseAcLogXML(line)
+{
+  let record = {};
+  line = line.substring(5); // skip <CMD>
+  while (line.length > 0)
+  {
+    while (line.charAt(0) != "<" && line.length > 0)
+    {
+      line = line.substring(1);
+    }
+    if (line.length > 0)
+    {
+      line = line.substring(1);
+      let nextChev = line.indexOf(">");
+      if (nextChev > -1)
+      {
+        let fieldName = line.substring(0, nextChev).toUpperCase();
+        let endField = "</" + fieldName + ">";
+        line = line.substring(fieldName.length + 1);
+        let end = line.indexOf(endField);
+        if (end > 0 )
+        {
+          let  fieldValue = line.substring(0, end);
+          line = line.substring(end + endField.length);
+          record[fieldName] = fieldValue;
+        }
+      }
+    }
+  }
+
+  return record;
+}
+
+function parseAcLog(task)
+{
+  GT.appSettings = task.appSettings;
+  GT.aclSettings = task.aclSettings;
+  GT.myQsoCalls = {};
+  GT.myQsoGrids = {};
+
+  let rows = 0;
+  let rowsFiltered = 0;
+  let lastHash = null;
+  let myCall = GT.appSettings.myCall;
+  let myGrid = GT.appSettings.myGrid;
+  let returnTask = {};
+
+  try {
+
+    let eorRegEx = new RegExp("</CMD>", "i");
+
+    if (task.rawAcLogBuffer.length > 1)
+    {
+      let startPos = 0;
+      let endPos = task.rawAcLogBuffer.length;
+
+      let opRow = task.rawAcLogBuffer.substring(startPos).search(eorRegEx);
+      if (opRow != -1)
+      {
+        let opInfo = parseAcLogXML(task.rawAcLogBuffer.substring(startPos, opRow));
+        myCall = (opInfo.CALL || myCall);
+        myGrid = (opInfo.GRID || myGrid);
+        startPos += opRow + 6; // skip </CMD>
+      }
+      else
+      {
+        console.log("Missing operator info, we should not continue?");
+      }
+
+      while (startPos != endPos)
+      {
+        let eor = task.rawAcLogBuffer.substring(startPos).search(eorRegEx);
+        if (eor != -1)
+        {
+          let row = task.rawAcLogBuffer.substring(startPos, startPos + eor);
+          startPos += eor + 6; // skip </CMD>
+          let object = parseAcLogXML(row);
+          let confSource = null;
+          let confirmed = false;
+
+          let finalDEcall = (object.FLDOPERATOR || myCall);
+          GT.myQsoCalls[finalDEcall] = true;
+
+          if (GT.appSettings.workingCallsignEnable && !(finalDEcall in GT.appSettings.workingCallsigns))
+          {
+            // not in the working callsigns, move to next
+            rowsFiltered++;
+            continue;
+          }
+
+          let finalTime = 0;
+
+          if (object.DATE && object.TIMEON)
+          {
+            let dateTime = new Date(
+              Date.UTC(
+                object.DATE.substring(0, 4),
+                parseInt(object.DATE.substring(5, 7)) - 1,
+                object.DATE.substring(8, 10),
+                object.TIMEON.substring(0, 2),
+                object.TIMEON.substring(3, 5),
+                object.TIMEON.substring(6, 8)
+              )
+            );
+
+            finalTime = parseInt(dateTime.getTime() / 1000);
+          }
+
+          if (GT.appSettings.workingDateEnable && finalTime < GT.appSettings.workingDate)
+          {
+            // Not after our working date
+            rowsFiltered++;
+            continue;
+          }
+
+          myGrid = (object.FLDGRIDS || myGrid);
+          if (myGrid.length > 3)
+          {
+            let finalMyGrid = myGrid.substr(0, 4).toUpperCase();;
+            GT.myQsoGrids[finalMyGrid] = true;
+            if (GT.appSettings.workingGridEnable && !(finalMyGrid in GT.appSettings.workingGrids))
+            {
+              // not in the working grids, move to next
+              rowsFiltered++;
+              continue;
+            }
+          }
+
+          let finalDXcall = (object.CALL || null);
+          if (finalDXcall == null) continue;
+
+          // We made it this far, we have a workable qso
+          const qso = {
+            DXcall: finalDEcall,
+            DEcall: finalDXcall,
+            time: finalTime,
+          };
+
+          let finalGrid = (object.GRID || "").toUpperCase().substring(0, 6);
+          let vuccGrids = (object.VUCC_GRIDS || "").toUpperCase();
+          let finalVucc = [];
+
+          if (!validateGridFromString(finalGrid)) finalGrid = null;
+          if (finalGrid == null && vuccGrids != "")
+          {
+            finalVucc = vuccGrids.split(",");
+            finalGrid = finalVucc[0];
+            finalVucc.shift();
+          }
+
+          if (finalVucc.length > 0)  qso.vucc_grids = [ ...finalVucc ];
+
+          if (finalGrid)
+          {
+            qso.grid = finalGrid;
+            qso.field = finalGrid.substring(0, 2);
+          }
+  
+          let finalRSTsent = (object.RSTS || null);
+          if (finalRSTsent) qso.RSTsent = finalRSTsent;
+
+          let finalRSTrecv = (object.RSTR || null);
+          if (finalRSTrecv) qso.RSTrecv = finalRSTrecv;
+
+          let finalBand = (object.BAND || "").toLowerCase() + "m";
+          if (finalBand == "m" || finalBand == "oob")
+          {
+            finalBand = formatBand(Number(object.FREQUENCY || 0));
+          }
+          qso.band = finalBand;
+
+          let finalPropMode = (object.PROP_MODE || null);
+          if (finalPropMode) qso.propMode = finalPropMode.toUpperCase();
+
+          let finalSatName = (object.SAT_NAME || null);
+          if (finalSatName) qso.satName = finalSatName.toUpperCase();
+
+          let finalCont = (object.CONTINENT || null);
+          if (finalCont && finalCont in GT.wacZones)  qso.cont = finalCont.toUpperCase();
+
+          let finalDxcc = 0;
+          if (object.FLDCOUNTRYDXCC)
+          {
+            finalDxcc = parseInt(object.FLDCOUNTRYDXCC);
+            if (finalDxcc == 0)  finalDxcc = parseInt(callsignToDxcc(finalDXcall));
+            if (!(finalDxcc in GT.dxccInfo)) finalDxcc = parseInt(callsignToDxcc(finalDXcall));
+            qso.dxcc = finalDxcc
+          }
+
+          let finalCnty = (object.COUNTYR || null);
+          // GT references internally with NO spaces, this is important 
+          if (finalCnty) qso.cnty = replaceAll(finalCnty.toUpperCase(), " ", "");
+
+          let finalState = (object.STATE || null);
+          if (finalState && qso.cnty) qso.cnty = finalState + "," + qso.cnty;
+          if (finalState && finalDxcc > 0) finalState = GT.dxccToCountryCode[finalDxcc] + "-" + finalState.toUpperCase();
+          if (finalState) qso.state = finalState;
+
+          qso.mode = (object.MODE || "").toUpperCase();
+
+          let finalMsg = (object.COMMENTS || null);
+          if (finalMsg) 
+          {
+            finalMsg = finalMsg.trim();
+            if (finalMsg.length > 40) finalMsg = finalMsg.substring(0, 40) + "...";
+            if (finalMsg.length > 0) qso.msg = finalMsg;
+          }
+
+          let finalCqZone = (object.CQZONE || "");
+          if (finalCqZone.length == 1) finalCqZone = "0" + finalCqZone;
+          finalCqZone = String(finalCqZone);
+          if (finalCqZone in GT.cqZones) qso.cqz = finalCqZone;
+
+          let finalItuZone = (object.ITUZ || "");
+          if (finalItuZone.length == 1) finalItuZone = "0" + finalItuZone;
+          finalItuZone = String(finalItuZone);
+          if (finalItuZone in GT.ituZones) qso.ituz = finalItuZone;
+          
+          let finalIOTA = (object.IOTA || null);
+          if (finalIOTA) qso.IOTA = finalIOTA.toUpperCase();
+
+          let genericConfirmed = (object.FLDQSLR || "").toUpperCase();
+          if (genericConfirmed == "Y")
+          {
+            if (GT.aclSettings.qsl != "A")
+            {
+              let confby = (object.QSLCONFBYR || null);
+              if (confby && confby.indexOf(GT.aclSettings.qs) != -1)
+              {
+                confirmed = true;
+                confSource = "A";
+              }
+            }
+            else
+            {
+              confirmed = true;
+              confSource = "A";
+            }
+          }
+
+          qso.confirmed = confirmed;
+          if (confSource) { qso.confSrcs = {}; qso.confSrcs[confSource] = true; }
+
+          if (qso.mode in GT.modes) qso.digital = GT.modes[qso.mode];
+          if (qso.mode in GT.modes_phone) qso.phone = GT.modes_phone[qso.mode];
+
+          let finalPOTA = (object.POTA_REF || object.POTA || null);
+          if (finalPOTA) qso.pota = finalPOTA.toUpperCase();
+        
+          lastHash = addQSO(qso, confSource);
+          rows++;
+        }
+        else
+        {
+          break; // we're done
+        }
+      }
+    }
+
+    returnTask.type = "parsedAcLog";
+    returnTask.QSOhash = GT.QSOhash;
+    returnTask.myQsoCalls = GT.myQsoCalls;
+    returnTask.myQsoGrids = GT.myQsoGrids;
+    returnTask.rowsFiltered = rowsFiltered;
+    returnTask.nextFunc = task.nextFunc;
+  }
+  catch(e)
+  {
+    // something when horribly wrong, let's tell the boss
+    returnTask.type = "exception";
+    returnTask.nextFunc = task.nextFunc;
+  }
+  postMessage(returnTask);
 }

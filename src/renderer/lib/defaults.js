@@ -252,7 +252,10 @@ const def_settings = {
   acLog: {
     enable: false,
     port: 1100,
-    ip: "127.0.0.1"
+    ip: "127.0.0.1",
+    menu: false,
+    startup: false,
+    qsl: "A"
   },
   trustedQsl: {
     stationFile: "",
@@ -612,8 +615,23 @@ function importLegacySettings()
     if (!fs.existsSync(copiedGridTrackerOneAdif))
     {
       let documentsPath = path.join(electron.ipcRenderer.sendSync("getPath","documents"), "GridTracker", "GridTracker_QSO.adif");
-      fs.copyFileSync(documentsPath, copiedGridTrackerOneAdif, fs.constants.COPYFILE_EXCL);
-      console.log("Copied v1 Logfile to Backup Logs");
+      if(fs.existsSync(documentsPath))
+      {
+        fs.copyFileSync(documentsPath, copiedGridTrackerOneAdif, fs.constants.COPYFILE_EXCL);
+        console.log("Copied v1 Logfile to Backup Logs");
+      }
+      else
+      {
+        if (documentsPath.indexOf("OneDrive") > 0)
+        {
+          documentsPath = documentsPath.replace("/OneDrive","").replace("\\OneDrive","");
+          if(fs.existsSync(documentsPath))
+          {
+            fs.copyFileSync(documentsPath, copiedGridTrackerOneAdif, fs.constants.COPYFILE_EXCL);
+            console.log("Copied v1 Logfile to Backup Logs");
+          }
+        }
+      }
     }
   }
   catch (e)

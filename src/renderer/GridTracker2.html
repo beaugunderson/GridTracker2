@@ -496,7 +496,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           <img src="img/adif.png" class="buttonImg" />
         </div>
         <div id="buttonAdifCheckBoxDiv" onclick="startupAdifLoadFunction()" class="iconButton" title="Reload Local ADIF Files">
-          <img src="img/log_local.png" class="buttonImg" />
+          <img src="img/Log_Button_Local.png" class="buttonImg" />
         </div>
         <div id="timezoneButton" onclick="toggleTimezones()" class="iconButton" title="Toggle Timezone Layer">
           <img id="timezoneImg" src="img/timezone-button.png" class="buttonImg" />
@@ -526,14 +526,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           <img id="pskImg" src="img/psk_24_32.png" class="buttonImg" />
         </div>
         <div id="buttonQRZCheckBoxDiv" onclick="if ( ValidateQrzApi(qrzApiKey ) ) grabQrzComLog()" class="iconButton" title="Download log from QRZ.com">
-            <img id="qrzLogImg" src="img/log_QRZ.png" class="buttonImg" />
+            <img id="qrzLogImg" src="img/Log_Button_QRZ.png" class="buttonImg" />
         </div>
         <div id="buttonLOTWCheckBoxDiv" onclick="if ( ValidateText(lotwLogin) && ValidateText(lotwPassword) ) {  grabLOtWLog(false); } " class="iconButton" title="Download log from Logbook of the World">
-            <img id="lotwLogImg" src="img/log_LoTW.png" class="buttonImg" />
+            <img id="lotwLogImg" src="img/Log_Button_LoTW.png" class="buttonImg" />
         </div>
         <div id="buttonClubCheckBoxDiv" onclick="if ( ValidateText(clubEmail) && ValidateText(clubPassword) ) { grabClubLog(); }" class="iconButton" title="Download log from ClubLog">
-            <img id="ClubLogImg" src="img/log_club.png" class="buttonImg" />
+            <img id="ClubLogImg" src="img/Log_Button_Club.png" class="buttonImg" />
         </div>
+        <div id="buttonAcLogCheckBoxDiv" onclick="grabAcLog()" class="iconButton" title="Download log from N3FJP Logger">
+          <img id="AcLogImg" src="img/Log_Button_N3FJP.png" class="buttonImg" />
+      </div>
         <div id="potaButton" onClick="togglePotaMap();" class="iconButton" title="Parks On The Air">
           <img id="potaImg" src="img/pota.png" class="buttonImg" />
         </div>
@@ -1454,7 +1457,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
             <tr>
               <td id="workingDateTd" title="Date/Time is UTC">
-                <label data-i18n="settings.logbook.date.date" for="workingDateValue">UTC</label> <input type="datetime-local" id="workingDateValue" value="1970-01-01" style="background-color: green; color: yellow;" onchange="workingDateChanged()" />
+                <label data-i18n="settings.logbook.date.date" for="workingDateValue">UTC</label> <input type="datetime-local" id="workingDateValue" value="1970-01-01T00:00" style="background-color: green; color: yellow;" onchange="workingDateChanged()" />
               </td>
             </tr>
           </table>
@@ -1480,6 +1483,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 <option value="Q">QRZ.com</option>
                 <option value="e">eQSL</option>
                 <option value="C">Clublog</option>
+                <option value="A">N3FJP</option>
                 <option value="O">Other</option>
                 <option value="0">Last Loaded</option>
                 <option value="1">None</option>
@@ -2134,21 +2138,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </tr>
           <tr>
             <td data-i18n="settings.logging.N3FJP.source">N3FJP Loggers</td>
-            <td></td>
-            <td></td>
             <td>
-              <input type="checkbox" checked="false" class="inputTextValue" id="buttonacLogCheckBox"
-                onclick=" ValidateIPaddress(acLogIpInput,this); ValidatePort(acLogPortInput,this, null ); acLogLoggerChanged(); " />
+              <input type="checkbox" id="acLogMenuCheckbox" onclick="acLogLoggerChanged()" />
+            </td>
+            <td>
+              <input type="checkbox" id="acLogStartupCheckbox" onclick="acLogLoggerChanged()" />
+            <td>
+              <input type="checkbox" class="inputTextValue" id="acLogCheckbox" onclick="acLogLoggerChanged()" />
             </td>
             <td>
               <label data-i18n="settings.logging.N3FJP.details.IP" for="acLogIpInput">IP</label>
               <input id="acLogIpInput" type="text" class="inputTextValue" maxlength="15" size="11"
-                onkeypress='return validIpKeys(event.charCode);' oninput="ValidateIPaddress(this,buttonacLogCheckBox);
+                onkeypress='return validIpKeys(event.charCode);' oninput="ValidateIPaddress(this,acLogCheckbox);
                   acLogLoggerChanged(); " />
               <label data-i18n="settings.logging.N3FJP.details.Port" for="acLogPortInput">Port</label>
               <input id="acLogPortInput" type="text" class="inputTextValue" maxlength="5" size="5"
                 onkeypress='return validNumberKeys(event.charCode);'
-                oninput="ValidatePort(this,buttonacLogCheckBox, null ); acLogLoggerChanged(); " />
+                oninput="ValidatePort(this,acLogCheckbox, null ); acLogLoggerChanged(); " />
+              <span id="acLogQslSpan">
+                <label for="acLogQsl">QSL By</label>
+                <select id="acLogQsl" onchange="acLogLoggerChanged();">
+                  <option value="A">Any</option>
+                  <option value="C">Card</optio>
+                  <option value="E">eQSL</option>
+                  <option value="L">LoTW</option>
+                  <option value="Q">QRZ.com</option>
+                  <option value="B">Clublog</option>
+                </select>
+              </span>
             </td>
             <td></td>
             <td></td>

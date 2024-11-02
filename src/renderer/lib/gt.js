@@ -9769,7 +9769,8 @@ function renderBandActivity()
       }
 
       buffer += "<div title='" + title + "' style='display:inline-block;margin:1px;' class='aBand'>";
-      buffer += "<div style='height: " + (bandData[band].pskScore * scaleFactor + 1) + "px;' class='barTx'></div>"; buffer += "<div style='height: " + blueBarValue + "px;' class='barRx'></div>";
+      buffer += "<div style='height: " + blueBarValue + "px;' class='barRx'></div>";
+      buffer += "<div style='height: " + (bandData[band].pskScore * scaleFactor + 1) + "px;' class='barTx'></div>"; 
       buffer += "<div style='font-size:10px' " + blockMyBand + ">" + parseInt(band) + "</div>";
       buffer += "</div>";
     }
@@ -11621,9 +11622,14 @@ function loadViewSettings()
 
   acLogIpInput.value = GT.settings.acLog.ip;
   acLogPortInput.value = GT.settings.acLog.port;
-  buttonacLogCheckBox.checked = GT.settings.acLog.enable;
-  ValidatePort(acLogPortInput, buttonacLogCheckBox, null);
-  ValidateIPaddress(acLogIpInput, buttonacLogCheckBox, null);
+  acLogCheckbox.checked = GT.settings.acLog.enable;
+  acLogMenuCheckbox.checked = GT.settings.acLog.menu;
+  acLogStartupCheckbox.checked = GT.settings.acLog.startup;
+  ValidatePort(acLogPortInput, acLogCheckbox, null);
+  ValidateIPaddress(acLogIpInput, acLogCheckbox, null);
+  acLogQsl.value = GT.settings.acLog.qsl;
+  acLogQslSpan.style.display = (acLogMenuCheckbox.checked || acLogStartupCheckbox.checked) ? "" : "none";
+  buttonAcLogCheckBoxDiv.style.display = (acLogMenuCheckbox.checked) ? "" : "none";
 
   dxkLogIpInput.value = GT.settings.dxkLog.ip;
   dxkLogPortInput.value = GT.settings.dxkLog.port;

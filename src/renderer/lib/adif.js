@@ -7,6 +7,7 @@ GT.confSrcNames = {
   C: "Clublog",
   e: "eQSL",
   L: "LoTW",
+  A: "N3FJP",
   Q: "QRZ.com",
   O: "Other"
 };
@@ -17,6 +18,7 @@ GT.adifWorkerCallbacks = {
   loaded: initAdifComplete,
   parsed: adifParseComplete,
   parsedLive: adifParseLiveComplete,
+  parsedAcLog: aclogParseComplete,
   filteredLive: adifFilteredLiveComplete,
   exception: exceptionComplete,
   cleared: clearComplete
@@ -175,6 +177,24 @@ function adifParseComplete(task)
   tryNextTask(task);
 }
 
+function aclogParseComplete(task)
+{
+  GT.adifLogCount--;
+  GT.QSOhash = task.QSOhash;
+  GT.rowsFiltered += task.rowsFiltered;
+
+  GT.myQsoCalls = { ...GT.myQsoCalls, ...task.myQsoCalls };
+  GT.myQsoGrids = { ...GT.myQsoGrids, ...task.myQsoGrids };
+
+  stateCheck();
+  refreshQSOs();
+
+  qsoGridsFound.innerHTML = "Found: " + Object.keys(GT.myQsoGrids).join(",");
+  qsoCallsignsFound.innerHTML = "Found: " + Object.keys(GT.myQsoCalls).join(",");
+
+  tryNextTask(task);
+}
+
 function clubLogCallback(buffer, flag, cookie)
 {
   var rawAdiBuffer = String(buffer);
@@ -291,15 +311,14 @@ function lotwCallback(buffer, flag, cookies, url)
       var shouldAppend = true;
       var adiFileName = "LoTW_QSL.adif";
       var eorRegEx = new RegExp("<EOR>", "i");
-      var nextFunc = null;
-
+  
       // don't write just an empty <EOH> only result
       if (rawAdiBuffer.search(eorRegEx) > 0)
       {
         rawAdiBuffer = tryToWriteAdifToDocFolder(adiFileName, rawAdiBuffer, shouldAppend);
       }
 
-      onAdiLoadComplete(rawAdiBuffer, nextFunc);
+      onAdiLoadComplete(rawAdiBuffer);
     }
   }
 }
@@ -407,7 +426,7 @@ function qrzCallback(buffer, flag)
   }
 }
 
-GT.isGettingQRZCom = false;
+
 function grabQrzComLog(test)
 {
   if (fs.existsSync(GT.QrzLogFile) && getFilesizeInBytes(GT.QrzLogFile) > 0)
@@ -415,29 +434,27 @@ function grabQrzComLog(test)
     fs.readFile(GT.QrzLogFile, "utf-8", handleAdifLoad);
   }
 
-  if (GT.isGettingQRZCom == false)
-  {
-    var action = "FETCH";
-    if (test)
-    {
-      qrzTestResult.innerHTML = "Testing";
-      action = "STATUS";
-    }
 
-    getABuffer(
-      "https://logbook.qrz.com/api?KEY=" +
-        qrzApiKey.value +
-        "&ACTION=" +
-        action,
-      qrzCallback,
-      test,
-      "https",
-      443,
-      qrzLogImg,
-      "GT.isGettingQRZCom",
-      null
-    );
+  let action = "FETCH";
+  if (test)
+  {
+    qrzTestResult.innerHTML = "Testing";
+    action = "STATUS";
   }
+
+  getABuffer(
+    "https://logbook.qrz.com/api?KEY=" +
+      qrzApiKey.value +
+      "&ACTION=" +
+      action,
+    qrzCallback,
+    test,
+    "https",
+    443,
+    qrzLogImg,
+    "GT.isGettingQRZCom",
+    null
+  );
 }
 
 function ValidateQrzApi(inputText)
@@ -445,9 +462,9 @@ function ValidateQrzApi(inputText)
   inputText.value = inputText.value.toUpperCase().trim();
   if (inputText.value.length == 19)
   {
-    var passed = false;
-    var dashcount = 0;
-    for (var i = 0; i < inputText.value.length; i++)
+    let passed = false;
+    let dashcount = 0;
+    for (let i = 0; i < inputText.value.length; i++)
     {
       if (inputText.value[i] == "-") dashcount++;
     }
@@ -497,7 +514,7 @@ function ValidateText(inputText)
 function adifMenuCheckBoxChanged(what)
 {
   GT.settings.adifLog.menu[what.id] = what.checked;
-  var menuItem = what.id + "Div";
+  let menuItem = what.id + "Div";
   if (what.checked == true)
   {
     document.getElementById(menuItem).style.display = "inline-block";
@@ -551,7 +568,6 @@ function adifNicknameCheckBoxChanged(what)
       eQSLNickname.style.display = "none";
     }
   }
-
 }
 
 function adifTextValueChange(what)
@@ -743,21 +759,18 @@ function getFilesizeInBytes(filename)
 
 function loadLoTWLogFile()
 {
+  if (GT.settings.app.workingDateEnable == true && GT.settings.app.workingDate > 0)
+  {
+    GT.settings.adifLog.lastFetch.lotw_qsl = GT.settings.app.workingDate * 1000;
+  }
+
   if (fs.existsSync(GT.LoTWLogFile) && getFilesizeInBytes(GT.LoTWLogFile) > 0)
   {
     fs.readFile(GT.LoTWLogFile, "utf-8", handleAdifLoadLocalLoTW);
   }
   else
   {
-    if (GT.settings.app.workingDateEnable == true && GT.settings.app.workingDate > 0)
-    {
-      GT.settings.adifLog.lastFetch.lotw_qsl = GT.settings.app.workingDate * 1000;
-    }
-    else
-    {
-      // We have no history, so our dates are not valid any more
-      GT.settings.adifLog.lastFetch.lotw_qsl = 0;
-    }
+    GT.settings.adifLog.lastFetch.lotw_qsl = 0;
     grabLoTWQSL();
   }
 }
@@ -1079,6 +1092,8 @@ function startupAdifLoadCheck()
 
   if (loadAdifCheckBox.checked == true && GT.settings.startupLogs.length > 0) startupAdifLoadFunction();
 
+  if (GT.settings.acLog.startup == true) grabAcLog();
+
   if (GT.settings.map.offlineMode == false)
   {
     if (loadClubCheckBox.checked == true) grabClubLog(false);
@@ -1331,6 +1346,13 @@ function sendTcpMessage(msg, length, port, address)
   });
 
   client.on("close", function () {});
+
+  client.on("end", function () {
+  });
+
+  client.on("timeout", function () {
+    client.end();
+  });
 }
 
 function valueToAdiField(field, value)
@@ -2082,9 +2104,15 @@ function log4OMLoggerChanged()
 
 function acLogLoggerChanged()
 {
-  GT.settings.acLog.enable = buttonacLogCheckBox.checked;
+  GT.settings.acLog.enable = acLogCheckbox.checked;
   GT.settings.acLog.ip = acLogIpInput.value;
   GT.settings.acLog.port = acLogPortInput.value;
+  GT.settings.acLog.menu = acLogMenuCheckbox.checked;
+  GT.settings.acLog.startup = acLogStartupCheckbox.checked;
+  GT.settings.acLog.qsl = acLogQsl.value;
+
+  acLogQslSpan.style.display = (acLogMenuCheckbox.checked || acLogStartupCheckbox.checked) ? "" : "none";
+  buttonAcLogCheckBoxDiv.style.display = (acLogMenuCheckbox.checked) ? "" : "none";
 }
 
 function dxkLogLoggerChanged()
@@ -2889,7 +2917,7 @@ function sendACLogMessage(record, port, address)
     }
   }
 
-  report += aclAction("ENTER");
+  report += aclAction("ENTER") + "\r\n\r\n";
 
   sendTcpMessage(report, report.length, port, address);
 }
@@ -3145,4 +3173,67 @@ function parsePSKadif(adiBuffer)
   }
   redrawLiveGrids(false);
   updateCountStats();
+}
+
+function sendTcpMessageGetResponse(msg, port, address, callback = null)
+{
+  const net = require("net");
+  var client = new net.Socket();
+  let fileBuffer = null;
+  client.setTimeout(30000);
+  client.on("error", function () {
+    addLastTraffic("<font style='color:orange'>N3FJP Download Failed</font><br/><font style='color:white'>Is it running?</font>");
+    if (callback) callback(null);
+  });
+
+  client.connect(port, address, function ()
+  {
+    client.write(Buffer.from(msg, "utf-8"));
+  });
+
+  client.on("data", function (data)  {
+      if (fileBuffer == null) fileBuffer = Buffer.from(data);
+      else fileBuffer = Buffer.concat([fileBuffer, data]);
+  });
+
+  client.on("close", function () {
+  });
+
+  client.on("end", function () {
+    if (callback) callback(fileBuffer);
+  });
+
+  client.on("timeout", function () {
+    client.end();
+  });
+}
+
+function grabAcLog()
+{
+  AcLogImg.style.webkitFilter = "invert(100%) grayscale(1)";
+
+  let cmd = valueToXmlField("CMD", "<OPINFO>") + "\r\n";
+  cmd += valueToXmlField("CMD", "<LIST><INCLUDEALL>") + "\r\n\r\n";
+
+  sendTcpMessageGetResponse(cmd, GT.settings.acLog.port, GT.settings.acLog.ip, acLogCallback);
+}
+
+function acLogCallback(buffer)
+{
+  AcLogImg.style.webkitFilter = "";
+  if (buffer)
+  {
+    clearOrLoadButton.style.display = "none";
+    busyDiv.style.display = "block";
+
+    var task = {};
+    task.type = "parseAcLog";
+    task.appSettings = GT.settings.app;
+    task.aclSettings = GT.settings.acLog;
+    task.nextFunc = null;
+    task.rawAcLogBuffer = buffer.toString();
+
+    GT.adifLogCount++;
+    GT.adifWorker.postMessage(task);
+  }
 }
