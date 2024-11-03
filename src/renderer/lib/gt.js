@@ -1026,19 +1026,7 @@ function addLiveCallsign(
   confirmed,
   isQSO,
   finalRSTrecv,
-  finalDxcc,
-  finalState,
-  finalCont,
-  finalCnty,
-  finalCqZone,
-  finalItuZone,
-  finalVucc = [],
-  finalPropMode = "",
-  finalDigital = false,
-  finalPhone = false,
-  finalIOTA = "",
-  finalSatName = "",
-  finalPOTA = null
+  finalDxcc
 )
 {
   var callsign = null;
@@ -1082,8 +1070,8 @@ function addLiveCallsign(
     newCallsign.px = null;
     newCallsign.zone = null;
     newCallsign.pota = null;
-    newCallsign.cnty = finalCnty;
-    newCallsign.cont = finalCont;
+    newCallsign.cnty = null;
+    newCallsign.cont = null;
     if (finalDxcc > -1)
     {
       newCallsign.px = getWpx(finalDXcall);
@@ -1113,8 +1101,8 @@ function addLiveCallsign(
     newCallsign.delta = -1;
     newCallsign.DXcall = finalDEcall;
     newCallsign.wspr = wspr;
-    newCallsign.state = finalState;
-     newCallsign.instance = null;
+    newCallsign.state = null;
+    newCallsign.instance = null;
     newCallsign.rosterAlerted = false;
     newCallsign.shouldRosterAlert = false;
     newCallsign.audioAlerted = false;
@@ -1123,10 +1111,9 @@ function addLiveCallsign(
     newCallsign.qrz = false;
     newCallsign.vucc_grids = [];
     newCallsign.propMode = "";
-    newCallsign.digital = finalDigital;
-    newCallsign.phone = finalPhone;
-    newCallsign.IOTA = finalIOTA;
-    newCallsign.satName = finalSatName;
+    newCallsign.digital = true;
+    newCallsign.phone = false;
+    newCallsign.IOTA = "";
     newCallsign.hash = hash;
 
     if (newCallsign.state == null && isKnownCallsignDXCC(newCallsign.dxcc))
@@ -1171,10 +1158,9 @@ function addLiveCallsign(
       if (finalRSTrecv != null) callsign.RSTrecv = finalRSTrecv;
       callsign.vucc_grids = [];
       callsign.propMode = "";
-      callsign.digital = finalDigital;
-      callsign.phone = finalPhone;
-      callsign.IOTA = finalIOTA;
-      callsign.satName = finalSatName;
+      callsign.digital = true;
+      callsign.phone = false;
+      callsign.IOTA = "";
     }
   }
 }
@@ -2021,7 +2007,6 @@ function registerHotKeys()
   registerHotKey("Toggle All Grid Overlay", "KeyB", toggleAllGrids, null, null, "ctrlKey");
   registerHotKey("Open Conditions Windows", "KeyC", showConditionsBox, null, null, "ctrlKey");
   registerHotKey("Toggle Moon Tracking", "KeyD", toggleMoon, null, null, "ctrlKey");
-  registerHotKey("Toggle Spot Paths", "KeyF", toggleSpotPaths, null, null, "ctrlKey");
   registerHotKey("Toggle GridTracker Users", "KeyG", toggleGtMap, null, null, "ctrlKey");
   registerHotKey("Toggle Timezone Overlay", "KeyH", toggleTimezones, null, null, "ctrlKey");
   registerHotKey("Open Statistics Window", "KeyI", showRootInfoBox, null, null, "ctrlKey");
@@ -4747,13 +4732,13 @@ function changeNightMapEnable(check)
   }
   else
   {
-
     GT.settings.map.nightMapEnable = false;
   }
+
+  nightMapSpan.style.display = GT.settings.map.nightMapEnable ? "" : "none";
   changeMapLayer();
   styleAllFlightPaths();
   redrawSpots();
-  
 }
 
 function createRadar()
@@ -5915,7 +5900,6 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
       newCallsign.digital = true;
       newCallsign.phone = false;
       newCallsign.IOTA = "";
-      newCallsign.satName = "";
       newCallsign.hash = hash;
       if (newCallsign.dxcc != -1)
       {
@@ -6456,12 +6440,7 @@ function handleWsjtxWSPR(newMessage)
     false,
     false,
     null,
-    callsignToDxcc(callsign),
-    null,
-    null,
-    null,
-    "",
-    ""
+    callsignToDxcc(callsign)
   );
 
   processCustomAlertMessage(callsign + " " + newMessage.Grid);
@@ -11655,7 +11634,7 @@ function loadViewSettings()
   spotHistoryTimeTd.innerHTML =
     "Max Age: " + toDHM(Number(GT.settings.reception.viewHistoryTimeSec));
 
-  spotPathsValue.checked = GT.settings.reception.viewPaths;
+
   spotPathColorValue.value = GT.settings.reception.pathColor;
   spotNightPathColorValue.value = GT.settings.reception.pathNightColor;
   spotWidthTd.innerHTML = spotWidthValue.value = GT.settings.reception.spotWidth;
@@ -11672,7 +11651,7 @@ function loadViewSettings()
   clearOnCQ.checked = GT.settings.app.clearOnCQ;
 
   lookupMissingGridTr.style.display = GT.settings.app.lookupMerge ? "" : "none";
-  spotPathWidthDiv.style.display = GT.settings.reception.viewPaths ? "" : "none";
+
   gridModeDiv.style.display = GT.pushPinMode ? "" : "none";
 
   spotPathChange();
@@ -14232,7 +14211,7 @@ function createSpot(report, key, fromPoint, addToLayer = true)
 
     GT.layerSources.pskHeat.addFeature(pointFeature);
 
-    if (GT.settings.reception.viewPaths && GT.settings.reception.spotWidth > 0)
+    if (GT.settings.reception.spotWidth > 0)
     {
       var strokeWeight = GT.settings.reception.spotWidth;
 
@@ -14312,16 +14291,7 @@ function changeSpotValues()
 {
   GT.settings.reception.viewHistoryTimeSec = parseInt(spotHistoryTimeValue.value) * 60;
   spotHistoryTimeTd.innerHTML = "Max Age: " + toDHM(Number(GT.settings.reception.viewHistoryTimeSec));
-  GT.settings.reception.viewPaths = spotPathsValue.checked;
 
-  if (GT.settings.reception.viewPaths)
-  {
-    spotPathWidthDiv.style.display = "";
-  }
-  else
-  {
-    spotPathWidthDiv.style.display = "none";
-  }
 
   GT.settings.reception.mergeSpots = spotMergeValue.checked;
 
@@ -14356,6 +14326,8 @@ function spotPathChange()
     spotPathColorDiv.style.color = "#FFF";
     spotPathColorDiv.style.backgroundColor = pathColor;
   }
+
+  spotPathInfoLabel.style.display = (GT.settings.reception.pathColor == -1) ? "" : "none";
 
   GT.spotFlightColor =
     GT.settings.reception.pathColor < 1
@@ -14406,24 +14378,6 @@ function toggleMergeOverlay()
 {
   mergeOverlayValue.checked = mergeOverlayValue.checked != true;
   changeMergeOverlayValue();
-}
-
-function toggleSpotPaths()
-{
-  var spotPaths = spotPathsValue.checked == true ? 1 : 0;
-  spotPaths ^= 1;
-  spotPathsValue.checked = spotPaths == 1;
-  GT.settings.reception.viewPaths = spotPathsValue.checked;
-
-  if (GT.settings.reception.viewPaths)
-  {
-    spotPathWidthDiv.style.display = "";
-  }
-  else
-  {
-    spotPathWidthDiv.style.display = "none";
-  }
-  redrawSpots();
 }
 
 function setSpotImage()
@@ -14478,6 +14432,8 @@ function updateSpottingViews()
     spotsDiv.style.display = "none";
     spotMergeTr.style.display = "none";
     buttonSpotsBoxDiv.style.display = "none";
+    spotPathColorDiv.style.display = "none";
+    spotPathWidthDiv.style.display = "none";
     openPskMqtt();
     return;
   }
@@ -14485,6 +14441,8 @@ function updateSpottingViews()
   {
     buttonSpotsBoxDiv.style.display = "";
     spotMergeTr.style.display = "";
+    spotPathColorDiv.style.display = "";
+    spotPathWidthDiv.style.display = "";
   }
 
   if (GT.spotView > 0)

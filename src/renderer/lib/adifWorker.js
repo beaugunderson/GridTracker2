@@ -233,9 +233,6 @@ function onAdiLoadComplete(task)
           let finalPropMode = (object.PROP_MODE || null);
           if (finalPropMode) qso.propMode = finalPropMode.toUpperCase();
 
-          let finalSatName = (object.SAT_NAME || null);
-          if (finalSatName) qso.satName = finalSatName.toUpperCase();
-
           let finalCont = (object.CONT || null);
           if (finalCont && finalCont in GT.wacZones)  qso.cont = finalCont.toUpperCase();
 
@@ -416,7 +413,6 @@ const def_qso = {
   qual: false,
   RSTrecv: "",
   RSTsent: "",
-  satName: "",
   state: null,
   time: 0,
   vucc_grids: [],
@@ -440,6 +436,7 @@ function addQSO(qso, confSource = null)
     let canWrite = (details.confirmed == false || GT.appSettings.qslAuthority == "0" || GT.appSettings.qslAuthority == confSource || !(GT.appSettings.qslAuthority in details.confSrcs));
     if (GT.appSettings.qslAuthority == "1" && qso.confirmed == true) canWrite = false;
     if (confSource) details.confSrcs[confSource] = true;
+    if (qso.pota) details.pota = qso.pota;
     if (canWrite == false) return;
     details = deepmerge(details, qso);
   }
@@ -491,7 +488,6 @@ GT.strictAdif = {
   BAND: false,
   FREQ: false,
   PROP_MODE: false,
-  SAT_NAME: false,
   CONT: false,
   CNTY: false,
   MODE: false,
@@ -731,9 +727,6 @@ function parseAcLog(task)
           let finalPropMode = (object.PROP_MODE || null);
           if (finalPropMode) qso.propMode = finalPropMode.toUpperCase();
 
-          let finalSatName = (object.SAT_NAME || null);
-          if (finalSatName) qso.satName = finalSatName.toUpperCase();
-
           let finalCont = (object.CONTINENT || null);
           if (finalCont && finalCont in GT.wacZones)  qso.cont = finalCont.toUpperCase();
 
@@ -803,8 +796,8 @@ function parseAcLog(task)
           if (qso.mode in GT.modes) qso.digital = GT.modes[qso.mode];
           if (qso.mode in GT.modes_phone) qso.phone = GT.modes_phone[qso.mode];
 
-          let finalPOTA = (object.POTA_REF || object.POTA || null);
-          if (finalPOTA) qso.pota = finalPOTA.toUpperCase();
+          /* let finalPOTA = (object.POTA_REF || object.POTA || null);
+          if (finalPOTA) qso.pota = finalPOTA.toUpperCase(); */
         
           lastHash = addQSO(qso, confSource);
           rows++;

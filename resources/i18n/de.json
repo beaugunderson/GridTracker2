@@ -293,7 +293,7 @@
     "settings.map.FitMapToQRZ.hover": "Karte auf QRZ zentrieren umschalten",
     "settings.map.CQHighlight.label": "'CQ' Hervorheben",
     "settings.map.CQHighlight.hover": "'CQ XX' Hervorheben umschalten",
-    "settings.map.MissingGrid.label": "QRZ unbekannter Locator DXCC Alternative",
+    "settings.map.MissingGrid.label": "Unbekannter Locator DXCC Alternative",
     "settings.map.MissingGrid.hover": "Bei unbekanntem Locator einer Station DXCC zentrieren",
     "settings.map.RXSpotPath.color.label": "RX Reportfarbe",
     "settings.map.RXSpotPath.color.default": "PSK-Reporter Palette",

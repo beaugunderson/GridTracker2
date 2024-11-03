@@ -1083,12 +1083,10 @@ button:focus {
 }
 
 .flexSettingDiv {
-  display: grid;
-  gap: 0px;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto;
-  height: 400px;
+  display: block;
+  width: 780px;
   font-weight: bold;
+  align-items: center;
 }
 
 .flexItem {
@@ -1099,28 +1097,28 @@ button:focus {
   transition: border-color;
 
   height: fit-content;
-
+  width: fit-content;
   margin: 2px;
   padding: 2px;
   padding-top: 3px;
-
-  display: flex;
+  min-width: 168px;
+  min-height: 44px;
+  display: inline-flex;
   flex: auto;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: flex-start;
-  vertical-align: text-bottom;
+}
+
+.flexItem input[type="checkbox"] {
+  margin-top: 3px;
 }
 
 .flexItem label {
   margin-right: 3px;
 }
 
-.flexItem select {
-  margin-top: -6px;
-}
-
 .flexItem input[type="range"] {
-  margin-top: 2px;
+  margin-top: 6px;
 }
 
 .flexItem:hover {

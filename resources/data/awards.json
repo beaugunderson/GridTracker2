@@ -9371,28 +9371,6 @@
         "sponsor": "FT8DMC",
         "tooltip": "Worked Sixty"
       },
-      "WSAT": {
-        "name": "WSAT - Worked Satellite QO-100",
-        "rule": {
-          "band": [
-            "Mixed"
-          ],
-          "count": [
-            10
-          ],
-          "endorse": [],
-          "mode": [
-            "FT8"
-          ],
-          "propMode": "SAT",
-          "satName": [
-            "QO-100"
-          ],
-          "type": "call"
-        },
-        "sponsor": "FT8DMC",
-        "tooltip": "Worked Satellite QO-100"
-      },
       "WSCA": {
         "name": "WSCA - Worked Scandinavian Countries",
         "rule": {

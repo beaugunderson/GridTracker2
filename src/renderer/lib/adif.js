@@ -154,6 +154,12 @@ function exceptionComplete(task)
   tryNextTask(task);
 }
 
+function setQsoFound()
+{
+  qsoGridsFound.title = "Found: " + Object.keys(GT.myQsoGrids).join(",");
+  qsoCallsignsFound.title = "Found: " + Object.keys(GT.myQsoCalls).join(",");
+}
+
 function adifParseComplete(task)
 {
   GT.adifLogCount--;
@@ -171,8 +177,7 @@ function adifParseComplete(task)
   stateCheck();
   refreshQSOs();
 
-  qsoGridsFound.innerHTML = "Found: " + Object.keys(GT.myQsoGrids).join(",");
-  qsoCallsignsFound.innerHTML = "Found: " + Object.keys(GT.myQsoCalls).join(",");
+  setQsoFound();
 
   tryNextTask(task);
 }
@@ -189,8 +194,7 @@ function aclogParseComplete(task)
   stateCheck();
   refreshQSOs();
 
-  qsoGridsFound.innerHTML = "Found: " + Object.keys(GT.myQsoGrids).join(",");
-  qsoCallsignsFound.innerHTML = "Found: " + Object.keys(GT.myQsoCalls).join(",");
+  setQsoFound();
 
   tryNextTask(task);
 }
@@ -3116,12 +3120,7 @@ function parsePSKadif(adiBuffer)
             false,
             false,
             finalRSTsent,
-            finalDxcc,
-            null,
-            null,
-            null,
-            null,
-            null
+            finalDxcc
           );
         }
         else if (finalDEcall == GT.settings.app.myCall)
@@ -3138,12 +3137,7 @@ function parsePSKadif(adiBuffer)
             false,
             false,
             null,
-            finalDxcc,
-            null,
-            null,
-            null,
-            null,
-            null
+            finalDxcc
           );
         }
         else
@@ -3160,12 +3154,7 @@ function parsePSKadif(adiBuffer)
             false,
             false,
             null,
-            finalDxcc,
-            null,
-            null,
-            null,
-            null,
-            null
+            finalDxcc
           );
         }
       }

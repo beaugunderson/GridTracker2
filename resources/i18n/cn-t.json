@@ -287,7 +287,7 @@
     "settings.map.FitMapToQRZ.hover": "將地圖匹配映射切換到QRZ",
     "settings.map.CQHighlight.label": "'CQ'高亮顯示",
     "settings.map.CQHighlight.hover": "切換'CQ XX'高亮顯示",
-    "settings.map.MissingGrid.label": "QRZ缺少網格 DXCC回退",
+    "settings.map.MissingGrid.label": "缺少網格 DXCC回退",
     "settings.map.MissingGrid.hover": "如果電臺網格缺少網格則使用DXCC",
     "settings.map.RXSpotPath.color.label": "RX Spot 顏色調整",
     "settings.map.RXSpotPath.color.default": "PSK",

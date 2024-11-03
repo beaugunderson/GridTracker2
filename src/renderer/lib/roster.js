@@ -1744,11 +1744,6 @@ function testAward(awardName, obj)
   )
   { return false; }
 
-  if (
-    CR.awardTracker[awardName].test.sat &&
-    CR.awardTracker[awardName].rule.satName.indexOf(obj.satName) == -1
-  )
-  { return false; }
 
   let baseHash = "";
   if (CR.awardTracker[awardName].test.band) baseHash += obj.band;
@@ -1789,7 +1784,6 @@ function processAward(awardName)
   test.cont = "cont" in award.rule;
   test.grid = "grid" in award.rule;
   test.prop = "propMode" in award.rule;
-  test.sat = "satName" in award.rule;
 
   CR.awardTracker[awardName].stat = {};
 
@@ -1814,8 +1808,6 @@ function processAward(awardName)
     if (test.cont && award.rule.cont.indexOf(obj.cont) == -1) continue;
 
     if (test.prop && award.rule.propMode != obj.propMode) continue;
-
-    if (test.sat && award.rule.satName.indexOf(obj.satName) == -1) continue;
 
     CR.awardTypes[award.rule.type].score(CR.awardTracker[awardName], obj);
   }

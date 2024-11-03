@@ -223,7 +223,7 @@ const def_settings = {
   },
   reception: {
     viewHistoryTimeSec: 900,
-    viewPaths: true,
+
     pathColor: -1,
     pathNightColor: 361,
     spotWidth: 0.8,

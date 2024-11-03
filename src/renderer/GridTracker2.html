@@ -1269,212 +1269,76 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    
     </div>
     <div id="SpeechSettingsDiv" class="settingsTabcontent">
-      <div class="roundBorder" style="border: 1px solid #666; margin: 2px; padding: 5px">
-        <div class="mapItem">
-          <table align="center">
-            <tr align="center">
-              <td data-i18n="settings.audio.TextToSpeech.label" align="center">Text-to-speech Voice</td>
-            </tr>
-            <tr align="center">
-              <td colspan="1" id="voicesDiv"><select id="alertVoiceInput"></select></td>
-            </tr>
-          </table>
-        </div>
-        <br />
-        <div class="mapItem">
-          <table align="center">
-            <tr align="center">
-              <td data-i18n="settings.audio.Speech.Rate.label" align="center">Speech Rate</td>
-              <td align="center" id="speechRateTd">1</td>
-            </tr>
-            <tr align="center">
-              <td colspan="2">
-                <input type="range" min="0.1" max="10" value="1" step="0.1" class="slider" id="speechRate"
-                  oninput="changeSpeechValues()" />
-              </td>
-            </tr>
-          </table>
-        </div>
-        <div class="mapItem">
-          <table align="center">
-            <tr>
-              <td data-i18n="settings.audio.Speech.Pitch.label" align="center">Speech Pitch</td>
-              <td align="center" id="speechPitchTd">1</td>
-            </tr>
-            <tr align="center">
-              <td colspan="2">
-                <input type="range" min="0" max="2" value="1" step="0.1" class="slider" id="speechPitch"
-                  oninput="changeSpeechValues()" />
-              </td>
-            </tr>
-          </table>
-        </div>
-        <div class="mapItem">
-          <table align="center">
-            <tr>
-              <td data-i18n="settings.audio.Speech.Volume.label" align="center">Speech Volume</td>
-              <td align="center" id="speechVolumeTd">1</td>
-            </tr>
-            <tr align="center">
-              <td colspan="2">
-                <input type="range" min="0.1" max="1" value="1" step="0.05" class="slider" id="speechVolume"
-                  oninput="changeSpeechValues()" />
-              </td>
-            </tr>
-          </table>
-        </div>
-        <div class="mapItem">
-          <table align="center">
-            <tr>
-              <td data-i18n="settings.audio.Speech.Phonetics.label"
-                title="Speak Callsigns and Gridsquares phonetically">Phonetics</td>
-            </tr>
-            <tr>
-              <td title="Speak Callsigns and Gridsquares phonetically">
-                <input type="checkbox" id="speechPhonetics" onclick="changeSpeechValues()" />
-              </td>
-            </tr>
-          </table>
-        </div>
-      </div>
-      <div class="mapItem">
-        <table align="center">
-          <tr align="center">
-            <td data-i18n="settings.audio.Device.label" align="center">Audio Device</td>
+      <div class="mapItem" >
+        <table class="darkTable">
+          <tr>
+            <th data-i18n="settings.audio.Device.label" colspan="3" style="font-weight: bold; color: yellow">Audio Device</th>            
           </tr>
-          <tr align="center">
-            <td colspan="1">
+          <tr>
+            <td colspan="3">
               <div id="soundCardDiv"></div>
             </td>
           </tr>
-        </table>
-      </div>
-      <br />
-      <div class="mapItem" style="white-space: nowrap">
-        <table align="center">
           <tr>
-            <td data-i18n="settings.audio.File.Volume.label" align="center">File Audio Volume</td>
-            <td align="center" id="audioVolumeTd">1</td>
-          </tr>
-          <tr align="center">
+            <td data-i18n="settings.audio.QSOLogEventFile.label">QSO Log Event Notification</td>
             <td colspan="2">
-              <input type="range" min="0.00" max="1" value="1" step="0.01" class="slider" id="audioVolume"
-                oninput="changeAudioValues()" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <br />
-      <div class="mapItem" style="white-space: nowrap">
-        <table align="center">
-          <tr>
-            <td data-i18n="settings.audio.QSOLogEventFile.label" align="center">QSO Log Event Notification</td>
-          </tr>
-          <tr align="center">
-            <td>
               <select id="logEventMedia" onchange="newLogEventSetting(this); alertLogMessage();"></select>
             </td>
           </tr>
+          <tr>
+            <td data-i18n="settings.audio.File.Volume.label">File Audio Volume</td>
+            <td>
+              <input type="range" min="0.00" max="1" value="1" step="0.01" class="slider" id="audioVolume"
+                oninput="changeAudioValues()" />
+            </td>
+            <td id="audioVolumeTd">1</td>
+          </tr>
+          <tr>
+            <td colspan="3" data-i18n="settings.audio.TextToSpeech.label" style="font-weight: bold; color: cyan">Text-to-speech Voice</td>
+          </tr>
+          <tr>
+            <td colspan="3" id="voicesDiv"><select id="alertVoiceInput"></select></td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.audio.Speech.Rate.label" >Speech Rate</td>
+            <td>
+              <input type="range" min="0.1" max="10" value="1" step="0.1" class="slider" id="speechRate"
+                oninput="changeSpeechValues()" />
+            </td>
+            <td id="speechRateTd">1</td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.audio.Speech.Pitch.label" >Speech Pitch</td>
+            <td >
+              <input type="range" min="0" max="2" value="1" step="0.1" class="slider" id="speechPitch"
+                oninput="changeSpeechValues()" />
+            </td>
+            <td  id="speechPitchTd">1</td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.audio.Speech.Volume.label" >Speech Volume</td>
+            <td>
+              <input type="range" min="0.1" max="1" value="1" step="0.05" class="slider" id="speechVolume"
+                oninput="changeSpeechValues()" />
+            </td>
+            <td  id="speechVolumeTd">1</td>
+          </tr>
+          <tr>
+            <td data-i18n="settings.audio.Speech.Phonetics.label"
+              title="Speak Callsigns and Gridsquares phonetically">Phonetics</td>
+            <td title="Speak Callsigns and Gridsquares phonetically">
+              <input type="checkbox" id="speechPhonetics" onclick="changeSpeechValues()" />
+            </td>
+          </tr>
         </table>
+
       </div>
     </div>
     <div id="logbookSettingsDiv" class="settingsTabcontent" style="padding: 5px">
-      <div style="padding: 5px" class="mapItem">
-        <div style="padding: 5px" class="mapItem"
-          title="Filter Logbook QSOs to include these Callsigns only&#10;(comma separated)">
-          <table align="center">
-            <tr>
-              <td data-i18n="settings.logbook.callsigns.label">Working Callsign(s)</td>
-            </tr>
-            <tr>
-              <td id="workingCallsignEnableTd" >
-                <label data-i18n="settings.logbook.callsigns.enable" for="workingCallsignEnable">Enable?</label>
-                <input title="Enable Filtering" type="checkbox" id="workingCallsignEnable"
-                  onclick="workingCallsignEnableChanged(this);" />
-              </td>
-            </tr>
-            <tr>
-              <td id="workingCallsignsTd">
-                <label data-i18n="settings.logbook.callsigns.callsigns" for="workingCallsignsValue">Callsign(s)</label>
-                <input id="workingCallsignsValue" type="text" class="inputTextValue" size="15"
-                  onkeypress="return validCallsignsKeys(event.charCode);"
-                  oninput="workingCallsignsChanged(this);" />
-              </td>
-            </tr>
-            <tr>
-              <td id="qsoCallsignsFound"></td>
-            </tr>
-          </table>
-        </div>
-        <div style="padding: 5px" class="mapItem"
-        title="Filter Logbook QSOs to include these Grids only&#10;(comma separated)">
-        <table align="center">
-          <tr>
-            <td>Working Grid(s)</td>
-          </tr>
-          <tr>
-            <td id="workingGridEnableTd">
-              <label for="workingGridEnable">Enable?</label>
-              <input title="Enable Filtering" type="checkbox" id="workingGridEnable"
-                onclick="workingGridEnableChanged(this);" />
-            </td>
-          </tr>
-          <tr>
-            <td id="workingGridsTd">
-              <label  for="workingGridsValue">Grid(s)</label>
-              <input id="workingGridsValue" type="text" class="inputTextValue" size="15"
-                onkeypress="return validGridKeys(event.charCode);"
-                oninput="workingGridsChanged(this);" />
-            </td>
-          </tr>
-          <tr>
-            <td id="qsoGridsFound"></td>
-          </tr>
-        </table>
-      </div>
-        <br />
-        <div style="padding: 5px" class="mapItem" title="Filter Logbook QSOs from before this Date">
-          <table align="center">
-            <tr>
-              <td data-i18n="settings.logbook.date.label"><b>Working Date</b></td>
-            </tr>
-            <tr>
-              <td id="workingDateEnableTd">
-                <label data-i18n="settings.logbook.date.enable" for="workingDateEnable">Enable?</label>
-                <input title="Enable Filtering" type="checkbox" id="workingDateEnable"
-                  onclick="workingDateEnableChanged(this);" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div class="roundBorderValue" style="margin-bottom:5px; width: auto; font-size: larger; font-weight: bold"
-                  id="workingDateString">
-                  No Date
-                </div>
-              </td>
-              <td></td>
-            </tr>
-
-            <tr>
-              <td id="workingDateTd" title="Date/Time is UTC">
-                <label data-i18n="settings.logbook.date.date" for="workingDateValue">UTC</label> <input type="datetime-local" id="workingDateValue" value="1970-01-01T00:00" style="background-color: green; color: yellow;" onchange="workingDateChanged()" />
-              </td>
-            </tr>
-          </table>
-        </div>
-        <br />
-        <div data-i18n="settings.logbook.apply.label"
-          style="padding: 5px; display: none; font-size: larger; font-weight: bold; color: cyan"
-          id="applyCallsignsAndDateDiv" class="button" onclick="applyCallsignsAndDates();"
-          title="Apply Changes and Re-Import Logbook(s)">
-          Apply Changes
-        </div>
-      </div>
-      <br/>
       <div  style="padding: 5px" class="mapItem">
         <table align="center">
           <tr>
-            <td> QSL Location Authority</td>
+            <td>QSL Location Authority</td>
           </tr>
           <tr>
             <td>
@@ -1507,6 +1371,91 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </td>
           </tr>
         </table>
+      </div>
+      <br />
+      <div style="padding: 5px" class="mapItem">
+        <div style="padding: 5px" class="mapItem"
+          title="Filter Logbook QSOs to include these Callsigns only&#10;(comma separated)">
+          <table align="center" id="qsoCallsignsFound">
+            <tr>
+              <td data-i18n="settings.logbook.callsigns.label">Working Callsign(s)</td>
+            </tr>
+            <tr>
+              <td id="workingCallsignEnableTd" >
+                <label data-i18n="settings.logbook.callsigns.enable" for="workingCallsignEnable">Enable?</label>
+                <input title="Enable Filtering" type="checkbox" id="workingCallsignEnable"
+                  onclick="workingCallsignEnableChanged(this);" />
+              </td>
+            </tr>
+            <tr>
+              <td id="workingCallsignsTd">
+                <label data-i18n="settings.logbook.callsigns.callsigns" for="workingCallsignsValue">Callsign(s)</label>
+                <input id="workingCallsignsValue" type="text" class="inputTextValue" size="15"
+                  onkeypress="return validCallsignsKeys(event.charCode);"
+                  oninput="workingCallsignsChanged(this);" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div style="padding: 5px" class="mapItem"
+        title="Filter Logbook QSOs to include these Grids only&#10;(comma separated)">
+        <table align="center" id="qsoGridsFound">
+          <tr>
+            <td>Working Grid(s)</td>
+          </tr>
+          <tr>
+            <td id="workingGridEnableTd">
+              <label for="workingGridEnable">Enable?</label>
+              <input title="Enable Filtering" type="checkbox" id="workingGridEnable"
+                onclick="workingGridEnableChanged(this);" />
+            </td>
+          </tr>
+          <tr>
+            <td id="workingGridsTd">
+              <label  for="workingGridsValue">Grid(s)</label>
+              <input id="workingGridsValue" type="text" class="inputTextValue" size="15"
+                onkeypress="return validGridKeys(event.charCode);"
+                oninput="workingGridsChanged(this);" />
+            </td>
+          </tr>
+        </table>
+      </div>
+        <br />
+        <div style="padding: 5px" class="mapItem" title="Filter Logbook QSOs from before this Date">
+          <table align="center">
+            <tr>
+              <td data-i18n="settings.logbook.date.label"><b>Working Date</b></td>
+            </tr>
+            <tr>
+              <td id="workingDateEnableTd">
+                <label data-i18n="settings.logbook.date.enable" for="workingDateEnable">Enable?</label>
+                <input title="Enable Filtering" type="checkbox" id="workingDateEnable"
+                  onclick="workingDateEnableChanged(this);" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="roundBorderValue" style="margin-bottom:5px; width: auto; font-size: larger; font-weight: bold"
+                  id="workingDateString">
+                  No Date
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td id="workingDateTd" title="Date/Time is UTC">
+                <label data-i18n="settings.logbook.date.date" for="workingDateValue">UTC</label> <input type="datetime-local" id="workingDateValue" value="1970-01-01T00:00" style="background-color: green; color: yellow;" onchange="workingDateChanged()" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <br />
+        <div data-i18n="settings.logbook.apply.label"
+          style="padding: 5px; display: none; font-size: larger; font-weight: bold; color: cyan"
+          id="applyCallsignsAndDateDiv" class="button" onclick="applyCallsignsAndDates();"
+          title="Apply Changes and Re-Import Logbook(s)">
+          Apply Changes
+        </div>
       </div>
     </div>
     <div id="gridSettingsDiv" class="settingsTabcontent">
@@ -1675,6 +1624,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <div class="flexSettingDiv">
         <div class="flexItem">
             <label data-i18n="settings.map.current.label">Current Map</label>
+
             <div>
               <select id="mapSelect" value="terrain-background" onchange="changeMapValues();"></select>
               <select id="offlineMapSelect" value="terrain-background" onchange="changeOfflineMap();"></select>
@@ -1687,9 +1637,53 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </div>
         </div>
         <div class="flexItem">
-          <label data-i18n="settings.map.transparency.label" >Map Settings Transparency</label>
-          <input type="range" min="0" max="1" value="0.5" step="0.01" class="slider" id="mapTransValue" oninput="mapTransChange();" />
-          <label id="mapTransTd">50%</label>
+          <label data-i18n="settings.map.NightMap.select.label" >Night Map</label>
+          <div>
+            <select id="mapNightSelect" value="18" onchange="changeMapNightValues();"></select>
+            <select id="offlineMapNightSelect" value="terrain-background" onchange="changeOfflineNightMap();"></select>
+            <br/>
+            <div id="nightMapApiKeyTr">
+              <label data-i18n="settings.logging.QRZcom.details.apikey" for="nightMapApiKeyInput">API Key</label>
+              <input id="nightMapApiKeyInput" type="test" class="inputTextValue"  size="21" oninput="nightMapApiKeyInputChanged()" /><br/>
+              <div id="nightMapApiKeyApplyDiv" data-i18n="settings.Update.label" class="button" onclick="changeMapLayer()">Apply Changes</div>
+            </div>
+          </div>
+        </div>
+        <br/>
+        <div class="flexItem">
+          <label data-i18n="settings.map.Brightness.label">Brightness</label>
+          <input type="range" min="0" max="1" value="1" step="0.01" class="slider" id="brightnessValue" oninput="changeMapValues()" />
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.animatePaths.label" for="animateValue">Animate Active Paths</label>
+          <input type="checkbox" id="animateValue" onclick="changeAnimate()" />
+          <input title="Animation Speed" type="range" min="1" max="20" value="10" step="1" class="slider" id="animateSpeedValue" oninput="changeAnimateSpeedValue()" />
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.GraylineDarkness.label">Grayline Darkness</label>
+          <input type="range" min="0.03" max="0.70" value="0.1" step="0.01" class="slider" id="graylineValue" oninput="changeGrayline()" />
+          <label id="showDarknessTd">10%</label>
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.MergeAward.label" for="mergeOverlayValue">Merge Award Overlay</label>
+          <input type="checkbox" id="mergeOverlayValue" onclick="changeMergeOverlayValue()" />
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.FitMapToQRZ.label" for="fitQRZvalue" >Fit Map To QRZ</label>
+          <input type="checkbox" id="fitQRZvalue" onclick="changeFitQRZvalue()" />
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.CQHighlight.label" for="CqHiliteValue">'CQ' Highlighting</label>
+          <input type="checkbox" id="CqHiliteValue" onclick="changeCqHiliteValue(this);" />
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.MissingGrid.label" for="qrzDxccFallbackValue" >QRZ DXCC Fallback</label>
+          <input type="checkbox" id="qrzDxccFallbackValue" onclick="changeQrzDxccFallbackValue();" />
+        </div>
+        <div class="flexItem">
+          <label>Prediction Layer Opacity</label>
+          <input type="range" min="0.05" max="1" value="0.3" step="0.01" class="slider" id="predOpacityValue" oninput="changePredOpacityValue();" />
+          <label id="predOpacityTd">0.3</label>
         </div>
         <div class="flexItem">
           <label data-i18n="settings.map.QSXPath.width.label" >QSX Path Width</label>
@@ -1710,41 +1704,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           <input type="range" min="0" max="361" value="360" class="slider" id="qrzPathColorValue" oninput="changePathValues()" />
         </div>
         <div class="flexItem">
-          <label data-i18n="settings.map.GraylineDarkness.label">Grayline Darkness</label>
-          <input type="range" min="0.03" max="0.70" value="0.1" step="0.01" class="slider" id="graylineValue" oninput="changeGrayline()" />
-          <label id="showDarknessTd">10%</label>
-        </div>
-        <div class="flexItem">
-          <label data-i18n="settings.map.Brightness.label">Brightness</label>
-          <input type="range" min="0" max="1" value="1" step="0.01" class="slider" id="brightnessValue" oninput="changeMapValues()" />
-        </div>
-        <div class="flexItem">
-          <label data-i18n="settings.map.MergeAward.label" for="mergeOverlayValue">Merge Award Overlay</label>
-          <input type="checkbox" id="mergeOverlayValue" onclick="changeMergeOverlayValue()" />
-        </div>
-        <div class="flexItem">
-          <label data-i18n="settings.map.FitMapToQRZ.label" for="fitQRZvalue" >Fit Map To QRZ</label>
-          <input type="checkbox" id="fitQRZvalue" onclick="changeFitQRZvalue()" />
-        </div>
-        <div class="flexItem">
-          <label data-i18n="settings.map.CQHighlight.label" for="CqHiliteValue">'CQ' Highlighting</label>
-          <input type="checkbox" id="CqHiliteValue" onclick="changeCqHiliteValue(this);" />
-        </div>
-        <div class="flexItem">
-          <label data-i18n="settings.map.MissingGrid.label" for="qrzDxccFallbackValue" >QRZ DXCC Fallback</label>
-          <input type="checkbox" id="qrzDxccFallbackValue" onclick="changeQrzDxccFallbackValue();" />
-        </div>
-        <div class="flexItem">
-          <label data-i18n="settings.map.animatePaths.label" for="animateValue">Animate Active Paths</label>
-          <input type="checkbox" id="animateValue" onclick="changeAnimate()" />
-          <input title="Animation Speed" type="range" min="1" max="20" value="10" step="1" class="slider" id="animateSpeedValue" oninput="changeAnimateSpeedValue()" />
-        </div>
-        <div class="flexItem">
-          <label>Prediction Layer Opacity</label>
-          <input type="range" min="0.05" max="1" value="0.3" step="0.01" class="slider" id="predOpacityValue" oninput="changePredOpacityValue();" />
-          <label id="predOpacityTd">0.3</label>
-        </div>
-        <div class="flexItem">
           <label>AEQD Range Ring Spacing</label>
           <input type="range" min="0" max="19500" value="2500" step="100" class="slider" id="rangeRingDistanceValue" oninput="changeRangeRingDistance()" />
           <label id="rangeRingDistanceTd">2500 km</label>
@@ -1756,49 +1715,41 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <div class="flexItem" id="spotPathColorDiv">
           <label data-i18n="settings.map.RXSpotPath.color.label">RX Spot Color</label>
           <input type="range" min="-1" max="361" value="-1" class="slider" id="spotPathColorValue" oninput="spotPathChange();" onkeyup="redrawSpots();" onmouseup="redrawSpots();" />
-        </div>
-        <div class="flexItem">
-          <label data-i18n="settings.map.RXSpotPath.enable.label" for="spotPathsValue">Spot Paths</label>
-          <input type="checkbox" id="spotPathsValue" onclick="changeSpotValues();redrawSpots();" />
+          <label data-i18n="settings.map.RXSpotPath.color.default" id="spotPathInfoLabel">PSK-Reporter Palette</label>
         </div>
         <div class="flexItem" id="spotPathWidthDiv">
           <label data-i18n="settings.map.RXSpotPath.width.label" >Spot Path Width</label>
-          <input type="range" min="0.0" max="5" value="1.5" step="0.05" class="slider" id="spotWidthValue" oninput="spotPathChange();" onkeyup="redrawSpots();" onmouseup="redrawSpots();" />
+          <input type="range" min="0" max="5" value="1.5" step="0.05" class="slider" id="spotWidthValue" oninput="spotPathChange();" onkeyup="redrawSpots();" onmouseup="redrawSpots();" />
           <label id="spotWidthTd">1.5</label>
+        </div>
+        <div class="flexItem">
+          <label data-i18n="settings.map.transparency.label" >Map Settings Transparency</label>
+          <input type="range" min="0" max="1" value="0.5" step="0.01" class="slider" id="mapTransValue" oninput="mapTransChange();" />
+          <label id="mapTransTd">50%</label>
         </div>
         <div class="flexItem">
           <label data-i18n="settings.map.AutoNight.enable.label" for="nightMapEnable">Auto Night Map</label>
           <input type="checkbox" id="nightMapEnable" onclick="changeNightMapEnable(this);" />
         </div>
-        <div class="flexItem">
-          <label data-i18n="settings.map.NightMap.select.label" >Night Map</label>
-          <div>
-            <select id="mapNightSelect" value="18" onchange="changeMapNightValues();"></select>
-            <select id="offlineMapNightSelect" value="terrain-background" onchange="changeOfflineNightMap();"></select>
-            <br/>
-            <div id="nightMapApiKeyTr">
-              <label data-i18n="settings.logging.QRZcom.details.apikey" for="nightMapApiKeyInput">API Key</label>
-              <input id="nightMapApiKeyInput" type="test" class="inputTextValue"  size="21" oninput="nightMapApiKeyInputChanged()" /><br/>
-              <div id="nightMapApiKeyApplyDiv" data-i18n="settings.Update.label" class="button" onclick="changeMapLayer()">Apply Changes</div>
-            </div>
+        <span id="nightMapSpan">
+          <br/>
+          <div class="flexItem" id="pathNightColorDiv">
+            <label data-i18n="settings.map.NightQSXPath.color.label" >Night QSX Path Color</label>
+            <input type="range" min="0" max="361" value="0" class="slider" id="nightPathColorValue" oninput="changeMapNightPathValues()" />
           </div>
-        </div>
-        <div class="flexItem" id="pathNightColorDiv">
-          <label data-i18n="settings.map.NightQSXPath.color.label" >Night QSX Path Color</label>
-          <input type="range" min="0" max="361" value="0" class="slider" id="nightPathColorValue" oninput="changeMapNightPathValues()" />
-        </div>
-        <div class="flexItem" id="pathNightQrzColorDiv">
-          <label data-i18n="settings.map.NightQRZPath.color.label">Night QRZ Path Color</label>
-          <input type="range" min="0" max="361" value="0" class="slider" id="nightQrzPathColorValue"  oninput="changeMapNightPathValues()" />
-        </div>
-        <div class="flexItem" id="spotNightPathColorDiv">
-          <label data-i18n="settings.map.NightRXSpot.color.label">Night Spot Color</label>
-          <input type="range" min="-1" max="361" value="-1" class="slider" id="spotNightPathColorValue" oninput="spotPathChange();" onkeyup="redrawSpots();" onmouseup="redrawSpots();" />
-        </div>
-        <div class="flexItem">
-          <label data-i18n="settings.map.NightBrightness.label" >Night Brightness</label>
-          <input type="range" min="0" max="1" value="1" step="0.01" class="slider" id="nightBrightnessValue" oninput="changeMapNightValues()" />
-        </div>
+          <div class="flexItem" id="pathNightQrzColorDiv">
+            <label data-i18n="settings.map.NightQRZPath.color.label">Night QRZ Path Color</label>
+            <input type="range" min="0" max="361" value="0" class="slider" id="nightQrzPathColorValue"  oninput="changeMapNightPathValues()" />
+          </div>
+          <div class="flexItem" id="spotNightPathColorDiv">
+            <label data-i18n="settings.map.NightRXSpot.color.label">Night Spot Color</label>
+            <input type="range" min="-1" max="361" value="-1" class="slider" id="spotNightPathColorValue" oninput="spotPathChange();" onkeyup="redrawSpots();" onmouseup="redrawSpots();" />
+          </div>
+          <div class="flexItem">
+            <label data-i18n="settings.map.NightBrightness.label" >Night Brightness</label>
+            <input type="range" min="0" max="1" value="1" step="0.01" class="slider" id="nightBrightnessValue" oninput="changeMapNightValues()" />
+          </div>
+        </span>
       </div>
     </div>
     <div id="logSettingsDiv" class="settingsTabcontent">
