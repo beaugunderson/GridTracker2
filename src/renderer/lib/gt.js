@@ -6144,11 +6144,10 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
           var strokeWeight = qrzPathWidthValue.value;
           var flightPath = null;
           var isQRZ = true;
-          var DEcallsign = GT.liveCallsigns[GT.settings.app.myCall];
-
-          if (strokeWeight != 0)
+ 
+          if (strokeWeight != 0 && GT.settings.app.myGrid.length > 0)
           {
-            var toPoint = getPoint(DEcallsign.grid);
+            var toPoint = getPoint(GT.settings.app.myGrid);
 
             var Lat = GT.dxccInfo[callsign.dxcc].lat;
             var Lon = GT.dxccInfo[callsign.dxcc].lon;
