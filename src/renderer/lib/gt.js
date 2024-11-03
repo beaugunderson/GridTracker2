@@ -14116,7 +14116,7 @@ function addNewMqttPskSpot(json)
 
   let call = json.rc.replaceAll(".", "/");
   let report;
-  json.rl = json.rl.substring(0, 6);
+  json.rl = json.rl.substring(0, 6).toUpperCase();
   let hash = call + json.md + json.b;
 
   if (hash in GT.receptionReports.spots)
