@@ -724,7 +724,7 @@ function parseAcLog(task)
           }
           qso.band = finalBand;
 
-          let finalPropMode = (object.PROP_MODE || null);
+          let finalPropMode = (object.PROPMODE || null);
           if (finalPropMode) qso.propMode = finalPropMode.toUpperCase();
 
           let finalCont = (object.CONTINENT || null);
