@@ -5793,7 +5793,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
     }
 
     // Grab the last word in the decoded message
-    var qth = decodeWords[decodeWords.length - 1].trim();
+    var qth = decodeWords[decodeWords.length - 1].trim().substring(0,4);
     if (qth.length == 4)
     {
       var LETTERS = qth.substr(0, 2);
