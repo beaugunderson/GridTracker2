@@ -61,6 +61,8 @@ function changeSpeechValues()
   speechVolumeTd.innerText = speechVolume.value;
   speechPitchTd.innerText = speechPitch.value;
   speechRateTd.innerText = speechRate.value; 
+
+  speakAlertString("Audio Test", "CQ 73");
 }
 
 function addNewAlert()
