@@ -2002,14 +2002,17 @@ function registerHotKeys()
   registerHotKey("Show CA Provinces Award Layer", "9", setTrophyOverlay, 8);
   registerHotKey("Toggle US Radar Overlay", "0", toggleRadar);
   registerHotKey("Cycle Award Layers", "Equal", cycleTrophyOverlay);
-
+  
   registerHotKey("Toggle Active Path Animation", "KeyA", toggleAnimate, null, null, "ctrlKey");
   registerHotKey("Toggle All Grid Overlay", "KeyB", toggleAllGrids, null, null, "ctrlKey");
   registerHotKey("Open Conditions Windows", "KeyC", showConditionsBox, null, null, "ctrlKey");
   registerHotKey("Toggle Moon Tracking", "KeyD", toggleMoon, null, null, "ctrlKey");
+
+
   registerHotKey("Toggle GridTracker Users", "KeyG", toggleGtMap, null, null, "ctrlKey");
   registerHotKey("Toggle Timezone Overlay", "KeyH", toggleTimezones, null, null, "ctrlKey");
   registerHotKey("Open Statistics Window", "KeyI", showRootInfoBox, null, null, "ctrlKey");
+
   registerHotKey("Capture Window to Clipboard", "KeyK", captureScreenshot, null, null, "ctrlKey");
   registerHotKey("Open ADIF file", "KeyL", adifLoadDialog, null, null, "ctrlKey");
   registerHotKey("Toggle Audio Mute", "KeyM", toggleAlertMute, null, null, "ctrlKey");
@@ -2021,11 +2024,13 @@ function registerHotKeys()
   registerHotKey("Open Settings", "KeyS", showSettingsBox, null, null, "ctrlKey");
   registerHotKey("Toggle RX Spots over Grids", "KeyT", toggleSpotOverGrids, null, null, "ctrlKey");
   registerHotKey("Toggle Award Layer Merge", "KeyU", toggleMergeOverlay, null, null, "ctrlKey");
+
   registerHotKey("Toggle AEQD Projection", "KeyW", changeMapProjection, null, null, "ctrlKey");
   registerHotKey("Toggle Map Position Info", "KeyX", toggleMouseTrack, null, null, "ctrlKey");
-  registerHotKey("Center Map on QTH Grid", "KeyZ", setCenterQTH, null, null, "ctrlKey");
-  registerHotKey("Toggle Call Roster Scripts", "Minus", toggleCRScript, null, null, "shiftKey");
 
+  registerHotKey("Center Map on QTH Grid", "KeyZ", setCenterQTH, null, null, "ctrlKey");
+
+  registerHotKey("Toggle Call Roster Scripts", "Minus", toggleCRScript, null, null, "shiftKey");
   registerHotKey("Map Memory 1", "F5", mapMemory, 0, "shiftKey", null, "Save");
   registerHotKey("Map Memory 2", "F6", mapMemory, 1, "shiftKey", null, "Save");
   registerHotKey("Map Memory 3", "F7", mapMemory, 2, "shiftKey", null, "Save");

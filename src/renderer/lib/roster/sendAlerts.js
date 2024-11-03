@@ -3,6 +3,7 @@ function sendAlerts()
   CR.alertTimer = null;
   const callRoster = CR.callRoster;
   let scriptPath = window.opener.GT.scriptPath;
+  let everyDecode = window.opener.GT.settings.audioAlerts.rules.everyDecode;
   let dirPath = path.dirname(scriptPath);
   let scriptExists = false;
   let shouldRosterAlert = 0;
@@ -29,15 +30,18 @@ function sendAlerts()
     delete scriptReport[call].qso;
     delete scriptReport[call].instance;
 
-    if (callObj.rosterAlerted == false && callObj.shouldRosterAlert == true)
+    if (callObj.shouldRosterAlert == true && callObj.rosterAlerted == false)
     {
       callObj.rosterAlerted = true;
       shouldRosterAlert++;
     }
     callObj.shouldRosterAlert = false;
 
-    if (callObj.audioAlerted == false && callObj.shouldAudioAlert == true)
+    if (callObj.shouldAudioAlert == true && (callObj.audioAlerted == false || everyDecode))
+    {
+      if (!callObj.lastUTC || callObj.lastUTC != callObj.UTC)
       {
+        callObj.lastUTC = callObj.UTC;
         callObj.audioAlerted = true;
         for (const key in callObj.audioAlertReason)
         {
@@ -45,6 +49,7 @@ function sendAlerts()
         }
         shouldAudioAlert++;
       }
+    }
     callObj.shouldAudioAlert = false;
   }
 

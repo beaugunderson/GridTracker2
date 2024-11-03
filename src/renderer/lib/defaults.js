@@ -308,6 +308,9 @@ const def_settings = {
     volume: 1
   },
   audioAlerts: {
+    rules: {
+      everyDecode: false
+    },
     wanted: {
       huntCallsign: false,
       huntGrid: false,

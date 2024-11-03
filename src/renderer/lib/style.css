@@ -1028,10 +1028,27 @@ button:focus {
   flex:auto;
 }
 
+#exceptionDiv h3 {
+  color: rgb(206, 89, 89);
+  border-bottom: 2px solid rgb(206, 89, 89);
+  margin-bottom: 3px;
+}
+
+#audioAlertRulesDiv {
+  flex:auto;
+}
+
+#audioAlertRulesDiv h3 {
+  color: rgb(206, 204, 89);
+  border-bottom: 2px solid rgb(206, 204, 89);
+  margin-bottom: 3px;
+}
+
 .secondaryControlGroup {
   flex: auto;
   margin-left: 2px;
   padding: 0px;
+  margin-bottom: 0px;
 }
 
 .secondaryControlGroup h3 {
@@ -1048,11 +1065,7 @@ button:focus {
   margin-bottom: 3px;
 }
 
-#exceptionDiv h3 {
-  color: rgb(206, 89, 89);
-  border-bottom: 2px solid rgb(206, 89, 89);
-  margin-bottom: 3px;
-}
+
 
 #ReferenceAudioAlertControls h3 {
   color: rgb(89, 206, 206);

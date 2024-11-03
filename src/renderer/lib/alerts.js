@@ -774,6 +774,15 @@ function huntingValueChanged(element)
   }
 }
 
+function alertRulesValueChanged(element)
+{
+    window.speechSynthesis.cancel();
+    let value = (element.type == "checkbox") ? element.checked : element.value;
+    GT.settings.audioAlerts.rules[element.id] = value;
+    GT.callRosterWindowHandle.window.huntingValueChangedFromAudioAlerts(element.id, value);
+    setVisualAudioAlerts();
+}
+
 function huntingValueChangedFromCallRoster(id, value)
 {
   if (id in window)
@@ -843,6 +852,21 @@ function loadAudioAlertSettings()
   onlySpot.checked = GT.settings.roster.onlySpot;
   usesOQRS.checked = GT.settings.roster.usesOQRS;
   allOnlyNew.checked = GT.settings.roster.allOnlyNew;
+
+  for (const key in GT.settings.audioAlerts.rules)
+  {
+    if (key in window)
+    {
+      if (window[key].type == "checkbox")
+      {
+        window[key].checked = GT.settings.audioAlerts.rules[key];
+      }
+      else
+      {
+        window[key].value = GT.settings.audioAlerts.rules[key];
+      }
+    }
+  }
 
   for (const key in GT.settings.audioAlerts.wanted)
   {
