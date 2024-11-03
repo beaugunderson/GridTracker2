@@ -34,7 +34,7 @@ exports.default = async function(context) {
     
         fs.renameSync(pathGridTracker2, pathGridTracker2Bin);
     
-        const wrapperScript = "#!/bin/bash\nSOURCE_DIR=\`realpath $0\`\nSOURCE_DIR=\`dirname ${SOURCE_DIR}\`\n${SOURCE_DIR}/gridtracker2.bin \"$@\" --no-sandbox\n";
+        const wrapperScript = "#!/bin/bash\nSOURCE_DIR=\`realpath $0\`\nSOURCE_DIR=\`dirname ${SOURCE_DIR}\`\n${SOURCE_DIR}/gridtracker2.bin \"$@\" --no-sandbox --enable-speech-dispatcher\n";
     
         fs.writeFileSync(pathGridTracker2, wrapperScript);
         exec(`chmod +x ${pathGridTracker2}`);
