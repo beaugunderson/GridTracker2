@@ -1191,7 +1191,7 @@ function getABuffer(file_url, callback, flag, mode, port, imgToGray, stringOfFla
 
   req.on("socket", function (socket)
   {
-    socket.setTimeout(180000);
+    socket.setTimeout(280000);
     socket.on("timeout", function ()
     {
       req.abort();
@@ -1304,7 +1304,7 @@ function getAPostBuffer(
 
   req.on("socket", function (socket)
   {
-    socket.setTimeout(180000);
+    socket.setTimeout(280000);
     socket.on("timeout", function ()
     {
       req.abort();
