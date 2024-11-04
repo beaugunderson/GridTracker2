@@ -56,6 +56,7 @@ CR.modeColors.QRA64 = "FF00FF";
 CR.modeColors.MSK144 = "4949FF";
 CR.rosterTimeout = null;
 CR.rosterFocus = false;
+CR.lastTime = 0;
 CR.watchers = {};
 CR.watchersTest = {};
 
@@ -268,6 +269,9 @@ function realtimeRoster()
   let now = timeNowSec();
   CR.day = parseInt(now / 86400);
   CR.dayAsString = String(CR.day);
+
+  if (Object.keys(window.opener.GT.gtUnread).length > 0 && now % 2 == 0) rosterChatNotifyImg.style.webkitFilter = "invert(1)";
+  else rosterChatNotifyImg.style.webkitFilter = "";
 
   if (CR.rosterSettings.realtime == false) return;
 
@@ -746,7 +750,7 @@ function setVisual()
         window[key].checked = CR.rosterSettings.wanted[key];
         if (GT.settings.audioAlerts.wanted[key] == true)
         {
-          window[key].nextElementSibling.nextElementSibling.innerHTML = "<font style='font-size:smaller;'>&#128276;</font>";
+          window[key].nextElementSibling.nextElementSibling.innerHTML = "<font style='font-size:smaller;' onclick='window.opener.openAudioAlertSettings()'>&#128276;</font>";
         }
         else
         {
@@ -769,7 +773,7 @@ function setVisual()
   useseQSLDiv.style.display = (GT.settings.callsignLookups.eqslUseEnable) ? "" : "none";
   usesOQRSDiv.style.display = (GT.settings.callsignLookups.oqrsUseEnable) ? "" : "none";
   onlySpotDiv.style.display = (CR.rosterSettings.columns.Spot) ? "" : "none";
-  huntingMatrixOAMSDiv.style.display = (window.opener.oamsCanMsg()) ? "" : "none";
+  rosterChatNotifyImg.style.display = huntingMatrixOAMSDiv.style.display = (window.opener.oamsCanMsg()) ? "" : "none";
   huntingMatrixPotaDiv.style.display = (GT.settings.app.potaFeatureEnabled && GT.settings.map.offlineMode == false) ? "" : "none";
   rosterBody.style.display = "block";
   

@@ -1786,6 +1786,15 @@ function toggleMessaging()
   }
 }
 
+function openMessaging()
+{
+  if (GT.chatWindowInitialized)
+  {
+    electron.ipcRenderer.send("showWin", "gt_chat");
+    electron.ipcRenderer.send("focusWin", "gt_chat");
+  }
+}
+
 function initPopupWindow()
 {
   if (GT.popupWindowHandle == null)
@@ -7926,6 +7935,15 @@ function openLogbookSettings()
   helpDiv.style.display = "none";
   GT.helpShow = false;
   rootSettingsDiv.style.display = "inline-block";
+}
+
+function openAudioAlertSettings()
+{
+  openSettingsTab(audioalertbut, 'audioAlertsDiv');
+  helpDiv.style.display = "none";
+  GT.helpShow = false;
+  rootSettingsDiv.style.display = "inline-block";
+  electron.ipcRenderer.send("showWin", "GridTracker2")
 }
 
 function openSettingsTab(evt, tabName)
