@@ -464,7 +464,7 @@ app.whenReady().then(() => {
       window.on('close', (event) => {
         // save all window(s) and position(s)
         let bounds = window.getContentBounds();
-        let saveBounds = !(window.isMaximized() || window.isFullScreen());
+        let saveBounds = !(window.isFullScreen());
 
         if (window.id != 1) {
           if (mainWindowClosing == false) {
