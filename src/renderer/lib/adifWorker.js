@@ -119,13 +119,17 @@ function onAdiLoadComplete(task)
 
           if (object.APP_LOTW_RXQSL)
           {
-            let dRXQSL = Date.parse(object.APP_LOTW_RXQSL);
-            if ((isNaN(dRXQSL) == false) && dRXQSL > 0 && dRXQSL > task.lotw_qsl)
+            let parts = object.APP_LOTW_RXQSL.split(" ");
+            if (parts.length == 2)
             {
-              // add a second
-              dRXQSL += 1000;
-              task.lotw_qsl = dRXQSL;
-              lotwTimestampUpdated = true;
+              let dRXQSL = Date.parse(parts.join("T") + "Z");
+              if ((isNaN(dRXQSL) == false) && dRXQSL > 0 && dRXQSL > task.lotw_qsl)
+              {
+                // add a second
+                dRXQSL += 1000;
+                task.lotw_qsl = dRXQSL;
+                lotwTimestampUpdated = true;
+              }
             }
             lotwConfirmed = true;
           }

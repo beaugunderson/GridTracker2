@@ -763,10 +763,7 @@ function getFilesizeInBytes(filename)
 
 function loadLoTWLogFile()
 {
-  if (GT.settings.app.workingDateEnable == true && GT.settings.app.workingDate > 0)
-  {
-    GT.settings.adifLog.lastFetch.lotw_qsl = GT.settings.app.workingDate * 1000;
-  }
+  GT.settings.adifLog.lastFetch.lotw_qsl = 0;
 
   if (fs.existsSync(GT.LoTWLogFile) && getFilesizeInBytes(GT.LoTWLogFile) > 0)
   {
@@ -774,7 +771,6 @@ function loadLoTWLogFile()
   }
   else
   {
-    GT.settings.adifLog.lastFetch.lotw_qsl = 0;
     grabLoTWQSL();
   }
 }
@@ -2415,28 +2411,25 @@ function sendClubLogEntry(report)
 
   if (logClubqsoCheckBox.checked == true)
   {
-    if (typeof nw != "undefined")
-    {
-      var postData = {
-        email: clubEmail.value,
-        password: clubPassword.value,
-        callsign: clubCall.value,
-        adif: report,
-        api: CLk
-      };
+    var postData = {
+      email: clubEmail.value,
+      password: clubPassword.value,
+      callsign: clubCall.value,
+      adif: report,
+      api: CLk
+    };
 
-      getPostBuffer(
-        "https://clublog.org/realtime.php",
-        clubLogQsoResult,
-        null,
-        "https",
-        443,
-        postData,
-        30000,
-        postRetryErrorCallaback,
-        "ClubLog.org"
-      );
-    }
+    getPostBuffer(
+      "https://clublog.org/realtime.php",
+      clubLogQsoResult,
+      null,
+      "https",
+      443,
+      postData,
+      30000,
+      postRetryErrorCallaback,
+      "ClubLog.org"
+    );
   }
 }
 
@@ -2490,26 +2483,23 @@ function sendHrdLogEntry(report)
 
   if (logHRDLOGqsoCheckBox.checked == true)
   {
-    if (typeof nw != "undefined")
-    {
-      var postData = {
-        Callsign: HRDLOGCallsign.value,
-        Code: HRDLOGUploadCode.value,
-        App: "GridTracker " + gtVersion,
-        ADIFData: report
-      };
-      getPostBuffer(
-        "https://www.hrdlog.net/NewEntry.aspx",
-        hrdSendLogResult,
-        null,
-        "https",
-        443,
-        postData,
-        30000,
-        postRetryErrorCallaback,
-        "HRDLog.net"
-      );
-    }
+    var postData = {
+      Callsign: HRDLOGCallsign.value,
+      Code: HRDLOGUploadCode.value,
+      App: "GridTracker " + gtVersion,
+      ADIFData: report
+    };
+    getPostBuffer(
+      "https://www.hrdlog.net/NewEntry.aspx",
+      hrdSendLogResult,
+      null,
+      "https",
+      443,
+      postData,
+      30000,
+      postRetryErrorCallaback,
+      "HRDLog.net"
+    );
   }
 }
 
@@ -2648,25 +2638,22 @@ function sendHamCQEntry(report)
 
   if (logHamCQqsoCheckBox.checked == true)
   {
-    if (typeof nw != "undefined")
-    {
-      var postData = {
-        key: HamCQApiKey.value,
-        app: "GridTracker " + gtVersion,
-        adif: report
-      };
-      getPostBuffer(
-        "https://www.hamcq.cn/v1/logbook?from=gridtracker",
-        HamCQSendResult,
-        null,
-        "https",
-        443,
-        postData,
-        30000,
-        postRetryErrorCallaback,
-        "HamCQ.cn"
-      );
-    }
+    var postData = {
+      key: HamCQApiKey.value,
+      app: "GridTracker " + gtVersion,
+      adif: report
+    };
+    getPostBuffer(
+      "https://www.hamcq.cn/v1/logbook?from=gridtracker",
+      HamCQSendResult,
+      null,
+      "https",
+      443,
+      postData,
+      30000,
+      postRetryErrorCallaback,
+      "HamCQ.cn"
+    );
   }
 }
 

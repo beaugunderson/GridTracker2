@@ -112,7 +112,6 @@ const allowedWindows = {
   GridTracker2: {
     window: null,
     honorVisibility: true,
-    tempBounds: {},
     options: { x: 0, y: 0, width: 860, height: 652, show: true, zoom: 0 },
     static: {
       minWidth: 217,
@@ -123,14 +122,12 @@ const allowedWindows = {
   gt_popup: {
     window: null,
     honorVisibility: false,
-    tempBounds: {},
     options: { x: 5, y: 5, width: 200, height: 200, show: false, zoom: 0 },
     static: { minWidth: 100, minHeight: 50 },
   },
   gt_stats: {
     window: null,
     honorVisibility: true,
-    tempBounds: {},
     options: { x: 50, y: 50, width: 640, height: 480, show: false, zoom: 0 },
     static: {
       minWidth: 620,
@@ -141,7 +138,6 @@ const allowedWindows = {
   gt_lookup: {
     window: null,
     honorVisibility: true,
-    tempBounds: {},
     options: { x: 75, y: 75, width: 680, height: 200, show: false, zoom: 0 },
     static: {
       minWidth: 680,
@@ -152,21 +148,18 @@ const allowedWindows = {
   gt_bandactivity: {
     window: null,
     honorVisibility: true,
-    tempBounds: {},
     options: { x: 250, y: 250, width: 198, height: 52, show: false, zoom: 0 },
     static: { minWidth: 198, minHeight: 52, frame: false, alwaysOnTop: true, skipTaskbar: true },
   },
   gt_alert: {
     window: null,
     honorVisibility: false,
-    tempBounds: {},
     options: { x: 5, y: 5, width: 600, height: 52, show: false, zoom: 0 },
     static: { resizable: false, alwaysOnTop: true },
   },
   gt_conditions: {
     window: null,
     honorVisibility: true,
-    tempBounds: {},
     options: { x: 75, y: 75, width: 492, height: 308, show: false, zoom: 0 },
     static: {
       minWidth: 492,
@@ -177,14 +170,12 @@ const allowedWindows = {
   gt_chat: {
     window: null,
     honorVisibility: true,
-    tempBounds: {},
     options: { x: 55, y: 55, width: 640, height: 300, show: false, zoom: 0 },
     static: { minWidth: 450, minHeight: 140 },
   },
   gt_roster: {
     window: null,
     honorVisibility: true,
-    tempBounds: {},
     options: { x: 15, y: 15, width: 760, height: 400, show: false, zoom: 0 },
     static: {
       minWidth: 390,
@@ -213,7 +204,6 @@ if (!fs.existsSync(dxccInfoPath)) {
 }
 
 const windowIdToAllowedWindows = {};
-
 const windowSettingsPath = join(gtInternalPath, 'windows.json');
 
 if (fs.existsSync(windowSettingsPath)) {
@@ -440,16 +430,6 @@ app.whenReady().then(() => {
 
   checkForUpdates();
 
-  // Inital screen count
-  displayHandler.initialScreenCount = screen.getAllDisplays().length;
-
-  screen.on('display-added', () => {
-    displayHandler.onDisplayAdded();
-  });
-  screen.on('display-removed', () => {
-    displayHandler.onDisplayRemoved();
-  });
-
   app.on('browser-window-created', (_, window) => {
     // window.title works on Windows, window.tabbingIdentifier works on macOS
     const title = isMac ? window.tabbingIdentifier : window.title;
@@ -479,9 +459,6 @@ app.whenReady().then(() => {
           allowedWindows[windowIdToAllowedWindows[window.id]].options.zoom,
         );
 
-        // Save the current bounds
-        allowedWindows[windowIdToAllowedWindows[window.id]].tempBounds =
-          allowedWindows[windowIdToAllowedWindows[window.id]].window.getContentBounds();
       });
 
       window.on('close', (event) => {
@@ -529,14 +506,6 @@ app.whenReady().then(() => {
         }
       });
 
-      window.on('move', () => {
-        displayHandler.storeBounds(windowIdToAllowedWindows[window.id]);
-      });
-
-      window.on('resize', () => {
-          displayHandler.storeBounds(windowIdToAllowedWindows[window.id]);
-      });
-
       remoteMain.enable(window.webContents);
 
       window.webContents.setWindowOpenHandler((details) => {
@@ -577,33 +546,3 @@ function saveWindowPositions() {
   fs.writeFileSync(windowSettingsPath, JSON.stringify(finalSettings, null, 2), { flush: true });
 }
 
-// this could be a class, never done one before if you can believe it.
-// it does depend on allowedWindows, so i dunno
-// C++ sure, Javascript nope!
-const displayHandler = {
-  initialScreenCount: 0,
-  screenLost: false,
-  onDisplayAdded: function () {
-    if (
-      displayHandler.screenLost == true &&
-      displayHandler.initialScreenCount == screen.getAllDisplays().length
-    ) {
-      // Lets restore the positions now
-      for (let win in allowedWindows) {
-        if (allowedWindows[win].window != null) {
-          allowedWindows[win].window.setContentBounds(allowedWindows[win].tempBounds);
-        }
-      }
-      displayHandler.screenLost = false;
-    }
-  },
-  onDisplayRemoved: function () {
-
-    if (displayHandler.initialScreenCount != screen.getAllDisplays().length) {
-      displayHandler.screenLost = true;
-    }
-  },
-  storeBounds: function (windowName) {
-    allowedWindows[windowName].tempBounds = allowedWindows[windowName].window.getContentBounds();
-  },
-};

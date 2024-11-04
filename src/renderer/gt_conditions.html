@@ -39,11 +39,6 @@
     </style>
     <script src="./lib/first.js"></script>
     <script>
-      document.oncontextmenu = function (event) {
-        if (process.versions["nw-flavor"] != "sdk") {
-          ev.preventDefault();
-        }
-      };
 
       document.addEventListener("dragover", function (event) {
         event.preventDefault();
