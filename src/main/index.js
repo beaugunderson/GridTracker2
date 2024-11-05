@@ -443,20 +443,31 @@ app.whenReady().then(() => {
       window.on('ready-to-show', () => {
         // Options are being applied as bounds to the window, but if there is a scaleFactor
         // this call corrects the sizing
+        let options = allowedWindows[windowIdToAllowedWindows[window.id]].options;
         allowedWindows[windowIdToAllowedWindows[window.id]].window.setContentBounds(
-          allowedWindows[windowIdToAllowedWindows[window.id]].options
+          options
         );
+
+        // is the top left corner on screen?
+        if (!(isWithinDisplayBounds(options.x + 5, options.y + 5))) {
+          options.x = 40;
+          options.y = 40;
+          allowedWindows[windowIdToAllowedWindows[window.id]].window.setContentBounds(
+            options
+          );
+        }
 
         if (
           allowedWindows[windowIdToAllowedWindows[window.id]].honorVisibility == true &&
-          allowedWindows[windowIdToAllowedWindows[window.id]].options.show == true
+          options.show == true
         ) {
           window.show();
         }
+
         // Send this event to first.js, this windows zoom level
         allowedWindows[windowIdToAllowedWindows[window.id]].window.webContents.send(
           'loadZoom',
-          allowedWindows[windowIdToAllowedWindows[window.id]].options.zoom,
+          options.zoom,
         );
 
       });
@@ -464,7 +475,7 @@ app.whenReady().then(() => {
       window.on('close', (event) => {
         // save all window(s) and position(s)
         let bounds = window.getContentBounds();
-        let saveBounds = !(window.isFullScreen());
+        let saveBounds = !(window.isFullScreen() || (isMac && window.isMaximized()));
 
         if (window.id != 1) {
           if (mainWindowClosing == false) {
@@ -474,7 +485,7 @@ app.whenReady().then(() => {
             if (saveBounds) {
               allowedWindows[windowIdToAllowedWindows[window.id]].options = {
                 ...allowedWindows[windowIdToAllowedWindows[window.id]].options,
-               ...bounds,
+                ...bounds,
               };
             }
             event.preventDefault();
@@ -546,3 +557,16 @@ function saveWindowPositions() {
   fs.writeFileSync(windowSettingsPath, JSON.stringify(finalSettings, null, 2), { flush: true });
 }
 
+function isWithinDisplayBounds( x, y ) {
+  const displays = screen.getAllDisplays();
+  return displays.reduce((result, display) => {
+    const area = display.workArea
+    return (
+      result ||
+      (x >= area.x &&
+       y >= area.y &&
+       x < area.x + area.width &&
+       y < area.y + area.height)
+    );
+  }, false);
+}

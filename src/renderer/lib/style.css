@@ -526,6 +526,10 @@ input[type="checkbox"] {
   position: relative;
 }
 
+input[type="checkbox"]:hover {
+  cursor: pointer;
+}
+
 input[type="range"]::-webkit-slider-runnable-track {
   -webkit-appearance: none;
   height: 4px;

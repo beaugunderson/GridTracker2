@@ -971,7 +971,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 <input type="checkbox" id="clearOnCQ" onclick="changeClearOnCQ();" />
               </td>
             </tr>
-
               <tr>
                 <th colspan="6" style="font-weight: bold; color: orange" data-i18n="settings.logging.otherheader.service">Service</th>
               </tr>
@@ -1004,16 +1003,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <div class="mapItem" style="border:0">
           <table align="center" class="darkTable">
           <tr>
-            <th colspan=2 style="font-weight: bold;color:yellow">Online</th>
+            <th data-i18n="settings.Online.label" colspan=2 style="font-weight: bold;color:yellow">Online</th>
           </tr>
           <tr>
-            <th>Offline Mode</th>
+            <th data-i18n="settings.OfflineMode.label" for="offlineModeEnable">Offline Mode</th>
             <td>
               <input type="checkbox" id="offlineModeEnable" onclick="changeOffline()" />
             </td>
           </tr>
           <tr id="potaHuntingTr">
-            <td>POTA Hunting</td>
+            <td data-i18n="settings.POTA.hunting.label" for="potaFeatureEnabled">POTA Hunting</td>
             <td>
               <input type="checkbox" id="potaFeatureEnabled" onclick="changePotaEnable();" />
             </td>
@@ -1031,37 +1030,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </td>
           </tr>
           <tr id="offAirServicesTr">
-            <td >Off-Air Services</td>
+            <td data-i18n="settings.OffAirServices.label" for="offAirServicesEnable">Off-Air Services</td>
             <td>
                <input type="checkbox" id="offAirServicesEnable" onclick="changeOffAirServicesEnable();" />
             </td>
           </tr>
           <tr id="spottingEnableTr">
-            <td data-i18n="settings.spotting.enable.label">Spotting</td>
+            <td data-i18n="settings.spotting.enable.label" for="spottingEnable">Spotting</td>
             <td>
               <input title="Enable / Disable Spotting" type="checkbox" id="spottingEnable" onclick="setSpottingEnable(); redrawSpots();" />
             </td>
           </tr>
           <tr id="spotMergeTr">
-            <td data-i18n="settings.grids.spotsOverGrids.label" title="Place Spots over Grid Layer">Spots Over Grids</td>
+            <td data-i18n="settings.grids.spotsOverGrids.label" for="spotMergeValue">Spots Over Grids</td>
             <td>
               <input type="checkbox" id="spotMergeValue" onclick="changeSpotValues(); redrawSpots();" />
             </td>
           </tr>
           <tr id="bandActivityEnableTr">
-            <td data-i18n="settings.BandActivity.enable.label">Band Activity</td>
+            <td data-i18n="settings.BandActivity.enable.label" for="oamsBandActivity">Band Activity</td>
             <td>
               <input  type="checkbox" id="oamsBandActivity" onclick="setOamsBandActivity(this);" />
             </td>
           </tr>
           <tr id="bandActivityNeighborTr">
-            <td data-i18n="settings.BandActivity.neighbor.enable.label">Neighboring Grids</td>
+            <td data-i18n="settings.BandActivity.neighbor.enable.label" for="oamsBandActivityNeighbors">Neighboring Grids</td>
             <td>
               <input  type="checkbox" id="oamsBandActivityNeighbors" onclick="setOamsBandActivityNeighbors(this);" />
             </td>
           </tr>
           <tr id="oamsMsgEnableTr">
-            <td data-i18n="settings.OAMS.message.enable.label">Chat Messaging</td>
+            <td data-i18n="settings.OAMS.message.enable.label" for="oamsMsgEnable">Chat Messaging</td>
             <td>
               <input type="checkbox" id="oamsMsgEnable" onclick="setMsgEnable();" />
             </td>
