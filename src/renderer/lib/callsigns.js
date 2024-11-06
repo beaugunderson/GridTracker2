@@ -310,11 +310,11 @@ function cacDownload(fromSettings)
 {
   cacUpdatedTd.innerHTML = "<b><i>Downloading...</i></b>";
   getBuffer(
-    "https://storage.googleapis.com/gt_app/canada.txt",
+    "https://app2.gridtracker.org/dbs/canada.txt",
     processCacCallsigns,
     null,
-    "http",
-    80
+    "https",
+    443
   );
 }
 
@@ -480,11 +480,11 @@ function oqrsDownload(fromSettings)
 {
   oqrsUpdatedTd.innerHTML = "<b><i>Downloading...</i></b>";
   getBuffer(
-    "https://storage.googleapis.com/gt_app/callsigns/clublog.json",
+    "https://app2.gridtracker.org/dbs/clublog.json",
     processoqrsCallsigns,
     null,
-    "http",
-    80
+    "https",
+    443
   );
 }
 
@@ -784,11 +784,11 @@ function ulsDownload()
   ulsUpdatedTd.innerHTML = "<b><i>Downloading...</i></b>";
   ulsCountTd.innerHTML = 0;
   getBuffer(
-    "https://storage.googleapis.com/gt_app/callsigns/callsigns.txt",
+    "https://app2.gridtracker.org/dbs/us.txt",
     ulsDownloadHandler,
     null,
-    "http",
-    80
+    "https",
+    443
   );
 }
 
@@ -904,7 +904,7 @@ function downloadCtyDat()
   bigctyUpdatedTd.innerHTML = "<b><i>Checking...</i></b>";
   bigctyDetailsTd.innerHTML = "";
   getBuffer(
-    "https://storage.googleapis.com/gt_app/ctydatver.json",
+    "https://app2.gridtracker.org/dbs/ctydatver.json",
     processCtyDatVer,
     null,
     "https",
@@ -926,7 +926,7 @@ function processCtyDatVer(buffer)
       {
         bigctyUpdatedTd.innerHTML = "<b><i>Downloading...</i></b>";
         getBuffer(
-          "https://storage.googleapis.com/gt_app/ctydat.json",
+          "https://app2.gridtracker.org/dbs/ctydat.json",
           processCtyDat,
           null,
           "https",

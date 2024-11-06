@@ -9655,11 +9655,11 @@ function downloadAcknowledgements()
   if (GT.settings.map.offlineMode == false)
   {
     getBuffer(
-      "https://storage.googleapis.com/gt_app/acknowledgements.json",
+      "https://app2.gridtracker.org/dbs/acknowledgements.json",
       updateAcks,
       null,
-      "http",
-      80
+      "https",
+      443
     );
 
     // check again tomorrow

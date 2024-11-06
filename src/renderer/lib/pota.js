@@ -439,7 +439,7 @@ function getPotaParks()
   if (GT.settings.map.offlineMode == false && GT.settings.app.potaFeatureEnabled)
   {
     getBuffer(
-      "https://storage.googleapis.com/gt_app/pota.json?cb=" + Date.now(),
+      "https://app2.gridtracker.org/dbs/pota.json?cb=" + Date.now(),
       processPotaParks,
       null,
       "https",
