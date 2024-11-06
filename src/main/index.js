@@ -112,7 +112,7 @@ const allowedWindows = {
   GridTracker2: {
     window: null,
     honorVisibility: true,
-    options: { x: 0, y: 0, width: 860, height: 652, show: true, zoom: 0 },
+    options: { x: 40, y: 40, width: 860, height: 652, show: true, zoom: 0 },
     static: {
       minWidth: 217,
       minHeight: 626,
@@ -122,13 +122,13 @@ const allowedWindows = {
   gt_popup: {
     window: null,
     honorVisibility: false,
-    options: { x: 5, y: 5, width: 200, height: 200, show: false, zoom: 0 },
+    options: { x: 45, y: 45, width: 200, height: 200, show: false, zoom: 0 },
     static: { minWidth: 100, minHeight: 50 },
   },
   gt_stats: {
     window: null,
     honorVisibility: true,
-    options: { x: 50, y: 50, width: 640, height: 480, show: false, zoom: 0 },
+    options: { x: 55, y: 55, width: 640, height: 480, show: false, zoom: 0 },
     static: {
       minWidth: 620,
       minHeight: 200,
@@ -154,7 +154,7 @@ const allowedWindows = {
   gt_alert: {
     window: null,
     honorVisibility: false,
-    options: { x: 5, y: 5, width: 600, height: 52, show: false, zoom: 0 },
+    options: { x: 50, y: 50, width: 600, height: 52, show: false, zoom: 0 },
     static: { resizable: false, alwaysOnTop: true },
   },
   gt_conditions: {
@@ -176,7 +176,7 @@ const allowedWindows = {
   gt_roster: {
     window: null,
     honorVisibility: true,
-    options: { x: 15, y: 15, width: 760, height: 400, show: false, zoom: 0 },
+    options: { x: 55, y: 55, width: 760, height: 400, show: false, zoom: 0 },
     static: {
       minWidth: 390,
       minHeight: 250,
