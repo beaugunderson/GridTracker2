@@ -40,17 +40,12 @@
     <script src="./lib/first.js"></script>
     <script>
 
-      document.addEventListener("dragover", function (event) {
-        event.preventDefault();
-      });
-
-      document.addEventListener("drop", function (event) {
-        event.preventDefault();
-      });
-
       function timeNowSec() {
         return parseInt(Date.now() / 1000);
       }
+
+      const C = {};
+      C.refreshTimer = null;
 
       function showConditionsBox() {
         var now = timeNowSec() % 86400;
@@ -62,12 +57,22 @@
           images[i].src = parts[0] + "t=" + now;
         }
 
-        nodeTimers.setTimeout(showConditionsBox, 1800000);
+        if (C.refreshTimer)
+        {
+          nodeTimers.clearTimeout(C.refreshTimer);
+        }
+        C.refreshTimer = nodeTimers.setTimeout(showConditionsBox, 1800000);
+
+      }
+
+      function imageLoadFailed()
+      {
+        nodeTimers.setTimeout(showConditionsBox, 60000);
       }
 
       function init() {
-        window.opener.GT.conditionsWindowInitialized = true;
         showConditionsBox();
+        window.opener.GT.conditionsWindowInitialized = true;
       }
 
 
@@ -91,24 +96,22 @@
     >
       <div id="conditionsDataDiv">
         <div>
-          <a target="_blank" href="http://www.hamqsl.com" title="Visit www.hamqsl.net"
-            ><img src="http://www.hamqsl.com/solar101vhf.php?t="
-          /></a>
+          <a target="_blank" href="http://www.hamqsl.com" title="Visit www.hamqsl.net"><img onerror="imageLoadFailed()" src="https://www.hamqsl.com/solar101vhf.php?t="/></a>
         </div>
         <div>
           <table align="center">
             <tr>
               <td>
-                <img src="https://sohowww.nascom.nasa.gov/data/realtime/eit_304/512/latest.jpg?t=" class="solarImg" />
+                <img src="https://soho.nascom.nasa.gov/data/realtime/eit_304/512/latest.jpg?t=" class="solarImg" />
               </td>
               <td>
-                <img src="https://sohowww.nascom.nasa.gov/data/realtime/eit_171/512/latest.jpg?t=" class="solarImg" />
+                <img src="https://soho.nascom.nasa.gov/data/realtime/eit_171/512/latest.jpg?t=" class="solarImg" />
               </td>
               <td>
-                <img src="https://sohowww.nascom.nasa.gov/data/realtime/eit_195/512/latest.jpg?t=" class="solarImg" />
+                <img src="https://soho.nascom.nasa.gov/data/realtime/eit_195/512/latest.jpg?t=" class="solarImg" />
               </td>
               <td>
-                <img src="https://sohowww.nascom.nasa.gov/data/realtime/eit_284/512/latest.jpg?t=" class="solarImg" />
+                <img src="https://soho.nascom.nasa.gov/data/realtime/eit_284/512/latest.jpg?t=" class="solarImg" />
               </td>
               <td>
                 <img src="https://sdo.gsfc.nasa.gov/assets/img/latest/f_304_211_171_256.jpg?t=" class="solarImg" />
