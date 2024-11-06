@@ -143,3 +143,17 @@ function setAndSaveZoom()
   electron.webFrame.setZoomLevel(s_zoomLevel);
   electron.ipcRenderer.send("saveZoom", s_zoomLevel);
 }
+
+function registerCutAndPasteContextMenu()
+{
+  let inputText = document.getElementsByClassName("inputTextValue");
+  for (let x = 0; x < inputText.length; x++)
+  {
+    inputText[x].addEventListener('contextmenu', (element) => {
+      const menu = new Menu();
+      menu.append(new MenuItem({ label: I18N("copy"), role: 'copy' }));
+      menu.append(new MenuItem({ label: I18N("paste"), role: 'paste' }));
+      menu.popup();
+    });
+  }
+}

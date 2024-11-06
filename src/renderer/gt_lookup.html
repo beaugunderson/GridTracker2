@@ -81,6 +81,7 @@
         ValidateCallsign(lookupCallsignInput, null);
         window.opener.GT.lookupWindowInitialized = true;
         loadChildWindowI18n();
+        registerCutAndPasteContextMenu();
       }
 
       function addTextToClipboard(data) {

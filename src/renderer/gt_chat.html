@@ -22,6 +22,7 @@
     <script src="lib/first.js"></script>
     <script src="lib/protos.js" type="text/javascript"></script>
     <script src="lib/third-party.js" type="text/javascript"></script>
+    <script src="./lib/i18n.js" type="text/javascript"></script>
     <script type="text/javascript">
    
       var g_knownSources = {};
@@ -98,6 +99,15 @@
         window.opener.GT.chatWindowInitialized = true;
         Resize();
         showAllCallsigns();
+        loadChildWindowI18n();
+        registerCutAndPasteContextMenu();
+        messageInput.addEventListener('contextmenu', (element) => {
+          const menu = new Menu();
+          menu.append(new MenuItem({ label: I18N("copy"), role: 'copy' }));
+          menu.append(new MenuItem({ label: I18N("paste"), role: 'paste' }));
+          menu.append(new MenuItem({ label: I18N("spell.checker"), role: 'toggleSpellChecker' }));
+          menu.popup();
+        });
       }
 
       var g_viewBand = 0;

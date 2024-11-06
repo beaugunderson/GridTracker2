@@ -1425,7 +1425,8 @@ function init()
   setRosterTop();
 
   createActiveAwardsFromSettings();
-
+  
+  registerCutAndPasteContextMenu();
   window.opener.GT.callRosterWindowInitialized = true;
 }
 

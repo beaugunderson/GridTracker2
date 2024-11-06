@@ -12017,6 +12017,8 @@ function postInit()
   nodeTimers.setTimeout(downloadCtyDat, 300000); // In 5 minutes, when the dust settles
   nodeTimers.setTimeout(checkForNewVersion, 60000); // Informative check
 
+  registerCutAndPasteContextMenu();
+
   GT.finishedLoading = true;
 }
 
