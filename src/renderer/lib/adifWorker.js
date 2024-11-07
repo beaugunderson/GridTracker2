@@ -113,7 +113,6 @@ function onAdiLoadComplete(task)
           let row = task.rawAdiBuffer.substring(startPos, startPos + eor);
           startPos += eor + 5; // skip <EOR>
           let object = parseADIFRecordStrict(row);
-          let confSource = null;
           let lotwConfirmed = false;
           let confirmed = false;
 
@@ -309,34 +308,27 @@ function onAdiLoadComplete(task)
 
           let qrzConfirmed = (object.APP_QRZLOG_STATUS || "").toUpperCase();
           let genericConfirmed = (object.QSL_RCVD || "").toUpperCase();
-
-          if (qrzConfirmed == "C" || lotwConfirmed || genericConfirmed == "Y" || eQSLfile == true || clublogFile == true)
+          let lotw_qsl_rcvd = (object.LOTW_QSL_RCVD || "").toUpperCase();
+          let eqsl_qsl_rcvd = (object.EQSL_QSL_RCVD || "").toUpperCase();
+  
+          lotwConfirmed = (lotwConfirmed || lotw_qsl_rcvd == "Y" || lotw_qsl_rcvd == "V");
+          let eqslConf = (eQSLfile == true || eqsl_qsl_rcvd == "Y" || eqsl_qsl_rcvd == "V");
+          if (qrzConfirmed == "C" || lotwConfirmed || genericConfirmed == "Y" || genericConfirmed == "V" ||eqslConf || clublogFile == true)
           {
             confirmed = true;
-            if (qrzConfirmed == "C")
+            qso.confSrcs = {}; 
+
+            if (qrzConfirmed == "C") qso.confSrcs["Q"] = true;
+            else 
             {
-              confSource = "Q";
+              if (lotwConfirmed == true) qso.confSrcs["L"] = true;
+              if (eqslConf) qso.confSrcs["e"] = true;
+              if (clublogFile == true) qso.confSrcs["C"] = true; 
             }
-            else if (eQSLfile == true)
-            {
-              confSource = "e";
-            }
-            else if (lotwConfirmed == true)
-            {
-              confSource = "L";
-            }
-            else if (clublogFile == true)
-            {
-              confSource = "C";
-            }
-            else
-            {
-              confSource = "O";
-            }
+            if (Object.keys(qso.confSrcs).length == 0) qso.confSrcs["O"] = true;
           }
 
           qso.confirmed = confirmed;
-          if (confSource) { qso.confSrcs = {}; qso.confSrcs[confSource] = true; }
 
           if (finalMode in GT.modes) qso.digital = GT.modes[finalMode];
           if (finalMode in GT.modes_phone) qso.phone = GT.modes_phone[finalMode];
@@ -344,7 +336,7 @@ function onAdiLoadComplete(task)
           let finalPOTA = (object.POTA_REF || object.POTA || null);
           if (finalPOTA) qso.pota = finalPOTA.toUpperCase();
         
-          lastHash = addQSO(qso, confSource);
+          lastHash = addQSO(qso);
           rows++;
         }
         else
@@ -427,7 +419,7 @@ const def_qso = {
 };
 
 
-function addQSO(qso, confSource = null)
+function addQSO(qso)
 {
   let hash = "";
   let details = null;
@@ -437,9 +429,13 @@ function addQSO(qso, confSource = null)
   if (hash in GT.QSOhash)
   {
     details = GT.QSOhash[hash];
-    let canWrite = (details.confirmed == false || GT.appSettings.qslAuthority == "0" || GT.appSettings.qslAuthority == confSource || !(GT.appSettings.qslAuthority in details.confSrcs));
+    let canWrite = (details.confirmed == false || (qso.confirmed == true && (GT.appSettings.qslAuthority == "0" || GT.appSettings.qslAuthority in qso.confSrcs || !(GT.appSettings.qslAuthority in details.confSrcs))));
     if (GT.appSettings.qslAuthority == "1" && qso.confirmed == true) canWrite = false;
-    if (confSource) details.confSrcs[confSource] = true;
+    if (qso.confSrcs)
+    {
+      if (details.confSrcs) { details.confSrcs = { ...details.confSrcs, ...qso.confSrcs }; }
+      else { details.confSrcs = { ...qso.confSrcs }; }
+    }
     if (qso.pota) details.pota = qso.pota;
     if (canWrite == false) return;
     details = deepmerge(details, qso);
@@ -634,9 +630,8 @@ function parseAcLog(task)
           let row = task.rawAcLogBuffer.substring(startPos, startPos + eor);
           startPos += eor + 6; // skip </CMD>
           let object = parseAcLogXML(row);
-          let confSource = null;
           let confirmed = false;
-
+          let confSource = null;
           let finalDEcall = (object.FLDOPERATOR || myCall);
           GT.myQsoCalls[finalDEcall] = true;
 
@@ -776,12 +771,12 @@ function parseAcLog(task)
           if (finalIOTA) qso.IOTA = finalIOTA.toUpperCase();
 
           let genericConfirmed = (object.FLDQSLR || "").toUpperCase();
-          if (genericConfirmed == "Y")
+          if (genericConfirmed == "Y" || genericConfirmed == "V")
           {
             if (GT.aclSettings.qsl != "A")
             {
               let confby = (object.QSLCONFBYR || null);
-              if (confby && confby.indexOf(GT.aclSettings.qs) != -1)
+              if (confby && confby.indexOf(GT.aclSettings.qsl) != -1)
               {
                 confirmed = true;
                 confSource = "A";
@@ -803,7 +798,7 @@ function parseAcLog(task)
           /* let finalPOTA = (object.POTA_REF || object.POTA || null);
           if (finalPOTA) qso.pota = finalPOTA.toUpperCase(); */
         
-          lastHash = addQSO(qso, confSource);
+          lastHash = addQSO(qso);
           rows++;
         }
         else
