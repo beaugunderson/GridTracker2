@@ -38,12 +38,6 @@ const template = [
           label: app.name,
           submenu: [
             { role: 'about' },
-            {
-              label: 'Check for updates...',
-              click: async () => {
-                checkForUpdates();
-              },
-            },
             { type: 'separator' },
             { role: 'services' },
             { type: 'separator' },
@@ -86,12 +80,6 @@ const template = [
           label: 'Help',
           submenu: [
             { role: 'about' },
-            {
-              label: 'Check for updates...',
-              click: async () => {
-                checkForUpdates();
-              },
-            },
           ],
         },
       ]
