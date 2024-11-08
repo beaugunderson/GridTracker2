@@ -308,22 +308,23 @@ function onAdiLoadComplete(task)
 
           let qrzConfirmed = (object.APP_QRZLOG_STATUS || "").toUpperCase();
           let genericConfirmed = (object.QSL_RCVD || "").toUpperCase();
+          let genConf = (genericConfirmed == "Y" || genericConfirmed == "V");
           let lotw_qsl_rcvd = (object.LOTW_QSL_RCVD || "").toUpperCase();
           let eqsl_qsl_rcvd = (object.EQSL_QSL_RCVD || "").toUpperCase();
   
           lotwConfirmed = (lotwConfirmed || lotw_qsl_rcvd == "Y" || lotw_qsl_rcvd == "V");
           let eqslConf = (eQSLfile == true || eqsl_qsl_rcvd == "Y" || eqsl_qsl_rcvd == "V");
-          if (qrzConfirmed == "C" || lotwConfirmed || genericConfirmed == "Y" || genericConfirmed == "V" ||eqslConf || clublogFile == true)
+          let clubConf = (clublogFile && genConf);
+          if (genConf || qrzConfirmed == "C" || lotwConfirmed || eqslConf)
           {
             confirmed = true;
             qso.confSrcs = {}; 
-
             if (qrzConfirmed == "C") qso.confSrcs["Q"] = true;
             else 
             {
               if (lotwConfirmed == true) qso.confSrcs["L"] = true;
               if (eqslConf) qso.confSrcs["e"] = true;
-              if (clublogFile == true) qso.confSrcs["C"] = true; 
+              if (clubConf) qso.confSrcs["C"] = true; 
             }
             if (Object.keys(qso.confSrcs).length == 0) qso.confSrcs["O"] = true;
           }
@@ -595,7 +596,6 @@ function parseAcLog(task)
 
   let rows = 0;
   let rowsFiltered = 0;
-  let lastHash = null;
   let myCall = GT.appSettings.myCall;
   let myGrid = GT.appSettings.myGrid;
   let returnTask = {};
