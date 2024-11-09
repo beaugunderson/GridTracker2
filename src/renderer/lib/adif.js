@@ -613,7 +613,7 @@ function ValidatePotentialAdifLogFileAgainstInternal(fullPath)
 {
   let extName =  path.extname(fullPath);
   // Is an ADIF file
-  if (!(extName == ".adi" || extName == ".adif")) return false;
+  if (!(extName.toLowerCase() == ".adi" || extName.toLowerCase() == ".adif")) return false;
   // Is on disk
   if (!(fs.existsSync(fullPath))) return false;
   // Not in Local File(s)
