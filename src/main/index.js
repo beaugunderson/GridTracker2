@@ -45,7 +45,7 @@ const template = [
             { role: 'hideOthers' },
             { role: 'unhide' },
             { type: 'separator' },
-            { role: 'quit', label: 'Quit GridTracker2' },
+            { click: function () { allowedWindows.GridTracker2.window.close(); }, label: 'Quit GridTracker2' },
           ],
         },
       ]
