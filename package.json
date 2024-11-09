@@ -8,7 +8,7 @@
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
-    "dev": "electron .",
+    "dev": "electron --no-sandbox .",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "electron-builder --dir",
     "build:win": "electron-builder --win",
