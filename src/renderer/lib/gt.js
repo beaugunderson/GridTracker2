@@ -484,7 +484,7 @@ GT.lastHover = { feature: null, functor: null };
 
 GT.wsjtHandlers = {
   0: handleWsjtxNotSupported,
-  1: handleWsjtxStatus,
+  1: handleInstanceStatus,
   2: handleWsjtxDecode,
   3: handleWsjtxClear,
   4: handleWsjtxNotSupported,
@@ -5275,7 +5275,7 @@ function setRig(instanceId)
 
     GT.activeInstance = GT.instancesIndex[instanceId];
 
-    handleWsjtxStatus(GT.instances[GT.activeInstance].status);
+    handleInstanceStatus(GT.instances[GT.activeInstance].status);
     handleClosed(GT.instances[GT.activeInstance].status);
   }
 }
@@ -5293,12 +5293,12 @@ function activeRig(instance)
 
     GT.activeInstance = instance;
 
-    handleWsjtxStatus(GT.instances[GT.activeInstance].status);
+    handleInstanceStatus(GT.instances[GT.activeInstance].status);
     handleClosed(GT.instances[GT.activeInstance].status);
   }
 }
 
-function handleWsjtxStatus(newMessage)
+function handleInstanceStatus(newMessage)
 {
   if (GT.ignoreMessages == 1) return;
 
@@ -5647,7 +5647,7 @@ function handleWsjtxStatus(newMessage)
           }
           catch (err)
           {
-            console.error("Unexpected error inside handleWsjtxStatus", err)
+            console.error("Unexpected error inside handleInstanceStatus", err)
           }
         }
       }
