@@ -351,6 +351,10 @@ function playAlertMediaFile(filename)
   if (GT.settings.audio.alertMute == 1) return;
 
   let fpath = path.join(GT.gtMediaDir, filename);
+  if (!fs.existsSync(fpath))
+  {
+    fpath = path.join(GT.extraMediaDir, filename);
+  }
   audioElement.src = "file://" + fpath;
   audioElement.setSinkId(GT.soundCard);
   audioElement.volume = GT.settings.audio.volume;

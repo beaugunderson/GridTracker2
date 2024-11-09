@@ -28,6 +28,7 @@ function loadAllSettings()
   GT.scriptPath = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Call Roster Scripts");
   GT.appData = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Ginternal");
   GT.qsoBackupDir = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Backup Logs");
+  GT.extraMediaDir = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Extra Media");
   GT.dxccInfoPath = path.join(GT.appData, "dxcc-info.json");
   GT.tempDxccInfoPath = path.join(GT.appData, "dxcc-info-update.json");
   GT.spotsPath = path.join(GT.appData, "spots.json");
@@ -38,7 +39,8 @@ function loadAllSettings()
     var userdirs = [
       GT.appData,
       GT.scriptPath,
-      GT.qsoBackupDir
+      GT.qsoBackupDir,
+      GT.extraMediaDir
     ];
     for (var dir of userdirs)
     {
@@ -14016,7 +14018,7 @@ function mediaCheck()
 
   alertMediaSelect.appendChild(newOption("none", "Select File"));
 
-  GT.mediaFiles = fs.readdirSync(GT.gtMediaDir);
+  GT.mediaFiles = [ ...fs.readdirSync(GT.extraMediaDir), ...fs.readdirSync(GT.gtMediaDir) ];
 
   GT.mediaFiles.forEach((filename) =>
   {
