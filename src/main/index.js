@@ -226,12 +226,14 @@ ipcMain.on('updateAvailable', (event) => {
 ipcMain.on('showWin', (event, what) => {
   if (allowedWindows[what]?.window) {
     allowedWindows[what].window.show();
+    allowedWindows[what].options.show = true;
   }
 });
 
 ipcMain.on('hideWin', (event, what) => {
   if (allowedWindows[what]?.window) {
     allowedWindows[what].window.hide();
+    allowedWindows[what].options.show = false;
   }
 });
 
@@ -239,8 +241,10 @@ ipcMain.on('toggleWin', (event, what) => {
   if (allowedWindows[what]?.window) {
     if (allowedWindows[what].window.isVisible()) {
       allowedWindows[what].window.hide();
+      allowedWindows[what].options.show = false;
     } else {
       allowedWindows[what].window.show();
+      allowedWindows[what].options.show = true;
     }
   }
 });
