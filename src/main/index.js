@@ -52,7 +52,7 @@ const template = [
     : []),
   {
     label: 'File',
-    submenu: [isMac ? { role: 'close' } : { role: 'quit' }],
+    submenu: [ { role: 'close' } ],
   },
   // include developer menu items if the app is not packaged
   ...(!app.isPackaged
