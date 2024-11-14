@@ -1,0 +1,39 @@
+appId: org.gridtracker.GridTracker2
+productName: GridTracker2
+electronVersion: 22.0.0
+directories:
+  buildResources: build
+files:
+  - '!**/.vscode/*'
+  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+asar: true
+afterPack: "./electron-builder-afterpack.js"
+win:
+  executableName: GridTracker2
+  target:
+    - target: nsis
+      arch:
+        - x64
+        - ia32
+nsis:
+  artifactName: ${name}-${version}-win7-setup.${ext}
+  shortcutName: GridTracker2
+  uninstallDisplayName: GridTracker2
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  menuCategory: GridTracker2
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  selectPerMachineByDefault: false
+  packElevateHelper: true
+  allowElevation: true
+  license: LICENSE
+  deleteAppDataOnUninstall: false
+  warningsAsErrors: false
+  preCompressedFileExtensions: [".png", ".mp3"]
+npmRebuild: false
+publish:
+  provider: generic
+  url: https://download2.gridtracker.org/win7
