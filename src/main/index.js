@@ -333,6 +333,7 @@ function createMainWindow() {
     enableLargerThanScreen: true,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
+      backgroundThrottling: false,
       contextIsolation: false,
       nodeIntegration: true,
       nodeIntegrationInWorker: true,
@@ -368,6 +369,7 @@ function createMainWindow() {
         // for Windows
         title: details.frameName,
         webPreferences: {
+          backgroundThrottling: false,
           contextIsolation: false,
           nodeIntegration: true,
           nodeIntegrationInWorker: true,
