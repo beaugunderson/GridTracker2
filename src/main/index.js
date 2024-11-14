@@ -18,7 +18,7 @@ const { electronApp, optimizer } = require('@electron-toolkit/utils');
 const path = require('path');
 const { join } = require('path');
 
-app.commandLine.appendSwitch('no-sandbox');
+app.commandLine.appendSwitch('--no-sandbox');
 app.commandLine.appendSwitch("disable-renderer-backgrounding");
 
 const singleInstanceLock = app.requestSingleInstanceLock();
@@ -497,8 +497,14 @@ app.whenReady().then(() => {
           timers.setTimeout(onChildWindowCloseTimeout, 200, windowIdToAllowedWindows[window.id]);
         } else {
           mainWindowClosing = true;
-          saveWindowPositions();
-          app.quit();
+          // Main window is 1, so really destroy all the others
+          for (const windowId in windowIdToAllowedWindows) {
+            if (windowId != 1 &&
+                allowedWindows[windowIdToAllowedWindows[windowId]].window &&
+                !allowedWindows[windowIdToAllowedWindows[windowId]].window.isDestroyed() ) {
+              allowedWindows[windowIdToAllowedWindows[windowId]].window.destroy();
+            }
+          }
         }
       });
 
