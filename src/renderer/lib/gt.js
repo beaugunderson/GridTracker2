@@ -617,17 +617,12 @@ function saveAllSettings()
 {
   try
   {
-    if (GT.callRosterWindowInitialized)
-    {
-      GT.callRosterWindowHandle.window.writeRosterSettings();
-    }
-
     if (GT.map)
     {
       mapMemory(6, true, true);
       GT.settings.map.zoom = GT.map.getView().getZoom() / 0.333;
     }
-    
+  
     saveGridTrackerSettings();
   }
   catch (e)
@@ -670,18 +665,6 @@ function saveAndCloseApp(shouldRestart = false)
     }
   }
 
-  if (GT.acLogAPISockect != null)
-  {
-    try
-    {
-      closeAcLogAPI();
-    }
-    catch (e)
-    {
-      console.error(e);
-    }
-  }
-
   closePskMqtt();
 
   if (shouldRestart == true)
@@ -715,18 +698,6 @@ function clearAndReload()
     try
     {
       GT.forwardUdpServer.close();
-    }
-    catch (e)
-    {
-      console.error(e);
-    }
-  }
-
-  if (GT.acLogAPISockect != null)
-  {
-    try
-    {
-      closeAcLogAPI();
     }
     catch (e)
     {

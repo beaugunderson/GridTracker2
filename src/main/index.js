@@ -497,14 +497,8 @@ app.whenReady().then(() => {
           timers.setTimeout(onChildWindowCloseTimeout, 200, windowIdToAllowedWindows[window.id]);
         } else {
           mainWindowClosing = true;
-          // Main window is 1, so really destroy all the others
-          for (const windowId in windowIdToAllowedWindows) {
-            if (windowId != 1 &&
-                allowedWindows[windowIdToAllowedWindows[windowId]].window &&
-                !allowedWindows[windowIdToAllowedWindows[windowId]].window.isDestroyed() ) {
-              allowedWindows[windowIdToAllowedWindows[windowId]].window.destroy();
-            }
-          }
+          saveWindowPositions();
+          app.quit();
         }
       });
 

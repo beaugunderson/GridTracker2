@@ -103,37 +103,7 @@ function handleAcLogAPIMessage(buffer)
       }
       else if (object.type == "ENTEREVENT")
       {
-        GT.acLogAPISocket.write(Buffer.from("<CMD><LIST><INCLUDEALL><VALUE>1</VALUE></CMD>\r\n"));
-      }
-      else if (object.type == "LISTRESPONSE")
-      {
-        console.log(object);
-        let finalTime = 0;
-        if (object.DATE && object.TIMEON)
-        {
-          let dateTime = new Date(
-            Date.UTC(
-              object.DATE.substring(0, 4),
-              parseInt(object.DATE.substring(5, 7)) - 1,
-              object.DATE.substring(8, 10),
-              object.TIMEON.substring(0, 2),
-              object.TIMEON.substring(3, 5),
-              object.TIMEON.substring(6, 8)
-            )
-          );
-
-          finalTime = parseInt(dateTime.getTime() / 1000);
-        }
-
-        let finalDXcall = (object.CALL || null);
-        // No Callsign, we're out of here
-        if (finalDXcall == null || finalTime == 0) return;
-        // We made it this far, we have a workable qso
-        const qso = {
-          DXcall: finalDEcall,
-          DEcall: finalDXcall,
-          time: finalTime,
-        };
+ 
       }
 
       var notify = false;
