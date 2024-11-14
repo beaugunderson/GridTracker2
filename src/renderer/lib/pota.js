@@ -88,6 +88,13 @@ function iconText(center, iconObj, zIndex, propName)
 function initPota()
 {
   potaFeatureEnabled.checked = GT.settings.app.potaFeatureEnabled;
+  if (GT.settings.app.potaFeatureEnabled == true)
+  {
+    logGTqsoCheckBox.checked = true;
+    loadGTCheckBox.checked = true;
+    GT.settings.adifLog.startup.loadGTCheckBox = true;
+    GT.settings.adifLog.qsolog.logGTqsoCheckBox = true;
+  }
 
   potaButton.style.display = (GT.settings.app.potaFeatureEnabled && GT.settings.map.offlineMode == false) ? "" : "none";
   potaImg.style.filter = GT.settings.app.potaMapEnabled ? "" : "grayscale(1)";
@@ -106,8 +113,15 @@ function initPota()
 function changePotaEnable()
 {
   potaHuntingTr.style.display = GT.settings.map.offlineMode ? "none" : "";
-  
   GT.settings.app.potaFeatureEnabled = potaFeatureEnabled.checked;
+  if (GT.settings.app.potaFeatureEnabled == true)
+  {
+    logGTqsoCheckBox.checked = true;
+    loadGTCheckBox.checked = true;
+    GT.settings.adifLog.startup.loadGTCheckBox = true;
+    GT.settings.adifLog.qsolog.logGTqsoCheckBox = true;
+  }
+
   potaButton.style.display = (GT.settings.app.potaFeatureEnabled && GT.settings.map.offlineMode == false) ? "" : "none";
   if (!GT.settings.app.potaFeatureEnabled || GT.settings.map.offlineMode == true)
   {
