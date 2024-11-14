@@ -2,11 +2,6 @@
 // All rights reserved.
 // See LICENSE for more information.
 
-document.oncontextmenu = function (event)
-{
-  event.preventDefault();
-};
-
 document.addEventListener("dragover", function (event)
 {
   event.preventDefault();
@@ -127,6 +122,7 @@ function init()
 {
   openInfoTab(qsobox, "workedBoxDiv", "showWorkedBox");
   loadChildWindowI18n();
+  registerCutAndPasteContextMenu();
 }
 
 function searchWorked(dxcc, band, mode)
@@ -221,4 +217,12 @@ function reloadInfo(bandOrMode)
   {
     window.opener.showWASPlusBox();
   }
+}
+
+function contextMenu()
+{
+  const menu = new Menu();
+  menu.append(new MenuItem({ label: I18N("copy"), role: 'copy' }));
+  menu.append(new MenuItem({ label: I18N("paste"), role: 'paste' }));
+  menu.popup();
 }

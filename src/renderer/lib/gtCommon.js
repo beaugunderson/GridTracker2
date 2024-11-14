@@ -665,3 +665,40 @@ deepmerge.all = function deepmergeAll(array, optionsArgument) {
       return deepmerge(prev, next, optionsArgument)
   })
 }
+
+function parseAcLogXML(line)
+{
+  let record = {};
+  line = line.substring(5); // skip <CMD>
+  while (line.length > 0)
+  {
+    while (line.charAt(0) != "<" && line.length > 0)
+    {
+      line = line.substring(1);
+    }
+    if (line.length > 0)
+    {
+      line = line.substring(1);
+      let nextChev = line.indexOf(">");
+      if (nextChev > -1)
+      {
+        let fieldName = line.substring(0, nextChev).toUpperCase();
+        let endField = "</" + fieldName + ">";
+        line = line.substring(fieldName.length + 1);
+        let end = line.indexOf(endField);
+        if (end > -1)
+        {
+          let  fieldValue = line.substring(0, end);
+          line = line.substring(end + endField.length);
+          record[fieldName] = fieldValue;
+        }
+        else
+        {
+          record.type = fieldName;
+        }
+      }
+    }
+  }
+
+  return record;
+}

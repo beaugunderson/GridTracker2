@@ -18,7 +18,8 @@ const { electronApp, optimizer } = require('@electron-toolkit/utils');
 const path = require('path');
 const { join } = require('path');
 
-app.commandLine.appendSwitch('--no-sandbox');
+app.commandLine.appendSwitch('no-sandbox');
+app.commandLine.appendSwitch("disable-renderer-backgrounding");
 
 const singleInstanceLock = app.requestSingleInstanceLock();
 
@@ -464,47 +465,43 @@ app.whenReady().then(() => {
 
       });
 
-      window.on('close', (event) => {
-        // save all window(s) and position(s)
+      window.on('move', (event) => {
         let bounds = window.getContentBounds();
-        let saveBounds = !(window.isFullScreen() || (isMac && window.isMaximized()));
+        let saveBounds = !(window.isMinimized() || window.isFullScreen() || (isMac && window.isMaximized()));
+        if (saveBounds) {
+          allowedWindows[windowIdToAllowedWindows[window.id]].options = {
+            ...allowedWindows[windowIdToAllowedWindows[window.id]].options,
+            ...bounds,
+          };
+        }
+      });
 
+      window.on('resize', (event) => {
+        let bounds = window.getContentBounds();
+        let saveBounds = !(window.isMinimized() || window.isFullScreen() || (isMac && window.isMaximized()));
+        if (saveBounds) {
+          allowedWindows[windowIdToAllowedWindows[window.id]].options = {
+            ...allowedWindows[windowIdToAllowedWindows[window.id]].options,
+            ...bounds,
+          };
+        }
+      });
+
+      window.on('close', (event) => {
         if (window.id != 1) {
-          if (mainWindowClosing == false) {
-            // save, but don't close
-            bounds.show = window.isVisible();
-            window.hide();
-            if (saveBounds) {
-              allowedWindows[windowIdToAllowedWindows[window.id]].options = {
-                ...allowedWindows[windowIdToAllowedWindows[window.id]].options,
-                ...bounds,
-              };
-            }
-            event.preventDefault();
-          } else {
-            // save, and let it close
-            bounds.show = window.isVisible();
-            if (saveBounds) {
-              allowedWindows[windowIdToAllowedWindows[window.id]].options = {
-                ...allowedWindows[windowIdToAllowedWindows[window.id]].options,
-                ...bounds,
-              };
-            }
-          }
+          // save vis, but don't close
+          event.preventDefault();        
+          window.hide();
+          timers.setTimeout(onChildWindowCloseTimeout, 200, windowIdToAllowedWindows[window.id]);
         } else {
           mainWindowClosing = true;
-          // Main window is 1, so really close all the others so we can save their info
+          // Main window is 1, so really destroy all the others
           for (const windowId in windowIdToAllowedWindows) {
-            if (windowId != 1) {
-              allowedWindows[windowIdToAllowedWindows[windowId]].window.close();
+            if (windowId != 1 &&
+                allowedWindows[windowIdToAllowedWindows[windowId]].window &&
+                !allowedWindows[windowIdToAllowedWindows[windowId]].window.isDestroyed() ) {
+              allowedWindows[windowIdToAllowedWindows[windowId]].window.destroy();
             }
-          }
-          // save!
-          if (saveBounds) {
-            allowedWindows['GridTracker2'].options = {
-              ...allowedWindows['GridTracker2'].options,
-              ...bounds,
-            };
           }
         }
       });
@@ -540,6 +537,12 @@ app.on('window-all-closed', () => {
   saveWindowPositions();
   app.quit();
 });
+
+function onChildWindowCloseTimeout(windowName) {
+  if (mainWindowClosing == false) {
+    allowedWindows[windowName].options.show = false;
+  }
+}
 
 function saveWindowPositions() {
   const finalSettings = {};

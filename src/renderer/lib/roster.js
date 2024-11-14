@@ -392,7 +392,8 @@ function updateInstances()
       worker +=
         `<div class='button' style='background-color:${color};'>` +
         `<input type='checkbox' id='${inst}' onchange='instanceChange(this);' ` +
-        (instances[inst].crEnable ? "checked" : "") +
+        (instances[inst].crEnable ? "checked " : "") +
+        (instances[inst].canRoster ? "" : "disabled") +
         `>&nbsp;${shortInst}</div>`
     }
     instancesDiv.innerHTML = worker;

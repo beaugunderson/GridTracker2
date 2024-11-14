@@ -120,6 +120,8 @@ const def_settings = {
     CQhilite: true,
     predMode: 0,
     predOpacity: 0.4,
+    predLegend: true,
+    spotLegend: true,
     fitQRZ: false,
     focusRig: true,
     gridAlpha: 136,
@@ -255,7 +257,8 @@ const def_settings = {
     ip: "127.0.0.1",
     menu: false,
     startup: false,
-    qsl: "A"
+    qsl: "A",
+    connect: false
   },
   trustedQsl: {
     stationFile: "",

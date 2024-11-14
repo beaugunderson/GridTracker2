@@ -54,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <script src="./lib/gtws.js" type="text/javascript"></script>
   <script src="./lib/pota.js" type="text/javascript"></script>
   <script src="./lib/services/pstrotator.js" type="text/javascript"></script>
+  <script src="./lib/acLog.js" type="text/javascript"></script>
   <script src="./lib/gt.js" type="text/javascript"></script>
   <script src="./lib/mqttPsk.js" type="text/javascript"></script>
 </head>
@@ -1755,6 +1756,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <table class="darkTable" align="center">
           <tr>
             <th data-i18n="settings.logging.tableheader.source">Source/Sync</th>
+            <th>Connect?</th>
             <th data-i18n="settings.logging.tableheader.menu">Menu?</th>
             <th data-i18n="settings.logging.tableheader.startup">Startup?</th>
             <th data-i18n="settings.logging.tableheader.log">Log?</th>
@@ -1764,6 +1766,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </tr>
           <tr>
             <td>WSJT-X Log</td>
+            <td></td>
             <td></td>
             <td>
               <input type="checkbox" checked="false" id="loadWSJTCheckBox" onclick="adifStartupCheckBoxChanged(this);" />
@@ -1777,6 +1780,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           <tr>
             <td data-i18n="settings.logging.gridtracker.source">GridTracker2</td>
             <td></td>
+            <td></td>
             <td>
               <input type="checkbox" checked="false" id="loadGTCheckBox" onclick="adifStartupCheckBoxChanged(this);" />
             </td>
@@ -1789,6 +1793,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </tr>
           <tr>
             <td data-i18n="settings.logging.LocalFiles.source">Local File(s)</td>
+            <td></td>
             <td>
               <input type="checkbox" checked="false" id="buttonAdifCheckBox" onclick="adifMenuCheckBoxChanged(this);" />
             </td>
@@ -1816,6 +1821,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </tr>
           <tr id="pskTr">
             <td data-i18n="settings.logging.PSKReporter.source">PSK-Reporter</td>
+            <td></td>
             <td>
               <input type="checkbox" checked="false" id="buttonPsk24CheckBox"
                 onclick="adifMenuCheckBoxChanged(this);" />
@@ -1833,6 +1839,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </tr>
           <tr>
             <td data-i18n="settings.logging.QRZcom.source">QRZ.com</td>
+            <td></td>
             <td>
               <input type="checkbox" checked="false" id="buttonQRZCheckBox" onclick="adifMenuCheckBoxChanged(this);" />
             </td>
@@ -1856,6 +1863,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </tr>
           <tr>
             <td data-i18n="settings.logging.ClubLog.source">ClubLog</td>
+            <td></td>
             <td>
               <input type="checkbox" checked="false" id="buttonClubCheckBox" onclick="adifMenuCheckBoxChanged(this);" />
             </td>
@@ -1891,6 +1899,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td data-i18n="settings.logging.HRDLogNet.source">HRDLOG.net</td>
             <td></td>
             <td></td>
+            <td></td>
             <td>
               <input type="checkbox" checked="false" id="logHRDLOGqsoCheckBox"
                 onclick="adifLogQsoCheckBoxChanged(this);" />
@@ -1917,6 +1926,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </tr>
           <tr>
             <td data-i18n="settings.logging.CloudLog.source">Cloudlog</td>
+            <td></td>
             <td></td>
             <td></td>
             <td>
@@ -1950,6 +1960,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td data-i18n="settings.logging.eQSLcc.source">eQSL.cc</td>
             <td></td>
             <td></td>
+            <td></td>
             <td>
               <input type="checkbox" checked="false" id="logeQSLQSOCheckBox"
                 onclick="adifLogQsoCheckBoxChanged(this);" />
@@ -1977,6 +1988,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </tr>
           <tr>
             <td data-i18n="settings.logging.LoTW.source">LotW</td>
+            <td></td>
             <td>
               <input type="checkbox" checked="false" id="buttonLOTWCheckBox" onclick="adifMenuCheckBoxChanged(this);" />
             </td>
@@ -2026,6 +2038,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td data-i18n="settings.logging.HamCQ.source">HamCQ.cn</td>
             <td></td>
             <td></td>
+            <td></td>
             <td>
               <input type="checkbox" checked="false" id="logHamCQqsoCheckBox"
                 onclick="adifLogQsoCheckBoxChanged(this);" />
@@ -2046,6 +2059,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </tr>
           <tr>
             <td data-i18n="settings.logging.N1MM.source">N1MM Logger+</td>
+            <td></td>
             <td></td>
             <td></td>
             <td>
@@ -2069,6 +2083,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td data-i18n="settings.logging.Log4OM.source">Log4OM</td>
             <td></td>
             <td></td>
+            <td></td>
             <td>
               <input type="checkbox" checked="false" class="inputTextValue" id="buttonLog4OMCheckBox"
                 onclick=" ValidateIPaddress(log4OMIpInput,this); ValidatePort(log4OMPortInput,this, null ); log4OMLoggerChanged(); " />
@@ -2088,6 +2103,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </tr>
           <tr>
             <td data-i18n="settings.logging.N3FJP.source">N3FJP Loggers</td>
+            <td>
+              <input type="checkbox" id="acLogConnectCheckbox" onclick="acLogLoggerChanged()" />
+            </td>
             <td>
               <input type="checkbox" id="acLogMenuCheckbox" onclick="acLogLoggerChanged()" />
             </td>
@@ -2124,6 +2142,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td data-i18n="settings.logging.DXKeeper.source">DXKeeper</td>
             <td></td>
             <td></td>
+            <td></td>
             <td>
               <input type="checkbox" checked="false" class="inputTextValue" id="buttondxkLogCheckBox"
                 onclick=" ValidateIPaddress(dxkLogIpInput,this); ValidatePort(dxkLogPortInput,this, null ); dxkLogLoggerChanged(); " />
@@ -2143,6 +2162,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </tr>
           <tr>
             <td data-i18n="settings.logging.HRDLogbook.source">HRD Logbook</td>
+            <td></td>
             <td></td>
             <td></td>
             <td>
@@ -2407,14 +2427,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           <tr>
             <td>
               <select id="alertTypeSelect" name="alertTypeSelect" onchange="alertTypeChanged();">
-                <option data-i18n="settings.alerts.CustomAlerts.new.type.callsign.exact" value="0">Callsign (exact)
-                </option>
-                <option data-i18n="settings.alerts.CustomAlerts.new.type.callsign.partial" value="5">Callsign (partial)
-                </option>
-                <option data-i18n="settings.alerts.CustomAlerts.new.type.callsign.regex" value="6">Callsign (regex)
-                </option>
-                <option data-i18n="settings.alerts.CustomAlerts.new.type.gridsquare" value="2">Gridsquare</option>
                 <option data-i18n="settings.alerts.CustomAlerts.new.type.QRZ" value="4">QRZ</option>
+                <option data-i18n="settings.alerts.CustomAlerts.new.type.callsign.exact" value="0">Callsign (exact)</option>
+                <option data-i18n="settings.alerts.CustomAlerts.new.type.callsign.partial" value="5">Callsign (partial)</option>
+                <option data-i18n="settings.alerts.CustomAlerts.new.type.callsign.regex" value="6">Callsign (regex)</option>
+                <option data-i18n="settings.alerts.CustomAlerts.new.type.gridsquare" value="2">Gridsquare</option>
               </select>
             </td>
             <td id="alertValueSelect">
@@ -2423,8 +2440,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </td>
             <td>
               <select id="alertNotifySelect" name="alertNotifySelect" onchange="alertNotifyChanged();">
-                <option data-i18n="settings.alerts.CustomAlerts.new.notify.textToSpeech" value="1">Text-to-speech
-                </option>
+                <option data-i18n="settings.alerts.CustomAlerts.new.notify.textToSpeech" value="1">Text-to-speech</option>
                 <option data-i18n="settings.alerts.CustomAlerts.new.notify.mediaFile" value="0">Media File</option>
                 <option data-i18n="settings.alerts.CustomAlerts.new.notify.visual" value="2">Visual Popup</option>
                 <option data-i18n="settings.alerts.CustomAlerts.new.notify.mapcenter" value="3">Map Center</option>

@@ -670,6 +670,18 @@ function saveAndCloseApp(shouldRestart = false)
     }
   }
 
+  if (GT.acLogAPISockect != null)
+  {
+    try
+    {
+      closeAcLogAPI();
+    }
+    catch (e)
+    {
+      console.error(e);
+    }
+  }
+
   closePskMqtt();
 
   if (shouldRestart == true)
@@ -681,10 +693,45 @@ function saveAndCloseApp(shouldRestart = false)
 function clearAndReload()
 {
   GT.closing = true;
+  
   if (GT.wsjtUdpServer != null)
   {
-    GT.wsjtUdpServer.close();
-    GT.wsjtUdpServer = null;
+    try
+    {
+      if (multicastEnable.checked == true && GT.settings.app.wsjtIP != "")
+      {
+        GT.wsjtUdpServer.dropMembership(GT.settings.app.wsjtIP);
+      }
+      GT.wsjtUdpServer.close();
+    }
+    catch (e)
+    {
+      console.error(e);
+    }
+  }
+
+  if (GT.forwardUdpServer != null)
+  {
+    try
+    {
+      GT.forwardUdpServer.close();
+    }
+    catch (e)
+    {
+      console.error(e);
+    }
+  }
+
+  if (GT.acLogAPISockect != null)
+  {
+    try
+    {
+      closeAcLogAPI();
+    }
+    catch (e)
+    {
+      console.error(e);
+    }
   }
 
   GT.settings = { };
@@ -4080,6 +4127,7 @@ function displayTime()
   else secondsAgoMsg.innerHTML = "<b>Never</b>";
 
   checkWsjtxListener();
+  connectToAcLogAPI();
 
   if (GT.timeNow % 22 == 0)
   {
@@ -5058,7 +5106,7 @@ function haltAllTx(allTx = false)
 {
   for (var instance in GT.instances)
   {
-    if (instance != GT.activeInstance || allTx == true)
+    if ((instance != GT.activeInstance || allTx == true) && GT.instances[instance].remote)
     {
       var responseArray = Buffer.alloc(1024);
       var length = 0;
@@ -5135,11 +5183,11 @@ function spotLookupAndSetCall(spot)
 function setCallAndGrid(callsign, grid, instance = null, genMessages = true)
 {
   var thisInstance = null;
-  var port;
-  var address;
+  var port = null;
+  var address = null;
   if (instance != null)
   {
-    if (instance in GT.instances)
+    if (instance in GT.instances && GT.instances[instance].remote)
     {
       thisInstance = GT.instances[instance].status;
       port = GT.instances[instance].remote.port;
@@ -5148,13 +5196,14 @@ function setCallAndGrid(callsign, grid, instance = null, genMessages = true)
   }
   else
   {
-    if (GT.instances[GT.activeInstance].valid)
+    if (GT.instances[GT.activeInstance].valid && GT.instances[GT.activeInstance].remote)
     {
       thisInstance = GT.instances[GT.activeInstance].status;
       port = GT.instances[GT.activeInstance].remote.port;
       address = GT.instances[GT.activeInstance].remote.address;
     }
   }
+
   if (thisInstance && (thisInstance.TxEnabled == 0 || genMessages == false))
   {
     var responseArray = Buffer.alloc(1024);
@@ -5486,7 +5535,7 @@ function handleInstanceStatus(newMessage)
 
     if (localDXcall.innerHTML != "-")
     {
-      localDXReport.innerHTML = formatSignalReport(Number(newMessage.Report.trim()));
+      localDXReport.innerHTML = formatSignalReport(newMessage.Report.trim());
       if (DXcall.length > 0)
       {
         localDXCountry.innerHTML = GT.dxccToAltName[callsignToDxcc(DXcall)];
@@ -6427,6 +6476,7 @@ function handleClosed(newMessage)
     var txt = name[name.length - 1];
     txrxdec.innerHTML = txt + " Closed";
   }
+  updateRosterInstances();
 }
 
 function handleWsjtxClose(newMessage)
@@ -6434,7 +6484,6 @@ function handleWsjtxClose(newMessage)
   updateCountStats();
   GT.instances[newMessage.Id].open = false;
   handleClosed(newMessage);
-  updateRosterInstances();
 }
 
 function handleWsjtxWSPR(newMessage)
@@ -7088,13 +7137,13 @@ function showWorkedBox(sortIndex, nextPage, redraw)
     {
       var worker = "";
       worker += "<table  id='logTable' style='white-space:nowrap;overflow:auto;overflow-x;hidden;' class='darkTable' align=center>";
-      worker += "<tr><th><input type='text' id='searchWB' style='margin:0px' class='inputTextValue' value='" + GT.searchWB + "' size='8' oninput='window.opener.showWorkedSearchChanged(this);' / >";
+      worker += "<tr><th><input type='text' id='searchWB' style='margin:0px'  oncontextmenu='contextMenu()' class='inputTextValue' value='" + GT.searchWB + "' size='8' oninput='window.opener.showWorkedSearchChanged(this);' / >";
       if (GT.searchWB.length > 0)
       {
         worker += "<img title='Clear Callsign' onclick='searchWB.value=\"\";window.opener.showWorkedSearchChanged(searchWB);' src='img/trash_24x48.png' style='width: 30px; margin:0px; padding:0px; margin-bottom: -4px; cursor: pointer;'/>";
       }
       worker += "</th>";
-      worker += "<th><input type='text' id='searchGrid' style='margin:0px' class='inputTextValue' value='" + GT.gridSearch + "' size='6' oninput='window.opener.showWorkedSearchGrid(this);' / >";
+      worker += "<th><input type='text' id='searchGrid' style='margin:0px' oncontextmenu='contextMenu()' class='inputTextValue' value='" + GT.gridSearch + "' size='6' oninput='window.opener.showWorkedSearchGrid(this);' / >";
       if (GT.gridSearch.length > 0)
       {
         worker += "<img title='Clear Grid' onclick='searchGrid.value=\"\";window.opener.showWorkedSearchGrid(searchGrid);' src='img/trash_24x48.png' style='width: 30px; margin:0px; padding:0px; margin-bottom: -4px; cursor: pointer;'/>";
@@ -11628,6 +11677,7 @@ function loadViewSettings()
   acLogCheckbox.checked = GT.settings.acLog.enable;
   acLogMenuCheckbox.checked = GT.settings.acLog.menu;
   acLogStartupCheckbox.checked = GT.settings.acLog.startup;
+  acLogConnectCheckbox.checked = GT.settings.acLog.connect;
   ValidatePort(acLogPortInput, acLogCheckbox, null);
   ValidateIPaddress(acLogIpInput, acLogCheckbox, null);
   acLogQsl.value = GT.settings.acLog.qsl;
@@ -12020,8 +12070,50 @@ function postInit()
   nodeTimers.setTimeout(checkForNewVersion, 60000); // Informative check
 
   registerCutAndPasteContextMenu();
+  registerLegendContextMenus();
 
   GT.finishedLoading = true;
+}
+
+function registerLegendContextMenus()
+{
+  predButton.addEventListener('contextmenu', (event) => {
+    event.preventDefault();
+    if (GT.settings.map.predMode > 0)
+    {
+      const menu = new Menu();
+      menu.append(new MenuItem({
+        type: "checkbox",
+        label: I18N("legend.title"),
+        checked: GT.settings.map.predLegend,
+        click: function ()
+        {
+          GT.settings.map.predLegend = !GT.settings.map.predLegend;
+          predDiv.style.display = (GT.settings.map.predLegend) ? "" : "none";
+        }
+      }));
+      menu.popup();
+    }
+  });
+
+  buttonSpotsBoxDiv.addEventListener('contextmenu', (event) => {
+    event.preventDefault();
+    if (GT.spotView != 0)
+    {
+      const menu = new Menu();
+      menu.append(new MenuItem({
+        type: "checkbox",
+        label: I18N("legend.title"),
+        checked: GT.settings.map.spotLegend,
+        click: function ()
+        {
+          GT.settings.map.spotLegend = !GT.settings.map.spotLegend;
+          spotsDiv.style.display = GT.settings.map.spotLegend ? "" : "none";
+        }
+      }));
+      menu.popup();
+    }
+  });
 }
 
 function checkForNewVersion()
@@ -12409,6 +12501,23 @@ function checkWsjtxListener()
   }
   updateWsjtxListener(GT.settings.app.wsjtUdpPort);
 }
+function addNewInstance(instanceId)
+{
+  GT.instances[instanceId] = {};
+  GT.instances[instanceId].valid = false;
+  GT.instances[instanceId].open = false;
+  GT.instancesIndex.push(instanceId);
+  GT.instances[instanceId].intId = GT.instancesIndex.length - 1;
+  GT.instances[instanceId].crEnable = true;
+  GT.instances[instanceId].canRoster = true;
+  GT.instances[instanceId].oldStatus = null;
+  GT.instances[instanceId].status = null;
+  if (GT.instancesIndex.length > 1)
+  {
+    multiRigCRDiv.style.display = "inline-block";
+    haltTXDiv.style.display = "inline-block";
+  }
+}
 
 function updateWsjtxListener(port)
 {
@@ -12516,19 +12625,7 @@ function updateWsjtxListener(port)
       var instanceId = newMessage.Id;
       if (!(instanceId in GT.instances))
       {
-        GT.instances[instanceId] = {};
-        GT.instances[instanceId].valid = false;
-        GT.instancesIndex.push(instanceId);
-        GT.instances[instanceId].intId = GT.instancesIndex.length - 1;
-        GT.instances[instanceId].crEnable = true;
-        GT.instances[instanceId].oldStatus = null;
-        GT.instances[instanceId].status = null;
-        if (GT.instancesIndex.length > 1)
-        {
-          multiRigCRDiv.style.display = "inline-block";
-          haltTXDiv.style.display = "inline-block";
-        }
-        updateRosterInstances();
+        addNewInstance(instanceId);
       }
       var notify = false;
       if (GT.instances[instanceId].open == false) notify = true;
@@ -14495,7 +14592,7 @@ function updateSpottingViews()
       GT.layerVectors.pskHeat.setVisible(true);
     }
 
-    spotsDiv.style.display = "";
+    spotsDiv.style.display = GT.settings.map.spotLegend ? "" : "none";
   }
   else
   {
@@ -14645,7 +14742,7 @@ function displayPredLayer()
   predButton.style.display = (GT.settings.map.offlineMode == true) ? "none" : "";
   if (GT.settings.map.predMode > 0 && GT.settings.map.offlineMode == false)
   {
-    predDiv.style.display = "";
+    predDiv.style.display = (GT.settings.map.predLegend) ? "" : "none";
     for (var viewIndex in GT.predViews)
     {
       for (var html in GT.predViews[viewIndex])

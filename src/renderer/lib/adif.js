@@ -227,7 +227,8 @@ function grabClubLog(test)
 {
   if (fs.existsSync(GT.clublogLogFile) && getFilesizeInBytes(GT.clublogLogFile) > 0)
   {
-    fs.readFile(GT.clublogLogFile, "utf-8", handleAdifLoad);
+    let buffer = fs.readFileSync(GT.clublogLogFile, "utf-8");
+    if (buffer) onAdiLoadComplete(buffer);
   }
 
   if (GT.isGettingClub == false)
@@ -435,7 +436,8 @@ function grabQrzComLog(test)
 {
   if (fs.existsSync(GT.QrzLogFile) && getFilesizeInBytes(GT.QrzLogFile) > 0)
   {
-    fs.readFile(GT.QrzLogFile, "utf-8", handleAdifLoad);
+    let buffer = fs.readFileSync(GT.QrzLogFile, "utf-8");
+    if (buffer) onAdiLoadComplete(buffer);
   }
 
 
@@ -612,8 +614,6 @@ GT.fileSelector.onchange = function ()
 function ValidatePotentialAdifLogFileAgainstInternal(fullPath)
 {
   let extName =  path.extname(fullPath);
-  // Is an ADIF file
-  if (!(extName.toLowerCase() == ".adi" || extName.toLowerCase() == ".adif")) return false;
   // Is on disk
   if (!(fs.existsSync(fullPath))) return false;
   // Not in Local File(s)
@@ -634,7 +634,8 @@ function addLogToStartupList(fileObject)
   loadAdifCheckBox.checked = true;
   adifStartupCheckBoxChanged(loadAdifCheckBox);
 
-  fs.readFile(fileObject.path, "utf-8", handleAdifLoad);
+  let buffer = fs.readFileSync(fileObject.path, "utf-8");
+  if (buffer) onAdiLoadComplete(buffer);
   
   for (const i in GT.settings.startupLogs)
   {
@@ -745,7 +746,8 @@ function loadBackupLogFiles()
 
     logFiles.forEach((filename) =>
     {
-      fs.readFile(path.join(GT.qsoBackupDir, filename), "UTF-8", handleAdifLoad);
+      let buffer = fs.readFileSync(path.join(GT.qsoBackupDir, filename), "UTF-8");
+      if (buffer) onAdiLoadComplete(buffer);
     });
   }
   catch (e)
@@ -767,7 +769,8 @@ function loadLoTWLogFile()
 
   if (fs.existsSync(GT.LoTWLogFile) && getFilesizeInBytes(GT.LoTWLogFile) > 0)
   {
-    fs.readFile(GT.LoTWLogFile, "utf-8", handleAdifLoadLocalLoTW);
+    let buffer = fs.readFileSync(GT.LoTWLogFile, "utf-8");
+    if (buffer) onAdiLoadComplete(buffer, "grabLoTWQSL");
   }
   else
   {
@@ -779,7 +782,8 @@ function loadWsjtLogFile()
 {
   if (GT.settings.app.wsjtLogPath.length > 0 && GT.settings.adifLog.startup.loadWSJTCheckBox == true &&  fs.existsSync(GT.settings.app.wsjtLogPath))
   {
-    fs.readFile(GT.settings.app.wsjtLogPath, "UTF-8", handleAdifLoad);
+    let buffer = fs.readFileSync(GT.settings.app.wsjtLogPath, "UTF-8");
+    if (buffer) onAdiLoadComplete(buffer);
   }
 }
 
@@ -964,28 +968,11 @@ function startupAdifLoadFunction()
     {
       if (ValidatePotentialAdifLogFileAgainstInternal(GT.settings.startupLogs[i].file))
       {
-        fs.readFile(GT.settings.startupLogs[i].file, "UTF-8", handleAdifLoad);
+        let buffer = fs.readFileSync(GT.settings.startupLogs[i].file, "UTF-8");
+        if (buffer) onAdiLoadComplete(buffer);
       }
     }
     catch (e) {}
-  }
-}
-
-function handleAdifLoad(err, data)
-{
-  onAdiLoadComplete(data);
-  if (err)
-  {
-    console.log("File Read Error: " + err);
-  }
-}
-
-function handleAdifLoadLocalLoTW(err, data)
-{
-  onAdiLoadComplete(data, "grabLoTWQSL");
-  if (err)
-  {
-    console.log("File Read Error: " + err);
   }
 }
 
@@ -2109,6 +2096,7 @@ function acLogLoggerChanged()
   GT.settings.acLog.port = acLogPortInput.value;
   GT.settings.acLog.menu = acLogMenuCheckbox.checked;
   GT.settings.acLog.startup = acLogStartupCheckbox.checked;
+  GT.settings.acLog.connect = acLogConnectCheckbox.checked;
   GT.settings.acLog.qsl = acLogQsl.value;
 
   acLogQslSpan.style.display = (acLogMenuCheckbox.checked || acLogStartupCheckbox.checked) ? "" : "none";

@@ -89,14 +89,12 @@ function onAdiLoadComplete(task)
   let rowsFiltered = 0;
   let lastHash = null;
   let validAdifFile = true;
-  let eQSLfile = false;
   let clublogFile = false;
   let lotwTimestampUpdated = false;
   let returnTask = {};
 
   try {
     if (task.rawAdiBuffer.indexOf("PSKReporter") > -1) validAdifFile = false;
-    if (task.rawAdiBuffer.indexOf("Received eQSLs") > -1) eQSLfile = true;
     if (task.rawAdiBuffer.indexOf("clublog.adif") > -1 || task.rawAdiBuffer.indexOf("ADIF export from Club Log") > -1) clublogFile = true;
 
     let eorRegEx = new RegExp("<EOR>", "i");
@@ -189,8 +187,9 @@ function onAdiLoadComplete(task)
             }
           }
 
-          let finalDXcall = (object.CALL || null).replace("_", "/");
+          let finalDXcall = (object.CALL || null);
           if (finalDXcall == null) continue;
+          finalDXcall = finalDXcall.replace("_", "/");
 
           // We made it this far, we have a workable qso
           const qso = {
@@ -284,10 +283,11 @@ function onAdiLoadComplete(task)
           if (object.DXCC)
           {
             finalDxcc = parseInt(object.DXCC);
-            if (finalDxcc == 0)  finalDxcc = parseInt(callsignToDxcc(finalDXcall));
-            if (!(finalDxcc in GT.dxccInfo)) finalDxcc = parseInt(callsignToDxcc(finalDXcall));
-            qso.dxcc = finalDxcc
           }
+
+          if (finalDxcc == 0)  finalDxcc = parseInt(callsignToDxcc(finalDXcall));
+          if (!(finalDxcc in GT.dxccInfo)) finalDxcc = parseInt(callsignToDxcc(finalDXcall));
+          qso.dxcc = finalDxcc;
 
           let finalState = (object.STATE || null);
           if (finalState && finalDxcc > 0) finalState = GT.dxccToCountryCode[finalDxcc] + "-" + finalState.toUpperCase();
@@ -313,7 +313,7 @@ function onAdiLoadComplete(task)
           let eqsl_qsl_rcvd = (object.EQSL_QSL_RCVD || "").toUpperCase();
   
           lotwConfirmed = (lotwConfirmed || lotw_qsl_rcvd == "Y" || lotw_qsl_rcvd == "V");
-          let eqslConf = (eQSLfile == true || eqsl_qsl_rcvd == "Y" || eqsl_qsl_rcvd == "V");
+          let eqslConf = (eqsl_qsl_rcvd == "Y" || eqsl_qsl_rcvd == "V");
           let clubConf = (clublogFile && genConf);
           if (genConf || qrzConfirmed == "C" || lotwConfirmed || eqslConf)
           {
@@ -553,39 +553,6 @@ function parseADIFRecordStrict(line)
   return record;
 }
 
-
-function parseAcLogXML(line)
-{
-  let record = {};
-  line = line.substring(5); // skip <CMD>
-  while (line.length > 0)
-  {
-    while (line.charAt(0) != "<" && line.length > 0)
-    {
-      line = line.substring(1);
-    }
-    if (line.length > 0)
-    {
-      line = line.substring(1);
-      let nextChev = line.indexOf(">");
-      if (nextChev > -1)
-      {
-        let fieldName = line.substring(0, nextChev).toUpperCase();
-        let endField = "</" + fieldName + ">";
-        line = line.substring(fieldName.length + 1);
-        let end = line.indexOf(endField);
-        if (end > 0 )
-        {
-          let  fieldValue = line.substring(0, end);
-          line = line.substring(end + endField.length);
-          record[fieldName] = fieldValue;
-        }
-      }
-    }
-  }
-
-  return record;
-}
 
 function parseAcLog(task)
 {

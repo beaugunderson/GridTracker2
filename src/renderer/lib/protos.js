@@ -107,7 +107,7 @@ function formatMhz(freq, n, x)
 function formatSignalReport(val)
 {
   let report = String();
-  if (val >= 0) report = "+" + val;
+  if (!isNaN(val) && val >= 0) report = "+" + val;
   else report = val;
   return report;
 };
