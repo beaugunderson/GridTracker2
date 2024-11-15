@@ -1374,11 +1374,8 @@ function onMyKeyDown(event)
     {
       openColumns();
     }
-    else if (event.code == "KeyR")
-    {
-      resetFilters();
-    }
   }
+ 
 }
 
 function blurOnEnter(ele)

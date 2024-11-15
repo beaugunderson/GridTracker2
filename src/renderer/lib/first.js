@@ -109,8 +109,8 @@ function onZoomControlDown(event)
     if (event.code in g_zoomKeys)
     {
       g_zoomKeys[event.code]();
-      event.preventDefault();
     }
+    event.preventDefault();
   }
 }
 

@@ -1940,12 +1940,10 @@ function onMyKeyDown(event)
           if (GT.hotKeys[event.code].param2 in event) { param2 = event[GT.hotKeys[event.code].param2]; }
         }
         GT.hotKeys[event.code].func(GT.hotKeys[event.code].param1, param2);
-        event.preventDefault();
       }
       else
       {
         GT.hotKeys[event.code].func();
-        event.preventDefault();
       }
     }
     else if (event.key in GT.hotKeys)
@@ -1962,12 +1960,10 @@ function onMyKeyDown(event)
           if (GT.hotKeys[event.key].param2 in event) { param2 = event[GT.hotKeys[event.key].param2]; }
         }
         GT.hotKeys[event.key].func(GT.hotKeys[event.key].param1, param2);
-        event.preventDefault();
       }
       else
       {
         GT.hotKeys[event.key].func();
-        event.preventDefault();
       }
     }
   }
@@ -2036,7 +2032,7 @@ function registerHotKeys()
   registerHotKey("Toggle All Grid Overlay", "KeyB", toggleAllGrids, null, null, "ctrlKey");
   registerHotKey("Open Conditions Windows", "KeyC", showConditionsBox, null, null, "ctrlKey");
   registerHotKey("Toggle Moon Tracking", "KeyD", toggleMoon, null, null, "ctrlKey");
-
+  registerHotKey("Open Call Roster Window", "KeyF", openCallRosterWindow, null, null, "ctrlKey");
 
   registerHotKey("Toggle GridTracker Users", "KeyG", toggleGtMap, null, null, "ctrlKey");
   registerHotKey("Toggle Timezone Overlay", "KeyH", toggleTimezones, null, null, "ctrlKey");
@@ -2049,7 +2045,7 @@ function registerHotKeys()
   registerHotKey("Cycle Spot View", "KeyO", cycleSpotsView, null, null, "ctrlKey");
   registerHotKey("Toggle Grid/PushPin Mode", "KeyP", togglePushPinMode, null, null, "ctrlKey");
   registerHotKey("Cycle Logbook/Live View", "KeyQ", cycleGridView, null, null, "ctrlKey");
-  registerHotKey("Open Call Roster Window", "KeyR", openCallRosterWindow, null, null, "ctrlKey");
+
   registerHotKey("Open Settings", "KeyS", showSettingsBox, null, null, "ctrlKey");
   registerHotKey("Toggle RX Spots over Grids", "KeyT", toggleSpotOverGrids, null, null, "ctrlKey");
   registerHotKey("Toggle Award Layer Merge", "KeyU", toggleMergeOverlay, null, null, "ctrlKey");
