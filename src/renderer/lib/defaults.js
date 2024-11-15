@@ -43,6 +43,13 @@ const def_legendColors = {
   QTH: "#FFA600"
 };
 
+var def_maps = {
+  mapIndex: "Mapnik by OpenStreetMap (Intl)",
+  offlineMapIndex: "Satellite by MapTiler (No Labels)(Offline)",
+  nightMapIndex: "Dark Gray by Esri (English)",
+  offlineNightMapIndex: "Toner by Stamen (No Labels)(Offline)"
+};
+
 const def_settings = {
   defaultsApplied: true,
   app: {

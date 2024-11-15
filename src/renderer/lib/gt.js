@@ -4411,19 +4411,19 @@ function initMap()
 
     if (!(GT.settings.map.mapIndex in GT.maps))
     {
-      GT.settings.map.mapIndex = def_mapSettings.mapIndex;
+      GT.settings.map.mapIndex = def_maps.mapIndex;
     }
     if (!(GT.settings.map.nightMapIndex in GT.maps))
     {
-      GT.settings.map.nightMapIndex = def_mapSettings.nightMapIndex;
+      GT.settings.map.nightMapIndex = def_maps.nightMapIndex;
     }
     if (!(GT.settings.map.offlineMapIndex in GT.maps))
     {
-      GT.settings.map.offlineMapIndex = def_mapSettings.offlineMapIndex;
+      GT.settings.map.offlineMapIndex = def_maps.offlineMapIndex;
     }
     if (!(GT.settings.map.offlineNightMapIndex in GT.maps))
     {
-      GT.settings.map.offlineNightMapIndex = def_mapSettings.offlineNightMapIndex;
+      GT.settings.map.offlineNightMapIndex = def_maps.offlineNightMapIndex;
     }
 
     for (const key in GT.maps)
