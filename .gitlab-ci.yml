@@ -368,7 +368,9 @@ upload-gtserv:
     - echo ${APPNAME}-${VERSION}
     - scp -r dist/GridTracker2* ${GT_SERV_USER}@${GT_SERV_ADDRESS}:~/gt2_download/
     - scp -r dist/*.yml ${GT_SERV_USER}@${GT_SERV_ADDRESS}:~/gt2_download/stage/
-    - scp -r dist/win7 ${GT_SERV_USER}@${GT_SERV_ADDRESS}:~/gt2_download/win7
+    - scp -r dist/win7/GridTracker2* ${GT_SERV_USER}@${GT_SERV_ADDRESS}:~/gt2_download/win7/
+    - scp -r dist/win7/*.yml ${GT_SERV_USER}@${GT_SERV_ADDRESS}:~/gt2_download/win7/stage/
+
 
 auto-release-main:
   image: registry.gitlab.com/gitlab-org/release-cli:latest
