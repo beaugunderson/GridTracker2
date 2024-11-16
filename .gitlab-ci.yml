@@ -334,6 +334,8 @@ upload-gtserv:
   needs:
     - job: win:build
       artifacts: true
+    - job: win7:build
+      artifacts: true
     - job: mac:build
       artifacts: true
     - job: lin:build
@@ -375,6 +377,8 @@ auto-release-main:
   needs:
     - job: win:build
       artifacts: true
+    - job: win7:build
+      artifacts: true      
     - job: mac:build
       artifacts: true
     - job: lin:build
