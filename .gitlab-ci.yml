@@ -49,8 +49,39 @@ win:build:
     - echo "APPNAME=$APPNAME" >> build.env
     - echo "${APPNAME}-${VERSION}"
     - npm run build:win
+    - mkdir dist/win7
+    - mv dist/*.* dist/win7/.
     - ls dist
 
+win7:build:
+  stage: build
+  image: electronuserland/builder:wine
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/(v|test_|win_).*/'
+  artifacts:
+    reports:
+      dotenv: build.env
+    name: '$CI_COMMIT_REF_SLUG'
+    paths:
+      - '$CI_PROJECT_DIR/dist/*.*'
+    when: on_success
+  cache:
+    paths:
+      - .cache/
+      - node_modules/
+  before_script:
+    - cp electron-builder.win7.yml electron-builder.yml
+    - cp dev-app-update.win7.yml dev-app-update.yml
+    - npm install
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+  script:
+    - export VERSION=$(node -e "console.log(require('./package.json').version)")
+    - echo "VERSION=$VERSION" >> build.env
+    - export APPNAME=$(node -e "console.log(require('./package.json').name)")
+    - echo "APPNAME=$APPNAME" >> build.env
+    - echo "${APPNAME}-${VERSION}"
+    - npm run build:win
+    - ls dist
 
 mac:build:
   tags:
@@ -208,6 +239,22 @@ win:upload:
       curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/latest.yml" "${PACKAGE_REGISTRY_URL_YML}/latest.yml"
       echo "${PACKAGE_REGISTRY_URL_YML}/latest.yml"
 
+win7:upload:
+  stage: upload
+  image: fedora:40
+  rules:
+    - if: $CI_COMMIT_TAG =~ '/(v|test_|win_).*/'
+  needs:
+    - job: win7:build
+      artifacts: true
+  script:
+    #- source build.env
+    - echo "${APPNAME}-${VERSION}"
+    - |
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/win7/${APPNAME}-${VERSION}-win7-setup.exe" "${PACKAGE_REGISTRY_URL}/win7/${APPNAME}-${VERSION}-win7-setup.exe"
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/win7/latest.yml" "${PACKAGE_REGISTRY_URL_YML}/win7/stage/latest.yml"
+      echo "${PACKAGE_REGISTRY_URL_YML}/win7/stage/latest.yml"
+
 mac:upload:
   stage: upload
   image: fedora:40
@@ -297,6 +344,8 @@ upload-gtserv:
       artifacts: true
     - job: win:upload
       artifacts: true
+    - job: win7:upload
+      artifacts: true
     - job: mac:upload
       artifacts: true
     - job: lin:upload
@@ -317,6 +366,7 @@ upload-gtserv:
     - echo ${APPNAME}-${VERSION}
     - scp -r dist/GridTracker2* ${GT_SERV_USER}@${GT_SERV_ADDRESS}:~/gt2_download/
     - scp -r dist/*.yml ${GT_SERV_USER}@${GT_SERV_ADDRESS}:~/gt2_download/stage/
+    - scp -r dist/win7 ${GT_SERV_USER}@${GT_SERV_ADDRESS}:~/gt2_download/win7
 
 auto-release-main:
   image: registry.gitlab.com/gitlab-org/release-cli:latest
@@ -335,6 +385,8 @@ auto-release-main:
       artifacts: true
     - job: win:upload
       artifacts: true
+    - job: win7:upload
+      artifacts: true      
     - job: mac:upload
       artifacts: true
     - job: lin:upload
@@ -355,6 +407,9 @@ auto-release-main:
         - name: Windows $APPNAME $VERSION Latest
           url: ${PACKAGE_REGISTRY_URL_YML}/latest.yml
           link_type: other
+        - name: Windows $APPNAME $VERSION Win7 Latest
+          url: ${PACKAGE_REGISTRY_URL_YML}/win7/latest.yml
+          link_type: other          
         - name: MacOS $APPNAME $VERSION
           url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}.dmg
           link_type: package
