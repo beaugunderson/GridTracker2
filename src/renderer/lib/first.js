@@ -91,7 +91,10 @@ const g_zoomKeys = {
   NumpadAdd: increaseZoom,
   Equal: increaseZoom,
   Numpad0: resetZoom,
-  Digit0: resetZoom
+  Digit0: resetZoom,
+  KeyA: selectAll,
+  KeyC: copyToClipboard,
+  KeyV: pasteFromClipboard
 };
 
 electron.ipcRenderer.on('loadZoom', (_event, value) => loadZoomCallback(value));
@@ -108,7 +111,7 @@ function onZoomControlDown(event)
   {
     if (event.code in g_zoomKeys)
     {
-      g_zoomKeys[event.code]();
+      g_zoomKeys[event.code](event);
     }
     event.preventDefault();
   }
@@ -130,6 +133,36 @@ function resetZoom()
 {
   s_zoomLevel = 0;
   setAndSaveZoom();
+}
+
+function isTextInput(element)
+{
+  return element.tagName === 'INPUT' || element.tagName === 'TEXTAREA';
+}
+
+function selectAll(event)
+{
+  if (event.target && isTextInput(event.target))
+  {
+    event.target.focus();
+    event.target.select();
+  }
+}
+
+function copyToClipboard(event)
+{
+  const selection = window.getSelection();
+  event.clipboardData.setData("text", selection.toString());
+}
+
+function pasteFromClipboard(event)
+{
+  let paste = (event.clipboardData || window.clipboardData).getData("text");
+  const selection = window.getSelection();
+  if (!selection.rangeCount) return;
+  selection.deleteFromDocument();
+  selection.getRangeAt(0).insertNode(document.createTextNode(paste));
+  selection.collapseToEnd();
 }
 
 function clamp(num, min, max) {

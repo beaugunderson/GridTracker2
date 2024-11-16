@@ -182,6 +182,12 @@ if (!fs.existsSync(gtInternalPath)) {
   fs.mkdirSync(gtInternalPath);
 }
 
+const gtScreenshotPath = join(app.getPath('userData'), 'Screenshots');
+
+if (!fs.existsSync(gtScreenshotPath)) {
+  fs.mkdirSync(gtScreenshotPath);
+}
+
 // We will allow updating of this by the user, copy existing into Ginternal
 let dxccInfoPath = join(gtInternalPath, 'dxcc-info.json');
 if (!fs.existsSync(dxccInfoPath)) {
@@ -259,6 +265,8 @@ ipcMain.on('focusWin', (event, what) => {
 async function screenshot(window) {
   await window.capturePage().then((image) => {
     clipboard.writeImage(image);
+    let filename = path.join(gtScreenshotPath, "GT2 " + currentTimeStampString() + ".png");
+    fs.writeFileSync(filename, image.toPNG());
   });
 }
 
@@ -567,3 +575,28 @@ function isWithinDisplayBounds( x, y ) {
     );
   }, false);
 }
+
+function currentTimeStampString() {
+  let now = new Date();
+  return (
+    now.getFullYear() +
+    "-" +
+    (now.getMonth() + 1) +
+    "-" +
+    now.getDate() +
+    " " +
+    padNumber(now.getHours()) +
+    "." +
+    padNumber(now.getMinutes()) +
+    "." +
+    padNumber(now.getSeconds())
+  );
+}
+
+function padNumber(number, size) {
+  let s = String(number);
+  while (s.length < (size || 2)) {
+    s = "0" + s;
+  }
+  return s;
+};

@@ -2028,16 +2028,16 @@ function registerHotKeys()
   registerHotKey("Toggle US Radar Overlay", "0", toggleRadar);
   registerHotKey("Cycle Award Layers", "Equal", cycleTrophyOverlay);
   
-  registerHotKey("Toggle Active Path Animation", "KeyA", toggleAnimate, null, null, "ctrlKey");
+  // KeyA reserved in first.js
   registerHotKey("Toggle All Grid Overlay", "KeyB", toggleAllGrids, null, null, "ctrlKey");
-  registerHotKey("Open Conditions Windows", "KeyC", showConditionsBox, null, null, "ctrlKey");
+  // KeyC reserved in first.js
   registerHotKey("Toggle Moon Tracking", "KeyD", toggleMoon, null, null, "ctrlKey");
+  registerHotKey("Open Conditions Windows", "KeyE", showConditionsBox, null, null, "ctrlKey");
   registerHotKey("Open Call Roster Window", "KeyF", openCallRosterWindow, null, null, "ctrlKey");
-
   registerHotKey("Toggle GridTracker Users", "KeyG", toggleGtMap, null, null, "ctrlKey");
   registerHotKey("Toggle Timezone Overlay", "KeyH", toggleTimezones, null, null, "ctrlKey");
   registerHotKey("Open Statistics Window", "KeyI", showRootInfoBox, null, null, "ctrlKey");
-
+  registerHotKey("Toggle Active Path Animation", "KeyJ", toggleAnimate, null, null, "ctrlKey");
   registerHotKey("Capture Window to Clipboard", "KeyK", captureScreenshot, null, null, "ctrlKey");
   registerHotKey("Open ADIF file", "KeyL", adifLoadDialog, null, null, "ctrlKey");
   registerHotKey("Toggle Audio Mute", "KeyM", toggleAlertMute, null, null, "ctrlKey");
@@ -2045,11 +2045,11 @@ function registerHotKeys()
   registerHotKey("Cycle Spot View", "KeyO", cycleSpotsView, null, null, "ctrlKey");
   registerHotKey("Toggle Grid/PushPin Mode", "KeyP", togglePushPinMode, null, null, "ctrlKey");
   registerHotKey("Cycle Logbook/Live View", "KeyQ", cycleGridView, null, null, "ctrlKey");
-
+  // KeyR reserved and broken
   registerHotKey("Open Settings", "KeyS", showSettingsBox, null, null, "ctrlKey");
   registerHotKey("Toggle RX Spots over Grids", "KeyT", toggleSpotOverGrids, null, null, "ctrlKey");
   registerHotKey("Toggle Award Layer Merge", "KeyU", toggleMergeOverlay, null, null, "ctrlKey");
-
+  // KeyV reserved in first.js
   registerHotKey("Toggle AEQD Projection", "KeyW", changeMapProjection, null, null, "ctrlKey");
   registerHotKey("Toggle Map Position Info", "KeyX", toggleMouseTrack, null, null, "ctrlKey");
 

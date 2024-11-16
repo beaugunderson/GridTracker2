@@ -1,6 +1,5 @@
 // Basic regexp that identifies a callsign and any pre- and post-indicators.
-const CALLSIGN_REGEXP =
-  /^([A-Z0-9]+\/){0,1}([0-9][A-Z]{1,2}[0-9]|[A-Z]{1,2}[0-9])([A-Z0-9]+)(\/[A-Z0-9/]+){0,1}$/
+const CALLSIGN_REGEXP = /^([A-Z0-9]+\/){0,1}([0-9][A-Z]{1,2}[0-9]|[A-Z]{1,2}[0-9])([A-Z0-9]+)(\/[A-Z0-9/]+){0,1}$/
 /*
   `^ ... $`
     to ensure the callsign has no extraneous characters
@@ -40,7 +39,7 @@ function processRosterFiltering(callRoster, rosterSettings)
     
     // The awardReason is the "tooltip" on the callsign in the roster, if we're not award tracking
     // It's always "Callsign"
-    callObj.awardReason = "Callsign";
+    callObj.awardReason = null;
     callObj.awardType = null;
 
     if (!call || !call.match(CALLSIGN_REGEXP))
