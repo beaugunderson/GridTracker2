@@ -49,8 +49,6 @@ win:build:
     - echo "APPNAME=$APPNAME" >> build.env
     - echo "${APPNAME}-${VERSION}"
     - npm run build:win
-    - mkdir dist/win7
-    - mv dist/*.* dist/win7/.
     - ls dist
 
 win7:build:
@@ -63,7 +61,7 @@ win7:build:
       dotenv: build.env
     name: '$CI_COMMIT_REF_SLUG'
     paths:
-      - '$CI_PROJECT_DIR/dist/*.*'
+      - '$CI_PROJECT_DIR/dist/win7/*.*'
     when: on_success
   cache:
     paths:
@@ -81,6 +79,8 @@ win7:build:
     - echo "APPNAME=$APPNAME" >> build.env
     - echo "${APPNAME}-${VERSION}"
     - npm run build:win
+    - mkdir dist/win7
+    - mv dist/*.* dist/win7/.
     - ls dist
 
 mac:build:
