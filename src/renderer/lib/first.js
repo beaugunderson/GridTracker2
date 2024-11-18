@@ -78,7 +78,7 @@ if (document.title.substring(0, 12).trim() == "GridTracker2")
 }
 else
 {
-  GT.settings = window.opener.GT.settings;
+  GT = window.opener.GT;
 }
 
 // Zoom Code Below

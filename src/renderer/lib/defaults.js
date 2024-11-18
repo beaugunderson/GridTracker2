@@ -8,6 +8,7 @@ const validSettings = [
   "audio",
   "awardTracker",
   "bandActivity",
+  "byBandMode",
   "ignoredCQ",
   "ignoredCalls",
   "ignoredGrid",
@@ -56,6 +57,7 @@ const def_settings = {
     chatUUID: "",
     clearOnCQ: false,
     crScript: 0,
+    wantedByBandMode: false,
     distanceUnit: "MI",
     graylineImgSrc: 0,
     gridViewMode: 3,
@@ -522,7 +524,11 @@ const def_settings = {
     rosterTime: 120,
     compactEntity: "DXCC",
     watchers: {}
-  }
+  },
+  byBandMode: {
+    roster: { wanted: {} },
+    audioAlerts: { wanted: {} }
+  },
 };
 
 const def_mapMemory = {

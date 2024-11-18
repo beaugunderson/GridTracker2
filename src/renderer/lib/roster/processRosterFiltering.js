@@ -229,7 +229,7 @@ function processRosterFiltering(callRoster, rosterSettings)
             callObj.awardReason = CR.awards[x.sponsor].awards[x.name].tooltip + " (" + CR.awards[x.sponsor].sponsor + ")";
             callObj.awardType = CR.awards[x.sponsor].awards[x.name].rule.type;
             callObj.shouldRosterAlert = true;
-            if (window.opener.GT.settings.audioAlerts.wanted.huntAward)
+            if (GT.activeAudioAlertsWanted.huntAward)
             {
               callObj.AH = { huntAward: 1 };
             }

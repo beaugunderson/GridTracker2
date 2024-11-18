@@ -371,30 +371,29 @@ function instanceChange(what)
 
 function updateInstances()
 {
-  if (window.opener.GT.instancesIndex.length > 1)
+  if (GT.instanceCount > 1)
   {
     let instances = window.opener.GT.instances;
-
     let worker = "";
-
     let keys = Object.keys(instances).sort();
     for (const key in keys)
     {
       let inst = keys[key];
-      let sp = inst.split(" - ");
-      let shortInst = sp[sp.length - 1].substring(0, 18);
-      let color = "blue";
-
-      if (instances[inst].open == false)
+      if (instances[inst].canRoster)
       {
-        color = "purple";
+        let sp = inst.split(" - ");
+        let shortInst = sp[sp.length - 1].substring(0, 18);
+        let color = "blue";
+
+        if (instances[inst].open == false)
+        {
+          color = "purple";
+        }
+        worker += `<div class='button' style='background-color:${color};'>` +
+                  `<input type='checkbox' id='${inst}' onchange='instanceChange(this);' ` +
+                  (instances[inst].crEnable ? "checked " : "") +
+                  `>&nbsp;${shortInst}</div>`
       }
-      worker +=
-        `<div class='button' style='background-color:${color};'>` +
-        `<input type='checkbox' id='${inst}' onchange='instanceChange(this);' ` +
-        (instances[inst].crEnable ? "checked " : "") +
-        (instances[inst].canRoster ? "" : "disabled") +
-        `>&nbsp;${shortInst}</div>`
     }
     instancesDiv.innerHTML = worker;
     instancesWrapper.style.display = "";
@@ -744,12 +743,12 @@ function setVisual()
   }
   else
   {
-    for (const key in CR.rosterSettings.wanted)
+    for (const key in GT.activeRosterWanted)
     {
       if (key in window)
       {
-        window[key].checked = CR.rosterSettings.wanted[key];
-        if (GT.settings.audioAlerts.wanted[key] == true)
+        window[key].checked = GT.activeRosterWanted[key];
+        if (GT.activeAudioAlertsWanted[key] == true)
         {
           window[key].nextElementSibling.nextElementSibling.innerHTML = "<font style='font-size:smaller;' onclick='window.opener.openAudioAlertSettings()'>&#128276;</font>";
         }
@@ -783,7 +782,7 @@ function setVisual()
 
 function wantedChanged(element)
 {
-  CR.rosterSettings.wanted[element.id] = element.checked;
+  GT.activeRosterWanted[element.id] = element.checked;
 
   if (element.checked == true)
   {
@@ -1455,11 +1454,11 @@ function addControls()
 
   window.opener.setRosterSpot(CR.rosterSettings.columns.Spot);
 
-  for (const key in CR.rosterSettings.wanted)
+  for (const key in GT.activeRosterWanted)
   {
     if (key in window)
     { 
-      window[key].checked = CR.rosterSettings.wanted[key]; 
+      window[key].checked = GT.activeRosterWanted[key]; 
     }
   }
 
@@ -3198,7 +3197,7 @@ function addWatcher(value, type)
     entry.autoDelete = false;
     CR.watchers[value] = entry;
     CR.watchersTest[value] = null;
-    CR.rosterSettings.wanted.huntWatcher = huntWatcher.checked = true;
+    GT.activeRosterWanted.huntWatcher = huntWatcher.checked = true;
     window.opener.goProcessRoster();
     wantRenderWatchersTab();
   }

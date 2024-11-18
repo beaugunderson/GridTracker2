@@ -69,9 +69,9 @@ function processRosterHunting(callRoster, rosterSettings)
 
   let isAwardTracker = (CR.rosterSettings.referenceNeed == LOGBOOK_AWARD_TRACKER);
   // Rw == Roster Wanted
-  let RW = CR.rosterSettings.wanted;
+  let RW = GT.activeRosterWanted;
   // AAW == Audio Alert Wanted
-  let AAW = GT.settings.audioAlerts.wanted;
+  let AAW = GT.activeAudioAlertsWanted;
  
   // Second loop, hunting and highlighting
   for (const callHash in callRoster)

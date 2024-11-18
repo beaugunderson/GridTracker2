@@ -169,6 +169,9 @@ GT.qsoGrids = {};
 GT.liveCallsigns = {};
 GT.hotKeys = {};
 
+GT.activeRosterWanted = null;
+GT.activeAudioAlertsWanted = null;
+
 GT.flightPaths = [];
 GT.flightPathOffset = 0;
 GT.flightPathLineDash = [9, 3, 3];
@@ -572,6 +575,7 @@ GT.qtToSplice = 0;
 GT.forwardUdpServer = null;
 GT.instances = {};
 GT.instancesIndex = [];
+GT.instanceCount = 0;
 GT.activeInstance = "";
 GT.activeIndex = 0;
 GT.currentID = null;
@@ -3596,6 +3600,12 @@ function changeTrafficDecode()
   trafficDecodeView();
 }
 
+function changeWantedByBandMode()
+{
+  GT.settings.app.wantedByBandMode = wantedByBandMode.checked;
+  updateByBandMode();
+}
+
 function trafficDecodeView()
 {
   if (GT.settings.map.trafficDecode == false)
@@ -5419,6 +5429,7 @@ function handleInstanceStatus(newMessage)
     if (GT.pskBandActivityTimerHandle == null) pskGetBandActivity();
     if (bandChange || modeChange || GT.startingUp)
     {
+      updateByBandMode();
       removePaths();
       goProcessRoster();
       redrawGrids();
@@ -11226,6 +11237,7 @@ function loadMapSettings()
   haltAllOnTxValue.checked = GT.settings.map.haltAllOnTx;
 
   trafficDecode.checked = GT.settings.map.trafficDecode;
+  wantedByBandMode.checked = GT.settings.app.wantedByBandMode;
 
   setSpotImage();
 
@@ -12243,6 +12255,8 @@ function saveButtonOrder()
 
 function init()
 {
+  updateByBandMode();
+
   initQSOdata();
 
   aboutVersionText.innerHTML = gtShortVersion;
@@ -12593,6 +12607,7 @@ function updateWsjtxListener(port)
       if (!(instanceId in GT.instances))
       {
         addNewInstance(instanceId);
+        GT.instanceCount++;
       }
       var notify = false;
       if (GT.instances[instanceId].open == false) notify = true;
@@ -14759,7 +14774,6 @@ function predLayerRefreh()
   }
 }
 
-
 function handleKpIndexJSON(json)
 {
   if (json && typeof json == "object")
@@ -14859,4 +14873,53 @@ function createFileSelectorHandlers()
       // user aborted or file permission issue
     }
   });
+}
+
+function updateByBandMode()
+{
+  let hash = GT.settings.app.myBand + GT.settings.app.myMode;
+
+  if (!(hash in GT.settings.byBandMode.roster.wanted))
+  {
+    if (GT.activeRosterWanted)
+    {
+      GT.settings.byBandMode.roster.wanted[hash] = { ...GT.activeRosterWanted };
+    }
+    else
+    {
+      GT.settings.byBandMode.roster.wanted[hash] = { ...GT.settings.roster.wanted };
+    }  
+  }
+  if (!(hash in GT.settings.byBandMode.audioAlerts.wanted))
+  {
+    if (GT.activeAudioAlertsWanted)
+    {
+      GT.settings.byBandMode.audioAlerts.wanted[hash] = { ...GT.activeAudioAlertsWanted };
+    }
+    else
+    {
+      GT.settings.byBandMode.audioAlerts.wanted[hash] = { ...GT.settings.audioAlerts.wanted };
+    }  
+  }
+
+  if (GT.instanceCount > 1 || GT.settings.app.wantedByBandMode == false)
+  {
+    GT.activeRosterWanted = GT.settings.roster.wanted;
+    GT.activeAudioAlertsWanted = GT.settings.audioAlerts.wanted;
+  }
+  else
+  {
+    GT.activeRosterWanted = GT.settings.byBandMode.roster.wanted[hash];
+    GT.activeAudioAlertsWanted = GT.settings.byBandMode.audioAlerts.wanted[hash];
+  }
+
+  for (const key in GT.activeAudioAlertsWanted)
+  {
+    if (key in window)
+    {
+      window[key].checked = GT.activeAudioAlertsWanted[key];
+    }
+  }
+
+  setVisualHunting();
 }
