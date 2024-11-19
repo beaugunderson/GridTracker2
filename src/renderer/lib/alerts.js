@@ -659,11 +659,11 @@ function displayAlerts()
 
 function wantedChanged(what)
 {
-  if (what.id in GT.activeAudioAlertsWanted)
+  if (what.id in GT.activeAudioAlerts.wanted)
   {
     window.speechSynthesis.cancel();
-    GT.activeAudioAlertsWanted[what.id] = what.checked;
-    if (GT.activeAudioAlertsWanted[what.id] == false)
+    GT.activeAudioAlerts.wanted[what.id] = what.checked;
+    if (GT.activeAudioAlerts.wanted[what.id] == false)
     {
       window[what.id + "Count"].innerHTML = 0;
       window.huntMultipleCount.innerHTML = 0;
@@ -884,11 +884,11 @@ function loadAudioAlertSettings()
     }
   }
 
-  for (const key in GT.activeAudioAlertsWanted)
+  for (const key in GT.activeAudioAlerts.wanted)
   {
     if (key in window)
     {
-      window[key].checked = GT.activeAudioAlertsWanted[key];
+      window[key].checked = GT.activeAudioAlerts.wanted[key];
     }
   }
 

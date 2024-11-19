@@ -193,7 +193,7 @@ GT.liveCallsigns = {};
 GT.hotKeys = {};
 
 GT.activeRoster = null;
-GT.activeAudioAlertsWanted = null;
+GT.activeAudioAlerts = null;
 
 GT.flightPaths = [];
 GT.flightPathOffset = 0;
@@ -14919,34 +14919,38 @@ function updateByBandMode()
       };
     }  
   }
-  if (!(hash in GT.settings.ByBandMode.audioAlerts.wanted))
+  if (!(hash in GT.settings.ByBandMode.audioAlerts))
   {
-    if (GT.activeAudioAlertsWanted)
+    if (GT.activeAudioAlerts)
     {
-      GT.settings.ByBandMode.audioAlerts.wanted[hash] = { ...GT.activeAudioAlertsWanted };
+      GT.settings.ByBandMode.audioAlerts[hash] = { 
+        wanted: { ...GT.activeAudioAlerts.wanted }
+      };
     }
     else
     {
-      GT.settings.ByBandMode.audioAlerts.wanted[hash] = { ...GT.settings.audioAlerts.wanted };
+      GT.settings.ByBandMode.audioAlerts[hash] = { 
+        wanted: { ...GT.settings.audioAlerts.wanted }
+      };
     }  
   }
 
   if (GT.settings.app.wantedByBandMode == false || GT.instanceCount > 1)
   {
     GT.activeRoster = GT.settings.roster;
-    GT.activeAudioAlertsWanted = GT.settings.audioAlerts.wanted;
+    GT.activeAudioAlerts = GT.settings.audioAlerts;
   }
   else
   {
     GT.activeRoster = GT.settings.ByBandMode.roster[hash];
-    GT.activeAudioAlertsWanted = GT.settings.ByBandMode.audioAlerts.wanted[hash];
+    GT.activeAudioAlerts = GT.settings.ByBandMode.audioAlerts[hash];
   }
 
-  for (const key in GT.activeAudioAlertsWanted)
+  for (const key in GT.activeAudioAlerts.wanted)
   {
     if (key in window)
     {
-      window[key].checked = GT.activeAudioAlertsWanted[key];
+      window[key].checked = GT.activeAudioAlerts.wanted[key];
     }
   }
 

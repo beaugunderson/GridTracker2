@@ -71,7 +71,7 @@ function processRosterHunting(callRoster, rosterSettings)
   // Rw == Roster Wanted
   let RW = GT.activeRoster.wanted;
   // AAW == Audio Alert Wanted
-  let AAW = GT.activeAudioAlertsWanted;
+  let AAW = GT.activeAudioAlerts.wanted;
  
   // Second loop, hunting and highlighting
   for (const callHash in callRoster)

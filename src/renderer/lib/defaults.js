@@ -527,7 +527,7 @@ const def_settings = {
   },
   ByBandMode: {
     roster: { },
-    audioAlerts: { wanted: {} }
+    audioAlerts: { }
   },
 };
 

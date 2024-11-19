@@ -751,7 +751,7 @@ function setVisual()
       if (key in window)
       {
         window[key].checked = GT.activeRoster.wanted[key];
-        if (GT.activeAudioAlertsWanted[key] == true)
+        if (GT.activeAudioAlerts.wanted[key] == true)
         {
           window[key].nextElementSibling.nextElementSibling.innerHTML = "<font style='font-size:smaller;' onclick='window.opener.openAudioAlertSettings()'>&#128276;</font>";
         }
