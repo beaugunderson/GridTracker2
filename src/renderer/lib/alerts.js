@@ -764,6 +764,13 @@ function setVisualHunting()
   }
 }
 
+function logbookValuesChanged()
+{
+  GT.activeRoster.logbook.referenceNeed = referenceNeed.value;
+  GT.activeRoster.logbook.huntNeed = huntNeed.value;
+  setVisualHunting();
+}
+
 // Syncronized call with roster.js!
 function huntingValueChanged(element)
 {
@@ -825,7 +832,10 @@ function openExceptions()
 
 function setVisualAudioAlerts()
 {
-  if (referenceNeed.value == LOGBOOK_AWARD_TRACKER)
+  referenceNeed.value = GT.activeRoster.logbook.referenceNeed;
+  huntNeed.value = GT.activeRoster.logbook.huntNeed;
+
+  if (GT.activeRoster.logbook.referenceNeed == LOGBOOK_AWARD_TRACKER)
   {
     audioAlertsAwardTable.style.display = "";
     audioAlertsWantedTable.style.display = "none";
@@ -847,8 +857,8 @@ function setVisualAudioAlerts()
 
 function loadAudioAlertSettings()
 {
-  referenceNeed.value = GT.settings.roster.referenceNeed;
-  huntNeed.value = GT.settings.roster.huntNeed;
+  referenceNeed.value = GT.activeRoster.logbook.referenceNeed;
+  huntNeed.value = GT.activeRoster.logbook.huntNeed;
   requireGrid.checked = GT.settings.roster.requireGrid;
   wantRRCQ.checked = GT.settings.roster.wantRRCQ;
   cqOnly.checked = GT.settings.roster.cqOnly;

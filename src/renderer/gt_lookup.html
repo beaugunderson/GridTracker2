@@ -79,7 +79,7 @@
 
       function init() {
         ValidateCallsign(lookupCallsignInput, null);
-        window.opener.GT.lookupWindowInitialized = true;
+        GT.lookupWindowInitialized = true;
         loadChildWindowI18n();
         registerCutAndPasteContextMenu();
       }
@@ -89,8 +89,8 @@
       }
 
       function setClipboardFromLookup() {
-        if (window.opener.GT.lastLookupAddress) {
-          addTextToClipboard(window.opener.GT.lastLookupAddress);
+        if (GT.lastLookupAddress) {
+          addTextToClipboard(GT.lastLookupAddress);
         }
       }
 

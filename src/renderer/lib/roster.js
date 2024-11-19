@@ -228,7 +228,7 @@ function rosterNoFocus()
 
 function processRoster()
 {
-  CR.callRoster = window.opener.GT.callRoster;
+  CR.callRoster = GT.callRoster;
   if (CR.rosterTimeout != null)
   {
     nodeTimers.clearTimeout(CR.rosterTimeout);
@@ -270,7 +270,7 @@ function realtimeRoster()
   CR.day = parseInt(now / 86400);
   CR.dayAsString = String(CR.day);
 
-  if (Object.keys(window.opener.GT.gtUnread).length > 0 && now % 2 == 0) rosterChatNotifyImg.style.webkitFilter = "invert(1)";
+  if (Object.keys(GT.gtUnread).length > 0 && now % 2 == 0) rosterChatNotifyImg.style.webkitFilter = "invert(1)";
   else rosterChatNotifyImg.style.webkitFilter = "";
 
   if (CR.rosterSettings.realtime == false) return;
@@ -315,7 +315,7 @@ function getSpotString(callObj)
   if (callObj.spot && callObj.spot.when > 0)
   {
     when = timeNowSec() - callObj.spot.when;
-    if (when <= window.opener.GT.settings.reception.viewHistoryTimeSec)
+    if (when <= GT.settings.reception.viewHistoryTimeSec)
     { result = toDHM(parseInt(when)); }
   }
   if (result != "&nbsp;") result += " / " + callObj.spot.snr;
@@ -365,7 +365,7 @@ function centerOn(grid)
 
 function instanceChange(what)
 {
-  window.opener.GT.instances[what.id].crEnable = what.checked;
+  GT.instances[what.id].crEnable = what.checked;
   viewRoster();
 }
 
@@ -373,7 +373,7 @@ function updateInstances()
 {
   if (GT.instanceCount > 1)
   {
-    let instances = window.opener.GT.instances;
+    let instances = GT.instances;
     let worker = "";
     let keys = Object.keys(instances).sort();
     for (const key in keys)
@@ -710,6 +710,9 @@ function toggleMoreControls()
 
 function setVisual()
 {
+  referenceNeed.value = GT.activeRoster.logbook.referenceNeed;
+  huntNeed.value = GT.activeRoster.logbook.huntNeed;
+
   if (CR.rosterSettings.controls)
   {
     if (CR.rosterSettings.controlsExtended)
@@ -730,7 +733,7 @@ function setVisual()
   }
 
   // Award Hunter
-  if (referenceNeed.value == LOGBOOK_AWARD_TRACKER)
+  if (GT.activeRoster.logbook.referenceNeed == LOGBOOK_AWARD_TRACKER)
   {
     huntNeed.style.display = "none";
     onlyHitsDiv.style.display = "none";
@@ -743,11 +746,11 @@ function setVisual()
   }
   else
   {
-    for (const key in GT.activeRosterWanted)
+    for (const key in GT.activeRoster.wanted)
     {
       if (key in window)
       {
-        window[key].checked = GT.activeRosterWanted[key];
+        window[key].checked = GT.activeRoster.wanted[key];
         if (GT.activeAudioAlertsWanted[key] == true)
         {
           window[key].nextElementSibling.nextElementSibling.innerHTML = "<font style='font-size:smaller;' onclick='window.opener.openAudioAlertSettings()'>&#128276;</font>";
@@ -782,7 +785,7 @@ function setVisual()
 
 function wantedChanged(element)
 {
-  GT.activeRosterWanted[element.id] = element.checked;
+  GT.activeRoster.wanted[element.id] = element.checked;
 
   if (element.checked == true)
   {
@@ -831,6 +834,14 @@ function huntingValueChangedFromAudioAlerts(id, value)
   }
 }
 
+function logbookValuesChanged()
+{
+  GT.activeRoster.logbook.referenceNeed = referenceNeed.value;
+  GT.activeRoster.logbook.huntNeed = huntNeed.value;
+  setVisual();
+  window.opener.setVisualAudioAlerts();
+}
+
 function huntingValueChanged(element)
 {
   let id = element.id
@@ -865,8 +876,8 @@ function resetAlertReporting(clearRoster, clearAudio)
 {
   for (const callHash in CR.callRoster)
   {
-    if (clearRoster) window.opener.GT.callRoster[callHash].callObj.rosterAlerted = false;
-    if (clearAudio) window.opener.GT.callRoster[callHash].callObj.audioAlerted = false;
+    if (clearRoster) GT.callRoster[callHash].callObj.rosterAlerted = false;
+    if (clearAudio) GT.callRoster[callHash].callObj.audioAlerted = false;
   }
 }
 
@@ -939,38 +950,38 @@ function initSelectors()
     }
   }
 
-  let items = Object.keys(window.opener.GT.dxccToAltName).sort(function (a, b)
+  let items = Object.keys(GT.dxccToAltName).sort(function (a, b)
   {
-    return window.opener.GT.dxccToAltName[a].localeCompare(
-      window.opener.GT.dxccToAltName[b]
+    return GT.dxccToAltName[a].localeCompare(
+      GT.dxccToAltName[b]
     );
   });
 
   for (const i in items)
   {
     let key = items[i];
-    if (window.opener.GT.dxccInfo[key].geo != "deleted")
+    if (GT.dxccInfo[key].geo != "deleted")
     {
       let option = document.createElement("option");
       option.value = key;
-      option.text = window.opener.GT.dxccToAltName[key] + " (" + window.opener.GT.dxccInfo[key].pp + ")";
+      option.text = GT.dxccToAltName[key] + " (" + GT.dxccInfo[key].pp + ")";
       // Note: do not use cloneNode on elements/nodes that have ids
       ignoreCqDxccSelect.appendChild(option.cloneNode(true));
       ignoreDxccSelect.appendChild(option.cloneNode(true));
     }
   }
 
-  items = Object.keys(window.opener.GT.cqZones).sort();
+  items = Object.keys(GT.cqZones).sort();
   for (const i in items)
   {
     let key = items[i];
     let option = document.createElement("option");
     option.value = key;
-    option.text = key + " - " + window.opener.GT.cqZones[key].name;
+    option.text = key + " - " + GT.cqZones[key].name;
     ignoreCqzSelect.appendChild(option);
   }
 
-  items = Object.keys(window.opener.GT.ituZones).sort();
+  items = Object.keys(GT.ituZones).sort();
   for (const i in items)
   {
     let key = items[i];
@@ -1073,9 +1084,9 @@ CR.tracker = {};
 
 function updateWorked()
 {
-  CR.modes = window.opener.GT.modes;
-  CR.modes_phone = window.opener.GT.modes_phone;
-  CR.tracker = window.opener.GT.tracker;
+  CR.modes = GT.modes;
+  CR.modes_phone = GT.modes_phone;
+  CR.tracker = GT.tracker;
 
   processAllAwardTrackers();
 }
@@ -1272,7 +1283,7 @@ function renderIgnoresTab()
         let key = split[0];
         let dxcc = -1;
         if (split.length == 2) dxcc = parseInt(split[1]);
-        worker += "<tr><td align=left style='color:lightgreen;' >" + key + " from " + (dxcc == -1 ? "All" : window.opener.GT.dxccToAltName[dxcc]) + "</td><td style='cursor:pointer;' onclick='deleteCQIgnore(\"" + rawKey + "\")'><img src='img/trash_24x48.png' style='height:17px;margin:-1px;margin-bottom:-3px;padding:0px'></td></tr>";
+        worker += "<tr><td align=left style='color:lightgreen;' >" + key + " from " + (dxcc == -1 ? "All" : GT.dxccToAltName[dxcc]) + "</td><td style='cursor:pointer;' onclick='deleteCQIgnore(\"" + rawKey + "\")'><img src='img/trash_24x48.png' style='height:17px;margin:-1px;margin-bottom:-3px;padding:0px'></td></tr>";
       });
     worker += "</table></div>";
   }
@@ -1285,7 +1296,7 @@ function renderIgnoresTab()
       .sort()
       .forEach(function (key, i)
       {
-        worker += "<tr><td align=left style='color:#FFA500' >" + window.opener.GT.dxccToAltName[key] + " (" + window.opener.GT.dxccInfo[key].pp + ")</td><td style='cursor:pointer;' onclick='deleteDxccIgnore(\"" + key + "\")'><img src='img/trash_24x48.png' style='height:17px;margin:-1px;margin-bottom:-3px;padding:0px'></td></tr>";
+        worker += "<tr><td align=left style='color:#FFA500' >" + GT.dxccToAltName[key] + " (" + GT.dxccInfo[key].pp + ")</td><td style='cursor:pointer;' onclick='deleteDxccIgnore(\"" + key + "\")'><img src='img/trash_24x48.png' style='height:17px;margin:-1px;margin-bottom:-3px;padding:0px'></td></tr>";
       });
     worker += "</table></div>";
   }
@@ -1403,9 +1414,9 @@ function init()
 {
   loadSettings();
 
-  CR.callsignDatabaseDXCC = window.opener.GT.callsignDatabaseDXCC;
-  CR.callsignDatabaseUS = window.opener.GT.callsignDatabaseUS;
-  CR.callsignDatabaseUSplus = window.opener.GT.callsignDatabaseUSplus;
+  CR.callsignDatabaseDXCC = GT.callsignDatabaseDXCC;
+  CR.callsignDatabaseUS = GT.callsignDatabaseUS;
+  CR.callsignDatabaseUSplus = GT.callsignDatabaseUSplus;
   loadAwardJson();
 
   updateWorked();
@@ -1424,7 +1435,7 @@ function init()
   createActiveAwardsFromSettings();
   
   registerCutAndPasteContextMenu();
-  window.opener.GT.callRosterWindowInitialized = true;
+  GT.callRosterWindowInitialized = true;
 }
 
 function toggleShowControls()
@@ -1454,11 +1465,11 @@ function addControls()
 
   window.opener.setRosterSpot(CR.rosterSettings.columns.Spot);
 
-  for (const key in GT.activeRosterWanted)
+  for (const key in GT.activeRoster.wanted)
   {
     if (key in window)
     { 
-      window[key].checked = GT.activeRosterWanted[key]; 
+      window[key].checked = GT.activeRoster.wanted[key]; 
     }
   }
 
@@ -1468,7 +1479,9 @@ function addControls()
   createCompactMenuShow();
   createRestOfMenus();
 
-  huntNeed.value = CR.rosterSettings.huntNeed;
+  referenceNeed.value = GT.activeRoster.logbook.referenceNeed;
+  huntNeed.value = GT.activeRoster.logbook.huntNeed;
+
   requireGrid.checked = CR.rosterSettings.requireGrid;
 
   wantMaxDT.checked = CR.rosterSettings.wantMaxDT;
@@ -1495,7 +1508,6 @@ function addControls()
   onlySpot.checked = CR.rosterSettings.onlySpot;
   usesOQRS.checked = CR.rosterSettings.usesOQRS;
 
-  referenceNeed.value = CR.rosterSettings.referenceNeed;
   allOnlyNew.checked = CR.rosterSettings.allOnlyNew;
 
   clearRosterOnBandChange.checked = CR.rosterSettings.clearRosterOnBandChange;
@@ -1789,9 +1801,9 @@ function processAward(awardName)
 
   CR.awardTracker[awardName].stat = {};
 
-  for (const i in window.opener.GT.QSOhash)
+  for (const i in GT.QSOhash)
   {
-    let obj = window.opener.GT.QSOhash[i];
+    let obj = GT.QSOhash[i];
 
     if (test.confirmed && !obj.confirmed) continue;
 
@@ -2878,11 +2890,11 @@ function doubleCompile(award, firstLevel)
 function listShortInstances()
 {
   let shortInstances = [];
-  if (typeof window.opener.GT.instancesIndex != "undefined" && typeof window.opener.GT.instances != "undefined")
+  if (typeof GT.instancesIndex != "undefined" && typeof GT.instances != "undefined")
   {
-    if (window.opener.GT.instancesIndex.length > 1)
+    if (GT.instancesIndex.length > 1)
     {
-      let instances = window.opener.GT.instances;
+      let instances = GT.instances;
       let keys = Object.keys(instances).sort();
       for (let key in keys)
       {
@@ -3197,7 +3209,7 @@ function addWatcher(value, type)
     entry.autoDelete = false;
     CR.watchers[value] = entry;
     CR.watchersTest[value] = null;
-    GT.activeRosterWanted.huntWatcher = huntWatcher.checked = true;
+    GT.activeRoster.wanted.huntWatcher = huntWatcher.checked = true;
     window.opener.goProcessRoster();
     wantRenderWatchersTab();
   }
@@ -3445,7 +3457,7 @@ function createRestOfMenus()
   CR.callMenuRotator = new MenuItem({
     type: "normal",
     label: I18N("roster.menu.AimRotator"),
-    visible: window.opener.GT.settings.pstrotator.enable,
+    visible: GT.settings.pstrotator.enable,
     click: function ()
     {
       let target = CR.callRoster[CR.targetHash]
@@ -3519,7 +3531,7 @@ function createRestOfMenus()
   CR.callingMenuRotator = new MenuItem({
     type: "normal",
     label: I18N("roster.menu.AimRotator"),
-    visible: window.opener.GT.settings.pstrotator.enable,
+    visible: GT.settings.pstrotator.enable,
     click: function ()
     {
       let target = CR.callRoster[CR.targetHash]

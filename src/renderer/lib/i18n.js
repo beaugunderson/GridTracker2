@@ -1,14 +1,3 @@
-GT.languages = {
-  en: "i18n/en.json",
-  cn: "i18n/cn.json",
-  cnt: "i18n/cn-t.json",
-  de: "i18n/de.json",
-  fr: "i18n/fr.json",
-  it: "i18n/it.json",
-  es: "i18n/es.json"
-};
-
-GT.i18n = {};
 
 function readLocaleFile(locale)
 {
@@ -86,13 +75,11 @@ function changeLocale()
 
 function loadChildWindowI18n()
 {
-  readLocaleFile(window.opener.GT.settings.app.locale);
   renderI18n();
 }
 
 function loadRosterI18n()
 {
-  readLocaleFile(window.opener.GT.settings.app.locale);
   renderI18n();
   addControls();
 }

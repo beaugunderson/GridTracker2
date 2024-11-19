@@ -52,7 +52,7 @@ function processRosterFiltering(callRoster, rosterSettings)
     if (CR.rosterSettings.columns.Spot == true)
     {
       callObj.spot = window.opener.getSpotTime(callObj.DEcall + callObj.mode + callObj.band);
-      if (CR.rosterSettings.onlySpot == true && (callObj.spot.when == 0 || (timeNowSec() - callObj.spot.when > window.opener.GT.settings.reception.viewHistoryTimeSec)))
+      if (CR.rosterSettings.onlySpot == true && (callObj.spot.when == 0 || (timeNowSec() - callObj.spot.when > GT.settings.reception.viewHistoryTimeSec)))
       {
         entry.tx = false;
         continue;
@@ -77,7 +77,7 @@ function processRosterFiltering(callRoster, rosterSettings)
       entry.tx = false;
       continue;
     }
-    if (window.opener.GT.instances[callObj.instance].crEnable == false)
+    if (GT.instances[callObj.instance].crEnable == false)
     {
       entry.tx = false;
       continue;
@@ -154,7 +154,7 @@ function processRosterFiltering(callRoster, rosterSettings)
       continue;
     }
 
-    if (callObj.dxcc == window.opener.GT.myDXCC)
+    if (callObj.dxcc == GT.myDXCC)
     {
       if (CR.rosterSettings.noMyDxcc == true)
       {
@@ -171,15 +171,15 @@ function processRosterFiltering(callRoster, rosterSettings)
     let usesOneOf = 0;
     let checkUses = 0;
 
-    if (window.opener.GT.settings.callsignLookups.lotwUseEnable == true && CR.rosterSettings.usesLoTW == true)
+    if (GT.settings.callsignLookups.lotwUseEnable == true && CR.rosterSettings.usesLoTW == true)
     {
       checkUses++;
-      if (call in window.opener.GT.lotwCallsigns)
+      if (call in GT.lotwCallsigns)
       {
         usesOneOf++;
         if (CR.rosterSettings.maxLoTW < 27)
         {
-          let months = (CR.day - window.opener.GT.lotwCallsigns[call]) / 30;
+          let months = (CR.day - GT.lotwCallsigns[call]) / 30;
           if (months > CR.rosterSettings.maxLoTW)
           {
             usesOneOf--;
@@ -188,19 +188,19 @@ function processRosterFiltering(callRoster, rosterSettings)
       }
     }
 
-    if (window.opener.GT.settings.callsignLookups.eqslUseEnable == true && CR.rosterSettings.useseQSL == true)
+    if (GT.settings.callsignLookups.eqslUseEnable == true && CR.rosterSettings.useseQSL == true)
     {
       checkUses++;
-      if (call in window.opener.GT.eqslCallsigns)
+      if (call in GT.eqslCallsigns)
       {
         usesOneOf++;
       }
     }
 
-    if (window.opener.GT.settings.callsignLookups.oqrsUseEnable == true && CR.rosterSettings.usesOQRS == true)
+    if (GT.settings.callsignLookups.oqrsUseEnable == true && CR.rosterSettings.usesOQRS == true)
     {
       checkUses++;
-      if (call in window.opener.GT.oqrsCallsigns)
+      if (call in GT.oqrsCallsigns)
       {
         usesOneOf++;
       }

@@ -3,12 +3,11 @@ const validSettings = [
   "N1MM",
   "acLog",
   "adifLog",
-  "alerts",
   "app",
   "audio",
   "awardTracker",
   "bandActivity",
-  "byBandMode",
+  "ByBandMode",
   "ignoredCQ",
   "ignoredCalls",
   "ignoredGrid",
@@ -434,7 +433,6 @@ const def_settings = {
   ignoredITUz: {},
   roster: {
     onlyHits: false,
-    huntNeed: "confirmed",
     requireGrid: false,
     wantMaxDT: false,
     wantMinDB: false,
@@ -455,6 +453,10 @@ const def_settings = {
     onlySpot: false,
     allOnlyNew: false,
     realtime: true,
+    logbook: {
+      huntNeed: "confirmed",
+      referenceNeed: "4",
+    },
     wanted: {
       huntCallsign: false,
       huntGrid: true,
@@ -510,11 +512,9 @@ const def_settings = {
       sepia: 0,
       huerotate: 0
     },
-    referenceNeed: "4", // New users should start out Mixed Band & Mode to match GT Map View initial
     controls: true,
     controlsExtended: true,
     compact: false,
-    settingProfiles: false,
     sortColumn: "Age",
     sortReverse: true,
     clearRosterOnBandChange: true,
@@ -525,8 +525,8 @@ const def_settings = {
     compactEntity: "DXCC",
     watchers: {}
   },
-  byBandMode: {
-    roster: { wanted: {} },
+  ByBandMode: {
+    roster: { },
     audioAlerts: { wanted: {} }
   },
 };

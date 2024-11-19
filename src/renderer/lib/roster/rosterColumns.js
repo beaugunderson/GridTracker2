@@ -44,7 +44,7 @@ const ROSTER_COLUMNS = {
         html: html = formatCallsign((callObj.DEcallHTML || callObj.DEcall))
       }
 
-      let acks = window.opener.GT.acknowledgedCalls || {};
+      let acks = GT.acknowledgedCalls || {};
       if (acks[callObj.DEcall])
       {
         attrs.html = `${attrs.html} <span class='acknowledged'><img class='ackBadge' src='${acks[callObj.DEcall].badge}'></span>`
@@ -65,7 +65,7 @@ const ROSTER_COLUMNS = {
   Band: {
     compare: callObjSimpleComparer("band"),
     tableData: (callObj) => ({
-      style: `color: #${window.opener.GT.pskColors[callObj.band]};`,
+      style: `color: #${GT.pskColors[callObj.band]};`,
       html: callObj.band
     })
   },
@@ -108,10 +108,10 @@ const ROSTER_COLUMNS = {
   DXCC: {
     compare: (a, b) => window.opener.myDxccCompare(a.callObj, b.callObj),
     tableData: (callObj) => ({
-      title: window.opener.GT.dxccInfo[callObj.dxcc].pp,
+      title: GT.dxccInfo[callObj.dxcc].pp,
       name: `DXCC (${callObj.dxcc})`,
       rawAttrs: callObj.style.dxcc,
-      html: window.opener.GT.dxccToAltName[callObj.dxcc]
+      html: GT.dxccToAltName[callObj.dxcc]
     })
   },
 
@@ -129,7 +129,7 @@ const ROSTER_COLUMNS = {
     tableData: (callObj) => ({
       align: "center",
       style: "margin:0; padding:0;",
-      html: `<img style='margin-bottom:-3px;height:14px' src='img/flags/16/${window.opener.GT.dxccInfo[callObj.dxcc].flag}'>`
+      html: `<img style='margin-bottom:-3px;height:14px' src='img/flags/16/${GT.dxccInfo[callObj.dxcc].flag}'>`
     })
   },
 
@@ -139,7 +139,7 @@ const ROSTER_COLUMNS = {
       align: "center",
       rawAttrs: callObj.style.state,
       html: callObj.state ? callObj.state.substr(3) : "&nbsp;",
-      title: (callObj.state in window.opener.GT.StateData) ? window.opener.GT.StateData[callObj.state].name : null
+      title: (callObj.state in GT.StateData) ? GT.StateData[callObj.state].name : null
     })
   },
 
@@ -152,13 +152,13 @@ const ROSTER_COLUMNS = {
       let attrs = {
         align: "center",
         rawAttrs: callObj.style.cnty,
-        html: callObj.cnty ? window.opener.GT.cntyToCounty[callObj.cnty] : "&nbsp;"
+        html: callObj.cnty ? GT.cntyToCounty[callObj.cnty] : "&nbsp;"
       }
       if (callObj.cnty && callObj.qual == false)
       {
         attrs.title = I18N("rosterColumns.County.title")
         attrs.onClick = `window.opener.lookupCallsign("${callObj.DEcall}", "${callObj.grid}")`
-        attrs.html = attrs.html + " +" + String(window.opener.GT.zipToCounty[callObj.zipcode].length - 1)
+        attrs.html = attrs.html + " +" + String(GT.zipToCounty[callObj.zipcode].length - 1)
         attrs.style = "cursor: pointer; color: cyan;"
       }
       return attrs
@@ -245,11 +245,11 @@ const ROSTER_COLUMNS = {
     compare: false,
     tableData: (callObj) =>
     {
-      if (callObj.DEcall in window.opener.GT.lotwCallsigns)
+      if (callObj.DEcall in GT.lotwCallsigns)
       {
         if (CR.rosterSettings.maxLoTW < 27)
         {
-          let months = (CR.day - window.opener.GT.lotwCallsigns[callObj.DEcall]) / 30;
+          let months = (CR.day - GT.lotwCallsigns[callObj.DEcall]) / 30;
           if (months > CR.rosterSettings.maxLoTW)
           {
             return {
@@ -265,7 +265,7 @@ const ROSTER_COLUMNS = {
               style: "color: #0F0;",
               align: "center",
               title: `${I18N("rosterColumns.LoTW.LastUpdate")}${
-                window.opener.userDayString(window.opener.GT.lotwCallsigns[callObj.DEcall] * 86400000)
+                window.opener.userDayString(GT.lotwCallsigns[callObj.DEcall] * 86400000)
               }`,
               html: "&#10004;"
             }
@@ -277,7 +277,7 @@ const ROSTER_COLUMNS = {
             style: "color: #0F0;",
             align: "center",
             title: `${I18N("rosterColumns.LoTW.LastUpdate")}${
-              window.opener.userDayString(window.opener.GT.lotwCallsigns[callObj.DEcall] * 86400000)
+              window.opener.userDayString(GT.lotwCallsigns[callObj.DEcall] * 86400000)
             }`,
             html: "&#10004;"
           }
@@ -297,7 +297,7 @@ const ROSTER_COLUMNS = {
     tableData: (callObj) => ({
       style: "color: #0F0;",
       align: "center",
-      html: (callObj.DEcall in window.opener.GT.eqslCallsigns ? "&#10004;" : "&nbsp;")
+      html: (callObj.DEcall in GT.eqslCallsigns ? "&#10004;" : "&nbsp;")
     })
   },
 
@@ -306,7 +306,7 @@ const ROSTER_COLUMNS = {
     tableData: (callObj) => ({
       style: "color: #0F0;",
       align: "center",
-      html: (callObj.DEcall in window.opener.GT.oqrsCallsigns ? "&#10004;" : "&nbsp;")
+      html: (callObj.DEcall in GT.oqrsCallsigns ? "&#10004;" : "&nbsp;")
     })
   },
 
@@ -376,7 +376,7 @@ const ROSTER_COLUMNS = {
   Spot: {
     compare: (a, b) =>
     {
-      let cutoff = timeNowSec() - window.opener.GT.settings.reception.viewHistoryTimeSec;
+      let cutoff = timeNowSec() - GT.settings.reception.viewHistoryTimeSec;
 
       if (a.callObj.spot.when <= cutoff) return -1;
       if (b.callObj.spot.when <= cutoff) return 1;
@@ -436,9 +436,9 @@ function potaColumnHover(callObj)
 {
   let value = "";
 
-  if (callObj.pota in window.opener.GT.pota.parks)
+  if (callObj.pota in GT.pota.parks)
   {
-    value += callObj.pota + " - " + window.opener.GT.pota.parks[callObj.pota].name + "\n";
+    value += callObj.pota + " - " + GT.pota.parks[callObj.pota].name + "\n";
   }
   
   return value;

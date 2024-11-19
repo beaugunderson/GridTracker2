@@ -114,6 +114,19 @@ function loadAllSettings()
     }
   }
 
+  // remap any settings as neeeded
+  if ("huntNeed" in GT.settings.roster)
+  {
+    GT.settings.roster.logbook.huntNeed = GT.settings.roster.huntNeed;
+    delete GT.settings.roster.huntNeed;
+  }
+
+  if ("referenceNeed" in GT.settings.roster)
+  {
+    GT.settings.roster.logbook.referenceNeed = GT.settings.roster.referenceNeed;
+    delete GT.settings.roster.referenceNeed;
+  }
+
   setWindowTheme();
 }
 
@@ -124,6 +137,16 @@ const gtUserAgent = "GridTracker/" + gtVersionStr;
 const k_frequencyBucket = 10000;
 const backupAdifHeader = "GridTracker v" + gtVersion + " <EOH>\r\n";
 
+GT.languages = {
+  en: "i18n/en.json",
+  cn: "i18n/cn.json",
+  cnt: "i18n/cn-t.json",
+  de: "i18n/de.json",
+  fr: "i18n/fr.json",
+  it: "i18n/it.json",
+  es: "i18n/es.json"
+};
+GT.i18n = {};
 GT.popupWindowHandle = null;
 GT.popupWindowInitialized = false;
 GT.callRosterWindowHandle = null;
@@ -169,7 +192,7 @@ GT.qsoGrids = {};
 GT.liveCallsigns = {};
 GT.hotKeys = {};
 
-GT.activeRosterWanted = null;
+GT.activeRoster = null;
 GT.activeAudioAlertsWanted = null;
 
 GT.flightPaths = [];
@@ -5429,7 +5452,7 @@ function handleInstanceStatus(newMessage)
     if (GT.pskBandActivityTimerHandle == null) pskGetBandActivity();
     if (bandChange || modeChange || GT.startingUp)
     {
-      updateByBandMode();
+      if (GT.instances[GT.activeInstance].canRoster == true) { updateByBandMode(); }
       removePaths();
       goProcessRoster();
       redrawGrids();
@@ -14879,38 +14902,44 @@ function updateByBandMode()
 {
   let hash = GT.settings.app.myBand + GT.settings.app.myMode;
 
-  if (!(hash in GT.settings.byBandMode.roster.wanted))
+  if (!(hash in GT.settings.ByBandMode.roster))
   {
-    if (GT.activeRosterWanted)
+    if (GT.activeRoster)
     {
-      GT.settings.byBandMode.roster.wanted[hash] = { ...GT.activeRosterWanted };
+      GT.settings.ByBandMode.roster[hash] = { 
+          wanted: { ...GT.activeRoster.wanted },
+          logbook: { ...GT.activeRoster.logbook }
+        };
     }
     else
     {
-      GT.settings.byBandMode.roster.wanted[hash] = { ...GT.settings.roster.wanted };
+      GT.settings.ByBandMode.roster[hash] = { 
+        wanted: { ...GT.settings.roster.wanted },
+        logbook: { ...GT.settings.roster.logbook }
+      };
     }  
   }
-  if (!(hash in GT.settings.byBandMode.audioAlerts.wanted))
+  if (!(hash in GT.settings.ByBandMode.audioAlerts.wanted))
   {
     if (GT.activeAudioAlertsWanted)
     {
-      GT.settings.byBandMode.audioAlerts.wanted[hash] = { ...GT.activeAudioAlertsWanted };
+      GT.settings.ByBandMode.audioAlerts.wanted[hash] = { ...GT.activeAudioAlertsWanted };
     }
     else
     {
-      GT.settings.byBandMode.audioAlerts.wanted[hash] = { ...GT.settings.audioAlerts.wanted };
+      GT.settings.ByBandMode.audioAlerts.wanted[hash] = { ...GT.settings.audioAlerts.wanted };
     }  
   }
 
-  if (GT.instanceCount > 1 || GT.settings.app.wantedByBandMode == false)
+  if (GT.settings.app.wantedByBandMode == false || GT.instanceCount > 1)
   {
-    GT.activeRosterWanted = GT.settings.roster.wanted;
+    GT.activeRoster = GT.settings.roster;
     GT.activeAudioAlertsWanted = GT.settings.audioAlerts.wanted;
   }
   else
   {
-    GT.activeRosterWanted = GT.settings.byBandMode.roster.wanted[hash];
-    GT.activeAudioAlertsWanted = GT.settings.byBandMode.audioAlerts.wanted[hash];
+    GT.activeRoster = GT.settings.ByBandMode.roster[hash];
+    GT.activeAudioAlertsWanted = GT.settings.ByBandMode.audioAlerts.wanted[hash];
   }
 
   for (const key in GT.activeAudioAlertsWanted)

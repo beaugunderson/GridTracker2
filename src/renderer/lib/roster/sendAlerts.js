@@ -2,8 +2,8 @@ function sendAlerts()
 {
   CR.alertTimer = null;
   const callRoster = CR.callRoster;
-  let scriptPath = window.opener.GT.scriptPath;
-  let everyDecode = window.opener.GT.settings.audioAlerts.rules.everyDecode;
+  let scriptPath = GT.scriptPath;
+  let everyDecode = GT.settings.audioAlerts.rules.everyDecode;
   let dirPath = path.dirname(scriptPath);
   let scriptExists = false;
   let shouldRosterAlert = 0;
@@ -21,7 +21,7 @@ function sendAlerts()
 
     let call = callObj.DEcall;
     scriptReport[call] = Object.assign({}, callObj);
-    scriptReport[call].dxccName = window.opener.GT.dxccToAltName[callObj.dxcc];
+    scriptReport[call].dxccName = GT.dxccToAltName[callObj.dxcc];
     scriptReport[call].distance = (callObj.distance > 0) ? parseInt(callObj.distance * MyCircle.validateRadius(window.opener.distanceUnit.value)) : 0;
 
     delete scriptReport[call].DEcall;
@@ -70,11 +70,11 @@ function sendAlerts()
   // NOTE: Ring alerts if needed
   if (shouldRosterAlert > 0)
   {
-    if (window.opener.GT.settings.msg.msgPushover && window.opener.GT.settings.msg.msgPushoverRoster)
+    if (GT.settings.msg.msgPushover && GT.settings.msg.msgPushoverRoster)
     {
       sendPushOverAlert(parseCRJson(scriptReport));
     }
-    if (window.opener.GT.settings.msg.msgSimplepush && window.opener.GT.settings.msg.msgSimplepushRoster)
+    if (GT.settings.msg.msgSimplepush && GT.settings.msg.msgSimplepushRoster)
     {
       sendSimplePushMessage(parseCRJson(scriptReport));
     }
@@ -85,7 +85,7 @@ function sendAlerts()
       {
         scriptExists = true;
         scriptIcon.innerHTML = "<div class='buttonScript' onclick='window.opener.toggleCRScript();'>"
-          + (window.opener.GT.crScript == 1
+          + (GT.crScript == 1
           ? `<font color='lightgreen'>${I18N("sendAlerts.scriptEnabled")}</font>`
           : `<font color='yellow'>${I18N("sendAlerts.scriptDisabled")}</font>`) + "</div>";
         scriptIcon.style.display = "block";
@@ -95,7 +95,7 @@ function sendAlerts()
         scriptIcon.style.display = "none";
       }
   
-      if (scriptExists && window.opener.GT.crScript == 1)
+      if (scriptExists && GT.crScript == 1)
       {
         fs.writeFileSync(path.join(dirPath, "cr-alert.json"), JSON.stringify(scriptReport, null, 2), { flush: true });
         electron.ipcRenderer.send("spawnScript", scriptPath);
@@ -110,12 +110,12 @@ function sendSimplePushMessage(message)
 {
   const url = "https://api.simplepush.io/send";
   let data = {
-    key: window.opener.GT.settings.msg.msgSimplepushApiKey,
-    title: "GT Alert - " + formatCallsign(window.opener.GT.settings.app.myCall),
+    key: GT.settings.msg.msgSimplepushApiKey,
+    title: "GT Alert - " + formatCallsign(GT.settings.app.myCall),
     msg: message
   };
 
-  window.opener.GT.getPostBuffer(
+  GT.getPostBuffer(
     url,
     null, // callback,
     null,
@@ -130,13 +130,13 @@ function sendPushOverAlert(message)
 {
   const url = "https://api.pushover.net/1/messages.json";
   let data = {
-    user: window.opener.GT.settings.msg.msgPushoverUserKey,
-    token: window.opener.GT.settings.msg.msgPushoverToken,
-    title: "GT Alert - " + formatCallsign(window.opener.GT.settings.app.myCall),
+    user: GT.settings.msg.msgPushoverUserKey,
+    token: GT.settings.msg.msgPushoverToken,
+    title: "GT Alert - " + formatCallsign(GT.settings.app.myCall),
     message: message
   };
 
-  window.opener.GT.getPostBuffer(
+  GT.getPostBuffer(
     url,
     null, // callback,
     null,

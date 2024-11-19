@@ -2343,7 +2343,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <div class="columns">
               <div id="LogbookControls">
                 <label data-i18n="roster.controls.logbook.label" for="referenceNeed">Logbook</label>
-                <select id="referenceNeed" onchange="huntingValueChanged(this);">
+                <select id="referenceNeed" onchange="logbookValuesChanged();">
                   <option data-i18n="roster.controls.logbook.awardTracker" value="6">Award Tracker</option>
                   <option data-i18n="roster.controls.logbook.liveBandMode" value="0" selected="true">Live Band &amp; Mode</option>
                   <option data-i18n="roster.controls.logbook.liveBandMixMode" value="1">Live Band, Mix Modes</option>
@@ -2355,7 +2355,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               </div>
               <div id="HuntModeControls">
                 <label data-i18n="roster.controls.hunting.label" for="huntNeed">Hunting</label>
-                <select id="huntNeed" onchange="huntingValueChanged(this);">
+                <select id="huntNeed" onchange="logbookValuesChanged();">
                   <option data-i18n="roster.controls.huntNeed.worked" value="worked">New</option>
                   <option data-i18n="roster.controls.huntNeed.confirmed" value="confirmed">New+Unconfirmed</option>
                   <option data-i18n="roster.controls.huntNeed.mixed" value="mixed">Mixed</option>

@@ -79,14 +79,14 @@
         {
           // Do work
           var msg = messageInput.value.trim();
-          if (msg.length > 0 && g_currentId != 0 && g_currentId in window.opener.GT.gtFlagPins && window.opener.GT.gtFlagPins[g_currentId].canmsg == true) 
+          if (msg.length > 0 && g_currentId != 0 && g_currentId in GT.gtFlagPins && GT.gtFlagPins[g_currentId].canmsg == true) 
           {
             var worker = "";
             // No message history, so lets clear the div
-            if (!(g_currentId in window.opener.GT.gtMessages)) messageTextDiv.innerHTML = "";
+            if (!(g_currentId in GT.gtMessages)) messageTextDiv.innerHTML = "";
 
             window.opener.gtSendMessage(msg, g_currentId);
-            worker = makeViewMessage("self", window.opener.GT.settings.app.myCall, htmlEntities(msg));
+            worker = makeViewMessage("self", GT.settings.app.myCall, htmlEntities(msg));
             messageTextDiv.innerHTML += worker;
             scrollDown(messageTextDiv);
           }
@@ -96,7 +96,7 @@
 
       function init()
       {
-        window.opener.GT.chatWindowInitialized = true;
+        GT.chatWindowInitialized = true;
         Resize();
         showAllCallsigns();
         loadChildWindowI18n();
@@ -128,7 +128,7 @@
 
       function openIdCid(from)
       {
-        if (from.currentTarget.id in window.opener.GT.gtFlagPins)
+        if (from.currentTarget.id in GT.gtFlagPins)
         {
           openId(from.currentTarget.id);
         }
@@ -146,9 +146,9 @@
       {
         from.preventDefault();
 
-        if (from.currentTarget.id in window.opener.GT.gtFlagPins)
+        if (from.currentTarget.id in GT.gtFlagPins)
         {
-          doLookup(window.opener.GT.gtFlagPins[from.currentTarget.id].call);
+          doLookup(GT.gtFlagPins[from.currentTarget.id].call);
         }
         else 
         {
@@ -163,9 +163,9 @@
       function onHoverCid(from) 
       {
         var cid = from.currentTarget.id;
-        if (cid in window.opener.GT.gtFlagPins)
+        if (cid in GT.gtFlagPins)
         {
-          from.currentTarget.title = window.opener.GT.gtFlagPins[cid].band + " , " + window.opener.GT.gtFlagPins[cid].mode + " , " + window.opener.GT.dxccToAltName[window.opener.GT.gtFlagPins[cid].dxcc];
+          from.currentTarget.title = GT.gtFlagPins[cid].band + " , " + GT.gtFlagPins[cid].mode + " , " + GT.dxccToAltName[GT.gtFlagPins[cid].dxcc];
         }
         else
         {
@@ -210,9 +210,9 @@
           newDiv.oncontextmenu = openLookupCid;
          
           var worker = "<div id='"+callObj.cid +"CALL' style='clear:both;' class='"+ (callObj.live == false ? "rosterOff" : "rosterOn") + "'>" + callObj.fCall;
-          if (callObj.dxcc > 0 && callObj.dxcc in window.opener.GT.dxccInfo)
+          if (callObj.dxcc > 0 && callObj.dxcc in GT.dxccInfo)
           {
-            worker += "<img src='img/flags/16/" + window.opener.GT.dxccInfo[callObj.dxcc].flag +"' style='float:right;'>";
+            worker += "<img src='img/flags/16/" + GT.dxccInfo[callObj.dxcc].flag +"' style='float:right;'>";
           }
           worker += "</div>";
           newDiv.innerHTML = worker;
@@ -247,9 +247,9 @@
 
       function updateCallsign(id)
       {
-        if (id in window.opener.GT.gtFlagPins)
+        if (id in GT.gtFlagPins)
         {
-          var obj = window.opener.GT.gtFlagPins[id];
+          var obj = GT.gtFlagPins[id];
           if (obj.call != "" && obj.call != "NOCALL") 
           {
             var show = true;
@@ -261,9 +261,9 @@
             }
             catch (e) {}
 
-            if (g_viewBand > 0 && window.opener.GT.settings.app.myBand != obj.band) show = false;
+            if (g_viewBand > 0 && GT.settings.app.myBand != obj.band) show = false;
 
-            if (g_viewMode > 0 && window.opener.GT.settings.app.myMode != obj.mode) show = false;
+            if (g_viewMode > 0 && GT.settings.app.myMode != obj.mode) show = false;
 
             if (obj.canmsg == false) show = false;
 
@@ -326,9 +326,9 @@
           removeAllChildNodes(allCallDiv);
         }
 
-        for (const x in window.opener.GT.gtFlagPins)
+        for (const x in GT.gtFlagPins)
         {
-          var obj = window.opener.GT.gtFlagPins[x];
+          var obj = GT.gtFlagPins[x];
           if (obj.call != "" && obj.call != "NOCALL") 
           {
             var show = true;
@@ -340,9 +340,9 @@
             }
             catch (e) {}
 
-            if (g_viewBand > 0 && window.opener.GT.settings.app.myBand != obj.band) show = false;
+            if (g_viewBand > 0 && GT.settings.app.myBand != obj.band) show = false;
 
-            if (g_viewMode > 0 && window.opener.GT.settings.app.myMode != obj.mode) show = false;
+            if (g_viewMode > 0 && GT.settings.app.myMode != obj.mode) show = false;
 
             if (obj.canmsg == false) show = false;
 
@@ -363,7 +363,7 @@
 
         if (g_viewBand)
         {
-          viewBand.innerHTML = window.opener.GT.settings.app.myBand;
+          viewBand.innerHTML = GT.settings.app.myBand;
         }
         else 
         {
@@ -372,7 +372,7 @@
 
         if (g_viewMode)
         {
-          viewMode.innerHTML = window.opener.GT.settings.app.myMode;
+          viewMode.innerHTML = GT.settings.app.myMode;
         }
         else
         {
@@ -393,15 +393,15 @@
       function showAllMessages()
       {
         activeCallsignsDiv.innerHTML = "<font color='gray'>no message history</font>";
-        if (Object.keys(window.opener.GT.gtMessages).length > 0)
+        if (Object.keys(GT.gtMessages).length > 0)
         {
           var worker = "";
-          for (const key in window.opener.GT.gtMessages)
+          for (const key in GT.gtMessages)
           {
-            if (key in window.opener.GT.gtFlagPins)
+            if (key in GT.gtFlagPins)
             {
               worker += "<tr style='cursor:pointer;vertical-align:bottom;'><td align=left onclick=\"openId('" + key + "');\">";
-              if (key in window.opener.GT.gtUnread)
+              if (key in GT.gtUnread)
               {
                 worker += "🔥";
               }
@@ -410,7 +410,7 @@
                 worker += "💬";
               }
 
-              worker += "</td><td align=left style='color:cyan;' onclick=\"openId('" + key + "');\" >" + formatCallsign(window.opener.GT.gtFlagPins[key].call) + "</td>";
+              worker += "</td><td align=left style='color:cyan;' onclick=\"openId('" + key + "');\" >" + formatCallsign(GT.gtFlagPins[key].call) + "</td>";
               worker += "<td align=right title='Clear Messages' style='padding-bottom:2px' onclick=\"clearMessage('" + key + "');\"  >❌</td></tr>";
             }
           }
@@ -425,8 +425,8 @@
       {
         try
         {
-          if (what in window.opener.GT.gtMessages) delete window.opener.GT.gtMessages[what];
-          if (what in window.opener.GT.gtUnread) delete window.opener.GT.gtUnread[what];
+          if (what in GT.gtMessages) delete GT.gtMessages[what];
+          if (what in GT.gtUnread) delete GT.gtUnread[what];
         } 
         catch (e) {}
 
@@ -466,8 +466,8 @@
       function newChatMessage(id, jsmesg)
       {
         if (id == g_currentId) {
-          var worker = makeViewMessage("them", window.opener.GT.gtFlagPins[id].call, jsmesg.msg, jsmesg.when);
-          if (id in window.opener.GT.gtUnread) delete window.opener.GT.gtUnread[id];
+          var worker = makeViewMessage("them", GT.gtFlagPins[id].call, jsmesg.msg, jsmesg.when);
+          if (id in GT.gtUnread) delete GT.gtUnread[id];
           messageTextDiv.innerHTML += worker;
           scrollDown(messageTextDiv);
           return document.hasFocus();
@@ -496,14 +496,14 @@
       {
         if (id == 0) return;
 
-        if (id in window.opener.GT.gtFlagPins)
+        if (id in GT.gtFlagPins)
         {
-          callsign.innerHTML = formatCallsign(window.opener.GT.gtFlagPins[id].call);
-          country.innerHTML = window.opener.GT.dxccToAltName[window.opener.GT.gtFlagPins[id].dxcc];
-          grid.innerHTML = window.opener.GT.gtFlagPins[id].grid;
-          band.innerHTML = window.opener.GT.gtFlagPins[id].band;
-          mode.innerHTML = window.opener.GT.gtFlagPins[id].mode;
-          appSource.innerHTML = window.opener.GT.gtFlagPins[id].src in g_knownSources ? g_knownSources[window.opener.GT.gtFlagPins[id].src] : window.opener.GT.gtFlagPins[id].src;
+          callsign.innerHTML = formatCallsign(GT.gtFlagPins[id].call);
+          country.innerHTML = GT.dxccToAltName[GT.gtFlagPins[id].dxcc];
+          grid.innerHTML = GT.gtFlagPins[id].grid;
+          band.innerHTML = GT.gtFlagPins[id].band;
+          mode.innerHTML = GT.gtFlagPins[id].mode;
+          appSource.innerHTML = GT.gtFlagPins[id].src in g_knownSources ? g_knownSources[GT.gtFlagPins[id].src] : GT.gtFlagPins[id].src;
         }
       }
 
@@ -513,31 +513,31 @@
         // already displayed?
         if (id == g_currentId && messageAreaDiv.style.display == "inline-block") return;
 
-        if (!(id in window.opener.GT.gtFlagPins)) return;
+        if (!(id in GT.gtFlagPins)) return;
 
         var worker = "";
-        if (id in window.opener.GT.gtMessages && window.opener.GT.gtMessages[id].history.length > 0)
+        if (id in GT.gtMessages && GT.gtMessages[id].history.length > 0)
         {
-          for (msg in window.opener.GT.gtMessages[id].history)
+          for (msg in GT.gtMessages[id].history)
           {
-            if ("call" in window.opener.GT.gtMessages[id].history[msg])
+            if ("call" in GT.gtMessages[id].history[msg])
               worker += makeViewMessage(
                 "them",
-                window.opener.GT.gtFlagPins[id].call,
-                window.opener.GT.gtMessages[id].history[msg].msg,
-                window.opener.GT.gtMessages[id].history[msg].when
+                GT.gtFlagPins[id].call,
+                GT.gtMessages[id].history[msg].msg,
+                GT.gtMessages[id].history[msg].when
               );
             else
               worker += makeViewMessage(
                 "self",
-                window.opener.GT.settings.app.myCall,
-                window.opener.GT.gtMessages[id].history[msg].msg,
-                window.opener.GT.gtMessages[id].history[msg].when
+                GT.settings.app.myCall,
+                GT.gtMessages[id].history[msg].msg,
+                GT.gtMessages[id].history[msg].when
               );
           }
-          if (id in window.opener.GT.gtUnread)
+          if (id in GT.gtUnread)
           {
-            delete window.opener.GT.gtUnread[id];
+            delete GT.gtUnread[id];
             updateCallsign(id);
             showAllMessages();
           }
@@ -546,7 +546,7 @@
         g_currentId = id;
         messageAreaDiv.style.display = "inline-block";
 
-        if (window.opener.GT.gtFlagPins[id].live == false)
+        if (GT.gtFlagPins[id].live == false)
         {
           notifyNoChat(id);
         } else {

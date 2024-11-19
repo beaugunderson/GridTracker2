@@ -10,7 +10,7 @@ function renderCompactRosterHeaders()
 function renderCompactRosterRow(callObj, showBand)
 {
   let title = callObj.RSTsent + "&#13256;, " + parseInt(callObj.dt * 100) + "ms, " + callObj.delta + "hz" + (callObj.grid.length ? ", " + callObj.grid : "") + ", " + toDHMS(timeNowSec() - callObj.age);
-  let bandView = showBand ? "<div style='color: #" + window.opener.GT.pskColors[callObj.band] + ";float:right;display:inline-block;'>" + callObj.band + "</div>" : "";
+  let bandView = showBand ? "<div style='color: #" + GT.pskColors[callObj.band] + ";float:right;display:inline-block;'>" + callObj.band + "</div>" : "";
   if (CR.rosterSettings.compactEntity == "Band")
   {
     bandView = "";

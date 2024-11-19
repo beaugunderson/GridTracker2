@@ -8,19 +8,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
- - Added new CI/CD build system that allows packaging for Windows, MacOS, and Linux and enaables auto-update @nr0q
- - Ported a lot of code from NWJS to Electron - @tag.loomis
- - Built the framework files boilerplate, provided lots of good advice @beaugunderson
+- Added new CI/CD build system that allows packaging for Windows, MacOS, and Linux and enaables auto-update @nr0q
+- Ported a lot of code from NWJS to Electron - @tag.loomis
+- Built the framework files boilerplate, provided lots of good advice @beaugunderson
 
 ### Changed
 
-  - Animate Active Paths moved from Ctrl-A to Ctrl-J
-  - Conditions Window Toggle moved from Ctrl-C to Ctrl-E
-  - Ctrl-A, Ctrl-C, Ctrl-V reserved for Select All, Copy, Paste for text areas in first.js
-  - Screenshot Ctrl-K writes PNG to appData Screeenshots folder
-  - Callsign hover "Callsign" in Call Roster mode removed
-  
+- Animate Active Paths moved from Ctrl-A to Ctrl-J
+- Conditions Window Toggle moved from Ctrl-C to Ctrl-E
+- Ctrl-A, Ctrl-C, Ctrl-V reserved for Select All, Copy, Paste for text inputs
+- Screenshot Ctrl-K writes PNG to appData Screenshots folder
+- Callsign hover "Callsign" in Call Roster mode removed
+- Settings -> Features -> CR Wanted+Audio Alets by Band+Mode
+
 ### Fixed
+
 
 ### Removed
 

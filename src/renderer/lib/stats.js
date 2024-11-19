@@ -138,9 +138,9 @@ function addTextToClipboard(data)
 
 function setClipboardFromLookup()
 {
-  if (window.opener.GT.lastLookupAddress)
+  if (GT.lastLookupAddress)
   {
-    addTextToClipboard(window.opener.GT.lastLookupAddress);
+    addTextToClipboard(GT.lastLookupAddress);
   }
 }
 

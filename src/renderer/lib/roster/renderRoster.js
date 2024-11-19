@@ -68,9 +68,9 @@ function renderRoster(callRoster, rosterSettings)
 
     if (callObj.DEcall.match("^[KNW][0-9][A-W|Y|Z](/w+)?$"))
     { callObj.style.call = "class='oneByOne'"; }
-    if (callObj.DEcall == window.opener.GT.instances[callObj.instance].status.DXcall)
+    if (callObj.DEcall == GT.instances[callObj.instance].status.DXcall)
     {
-      if (window.opener.GT.instances[callObj.instance].status.TxEnabled == 1)
+      if (GT.instances[callObj.instance].status.TxEnabled == 1)
       {
         callObj.style.call = "class='dxCalling'";
       }

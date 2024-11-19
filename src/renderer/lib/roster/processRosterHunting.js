@@ -65,11 +65,11 @@ function processRosterHunting(callRoster, rosterSettings)
 {
   let hasGtPin = false;
   const currentYear = new Date().getUTCFullYear();
-  const potaFeatureEnabled = (window.opener.GT.settings.app.potaFeatureEnabled && window.opener.GT.settings.map.offlineMode == false);
+  const potaFeatureEnabled = (GT.settings.app.potaFeatureEnabled && GT.settings.map.offlineMode == false);
 
-  let isAwardTracker = (CR.rosterSettings.referenceNeed == LOGBOOK_AWARD_TRACKER);
+  let isAwardTracker = (GT.activeRoster.logbook.referenceNeed == LOGBOOK_AWARD_TRACKER);
   // Rw == Roster Wanted
-  let RW = GT.activeRosterWanted;
+  let RW = GT.activeRoster.wanted;
   // AAW == Audio Alert Wanted
   let AAW = GT.activeAudioAlertsWanted;
  
@@ -83,14 +83,14 @@ function processRosterHunting(callRoster, rosterSettings)
     if (callObj.qrz == true && entry.tx == false)
     {
       // The instance has to be enabled
-      if (window.opener.GT.instances[callObj.instance].crEnable == true)
+      if (GT.instances[callObj.instance].crEnable == true)
       {
         // Calling us, but we wouldn't normally display
         // If they are not ignored or we're in a QSO with them, let it through
 
         // TODO: This is here because it's after the filtering stage
         if ((!(entry.DEcall in CR.ignoredCalls) && !(callObj.dxcc in CR.ignoredDxcc) && !(callObj.grid in CR.ignoredGrid)) ||
-          window.opener.GT.instances[callObj.instance].status.DXcall == entry.DEcall)
+          GT.instances[callObj.instance].status.DXcall == entry.DEcall)
         {
           entry.tx = true;
         }
@@ -109,11 +109,11 @@ function processRosterHunting(callRoster, rosterSettings)
       if (rosterSettings.layeredMode)
       {
         workHashSuffix = hashMaker(callObj, rosterSettings.layeredMode);
-        layeredHashSuffix = hashMaker(callObj, CR.rosterSettings.referenceNeed);
+        layeredHashSuffix = hashMaker(callObj, GT.activeRoster.logbook.referenceNeed);
       }
       else
       {
-        workHashSuffix = hashMaker(callObj, CR.rosterSettings.referenceNeed);
+        workHashSuffix = hashMaker(callObj, GT.activeRoster.logbook.referenceNeed);
         layeredHashSuffix = false;
       }
       let workHash = workHashSuffix; // TODO: Remove after replacing all occurrences with Suffix
@@ -170,18 +170,18 @@ function processRosterHunting(callRoster, rosterSettings)
       }
 
       // Calls that have OAMS chat support
-      if (callsign in window.opener.GT.gtCallsigns)
+      if (callsign in GT.gtCallsigns)
       {
         callObj.gt = 0;
         hasGtPin = false;
-        for (const cid in window.opener.GT.gtCallsigns[callsign])
+        for (const cid in GT.gtCallsigns[callsign])
         {
-          if (cid in window.opener.GT.gtFlagPins && window.opener.GT.gtFlagPins[cid].canmsg == true)
+          if (cid in GT.gtFlagPins && GT.gtFlagPins[cid].canmsg == true)
           {
             callObj.callFlags.oams = true;
             callObj.gt = cid;
             hasGtPin = true;
-            if (window.opener.GT.gtFlagPins[cid].src == "GT")
+            if (GT.gtFlagPins[cid].src == "GT")
             {
               // a GT user, lets go with it
               break;
@@ -226,9 +226,9 @@ function processRosterHunting(callRoster, rosterSettings)
         }
 
         // Entries currently calling or being called by us
-        if (callObj.DEcall == window.opener.GT.instances[callObj.instance].status.DXcall)
+        if (callObj.DEcall == GT.instances[callObj.instance].status.DXcall)
         {
-          if (window.opener.GT.instances[callObj.instance].status.TxEnabled == 1)
+          if (GT.instances[callObj.instance].status.TxEnabled == 1)
           {
             callObj.hunting.call = "calling";
             callObj.style.call = "class='dxCalling'";
@@ -471,7 +471,7 @@ function processRosterHunting(callRoster, rosterSettings)
         if (RW.huntState || AAW.huntState)
         {
           let stateSearch = callObj.state;
-          if (stateSearch in window.opener.GT.StateData)
+          if (stateSearch in GT.StateData)
           {
             let hash = stateSearch + workHashSuffix;
             let layeredHash = rosterSettings.layeredMode && (stateSearch + layeredHashSuffix)
@@ -524,7 +524,7 @@ function processRosterHunting(callRoster, rosterSettings)
         }
 
         // Hunting for US Counties
-        if ((RW.huntCounty || AAW.huntCounty) && window.opener.GT.settings.callsignLookups.ulsUseEnable == true)
+        if ((RW.huntCounty || AAW.huntCounty) && GT.settings.callsignLookups.ulsUseEnable == true)
         {
           let finalDxcc = callObj.dxcc;
           if (callObj.cnty && (finalDxcc == 291 || finalDxcc == 110 || finalDxcc == 6 || finalDxcc == 202) && callObj.cnty.length > 0)
@@ -536,7 +536,7 @@ function processRosterHunting(callRoster, rosterSettings)
               let shouldAlert = false
               if (callObj.qual == false)
               {
-                let counties = window.opener.GT.zipToCounty[callObj.zipcode];
+                let counties = GT.zipToCounty[callObj.zipcode];
                 let foundHit = false;
                 for (const cnt in counties)
                 {
@@ -830,7 +830,7 @@ function processRosterHunting(callRoster, rosterSettings)
       }
 
       // Station is calling us
-      if (callObj.DXcall == window.opener.GT.settings.app.myCall)
+      if (callObj.DXcall == GT.settings.app.myCall)
       {
         callingBg = "#0000FF" + kInversionAlpha;
         calling = "#FFFF00;text-shadow: 0px 0px 2px #FFFF00";

@@ -9,26 +9,25 @@ function prepareRosterSettings()
     now: timeNowSec()
   }
 
-  if (referenceNeed.value == LOGBOOK_AWARD_TRACKER)
+  if (GT.activeRoster.logbook.referenceNeed == LOGBOOK_AWARD_TRACKER)
   {
     rosterSettings.onlyHits = false;
     rosterSettings.isAwardTracker = true;
-    CR.rosterSettings.huntNeed = huntNeed.value = "confirmed";
   }
 
-  if (CR.rosterSettings.huntNeed == "mixed")
+  if (GT.activeRoster.logbook.huntNeed == "mixed")
   {
     rosterSettings.huntIndex = CR.tracker.confirmed;
     rosterSettings.workedIndex = CR.tracker.worked;
-    rosterSettings.layeredMode = LAYERED_MODE_FOR[CR.rosterSettings.referenceNeed];
+    rosterSettings.layeredMode = LAYERED_MODE_FOR[GT.activeRoster.logbook.referenceNeed];
   }
-  else if (CR.rosterSettings.huntNeed == "worked")
+  else if (GT.activeRoster.logbook.huntNeed == "worked")
   {
     rosterSettings.huntIndex = CR.tracker.worked;
     rosterSettings.workedIndex = false;
     rosterSettings.layeredMode = false;
   }
-  else if (CR.rosterSettings.huntNeed == "confirmed")
+  else if (GT.activeRoster.logbook.huntNeed == "confirmed")
   {
     rosterSettings.huntIndex = CR.tracker.confirmed;
     rosterSettings.workedIndex = CR.tracker.worked;
