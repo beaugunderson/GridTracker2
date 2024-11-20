@@ -453,7 +453,7 @@ app.whenReady().then(() => {
         );
 
         // is the top left corner on screen?
-        if (!(isWithinDisplayBounds(options.x + 5, options.y + 5))) {
+        if (!(isWithinDisplayBounds(options.x + parseInt(options.width / 2), options.y + parseInt(options.height / 2)))) {
           options.x = 40;
           options.y = 40;
           allowedWindows[windowIdToAllowedWindows[window.id]].window.setContentBounds(
@@ -487,7 +487,29 @@ app.whenReady().then(() => {
         }
       });
 
+      window.on('moved', (event) => {
+        let bounds = window.getContentBounds();
+        let saveBounds = !(window.isMinimized() || window.isFullScreen() || (isMac && window.isMaximized()));
+        if (saveBounds) {
+          allowedWindows[windowIdToAllowedWindows[window.id]].options = {
+            ...allowedWindows[windowIdToAllowedWindows[window.id]].options,
+            ...bounds,
+          };
+        }
+      });
+
       window.on('resize', (event) => {
+        let bounds = window.getContentBounds();
+        let saveBounds = !(window.isMinimized() || window.isFullScreen() || (isMac && window.isMaximized()));
+        if (saveBounds) {
+          allowedWindows[windowIdToAllowedWindows[window.id]].options = {
+            ...allowedWindows[windowIdToAllowedWindows[window.id]].options,
+            ...bounds,
+          };
+        }
+      });
+
+      window.on('resized', (event) => {
         let bounds = window.getContentBounds();
         let saveBounds = !(window.isMinimized() || window.isFullScreen() || (isMac && window.isMaximized()));
         if (saveBounds) {
