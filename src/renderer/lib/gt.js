@@ -180,7 +180,7 @@ GT.currentOverlay = GT.settings.map.trophyOverlay;
 GT.spotCollector = {};
 GT.spotDetailsCollector = {};
 GT.decodeCollector = {};
-GT.wsjtxIni = null;
+
 GT.setNewUdpPortTimeoutHandle = null;
 GT.map = null;
 GT.menuShowing = true;
@@ -5854,7 +5854,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
     }
 
     // Grab the last word in the decoded message
-    var qth = decodeWords[decodeWords.length - 1].trim().substring(0,4);
+    var qth = decodeWords[decodeWords.length - 1].trim();
     if (qth.length == 4)
     {
       var LETTERS = qth.substr(0, 2);
@@ -10000,7 +10000,8 @@ function getIniFromApp(appName)
 
 function updateBasedOnIni()
 {
-  var which = GT.wsjtxIni = getIniFromApp("WSJT-X");
+  var which =  getIniFromApp("WSJT-X");
+  if (which.port == -1) which = getIniFromApp("JTDX");
 
   // UdpPortNotSet
   if (GT.settings.app.wsjtUdpPort == 0 && which.port > -1)
@@ -10020,6 +10021,11 @@ function updateBasedOnIni()
     GT.settings.app.wsjtLogPath = which.LogPath;
   }
  
+  if (which.LogPath.length > 0 && GT.settings.app.wsjtLogPath.length == 0)
+  {
+    GT.settings.app.wsjtLogPath = which.LogPath;
+  }
+
   if (GT.settings.app.wsjtUdpPort == 0)
   {
     GT.settings.app.wsjtUdpPort = 2237;

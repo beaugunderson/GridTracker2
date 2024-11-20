@@ -2901,7 +2901,7 @@ function listShortInstances()
         let inst = keys[key];
         let sp = inst.split(" - ");
         let shortInst = sp[sp.length - 1].substring(0, 18);
-        shortInstances.push(shortInst);
+        if (instances[inst].canRoster == true) shortInstances.push(shortInst);
       }
     }
   }

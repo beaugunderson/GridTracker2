@@ -1,6 +1,3 @@
-const fs = require('fs');
-const timers = require('timers');
-const remoteMain = require('@electron/remote/main');
 const {
   app,
   dialog,
@@ -13,16 +10,20 @@ const {
   clipboard,
   nativeTheme,
 } = require('electron');
+
+app.commandLine.appendSwitch('no-sandbox');
+app.commandLine.appendSwitch("disable-renderer-backgrounding");
+app.commandLine.appendSwitch("enable-speech-dispatcher");
+
+const fs = require('fs');
+const timers = require('timers');
+const remoteMain = require('@electron/remote/main');
 const { autoUpdater } = require('electron-updater');
 const { electronApp, optimizer } = require('@electron-toolkit/utils');
 const path = require('path');
 const { join } = require('path');
 
-app.commandLine.appendSwitch('--no-sandbox');
-app.commandLine.appendSwitch("disable-renderer-backgrounding");
-
 const singleInstanceLock = app.requestSingleInstanceLock();
-
 const isMac = process.platform === 'darwin';
 
 if (!singleInstanceLock) {

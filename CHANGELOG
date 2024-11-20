@@ -17,9 +17,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Animate Active Paths moved from Ctrl-A to Ctrl-J
 - Conditions Window Toggle moved from Ctrl-C to Ctrl-E
 - Ctrl-A, Ctrl-C, Ctrl-V reserved for Select All, Copy, Paste for text inputs
-- Screenshot Ctrl-K writes PNG to appData Screenshots folder
-- Callsign hover "Callsign" in Call Roster mode removed
-- Settings -> Features -> CR Wanted+Audio Alets by Band+Mode
+- Screenshot Ctrl-K writes PNG to appData Screenshots folder, in addition to copy to clipboard
+- Fixed Callsign hover "Callsign" in Call Roster
+- New Settings -> Features -> CR Wanted+Audio Alerts Band+Mode Memory
+- Fixed improper parsing of DL60RRDXA and PC38EUDX callsigns
+- Added JTDX installation search if WSJT-X installation not found
 
 ### Fixed
 
