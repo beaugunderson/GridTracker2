@@ -1425,27 +1425,16 @@ function oldSendToLogger()
 
   var band = formatBand(Number(newMessage.Frequency / 1000000));
 
-  if (
-    newMessage.DXGrid.length == 0 &&
-    newMessage.DXCall + band + newMessage.MO in GT.liveCallsigns
-  )
+  if (newMessage.DXGrid.length == 0 && newMessage.DXCall + band + newMessage.MO in GT.liveCallsigns)
   {
-    newMessage.DXGrid = GT.liveCallsigns[
-      newMessage.DXCall + band + newMessage.MO
-    ].grid.substr(0, 4);
+    newMessage.DXGrid = GT.liveCallsigns[newMessage.DXCall + band + newMessage.MO].grid.substr(0, 4);
   }
 
   var report = "<EOH>";
 
-  report += valueToAdiField(
-    "BAND",
-    formatBand(Number(newMessage.Frequency / 1000000))
-  );
+  report += valueToAdiField("BAND", formatBand(Number(newMessage.Frequency / 1000000)));
   report += valueToAdiField("CALL", newMessage.DXCall.toUpperCase());
-  report += valueToAdiField(
-    "FREQ",
-    Number(newMessage.Frequency / 1000000).toFixed(6)
-  );
+  report += valueToAdiField("FREQ", Number(newMessage.Frequency / 1000000).toFixed(6));
   report += valueToAdiField("MODE", newMessage.MO.toUpperCase());
   var date = convertToDate(parseInt(newMessage.DateOn));
   var dataString =
@@ -1514,16 +1503,16 @@ GT.adifLookupMap = {
 
 function sendToLogger(ADIF)
 {
-  var regex = new RegExp("<EOH>", "i");
-  var record = parseADIFRecord(ADIF.split(regex)[1]);
-  var localMode = record.MODE;
+  let regex = new RegExp("<EOH>", "i");
+  let record = parseADIFRecord(ADIF.split(regex)[1]);
+  let localMode = record.MODE;
 
   if (localMode == "MFSK" && "SUBMODE" in record)
   {
     localMode = record.SUBMODE;
   }
 
-  var localHash = record.CALL + record.BAND + localMode;
+  let localHash = record.CALL + record.BAND + localMode;
   if ((!("GRIDSQUARE" in record) || record.GRIDSQUARE.length == 0) && localHash in GT.liveCallsigns)
   {
     record.GRIDSQUARE = GT.liveCallsigns[localHash].grid.substr(0, 4);
