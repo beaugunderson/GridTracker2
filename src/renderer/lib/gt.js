@@ -6148,9 +6148,9 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
           {
             DEcallsign = GT.liveCallsigns[callsign.DXcall + newMessage.OB + newMessage.OM];
           }
-          else if (callsign.DXcall in GT.liveCallsigns)
+          else if (msgDXcallsign == GT.settings.app.myCall && GT.settings.app.myGrid in GT.liveCallsigns)
           {
-            DEcallsign = GT.liveCallsigns[callsign.DXcall];
+            DEcallsign = GT.liveCallsigns[GT.settings.app.myGrid];
           }
 
           if (DEcallsign != null && DEcallsign.grid != "")
