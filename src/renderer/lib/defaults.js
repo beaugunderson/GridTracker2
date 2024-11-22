@@ -600,30 +600,28 @@ function importLegacySettings()
             if (obj)
             {
               // use unless it's going to be a problem
-              GT.settings[legacySettingsMapping[key]] = { ...GT.settings[legacySettingsMapping[key]], ...obj };
-              // a backup solution
-              // deepmerge(GT.settings[legacySettingsMapping[key]], obj);
+              GT.settings[legacySettingsMapping[key]] = deepmerge(GT.settings[legacySettingsMapping[key]], obj);
             }
             else
             {
-              console.log("Nothing parse for legacy setting:", key);
+              console.log("Nothing parsed for legacy setting: " + key);
             }
           }
           catch (e)
           {
-            console.log("Could not parse legacy setting:", key);
+            logErrorObject(e);
           }
 
         }
         else
         {
-          console.log("Missing mapping: ", key, legacySettingsMapping[key]);
+          console.log("Missing mapping: " + key, legacySettingsMapping[key]);
         }
       }
     }
     catch (e)
     {
-      console.log("failed to parse legacy settings")
+      logErrorObject(e);
     }
   }
 
@@ -637,7 +635,6 @@ function importLegacySettings()
       if(fs.existsSync(documentsPath))
       {
         fs.copyFileSync(documentsPath, copiedGridTrackerOneAdif, fs.constants.COPYFILE_EXCL);
-        console.log("Copied v1 Logfile to Backup Logs");
       }
       else
       {
@@ -647,7 +644,6 @@ function importLegacySettings()
           if(fs.existsSync(documentsPath))
           {
             fs.copyFileSync(documentsPath, copiedGridTrackerOneAdif, fs.constants.COPYFILE_EXCL);
-            console.log("Copied v1 Logfile to Backup Logs");
           }
         }
       }
@@ -655,6 +651,7 @@ function importLegacySettings()
   }
   catch (e)
   {
-    console.log("Error copying old gridtracker log file");
+    logErrorString("Error copying old gridtracker log file");
+    logErrorObject(e);
   }
 }

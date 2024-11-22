@@ -205,8 +205,8 @@ function makeParkFeatures()
   }
   catch (e)
   {
-    console.log("exception: makeParkFeature " + park);
-    console.log(e.message);
+    logErrorString("exception: makeParkFeature " + park);
+    logErrorObject(e);
   }
 }
 
@@ -436,8 +436,8 @@ function processPotaParks(buffer)
     catch (e)
     {
       // can't write, somethings broke
-      console.log("Failed to load parks!");
-      console.log(e.message);
+      logErrorString("Failed to load parks!");
+      logErrorObject(e);
     }
   }
 }
@@ -538,6 +538,7 @@ function processPotaSpots(buffer)
     catch (e)
     {
       // can't write, somethings broke
+      logErrorObject(e);
     }
   }
 }

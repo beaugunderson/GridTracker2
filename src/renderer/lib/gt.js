@@ -80,10 +80,6 @@ function loadAllSettings()
     GT.settings.app.buttonPanelOrder = [];
     GT.settings.importLegacy = false;
   }
-  else
-  {
-    console.log("Skip import legacy settings, yay!");
-  }
 
   if (GT.settings.mapMemory.length != 7)
   {
@@ -109,7 +105,7 @@ function loadAllSettings()
   {
     if (validSettings.indexOf(key) == -1)
     {
-      console.log("Removing unknown setting: ", key);
+      console.log("Removing unknown setting: " + key);
       delete GT.settings[key];
     }
   }
@@ -6465,8 +6461,7 @@ function goProcessRoster()
     }
     catch (e)
     {
-      console.log("Call Roster exception");
-      console.log(e.message);
+      logErrorObject(e);
     }
   }
 }
@@ -12575,7 +12570,6 @@ function updateWsjtxListener(port)
           if (interfaces[i][x].family == "IPv4")
           {
             GT.wsjtUdpServer.addMembership(GT.settings.app.wsjtIP, interfaces[i][x].address);
-            console.log("Adding Multicast to: " + interfaces[i][x].address);
           }
         }
       }
@@ -14967,3 +14961,4 @@ function updateByBandMode()
 
   setVisualHunting();
 }
+

@@ -9,6 +9,22 @@ const path = require("path");
 const fs = require("fs");
 const process = require("process");
 
+console.log = logErrorString;
+
+function logErrorObject(error)
+{
+  logErrorString(e.name + ":" + e.message);
+}
+
+function logErrorString(errorString)
+{
+  electron.ipcRenderer.send("log", errorString);
+}
+
+window.onerror = function(message, source, lineNumber, colno, error) {
+  logErrorString(`${error.stack}`);
+};
+
 try
 {
   dns.setDefaultResultOrder("ipv4first");
@@ -16,7 +32,7 @@ try
 }
 catch (e)
 {
-  console.log("Can't set dns IPv4 default order");
+  logErrorString("Can't set dns IPv4 default order");
 }
 
 
@@ -73,7 +89,7 @@ if (document.title.substring(0, 12).trim() == "GridTracker2")
   {
     // In 2025 we remove importLegacy code -Tag
     GT.settings = { importLegacy: true };
-    console.log(e);
+    logErrorObject(e);
   }
 }
 else

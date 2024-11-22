@@ -63,7 +63,7 @@ function initAdifWorker()
 
 function initAdifComplete()
 {
-  console.log("Adif Worker Initialized");
+  // console.log("Adif Worker Initialized");
 }
 
 function clearAdifWorkerQSO(clearFiles, nextFunc = null)
@@ -149,7 +149,7 @@ function adifFilteredLiveComplete(task)
 function exceptionComplete(task)
 {
   GT.adifLogCount--;
-  console.log("Expection loading last log");
+  logErrorString("Expection loading last log");
 
   tryNextTask(task);
 }
@@ -752,7 +752,7 @@ function loadBackupLogFiles()
   }
   catch (e)
   {
-    console.log("Error trying to read directory:", GT.qsoBackupDir);
+    logErrorString("Error trying to read directory: " + GT.qsoBackupDir);
   }
 }
 
@@ -1684,7 +1684,7 @@ function finishSendingReport(record)
     }
     catch (e)
     {
-      console.log(e);
+      logErrorObject(e);
       addLastTraffic("<font style='color:red'>Exception GridTracker backup</font>");
     }
 
@@ -2052,6 +2052,7 @@ function sendLotwLogEntry(report)
       {
         if (stderr.indexOf("Final Status: Success") < 0)
         {
+          logErrorString("TQSL: " + stderr);
           addLastTraffic("<font style='color:red'>Fail log to TQSL</font>");
         }
         else

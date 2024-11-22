@@ -114,7 +114,7 @@ function gtConnectChat()
       else
       {
         // Not fatal!
-        console.log("Unknown oams message '" + jsmesg.type + "' ignoring");
+        // console.log("Unknown oams message '" + jsmesg.type + "' ignoring");
       }
     }
   };
@@ -733,7 +733,7 @@ function gtChatSendUUID()
 
 function gtWaitUUID()
 {
-  console.log("waiting for UUID from OAMS");
+  // console.log("waiting for UUID from OAMS");
 }
 
 function gtChatSetUUID(jsmesg)

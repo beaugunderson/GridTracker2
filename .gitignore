@@ -10,3 +10,4 @@ mac-signing-certificate.p12
 .VSCodeCounter
 .vscode/settings.json
 resources/media/desktop.ini
+.vscode/settings.json

@@ -22,6 +22,7 @@ const { autoUpdater } = require('electron-updater');
 const { electronApp, optimizer } = require('@electron-toolkit/utils');
 const path = require('path');
 const { join } = require('path');
+const log = require('electron-log');
 
 const singleInstanceLock = app.requestSingleInstanceLock();
 const isMac = process.platform === 'darwin';
@@ -30,6 +31,10 @@ if (!singleInstanceLock) {
   app.quit();
 }
 
+if (app.isPackaged) {
+  // we send to the log file instead
+  console.log = log.error;
+}
 // Needed for direct accsess to Menu and MenuItem
 remoteMain.initialize();
 
@@ -330,6 +335,10 @@ ipcMain.on('restartGridTracker2', (event, resetWindowPositions = false) => {
   app.exit();
 });
 
+ipcMain.on('log', (event, value) => {
+  log.error(value);
+});
+
 function createMainWindow() {
   const mainWindow = new BrowserWindow({
     //...allowedWindows['GridTracker2'].options,
@@ -403,7 +412,8 @@ function checkForUpdates() {
     autoUpdater.checkForUpdatesAndNotify();
   }
   catch (e) {
-    console.log("Failed to update check");
+    log.error("Failed to update check");
+    log.error(e.message);
   }
   // Check every 12 hours
   timers.setTimeout(checkForUpdates, 43200000);
@@ -418,7 +428,7 @@ app.whenReady().then(() => {
   app.setAppUserModelId('org.gridtracker.GridTracker2');
 
   dialog.showErrorBox = (title, content) => {
-    console.log(`${title}\n${content}`);
+    log.error(`${title}\n${content}`);
   };
 
 
@@ -549,7 +559,8 @@ app.whenReady().then(() => {
         return { action: 'deny' };
       });
     } else if (window.id !== 1) {
-      console.log(`WARNING: id: "${window.id}"  title: "${title}" not found in allowedWindows`);
+      // we need to fix this for Mac, it's the band activity window which doesn't have a tabbing title
+      // console.log(`WARNING: id: "${window.id}"  title: "${title}" not found in allowedWindows`);
     }
 
     // Default open or close DevTools by F12 in development
@@ -628,5 +639,5 @@ function padNumber(number, size) {
 };
 
 process.on('uncaughtException', function (error) {
-  console.log(error);
+  log.error(error);
 });

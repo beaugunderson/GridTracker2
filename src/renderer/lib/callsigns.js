@@ -114,7 +114,7 @@ function lotwLoadCallsigns()
   }
   catch (e)
   {
-    console.log(e);
+    logErrorObject(e);
     GT.settings.callsignLookups.lotwLastUpdate = 0;
     lotwDownload();
   }
@@ -535,7 +535,7 @@ function eqslLoadCallsigns()
   }
   catch (e)
   {
-    console.log(e);
+    logErrorObject(e);
     GT.settings.callsignLookups.eqslLastUpdate = 0;
     eqslDownload();
   }
@@ -820,7 +820,7 @@ function processulsCallsigns(error, buffer)
 {
   if (error)
   {
-    console.log("File Read Error: " + error);
+    logErrorString("File Read Error: " + error);
   }
 
   if (buffer && buffer.length > 0)
@@ -945,7 +945,7 @@ function processCtyDatVer(buffer)
     GT.downloadingCtyDat = false;
     bigctyUpdatedTd.innerHTML = "Version check";
     bigctyDetailsTd.innerHTML = "Error!";
-    console.log(e);
+    logErrorObject(e);
   }
 }
 
@@ -990,7 +990,7 @@ function processCtyDat(buffer)
   {
     bigctyUpdatedTd.innerHTML = "Failed to parse";
     bigctyDetailsTd.innerHTML = "Error!";
-    console.log(e);
+    logErrorObject(e);
   }
 }
 

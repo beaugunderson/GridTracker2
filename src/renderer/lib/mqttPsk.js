@@ -37,7 +37,7 @@ function openPskMqtt()
 
     GT.pskMqttClient.on('connect', () => {
         GT.pskMqttClient.subscribe([topic], () => {
-            console.log(`Subscribe to topic '${topic}'`);
+            // console.log(`Subscribe to topic '${topic}'`);
         })
     });
     
