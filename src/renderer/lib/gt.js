@@ -14961,4 +14961,3 @@ function updateByBandMode()
 
   setVisualHunting();
 }
-
