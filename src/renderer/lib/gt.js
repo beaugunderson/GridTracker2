@@ -903,7 +903,11 @@ function toggleEarth()
   Grayline.style.display = (GT.useTransform) ? "none" : "";
 }
 
-
+function toggleOffline()
+{
+  offlineModeEnable.checked = !offlineModeEnable.checked;
+  changeOffline();
+}
 
 function changeOffline()
 {
@@ -2079,7 +2083,7 @@ function registerHotKeys()
   // KeyV reserved in first.js
   registerHotKey("Toggle AEQD Projection", "KeyW", changeMapProjection, null, null, "ctrlKey");
   registerHotKey("Toggle Map Position Info", "KeyX", toggleMouseTrack, null, null, "ctrlKey");
-
+  registerHotKey("Toggle Offline Mode", "KeyY", toggleOffline, null, null, "ctrlKey");
   registerHotKey("Center Map on QTH Grid", "KeyZ", setCenterQTH, null, null, "ctrlKey");
 
   registerHotKey("Toggle Call Roster Scripts", "Minus", toggleCRScript, null, null, "shiftKey");
@@ -12141,7 +12145,8 @@ function checkForNewVersion()
         addLastTraffic("<font style='color:orange'>Current Version Expired</font></br><font style='color:yellow'>Online Mode Disabled</font>");
         if (GT.settings.map.offlineMode == false)
         {
-          toggleOffline();
+          offlineModeEnable.checked = false;
+          changeOffline();
         }
         GT.onlineDisable = true;
       }

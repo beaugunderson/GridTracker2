@@ -399,7 +399,12 @@ function createMainWindow() {
 }
 
 function checkForUpdates() {
-  autoUpdater.checkForUpdatesAndNotify();
+  try {
+    autoUpdater.checkForUpdatesAndNotify();
+  }
+  catch (e) {
+    console.log("Failed to update check");
+  }
   // Check every 12 hours
   timers.setTimeout(checkForUpdates, 43200000);
 }
@@ -412,12 +417,10 @@ app.whenReady().then(() => {
   electronApp.setAppUserModelId('org.gridtracker.GridTracker2');
   app.setAppUserModelId('org.gridtracker.GridTracker2');
 
-  /* if (app.isPackaged) {
-    dialog.showMessageBoxSync({
-      message: "This is a beta release of GridTracker2.\n\nPlease report any issues to the GridTracker.org team on Discord.\n",
-      type: "warning" 
-    });
-  } */
+  dialog.showErrorBox = (title, content) => {
+    console.log(`${title}\n${content}`);
+  };
+
 
   if (process.env.DEBUG_AUTO_UPDATING === 'true') {
     const log = require('electron-log');
@@ -623,3 +626,7 @@ function padNumber(number, size) {
   }
   return s;
 };
+
+process.on('uncaughtException', function (error) {
+  console.log(error);
+});
