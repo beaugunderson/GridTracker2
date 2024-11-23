@@ -13,7 +13,7 @@ CR.ignoredCQz = {};
 CR.ignoredITUz = {};
 CR.modes = {};
 CR.modes_phone = {};
-CR.rosterSettings = {};
+CR.rosterSettings = GT.settings.roster;
 CR.day = 0;
 CR.dayAsString = "0";
 CR.menuHide = null;
@@ -131,9 +131,6 @@ function storeAwardTracker()
 
 function loadSettings()
 {
-  CR.rosterSettings = GT.settings.roster;
-  fixLegacySettings();
-
   
   for (let key in CR.rosterSettings.watchers)
   {
@@ -155,11 +152,6 @@ function loadSettings()
   CR.watchers = CR.rosterSettings.watchers;
 }
 
-function fixLegacySettings()
-{
-  // In January 2022, we added a `columnOrder` setting, which we need to ensure always includes all columns
-  CR.rosterSettings.columnOrder = validateRosterColumnOrder(CR.rosterSettings.columnOrder);
-}
 
 function writeRosterSettings()
 {

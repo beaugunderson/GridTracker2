@@ -74,7 +74,6 @@ function loadAllSettings()
 
   if (GT.settings.importLegacy == true)
   {
-    console.log("Importing legacy settings");
     importLegacySettings();
     // Yes, reset the button panel order
     GT.settings.app.buttonPanelOrder = [];

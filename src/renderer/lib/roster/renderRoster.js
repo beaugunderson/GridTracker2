@@ -39,8 +39,8 @@ function renderRoster(callRoster, rosterSettings)
     multiInstance = true;
   }
   let multiBand = Object.keys(rosterSettings.bands).length > 1;
-  let showBands = multiBand || CR.rosterSettings.columns.Band;
-  let showModes = (Object.keys(rosterSettings.modes).length > 1) || CR.rosterSettings.columns.Mode;
+  let showBands = (CR.rosterSettings.columns.Band || multiBand);
+  let showModes = (CR.rosterSettings.columns.Mode || (Object.keys(rosterSettings.modes).length > 1));
 
   columnOverrides.Band = showBands;
   columnOverrides.Mode = showModes;

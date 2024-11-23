@@ -504,6 +504,14 @@ const def_settings = {
       Age: true,
       UTC: false
     },
+    columnOrder: [
+      "Callsign", "Band", "Mode", "Calling", "Rig", "Wanted", "Grid", "Msg",
+      "POTA", "DXCC", "Flag", "DXM", "State", "County", "Cont",
+      "dB", "Freq", "DT", "Dist", "Azim", 
+      "CQz", "ITUz", "PX",
+      "LoTW", "eQSL", "OQRS",
+      "Life", "Spot", "OAMS", "Age", "UTC"
+    ],
     displayFilters: {
       brightness: 100,
       contrast: 100,
