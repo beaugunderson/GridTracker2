@@ -24,10 +24,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added JTDX installation search if WSJT-X installation not found
 - Disabled high DPI scaling on Windows causing window save/restore issues
 - Fixed QRZ return paths not displaying
-- Ctrl-Y Toggles Offline Mode
-- Windows update now shows a dialog when updating
-- Fixed Ctrl-A (select all), Ctrl-C (copy), Ctrl-V (paste), Ctrl-Z (undo) on all platforms
-- {AppData}/logs/main.log error log created, helps with debugging issues (eg: tqsl)
+- App: Fixed screen issues on older operating systems
+- App: Ctrl-Y Toggles Offline Mode
+- Call Roster: Right-click of Callsign or Calling presents new "Copy" to clipboard option
+- System: {AppData}/logs/main.log error log created, helps with debugging issues (eg: tqsl)
+- Windows: Update now shows a dialog when updating
 
 ### Fixed
 

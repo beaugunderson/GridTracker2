@@ -3440,6 +3440,17 @@ function createRestOfMenus()
 
   CR.callMenu.append(item);
 
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("copy"),
+    click: function ()
+    {
+      navigator.clipboard.writeText(CR.callRoster[CR.targetHash].DEcall);
+    }
+  });
+
+  CR.callMenu.append(item);
+
   // Saved for later user
   CR.callMenuRotator = new MenuItem({
     type: "normal",
@@ -3510,6 +3521,17 @@ function createRestOfMenus()
     click: function ()
     {
       addWatcher(CR.callRoster[CR.targetHash].DXcall, "Callsign");
+    }
+  });
+
+  CR.callingMenu.append(item);
+
+  item = new MenuItem({
+    type: "normal",
+    label: I18N("copy"),
+    click: function ()
+    {
+      navigator.clipboard.writeText(CR.callRoster[CR.targetHash].DXcall);
     }
   });
 
