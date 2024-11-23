@@ -127,7 +127,7 @@ function onZoomControlDown(event)
       g_zoomKeys[event.code](event);
       event.preventDefault();
     }
-    else if (event.code == "KeyR")
+    else if (event.code == "KeyR" || event.code == "KeyW")
     {
       event.preventDefault();
     }

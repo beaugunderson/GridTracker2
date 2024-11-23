@@ -1380,12 +1380,7 @@ function onMyKeyDown(event)
     {
       openIgnores();
     }
-    else if (event.code == "KeyC")
-    {
-      openColumns();
-    }
   }
- 
 }
 
 function blurOnEnter(ele)
