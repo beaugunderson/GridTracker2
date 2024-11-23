@@ -14,6 +14,8 @@ const {
 app.commandLine.appendSwitch('no-sandbox');
 app.commandLine.appendSwitch("disable-renderer-backgrounding");
 app.commandLine.appendSwitch("enable-speech-dispatcher");
+app.commandLine.appendSwitch("disable-gpu");
+app.commandLine.appendSwitch("disable-accelerated-2d-canvas");
 
 const fs = require('fs');
 const timers = require('timers');
