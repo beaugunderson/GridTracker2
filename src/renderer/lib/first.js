@@ -11,7 +11,7 @@ const process = require("process");
 
 console.log = logErrorString;
 
-function logErrorObject(error)
+function logErrorObject(e)
 {
   logErrorString(e.name + ":" + e.message);
 }

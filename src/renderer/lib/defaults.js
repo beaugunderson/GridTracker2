@@ -648,7 +648,7 @@ function importLegacySettings()
       {
         if (documentsPath.indexOf("OneDrive") > 0)
         {
-          documentsPath = documentsPath.replace("/OneDrive","").replace("\\OneDrive","");
+          documentsPath = path.join(documentsPath.replace("OneDrive","."));
           if(fs.existsSync(documentsPath))
           {
             fs.copyFileSync(documentsPath, copiedGridTrackerOneAdif, fs.constants.COPYFILE_EXCL);
