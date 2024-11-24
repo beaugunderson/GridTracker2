@@ -74,8 +74,8 @@ if (document.title.substring(0, 12).trim() == "GridTracker2")
       else
       {
         // safety catch
-        // In 2025 we remove importLegacy code -Tag
         GT.settings = { importLegacy: true };
+        logErrorString("Error parsing settings, defaults will be applied");
       }
     }
     else
@@ -83,13 +83,17 @@ if (document.title.substring(0, 12).trim() == "GridTracker2")
       // This should happen only once for new users
       // In 2025 we remove importLegacy code -Tag
       GT.settings = { importLegacy: true };
+      logErrorString("Could not load: " + filename);
+      logErrorString("Defaults will be applied");
     }
   }
   catch (e)
   {
     // In 2025 we remove importLegacy code -Tag
     GT.settings = { importLegacy: true };
+    logErrorString("Could not load: " + filename);
     logErrorObject(e);
+    logErrorString("Defaults will be applied");
   }
 }
 else

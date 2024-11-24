@@ -68,7 +68,7 @@ function loadAllSettings()
   }
   else
   {
-    GT.settings = deepmerge(def_settings, GT.settings);
+    GT.settings = deepmerge(def_settings, GT.settings, { arrayMerge: (destinationArray, sourceArray) => sourceArray } );
   }
 
 
@@ -649,7 +649,7 @@ function saveAllSettings()
   }
   catch (e)
   {
-    console.error(e);
+    logErrorObject(e);
   }
 }
 
