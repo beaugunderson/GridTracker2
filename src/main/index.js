@@ -410,7 +410,7 @@ function createMainWindow() {
 
 function checkForUpdates() {
   try {
-    if (disableAutoUpdate) {
+    if (disableAutoUpdate == true) {
       autoUpdater.checkForUpdates();
     }
     else {
