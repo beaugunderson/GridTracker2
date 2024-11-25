@@ -26,6 +26,7 @@ const log = require('electron-log');
 
 const singleInstanceLock = app.requestSingleInstanceLock();
 const isMac = process.platform === 'darwin';
+const disableAutoUpdate = app.commandLine.hasSwitch("disable-auto-updates");
 
 if (!singleInstanceLock) {
   app.quit();
@@ -409,7 +410,12 @@ function createMainWindow() {
 
 function checkForUpdates() {
   try {
-    autoUpdater.checkForUpdatesAndNotify();
+    if (disableAutoUpdate) {
+      autoUpdater.checkForUpdates();
+    }
+    else {
+      autoUpdater.checkForUpdatesAndNotify();
+    }
   }
   catch (e) {
     log.error("Failed to update check");

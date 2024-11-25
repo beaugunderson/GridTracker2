@@ -378,7 +378,7 @@ html, body {
   -webkit-transition: border;
 }
 
-.iconButton, .iconButtonMoving {
+.iconButton {
   border-radius: 4px;
   cursor: pointer;
   margin: 1px;
@@ -393,14 +393,6 @@ html, body {
   transition: border-style;
 }
 
-.iconButtonMoving {
-  border-color: cyan;
-  border-style: dashed;
-  margin:0px;
-  border-width: 2px;
-  animation: borderDash 500ms ease infinite;
-  cursor: grab;
-}
 
 @keyframes borderDash {
   0% {

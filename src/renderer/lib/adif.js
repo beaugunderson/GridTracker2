@@ -1111,9 +1111,8 @@ function getABuffer(file_url, callback, flag, mode, port, imgToGray, stringOfFla
   if (typeof stringOfFlag != "undefined") window[stringOfFlag] = true;
   if (typeof imgToGray != "undefined")
   {
-    imgToGray.parentNode.style.background =
-      "linear-gradient(grey 0%, black 0% 100% )";
-    imgToGray.style.webkitFilter = "invert(100%) grayscale(1)";
+    imgToGray.parentNode.style.animation = "borderDash 750ms ease infinite";
+    imgToGray.style.webkitFilter = "invert(100%)";
   }
 
   const req = http.request(options, function (res)
@@ -1124,19 +1123,6 @@ function getABuffer(file_url, callback, flag, mode, port, imgToGray, stringOfFla
     {
       if (fileBuffer == null) fileBuffer = Buffer.from(data);
       else fileBuffer = Buffer.concat([fileBuffer, data]);
-
-      if (typeof imgToGray != "undefined")
-      {
-        let percent = 0;
-        if (fsize > 0) percent = parseInt((fileBuffer.length / fsize) * 100);
-        else percent = parseInt(((fileBuffer.length / 100000) * 100) % 100);
-        imgToGray.parentNode.style.background =
-          "linear-gradient(grey " +
-          percent +
-          "%, black " +
-          Number(percent + 10) +
-          "% 100% )";
-      }
     });
 
     res.on("end", function ()
@@ -1152,7 +1138,7 @@ function getABuffer(file_url, callback, flag, mode, port, imgToGray, stringOfFla
       }
       if (typeof imgToGray != "undefined")
       {
-        imgToGray.parentNode.style.background = "";
+        imgToGray.parentNode.style.animation = "";
         imgToGray.style.webkitFilter = "";
       }
       if (typeof callback == "function")
@@ -1170,7 +1156,7 @@ function getABuffer(file_url, callback, flag, mode, port, imgToGray, stringOfFla
         }
         if (typeof imgToGray != "undefined")
         {
-          imgToGray.parentNode.style.background = "";
+          imgToGray.parentNode.style.animation = "";
           imgToGray.style.webkitFilter = "";
         }
       });
@@ -1193,7 +1179,7 @@ function getABuffer(file_url, callback, flag, mode, port, imgToGray, stringOfFla
     }
     if (typeof imgToGray != "undefined")
     {
-      imgToGray.parentNode.style.background = "";
+      imgToGray.parentNode.style.animation = "";
       imgToGray.style.webkitFilter = "";
     }
   });
@@ -1232,9 +1218,8 @@ function getAPostBuffer(
 
   if (typeof imgToGray != "undefined")
   {
-    imgToGray.parentNode.style.background =
-      "linear-gradient(grey 0%, black 0% 100% )";
-    imgToGray.style.webkitFilter = "invert(100%) grayscale(1)";
+    imgToGray.parentNode.style.animation = "borderDash 750ms ease infinite";
+    imgToGray.style.webkitFilter = "invert(100%)";
   }
 
   var req = http.request(options, function (res)
@@ -1249,20 +1234,6 @@ function getAPostBuffer(
       {
         if (fileBuffer == null) fileBuffer = data;
         else fileBuffer += data;
-
-        if (typeof imgToGray != "undefined")
-        {
-          var percent = 0;
-          if (fsize > 0) percent = parseInt((fileBuffer.length / fsize) * 100);
-          else percent = parseInt(((fileBuffer.length / 100000) * 100) % 100);
-
-          imgToGray.parentNode.style.background =
-            "linear-gradient(grey " +
-            percent +
-            "%, black " +
-            Number(percent + 10) +
-            "% 100% )";
-        }
       })
       .on("end", function ()
       {
@@ -1273,7 +1244,7 @@ function getAPostBuffer(
           window[stringOfFlag] = false;
           if (typeof imgToGray != "undefined")
           {
-            imgToGray.parentNode.style.background = "";
+            imgToGray.parentNode.style.animation = "";
             imgToGray.style.webkitFilter = "";
           }
         }
@@ -1283,7 +1254,7 @@ function getAPostBuffer(
         window[stringOfFlag] = false;
         if (typeof imgToGray != "undefined")
         {
-          imgToGray.parentNode.style.background = "";
+          imgToGray.parentNode.style.animation = "";
           imgToGray.style.webkitFilter = "";
         }
       });
@@ -1303,7 +1274,7 @@ function getAPostBuffer(
     window[stringOfFlag] = false;
     if (typeof imgToGray != "undefined")
     {
-      imgToGray.parentNode.style.background = "";
+      imgToGray.parentNode.style.animation = "";
       imgToGray.style.webkitFilter = "";
     }
   });
@@ -3164,7 +3135,7 @@ function sendTcpMessageGetResponse(msg, port, address, callback = null)
 
 function grabAcLog()
 {
-  AcLogImg.style.webkitFilter = "invert(100%) grayscale(1)";
+  AcLogImg.style.webkitFilter = "invert(100%)";
 
   let cmd = valueToXmlField("CMD", "<OPINFO>") + "\r\n";
   cmd += valueToXmlField("CMD", "<LIST><INCLUDEALL>") + "\r\n\r\n";
