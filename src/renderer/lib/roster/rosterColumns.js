@@ -177,7 +177,7 @@ const ROSTER_COLUMNS = {
   dB: {
     compare: callObjSimpleComparer("RSTsent"),
     tableData: (callObj) => ({
-      style: "color:#DD44DD;",
+      style: "color:#CCC;",
       html: `<b>${callObj.RSTsent}</b>`
     })
   },
