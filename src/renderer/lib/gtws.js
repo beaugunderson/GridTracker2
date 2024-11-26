@@ -11,8 +11,11 @@ GT.chatRecvFunctions = {
   mesg: gtChatMessage,
   o: gtSpotMessage,
   ba: bandActivityReply,
-  Kp: kpIndexMessage
+  Kp: kpIndexMessage,
+  denied: oamsDisable
 };
+
+GT.oamsDenied = false;
 
 var ChatState = Object();
 ChatState.none = -1;
@@ -316,6 +319,14 @@ function bandActivityReply(jsmesg)
 function kpIndexMessage(jsmesg)
 {
   handleKpIndexJSON(jsmesg.i);
+}
+
+function oamsDisable(jsmesg)
+{
+  // Denied access from OAMS
+  // Do not attempt to connect again this session
+  GT.oamsDenied = true;
+  closeGtSocket();
 }
 
 function gtChatRemoveCall(jsmesg)
@@ -752,7 +763,7 @@ GT.getEngineWasRunning = false;
 
 function gtChatStateMachine()
 {
-  if (GT.settings.app.offAirServicesEnable == true && GT.settings.map.offlineMode == false && GT.settings.app.myCall.length > 2 && GT.settings.app.myCall != "NOCALL")
+  if (GT.settings.app.offAirServicesEnable == true && GT.settings.map.offlineMode == false && GT.settings.app.myCall.length > 2 && GT.settings.app.myCall != "NOCALL" && GT.oamsDenied == false)
   {
     var now = timeNowSec();
     GT.gtStateToFunction[GT.gtState]();
