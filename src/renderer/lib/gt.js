@@ -4581,7 +4581,8 @@ function renderMap()
   GT.mapView = new ol.View({
     center: ol.proj.transform([GT.myLon, GT.myLat], "EPSG:4326", GT.settings.map.projection),
     zoom: GT.settings.map.zoom * 0.333,
-    projection: GT.settings.map.projection
+    projection: GT.settings.map.projection,
+    showFullExtent: false
   });
 
   GT.shadowVector = new ol.layer.Vector({ zIndex: 0 });
