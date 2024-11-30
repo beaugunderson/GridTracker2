@@ -5316,9 +5316,6 @@ function rigChange(up)
     if (targetIndex < 0) targetIndex = indexInstances.length - 1;
   }
 
-  console.warn(indexInstances[targetIndex]);
-  console.warn(Object.keys(GT.instances).length);
-
   setRig(indexInstances[targetIndex]);
 }
 

@@ -9,6 +9,7 @@ function loadAlerts()
   logEventMedia.value = GT.settings.app.logEventMedia;
 
   loadAudioAlertSettings();
+  alertTypeChanged();
 }
 
 function newLogEventSetting(obj)
@@ -41,7 +42,6 @@ function changeAudioValues()
   audioVolumeTd.innerText = parseInt(audioVolume.value * 100) + "%";
 
   GT.testAudioTimer = nodeTimers.setTimeout(playTestFile, 200);
-  
 }
 
 function playTestFile()
@@ -132,7 +132,6 @@ function addAlert(value, type, notify, repeat, filename, shortname)
     alertItem.fired = 0;
     alertItem.needAck = 0;
     GT.settings.customAlerts[newKey] = alertItem;
-
     
     return true;
   }
