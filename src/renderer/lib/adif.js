@@ -1483,6 +1483,9 @@ function sendToLogger(ADIF)
     localMode = record.SUBMODE;
   }
 
+  // Fixed for MSHV
+  record.BAND = record.BAND.toLowerCase();
+
   let localHash = record.CALL + record.BAND + localMode;
   if ((!("GRIDSQUARE" in record) || record.GRIDSQUARE.length == 0) && localHash in GT.liveCallsigns)
   {

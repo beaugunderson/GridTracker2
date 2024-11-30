@@ -455,7 +455,7 @@ const def_settings = {
     realtime: true,
     logbook: {
       huntNeed: "confirmed",
-      referenceNeed: "4",
+      referenceNeed: "0",
     },
     wanted: {
       huntCallsign: false,
