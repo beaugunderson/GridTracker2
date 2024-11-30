@@ -77,7 +77,12 @@ function processRosterFiltering(callRoster, rosterSettings)
       entry.tx = false;
       continue;
     }
-    if (GT.instances[callObj.instance].crEnable == false)
+    if (!(callObj.instance in GT.instances))
+    {
+      entry.tx = false;
+      continue;
+    }
+    if (GT.instanceCount > 1 && GT.instances[callObj.instance].crEnable == false)
     {
       entry.tx = false;
       continue;

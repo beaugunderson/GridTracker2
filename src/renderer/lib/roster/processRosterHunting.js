@@ -83,7 +83,7 @@ function processRosterHunting(callRoster, rosterSettings)
     if (callObj.qrz == true && entry.tx == false)
     {
       // The instance has to be enabled
-      if (GT.instances[callObj.instance].crEnable == true)
+      if (GT.instances[callObj.instance].crEnable == true || GT.instanceCount == 1)
       {
         // Calling us, but we wouldn't normally display
         // If they are not ignored or we're in a QSO with them, let it through
@@ -155,13 +155,13 @@ function processRosterHunting(callRoster, rosterSettings)
       let hash = callsign + workHashSuffix;
 
       // Call worked in current logbook settings, regardless of hunting mode
-      if (hash in CR.tracker.worked.call)
+      if (hash in GT.tracker.worked.call)
       {
         callObj.callFlags.worked = true;
         didWork = true;
         callConf = `${kUnconf}${call}${kInversionAlpha};`;
 
-        if (hash in CR.tracker.confirmed.call)
+        if (hash in GT.tracker.confirmed.call)
         {
           callObj.callFlags.confirmed = true;
           callPointer = "text-decoration: line-through;";
@@ -206,7 +206,7 @@ function processRosterHunting(callRoster, rosterSettings)
           {
             let hash = CR.dayAsString + "." + callsign + "." + callObj.pota + "." + callObj.band + callObj.mode;
             // POTA is only in the worked list
-            if (hash in CR.tracker.worked.pota)
+            if (hash in GT.tracker.worked.pota)
             {
               entry.tx = false;
               continue;             
@@ -442,13 +442,13 @@ function processRosterHunting(callRoster, rosterSettings)
           let hash = `${callObj.dxcc}c${currentYear}`;
           let count = 0;
           let what;
-          if (callObj.dxcc > 0 && !(hash in CR.tracker.worked.dxm))
+          if (callObj.dxcc > 0 && !(hash in GT.tracker.worked.dxm))
           {
             count++;
             what = "DXCC";
           }
           hash = `${callObj.cqz}z${currentYear}`;
-          if (callObj.cqz && !(hash in CR.tracker.worked.dxm))
+          if (callObj.cqz && !(hash in GT.tracker.worked.dxm))
           {
             count++;
             what = "CQz";
@@ -585,7 +585,7 @@ function processRosterHunting(callRoster, rosterSettings)
           let hash = CR.dayAsString + "." + callsign + "." + callObj.pota + "." + callObj.band + callObj.mode;
 
           // POTA is only in the worked list
-          if (!(hash in CR.tracker.worked.pota))
+          if (!(hash in GT.tracker.worked.pota))
           {
             if (AAW.huntPOTA) AH.huntPOTA++;
             if (RW.huntPOTA)
@@ -595,9 +595,10 @@ function processRosterHunting(callRoster, rosterSettings)
 
               potaBg = `${pota}${kInversionAlpha};`;
               pota = kBold;
+              if (!(callObj.pota in GT.tracker.worked.pota)) pota += "text-decoration:dashed underline overline;" 
             }
           }
-          else if (callObj.pota in CR.tracker.worked.pota)
+          else if (callObj.pota in GT.tracker.worked.pota)
           {
             potaConf = `${kUnconf}${pota}${kInversionAlpha};`;
           }

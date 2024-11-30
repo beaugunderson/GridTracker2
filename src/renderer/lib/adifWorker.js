@@ -335,7 +335,15 @@ function onAdiLoadComplete(task)
           if (finalMode in GT.modes_phone) qso.phone = GT.modes_phone[finalMode];
 
           let finalPOTA = (object.POTA_REF || object.POTA || null);
-          if (finalPOTA) qso.pota = finalPOTA.toUpperCase();
+          if (finalPOTA) 
+          {
+            qso.pota = finalPOTA.toUpperCase();
+          }
+          else if (object.SIG && object.SIG.toUpperCase() == "POTA" && object.SIG_INFO && object.SIG_INFO.length > 2)
+          {
+            qso.pota = object.SIG_INFO.toUpperCase();
+          }
+          
         
           lastHash = addQSO(qso);
           rows++;
@@ -508,7 +516,9 @@ GT.strictAdif = {
   POTA: false,
   POTA_REF: false,
   OPERATOR: false,
-  APP_PSKREP_SNR: false
+  APP_PSKREP_SNR: false,
+  SIG: false,
+  SIG_INFO: false
 };
 
 function parseADIFRecordStrict(line)
@@ -762,8 +772,15 @@ function parseAcLog(task)
           if (qso.mode in GT.modes) qso.digital = GT.modes[qso.mode];
           if (qso.mode in GT.modes_phone) qso.phone = GT.modes_phone[qso.mode];
 
-          /* let finalPOTA = (object.POTA_REF || object.POTA || null);
-          if (finalPOTA) qso.pota = finalPOTA.toUpperCase(); */
+          let finalPOTA = (object.POTA_REF ||null);
+          if (finalPOTA) 
+          {
+            qso.pota = finalPOTA.toUpperCase();
+          }
+          else if (object.SIG && object.SIG.toUpperCase() == "POTA" && object.SIG_INFO && object.SIG_INFO.length > 2)
+          {
+            qso.pota = object.SIG_INFO.toUpperCase();
+          }
         
           lastHash = addQSO(qso);
           rows++;

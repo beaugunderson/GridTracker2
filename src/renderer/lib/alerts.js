@@ -279,10 +279,7 @@ function checkAlerts(
       // callsign regex
       try
       {
-        if (
-          !(DEcallsign + band + mode in GT.tracker.worked.call) &&
-          DEcallsign.match(nalert.value)
-        )
+        if (!(DEcallsign + band + mode in GT.tracker.worked.call) && DEcallsign.match(nalert.value))
         {
           handleAlert(nalert, DEcallsign, originalMessage, callsignRecord, grid);
           hadAlert = true;

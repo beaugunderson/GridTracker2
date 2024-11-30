@@ -87,8 +87,6 @@ LAYERED_MODE_FOR[LOGBOOK_MIX_BAND_DIGI_MODE] = LOGBOOK_LIVE_BAND_DIGI_MODE;
 LAYERED_MODE_FOR[LOGBOOK_AWARD_TRACKER] = false;
 
 
-window.addEventListener("message", receiveMessage, false);
-
 // awardTrackersActive is a much smaller object than awardTracker
 CR.awardTrackersActive = GT.settings.awardTracker;
 CR.awardTracker = {};
@@ -1070,15 +1068,10 @@ function addNewIgnore()
   }
 }
 
-function receiveMessage(event) {}
-
-CR.tracker = {};
-
 function updateWorked()
 {
   CR.modes = GT.modes;
   CR.modes_phone = GT.modes_phone;
-  CR.tracker = GT.tracker;
 
   processAllAwardTrackers();
 }
@@ -1408,8 +1401,6 @@ function init()
 
   updateWorked();
   // addAllAwards();
-
-  window.addEventListener("message", receiveMessage, false);
 
   loadFilterSettings();
   updateInstances();
@@ -1975,7 +1966,7 @@ function scoreAstates(award, obj)
 function testAstates(award, obj, baseHash)
 {
   // calls with empty state will not match anything in the hash map. so filter those out
-  if (!obj.state || obj.state + baseHash in CR.tracker[award.test.look].state)
+  if (!obj.state || obj.state + baseHash in GT.tracker[award.test.look].state)
   {
     return false;
   }
@@ -2013,7 +2004,7 @@ function scoreAdxcc(award, obj)
 
 function testAdxcc(award, obj, baseHash)
 {
-  if (String(obj.dxcc) + "|" + baseHash in CR.tracker[award.test.look].dxcc)
+  if (String(obj.dxcc) + "|" + baseHash in GT.tracker[award.test.look].dxcc)
   {
     return false;
   }
@@ -2045,7 +2036,7 @@ function testAcont(award, obj, baseHash)
     let cont = obj.cont;
     if (cont == "AN") cont = "OC";
 
-    if (cont + baseHash in CR.tracker[award.test.look].cont)
+    if (cont + baseHash in GT.tracker[award.test.look].cont)
     {
       return false;
     }
@@ -2081,7 +2072,7 @@ function testAcont5(award, obj, baseHash)
     if (cont == "NA" || cont == "SA") cont = "AM";
     if (cont == "AN") cont = "OC";
 
-    if (cont + baseHash in CR.tracker[award.test.look].cont)
+    if (cont + baseHash in GT.tracker[award.test.look].cont)
     {
       return false;
     }
@@ -2110,7 +2101,7 @@ function testAcont2band(award, obj, baseHash)
     let cont = obj.cont;
     if (cont == "AN") cont = "OC";
 
-    if (cont + baseHash in CR.tracker[award.test.look].cont)
+    if (cont + baseHash in GT.tracker[award.test.look].cont)
     {
       return false;
     }
@@ -2147,7 +2138,7 @@ function testAcont52band(award, obj, baseHash)
     if (cont == "NA" || cont == "SA") cont = "AM";
     if (cont == "AN") cont = "OC";
 
-    if (cont + baseHash in CR.tracker[award.test.look].cont)
+    if (cont + baseHash in GT.tracker[award.test.look].cont)
     {
       return false;
     }
@@ -2178,7 +2169,7 @@ function testAgrids(award, obj, baseHash)
   let grid = obj.grid;
   if (!grid || grid.length == 0) return false;
   if (award.rule.grid && award.rule.grid.indexOf(grid) == -1) return false;
-  if (grid + baseHash in CR.tracker[award.test.look].grid) return false;
+  if (grid + baseHash in GT.tracker[award.test.look].grid) return false;
 
   return true;
 }
@@ -2201,7 +2192,7 @@ function scoreAcnty(award, obj)
 
 function testAcnty(award, obj, baseHash)
 {
-  if (obj.cnty && obj.cnty + baseHash in CR.tracker[award.test.look].cnty)
+  if (obj.cnty && obj.cnty + baseHash in GT.tracker[award.test.look].cnty)
   {
     return false;
   }
@@ -2232,7 +2223,7 @@ function testAcall(award, obj, baseHash)
 {
   if (obj.DEcall.indexOf("/") > -1 && obj.DEcall.endsWith("/MM")) return false;
 
-  if (obj.DEcall + baseHash in CR.tracker[award.test.look].call)
+  if (obj.DEcall + baseHash in GT.tracker[award.test.look].call)
   {
     return false;
   }
@@ -2344,7 +2335,7 @@ function testApx(award, obj, baseHash)
       if (test.rule.px.indexOf(px) == -1) return false;
     }
 
-    if (String(obj.px) + baseHash in CR.tracker[award.test.look].px)
+    if (String(obj.px) + baseHash in GT.tracker[award.test.look].px)
     {
       return false;
     }
@@ -2384,7 +2375,7 @@ function testApxa(award, obj, baseHash)
     {
       if (test.rule.pxa[i].indexOf(obj.px) > -1)
       {
-        if (String(obj.px) + baseHash in CR.tracker[award.test.look].px)
+        if (String(obj.px) + baseHash in GT.tracker[award.test.look].px)
         {
           return false;
         }
@@ -2457,7 +2448,7 @@ function scoreAcalls2dxcc(award, obj)
 
 function testAcalls2dxcc(award, obj, baseHash)
 {
-  if (obj.DEcall + baseHash in CR.tracker[award.test.look].call)
+  if (obj.DEcall + baseHash in GT.tracker[award.test.look].call)
   {
     return false;
   }
@@ -2480,7 +2471,7 @@ function scoreAcalls2band(award, obj)
 
 function testAcalls2band(award, obj, baseHash)
 {
-  if (obj.DEcall + baseHash in CR.tracker[award.test.look].call)
+  if (obj.DEcall + baseHash in GT.tracker[award.test.look].call)
   {
     return false;
   }
@@ -2503,7 +2494,7 @@ function scoreAdxcc2band(award, obj)
 
 function testAdxcc2band(award, obj, baseHash)
 {
-  if (String(obj.dxcc) + "|" + baseHash in CR.tracker[award.test.look].dxcc)
+  if (String(obj.dxcc) + "|" + baseHash in GT.tracker[award.test.look].dxcc)
   {
     return false;
   }
@@ -2530,7 +2521,7 @@ function scoreAcqz(award, obj)
 function testAcqz(award, obj, baseHash)
 {
   // calls with empty cqz will not match anything in the hash map. so filter those out
-  if (!obj.cqz || obj.cqz + "|" + baseHash in CR.tracker[award.test.look].cqz)
+  if (!obj.cqz || obj.cqz + "|" + baseHash in GT.tracker[award.test.look].cqz)
   {
     return false;
   }
@@ -2877,19 +2868,15 @@ function doubleCompile(award, firstLevel)
 function listShortInstances()
 {
   let shortInstances = [];
-  if (typeof GT.instancesIndex != "undefined" && typeof GT.instances != "undefined")
+  if (typeof GT.instances != "undefined" && Object.keys(GT.instances).length > 1)
   {
-    if (GT.instancesIndex.length > 1)
+    let keys = Object.keys(GT.instances).sort();
+    for (let key in keys)
     {
-      let instances = GT.instances;
-      let keys = Object.keys(instances).sort();
-      for (let key in keys)
-      {
-        let inst = keys[key];
-        let sp = inst.split(" - ");
-        let shortInst = sp[sp.length - 1].substring(0, 18);
-        if (instances[inst].canRoster == true) shortInstances.push(shortInst);
-      }
+      let inst = keys[key];
+      let sp = inst.split(" - ");
+      let shortInst = sp[sp.length - 1].substring(0, 18);
+      if (GT.instances[inst].canRoster == true) shortInstances.push(shortInst);
     }
   }
   return shortInstances;

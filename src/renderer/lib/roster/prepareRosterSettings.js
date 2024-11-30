@@ -17,20 +17,20 @@ function prepareRosterSettings()
 
   if (GT.activeRoster.logbook.huntNeed == "mixed")
   {
-    rosterSettings.huntIndex = CR.tracker.confirmed;
-    rosterSettings.workedIndex = CR.tracker.worked;
+    rosterSettings.huntIndex = GT.tracker.confirmed;
+    rosterSettings.workedIndex = GT.tracker.worked;
     rosterSettings.layeredMode = LAYERED_MODE_FOR[GT.activeRoster.logbook.referenceNeed];
   }
   else if (GT.activeRoster.logbook.huntNeed == "worked")
   {
-    rosterSettings.huntIndex = CR.tracker.worked;
+    rosterSettings.huntIndex = GT.tracker.worked;
     rosterSettings.workedIndex = false;
     rosterSettings.layeredMode = false;
   }
   else if (GT.activeRoster.logbook.huntNeed == "confirmed")
   {
-    rosterSettings.huntIndex = CR.tracker.confirmed;
-    rosterSettings.workedIndex = CR.tracker.worked;
+    rosterSettings.huntIndex = GT.tracker.confirmed;
+    rosterSettings.workedIndex = GT.tracker.worked;
     rosterSettings.layeredMode = false;
   }
   else

@@ -565,7 +565,8 @@ GT.sortFunction = [
   myDxccCompare,
   myTimeCompare,
   myBandCompare,
-  myConfirmedCompare
+  myConfirmedCompare,
+  myPotaCompare
 ];
 
 GT.lastSortIndex = 4;
@@ -574,6 +575,7 @@ GT.qsoPage = 0;
 GT.lastSortType = 0;
 GT.searchWB = "";
 GT.gridSearch = "";
+GT.potaSearch = "";
 GT.filterBand = "Mixed";
 GT.filterMode = "Mixed";
 GT.filterDxcc = 0;
@@ -592,7 +594,6 @@ GT.wsjtUdpSocketError = false;
 GT.qtToSplice = 0;
 GT.forwardUdpServer = null;
 GT.instances = {};
-GT.instancesIndex = [];
 GT.instanceCount = 0;
 GT.activeInstance = "";
 GT.activeIndex = 0;
@@ -5104,15 +5105,15 @@ function setHomeGridsquare()
 
 function haltAllTx(allTx = false)
 {
-  for (var instance in GT.instances)
+  for (let instance in GT.instances)
   {
     if ((instance != GT.activeInstance || allTx == true) && GT.instances[instance].remote)
     {
-      var responseArray = Buffer.alloc(1024);
-      var length = 0;
+      let responseArray = Buffer.alloc(1024);
+      let length = 0;
 
-      var port = GT.instances[instance].remote.port;
-      var address = GT.instances[instance].remote.address;
+      let port = GT.instances[instance].remote.port;
+      let address = GT.instances[instance].remote.address;
 
       length = encodeQUINT32(responseArray, length, 0xadbccbda);
       length = encodeQUINT32(responseArray, length, 2);
@@ -5295,25 +5296,35 @@ function rigChange(up)
 {
   if (GT.activeInstance == "") return;
 
-  var targetInstance = 0;
-  if (up)
+  let targetIndex;
+  let indexInstances = [];
+
+  for (let instance in GT.instances)
   {
-    targetInstance = GT.instances[GT.activeInstance].intId + 1;
+    indexInstances.push(instance);
+  }
+
+  targetIndex = indexInstances.indexOf(GT.activeInstance);
+  if (up == true)
+  {
+    targetIndex = targetIndex + 1;
+    if (targetIndex > indexInstances.length - 1) targetIndex = 0;
   }
   else
   {
-    targetInstance = GT.instances[GT.activeInstance].intId - 1;
-    if (targetInstance < 0) targetInstance = GT.instancesIndex.length - 1;
+    targetIndex = targetIndex - 1;
+    if (targetIndex < 0) targetIndex = indexInstances.length - 1;
   }
 
-  targetInstance %= GT.instancesIndex.length;
+  console.warn(indexInstances[targetIndex]);
+  console.warn(Object.keys(GT.instances).length);
 
-  setRig(targetInstance);
+  setRig(indexInstances[targetIndex]);
 }
 
 function setRig(instanceId)
 {
-  if (GT.instances[GT.instancesIndex[instanceId]].valid)
+  if (GT.instances[instanceId].valid)
   {
     if (GT.lastMapView != null)
     {
@@ -5322,7 +5333,7 @@ function setRig(instanceId)
       GT.lastMapView = null;
     }
 
-    GT.activeInstance = GT.instancesIndex[instanceId];
+    GT.activeInstance = instanceId;
 
     handleInstanceStatus(GT.instances[GT.activeInstance].status);
     handleClosed(GT.instances[GT.activeInstance].status);
@@ -6476,7 +6487,29 @@ function handleClosed(newMessage)
     var txt = name[name.length - 1];
     txrxdec.innerHTML = txt + " Closed";
   }
+
+  if (GT.instanceCount > 1 && GT.instances[newMessage.Id].open == false)
+  {
+    if (GT.instances[newMessage.Id].canRoster == true) GT.instanceCount--;
+    delete GT.instances[newMessage.Id];
+  }
+
+  if (!(GT.activeInstance in GT.instances))
+  {
+    GT.activeInstance = "";
+  }
+
+  if (Object.keys(GT.instances).length > 1)
+  {
+    rigWrap.style.display = "";
+  }
+  else
+  {
+    rigWrap.style.display = "none";
+  }
+
   updateRosterInstances();
+  goProcessRoster();
 }
 
 function handleWsjtxClose(newMessage)
@@ -6652,7 +6685,7 @@ function showCallsignBox(redraw)
         "<th>" + I18N("gt.callsignBox.Flag") + "</th>" +
         "<th align=left>" + I18N("gt.callsignBox.QSO") + "</th>" +
         "<th>" + I18N("gt.callsignBox.QSL") + "</th>" +
-        "<th>" + I18N("gt.callsignBox.When") + "</th>"; // <th>ITUz</th><th>CQz</th><th>ISO</th>";
+        "<th>" + I18N("gt.callsignBox.When") + "</th>";
     if (GT.settings.callsignLookups.lotwUseEnable == true) worker += "<th>" + I18N("gt.callsignBox.LoTW") + "</th>";
     if (GT.settings.callsignLookups.eqslUseEnable == true) worker += "<th>" + I18N("gt.callsignBox.eQSL") + "</th>";
     if (GT.settings.callsignLookups.oqrsUseEnable == true) worker += "<th>" + I18N("gt.callsignBox.OQRS") + "</th>";
@@ -6884,6 +6917,13 @@ function myConfirmedCompare(a, b)
   return 0;
 }
 
+function myPotaCompare(a, b)
+{
+  if (a.pota && !b.pota) return 1;
+  if (!a.pota && b.pota) return -1;
+  return 0;
+}
+
 function resetSearch()
 {
   GT.lastSortIndex = 4;
@@ -6892,6 +6932,7 @@ function resetSearch()
   GT.lastSortType = 2;
   GT.searchWB = "";
   GT.gridSearch = "";
+  GT.potaSearch = "";
 
   GT.filterBand = "Mixed";
   GT.filterMode = "Mixed";
@@ -6915,6 +6956,14 @@ function showWorkedSearchChanged(object, index)
 {
   ValidateCallsign(object, null);
   GT.searchWB = object.value.toUpperCase();
+  GT.lastSearchSelection = object.id;
+  showWorkedBox(index, 0);
+}
+
+function showWorkedSearchPOTA(object, index)
+{
+  ValidateCallsign(object, null);
+  GT.potaSearch = object.value.toUpperCase();
   GT.lastSearchSelection = object.id;
   showWorkedBox(index, 0);
 }
@@ -6994,6 +7043,16 @@ function showWorkedBox(sortIndex, nextPage, redraw)
         var x = value.grid.indexOf(GT.gridSearch);
         var y = value.vucc_grids.indexOf(GT.gridSearch);
         return x == 0 || y == 0;
+      });
+    }
+
+    if (GT.potaSearch.length > 0)
+    {
+      let regExTest = new RegExp(GT.potaSearch, "gi")
+      list = list.filter(function (value)
+      {
+        if (!value.pota) return false;
+        return value.pota.match(regExTest);
       });
     }
 
@@ -7163,6 +7222,15 @@ function showWorkedBox(sortIndex, nextPage, redraw)
       {
         worker += "<th colspan=2><div id='dxccFilterDiv'></div><th>";
       }
+      if (GT.settings.app.potaFeatureEnabled) 
+      {
+        worker += "<th><input type='text' id='searchPOTA' style='margin:0px'  oncontextmenu='contextMenu()' class='inputTextValue' value='" + GT.potaSearch + "' size='8' oninput='window.opener.showWorkedSearchPOTA(this);' / >";
+        if (GT.potaSearch.length > 0)
+        {
+          worker += "<img title='Clear Park' onclick='searchPOTA.value=\"\";window.opener.showWorkedSearchPOTA(searchPOTA);' src='img/trash_24x48.png' style='width: 30px; margin:0px; padding:0px; margin-bottom: -4px; cursor: pointer;'/>";
+        }
+        worker += "</th>";""
+      }
 
       worker += "</tr> ";
       worker += "<tr><th style='cursor:pointer;' align=center onclick='window.opener.showWorkedBox(0);'>" + I18N("gt.qsoPage.Station") + "</th>";
@@ -7175,6 +7243,7 @@ function showWorkedBox(sortIndex, nextPage, redraw)
       worker += "<th style='cursor:pointer;' align=center onclick='window.opener.showWorkedBox(3);'>" + I18N("gt.qsoPage.DXCC") + "</th>";
       worker += "<th style='cursor:pointer;' align=center onclick='window.opener.showWorkedBox(3);'>" + I18N("gt.qsoPage.Flag") + "</th>";
       worker += "<th align=center>" + I18N("roster.secondary.wanted.state") + "</th>";
+      if (GT.settings.app.potaFeatureEnabled) worker += "<th style='cursor:pointer;' align=center onclick='window.opener.showWorkedBox(7);'>POTA</th>";
       worker += "<th style='cursor:pointer;' align=center onclick='window.opener.showWorkedBox(4);'>" + I18N("gt.qsoPage.When") + "</th>";
 
       if (GT.settings.callsignLookups.lotwUseEnable == true) worker += "<th>" + I18N("gt.qsoPage.LoTW") + "</th>";
@@ -7211,6 +7280,10 @@ function showWorkedBox(sortIndex, nextPage, redraw)
         else
         {
           worker += "<td></td>";
+        }
+        if (GT.settings.app.potaFeatureEnabled)
+        {
+          worker += key.pota ? "<td align=center style='color:#fbb6fc'>" + key.pota + "</td>" :  "<td></td>";
         }
         worker += "<td style='color:lightblue'>" + userTimeString(key.time * 1000) + "</td>";
         if (GT.settings.callsignLookups.lotwUseEnable == true)
@@ -12511,18 +12584,17 @@ function checkWsjtxListener()
   }
   updateWsjtxListener(GT.settings.app.wsjtUdpPort);
 }
+
 function addNewInstance(instanceId)
 {
   GT.instances[instanceId] = {};
   GT.instances[instanceId].valid = false;
   GT.instances[instanceId].open = false;
-  GT.instancesIndex.push(instanceId);
-  GT.instances[instanceId].intId = GT.instancesIndex.length - 1;
   GT.instances[instanceId].crEnable = true;
   GT.instances[instanceId].canRoster = true;
   GT.instances[instanceId].oldStatus = null;
   GT.instances[instanceId].status = null;
-  if (GT.instancesIndex.length > 1)
+  if (Object.keys(GT.instances).length > 1)
   {
     multiRigCRDiv.style.display = "inline-block";
     haltTXDiv.style.display = "inline-block";
