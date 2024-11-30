@@ -1723,7 +1723,7 @@ function delayedRosterUpdate()
   goProcessRoster();
 }
 
-function openCallRosterWindow(show = true)
+function openCallRosterWindow(toggle = true)
 {
   if (GT.callRosterWindowHandle == null)
   {
@@ -1731,7 +1731,14 @@ function openCallRosterWindow(show = true)
   }
   else if (GT.callRosterWindowInitialized)
   {
-    electron.ipcRenderer.send("toggleWin", "gt_roster");
+    if (toggle)
+    {
+      electron.ipcRenderer.send("toggleWin", "gt_roster");
+    }
+    else
+    {
+      electron.ipcRenderer.send("showWin", "gt_roster");
+    }
     goProcessRoster();
   }
 }
@@ -1825,11 +1832,18 @@ function showMessaging(show = true, cid)
   }
 }
 
-function toggleMessaging()
+function toggleMessaging(toggle = true)
 {
   if (GT.chatWindowInitialized)
   {
-    electron.ipcRenderer.send("toggleWin", "gt_chat");
+    if (toggle)
+    {
+      electron.ipcRenderer.send("toggleWin", "gt_chat");
+    }
+    else
+    {
+      electron.ipcRenderer.send("showWin", "gt_chat");
+    }
   }
 }
 
@@ -6485,7 +6499,7 @@ function handleClosed(newMessage)
     txrxdec.innerHTML = txt + " Closed";
   }
 
-  if (GT.instanceCount > 1 && GT.instances[newMessage.Id].open == false)
+  if (GT.instances[newMessage.Id].open == false)
   {
     if (GT.instances[newMessage.Id].canRoster == true) GT.instanceCount--;
     delete GT.instances[newMessage.Id];
@@ -6861,11 +6875,18 @@ function getLookupWindowHeight()
   return 300;
 }
 
-function showConditionsBox()
+function showConditionsBox(toggle = true)
 {
   if (GT.settings.map.offlineMode == false)
   {
-    toggleConditionsBox();
+    if (toggle)
+    {
+      toggleConditionsBox();
+    }
+    else
+    {
+      openConditionsWindow(true);
+    }
   }
 }
 
@@ -7915,11 +7936,18 @@ function showWPXBox()
   setStatsDiv("wpxListDiv", worker);
 }
 
-function showRootInfoBox()
+function showRootInfoBox(toggle = true)
 {
   if (GT.statsWindowInitialized)
   {
-    electron.ipcRenderer.send("toggleWin", "gt_stats");
+    if (toggle)
+    {
+      electron.ipcRenderer.send("toggleWin", "gt_stats");
+    }
+    else
+    {
+      electron.ipcRenderer.send("showWin", "gt_stats");
+    }
   }
 }
 
@@ -7987,11 +8015,18 @@ function openLookupWindow(show = false)
   }
 }
 
-function toggleLookupWindow()
+function toggleLookupWindow(toggle = true)
 {
   if (GT.lookupWindowInitialized == true)
   {
-    electron.ipcRenderer.send("toggleWin", "gt_lookup");
+    if (toggle)
+    {
+      electron.ipcRenderer.send("toggleWin", "gt_lookup");
+    }
+    else
+    {
+      electron.ipcRenderer.send("showWin", "gt_lookup");
+    }
   }
 }
 

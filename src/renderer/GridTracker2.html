@@ -466,7 +466,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <div id="projectionButton" class="iconButton" onclick="changeMapProjection();" title="Toggle AEQD" data-i18n="buttons.AEQD.hover" >
           <img id="projectionImg" src="img/aeqd.png" class="buttonImg" />
         </div>
-        <div id="callRosterButton" class="iconButton" onclick="openCallRosterWindow();" title="Open Call Roster">
+        <div id="callRosterButton" class="iconButton" onclick="openCallRosterWindow();" oncontextmenu="openCallRosterWindow(false);" title="Open Call Roster">
           <img src="img/roster-icon.png" class="buttonImg" />
         </div>
         <div id="pushPinButton" onclick="togglePushPinMode();" class="iconButton" title="Toggle Push-Pin Mode">
@@ -475,7 +475,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <div id="gridModeDiv" onclick="toggleGridMode()" class="iconButton" title="Toggle Maidenhead Width">
           <img id="modeImg" src="" class="buttonImg" />
         </div>
-        <div id="statsDiv" onclick="showRootInfoBox();" class="iconButton" title="Show Stats">
+        <div id="statsDiv" onclick="showRootInfoBox();" oncontextmenu="showRootInfoBox(false);" class="iconButton" title="Show Stats">
           <img src="img/stats-button.png" class="buttonImg" />
         </div>
         <div id="Grayline" onclick="toggleEarth()" class="iconButton" title="Toggle Grayline">
@@ -511,7 +511,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <div id="predButton" onclick="cyclePredLayer()" class="iconButton" title="Cycle Prediction Layer">
           <img id="predImg" src="img/no-pred.png" class="buttonImg" />
         </div>
-        <div id="conditionsButton" onclick="showConditionsBox();" class="iconButton" title="View Current Conditions">
+        <div id="conditionsButton" onclick="showConditionsBox();" oncontextmenu="showConditionsBox(false);" class="iconButton" title="View Current Conditions">
           <img src="img/conditions.png" class="buttonImg" />
         </div>
         <div id="buttonSpotsBoxDiv" onclick="cycleSpotsView()" class="iconButton" title="View Spot Reports">
@@ -520,7 +520,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <div id="donateButton" onclick="gotoDonate();" class="iconButton" title="Support GridTracker with a donation">
           <img style="-webkit-filter: brightness(70%); filter: brightness(70%)" src="img/donate.png" class="buttonImg" />
         </div>
-        <div id="lookupButton" onclick="toggleLookupWindow()" class="iconButton" title="Open Lookup Window">
+        <div id="lookupButton" onclick="toggleLookupWindow()" oncontextmenu="toggleLookupWindow(false)" class="iconButton" title="Open Lookup Window">
           <img src="img/lookup.png" class="buttonImg" />
         </div>
         <div id="buttonPsk24CheckBoxDiv" onclick="grabPsk24()" class="iconButton" title="Your PSK 24hour report">
@@ -544,7 +544,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <div id="gtFlagButton" onclick="toggleGtMap();" class="iconButton" title="Toggle View GridTracker Users">
           <img id="gtFlagImg" src="" class="buttonImg" />
         </div>
-        <div id="msgButton" onclick="toggleMessaging();" class="iconButton" title="Messaging Window">
+        <div id="msgButton" onclick="toggleMessaging()" oncontextmenu="toggleMessaging(false)" class="iconButton" title="Messaging Window">
           <img id="msgImg" src="img/gt_chat.png" class="buttonImg" />
         </div>
       </div>
