@@ -10694,50 +10694,50 @@ function loadMaidenHeadData()
     updateLookupsBigCtyUI();
   }
 
-  for (var key in GT.dxccInfo)
+  for (let key in GT.dxccInfo)
   {
     GT.dxccToAltName[GT.dxccInfo[key].dxcc] = GT.dxccInfo[key].name;
     GT.dxccToADIFName[GT.dxccInfo[key].dxcc] = GT.dxccInfo[key].aname;
     GT.altNameToDXCC[GT.dxccInfo[key].name] = GT.dxccInfo[key].dxcc;
     GT.dxccToCountryCode[GT.dxccInfo[key].dxcc] = GT.dxccInfo[key].cc;
 
-    for (var x = 0; x < GT.dxccInfo[key].prefix.length; x++)
+    for (let x = 0; x < GT.dxccInfo[key].prefix.length; x++)
     {
       GT.prefixToMap[GT.dxccInfo[key].prefix[x]] = key;
     }
     delete GT.dxccInfo[key].prefix;
 
-    for (var x = 0; x < GT.dxccInfo[key].direct.length; x++)
+    for (let x = 0; x < GT.dxccInfo[key].direct.length; x++)
     {
       GT.directCallToDXCC[GT.dxccInfo[key].direct[x]] = GT.dxccInfo[key].dxcc;
     }
     delete GT.dxccInfo[key].direct;
 
-    for (var val in GT.dxccInfo[key].prefixCQ)
+    for (let val in GT.dxccInfo[key].prefixCQ)
     {
       GT.prefixToCQzone[val] = GT.dxccInfo[key].prefixCQ[val];
     }
     delete GT.dxccInfo[key].prefixCQ;
 
-    for (var val in GT.dxccInfo[key].prefixITU)
+    for (let val in GT.dxccInfo[key].prefixITU)
     {
       GT.prefixToITUzone[val] = GT.dxccInfo[key].prefixITU[val];
     }
     delete GT.dxccInfo[key].prefixITU;
 
-    for (var val in GT.dxccInfo[key].directCQ)
+    for (let val in GT.dxccInfo[key].directCQ)
     {
       GT.directCallToCQzone[val] = GT.dxccInfo[key].directCQ[val];
     }
     delete GT.dxccInfo[key].directCQ;
 
-    for (var val in GT.dxccInfo[key].directITU)
+    for (let val in GT.dxccInfo[key].directITU)
     {
       GT.directCallToITUzone[val] = GT.dxccInfo[key].directITU[val];
     }
     delete GT.dxccInfo[key].directITU;
 
-    for (var x = 0; x < GT.dxccInfo[key].mh.length; x++)
+    for (let x = 0; x < GT.dxccInfo[key].mh.length; x++)
     {
       if (!(GT.dxccInfo[key].mh[x] in GT.gridToDXCC)) { GT.gridToDXCC[GT.dxccInfo[key].mh[x]] = Array(); }
       GT.gridToDXCC[GT.dxccInfo[key].mh[x]].push(GT.dxccInfo[key].dxcc);
@@ -10747,20 +10747,20 @@ function loadMaidenHeadData()
   }
 
   let dxccGeo = requireJson("data/dxcc.json");
-  for (var key in dxccGeo.features)
+  for (let key in dxccGeo.features)
   {
-    var dxcc = dxccGeo.features[key].properties.dxcc_entity_code;
+    let dxcc = dxccGeo.features[key].properties.dxcc_entity_code;
     GT.dxccInfo[dxcc].geo = dxccGeo.features[key];
   }
 
   let countyData = requireJson("data/counties.json");
 
-  for (var id in countyData)
+  for (let id in countyData)
   {
     if (!(countyData[id].properties.st in GT.stateToCounty)) { GT.stateToCounty[countyData[id].properties.st] = Array(); }
     GT.stateToCounty[countyData[id].properties.st].push(id);
 
-    var cnty = countyData[id].properties.st + "," + replaceAll(countyData[id].properties.n, " ", "").toUpperCase();
+    let cnty = countyData[id].properties.st + "," + replaceAll(countyData[id].properties.n, " ", "").toUpperCase();
 
     if (!(cnty in GT.cntyToCounty)) { GT.cntyToCounty[cnty] = toProperCase(countyData[id].properties.n); }
 
@@ -10774,9 +10774,9 @@ function loadMaidenHeadData()
     GT.countyData[cnty].worked_modes = {};
     GT.countyData[cnty].confirmed_modes = {};
 
-    for (var x in countyData[id].properties.z)
+    for (let x in countyData[id].properties.z)
     {
-      var zipS = String(countyData[id].properties.z[x]);
+      let zipS = String(countyData[id].properties.z[x]);
       if (!(zipS in GT.zipToCounty))
       {
         GT.zipToCounty[zipS] = Array();
@@ -10788,9 +10788,9 @@ function loadMaidenHeadData()
   GT.shapeData = requireJson("data/shapes.json");
   GT.StateData = requireJson("data/state.json");
 
-  for (var key in GT.StateData)
+  for (let key in GT.StateData)
   {
-    for (var x = 0; x < GT.StateData[key].mh.length; x++)
+    for (let x = 0; x < GT.StateData[key].mh.length; x++)
     {
       if (!(GT.StateData[key].mh[x] in GT.gridToState)) { GT.gridToState[GT.StateData[key].mh[x]] = Array(); }
       GT.gridToState[GT.StateData[key].mh[x]].push(GT.StateData[key].postal);
@@ -10800,7 +10800,7 @@ function loadMaidenHeadData()
   GT.phonetics = requireJson("data/phone.json");
   GT.enums = requireJson("data/enums.json");
 
-  for (var key in GT.dxccInfo)
+  for (let key in GT.dxccInfo)
   {
     if (GT.dxccInfo[key].pp != "" && GT.dxccInfo[key].geo != "deleted")
     {
@@ -10809,9 +10809,9 @@ function loadMaidenHeadData()
     if (key == 291)
     {
       // US Mainland
-      for (var mh in GT.dxccInfo[key].mh)
+      for (let mh in GT.dxccInfo[key].mh)
       {
-        var sqr = GT.dxccInfo[key].mh[mh];
+        let sqr = GT.dxccInfo[key].mh[mh];
 
         GT.us48Data[sqr] = {};
         GT.us48Data[sqr].name = sqr;
@@ -10828,12 +10828,12 @@ function loadMaidenHeadData()
   GT.cqZones = requireJson("data/cqzone.json");
   GT.ituZones = requireJson("data/ituzone.json");
 
-  for (var key in GT.StateData)
+  for (let key in GT.StateData)
   {
     if (key.substr(0, 3) == "US-")
     {
-      var shapeKey = key.substr(3, 2);
-      var name = key;
+      let shapeKey = key.substr(3, 2);
+      let name = key;
 
       if (shapeKey in GT.shapeData)
       {
@@ -10851,8 +10851,8 @@ function loadMaidenHeadData()
     }
     else if (key.substr(0, 3) == "CA-")
     {
-      var shapeKey = key.substr(3, 2);
-      var name = key;
+      let shapeKey = key.substr(3, 2);
+      let name = key;
 
       if (shapeKey in GT.shapeData)
       {
@@ -10870,11 +10870,11 @@ function loadMaidenHeadData()
     }
   }
 
-  for (var key in GT.shapeData)
+  for (let key in GT.shapeData)
   {
     if (GT.shapeData[key].properties.type == "Continent")
     {
-      var name = GT.shapeData[key].properties.name;
+      let name = GT.shapeData[key].properties.name;
       GT.wacZones[name] = {};
       GT.wacZones[name].geo = GT.shapeData[key];
 
@@ -10890,7 +10890,7 @@ function loadMaidenHeadData()
 
 
 
-  var langDxcc = requireJson("i18n/" + GT.settings.app.locale + "-dxcc.json");
+  let langDxcc = requireJson("i18n/" + GT.settings.app.locale + "-dxcc.json");
   if (langDxcc)
   {
     for (const dxcc in langDxcc)
@@ -10903,7 +10903,7 @@ function loadMaidenHeadData()
     }
   }
 
-  var langState = requireJson("i18n/" + GT.settings.app.locale + "-state.json");
+  let langState = requireJson("i18n/" + GT.settings.app.locale + "-state.json");
   if (langState)
   {
     for (const state in langState)
