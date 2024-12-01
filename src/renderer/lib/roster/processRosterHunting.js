@@ -612,7 +612,6 @@ function processRosterHunting(callRoster, rosterSettings)
           let hash = callObj.cqz + "|" + workHashSuffix;
           let layeredHash = rosterSettings.layeredMode && (callObj.cqz + "|" + layeredHashSuffix);
       
-
           if (rosterSettings.huntIndex && hash in rosterSettings.huntIndex.cqz) huntFound++;
           if (rosterSettings.layeredMode && layeredHash in rosterSettings.huntIndex.cqz) layeredFound++;
           if (rosterSettings.workedIndex && hash in rosterSettings.workedIndex.cqz) workedFound++;
@@ -662,12 +661,10 @@ function processRosterHunting(callRoster, rosterSettings)
               }
             }
           }
-
-          callObj.cqzSuffix = null;
         }
 
         // Hunting for ITU Zones
-        if ((RW.huntITUz || AAW.huntCQz) && callObj.ituz)
+        if ((RW.huntITUz || AAW.huntITUz) && callObj.ituz)
         {
           let huntTotal = 1;
           let huntFound = 0, layeredFound = 0, workedFound = 0, layeredWorkedFound = 0;

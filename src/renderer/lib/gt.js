@@ -6043,7 +6043,11 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
       callsign.DXcall = msgDXcallsign.trim();
       callsign.msg = newMessage.Msg;
       callsign.dt = newMessage.DT.toFixed(2);
+
+      if (callsign.ituz == null) callsign.ituz = ituZoneFromCallsign(callsign.DEcall, callsign.dxcc);
+      if (callsign.cqz == null ) callsign.cqz = cqZoneFromCallsign(callsign.DEcall, callsign.dxcc);
     }
+
     callsign.mode = newMessage.OM;
     callsign.band = newMessage.OB;
     callsign.instance = newMessage.instance;
@@ -13773,7 +13777,7 @@ function cacheLookupObject(lookup, gridPass, cacheable = false)
 
   if (lookup.hasOwnProperty("state") && lookup.hasOwnProperty("county"))
   {
-    var foundCounty = false;
+    let foundCounty = false;
 
     if (lookup.cnty == null)
     {
@@ -13804,10 +13808,7 @@ function cacheLookupObject(lookup, gridPass, cacheable = false)
     }
   }
 
-  lookup.name = joinSpaceIf(
-    getLookProp(lookup, "fname"),
-    getLookProp(lookup, "name")
-  );
+  lookup.name = joinSpaceIf(getLookProp(lookup, "fname"), getLookProp(lookup, "name"));
   lookup.fname = "";
 
   if (cacheable)
@@ -13821,11 +13822,10 @@ function cacheLookupObject(lookup, gridPass, cacheable = false)
 
 function displayLookupObject(lookup, gridPass, fromCache = false)
 {
-  var worker = "";
-  var thisCall = getLookProp(lookup, "call").toUpperCase();
+  let worker = "";
+  let thisCall = getLookProp(lookup, "call").toUpperCase();
 
-  worker +=
-    "<table title='Click to copy address to clipboard' onclick='setClipboardFromLookup();' style='cursor:pointer' >";
+  worker += "<table title='Click to copy address to clipboard' onclick='setClipboardFromLookup();' style='cursor:pointer' >";
   worker += "<tr>";
   worker += "<td style='font-size:36pt;color:cyan;font-weight:bold'>";
   worker += formatCallsign(getLookProp(lookup, "call").toUpperCase());
@@ -13833,14 +13833,11 @@ function displayLookupObject(lookup, gridPass, fromCache = false)
   worker += "<td align='center' style='margin:0;padding:0'>";
   if (lookup.dxcc > 0 && lookup.dxcc in GT.dxccInfo)
   {
-    worker +=
-      "<img style='padding-top:4px' src='img/flags/24/" +
-      GT.dxccInfo[lookup.dxcc].flag +
-      "'>";
+    worker += "<img style='padding-top:4px' src='img/flags/24/" + GT.dxccInfo[lookup.dxcc].flag + "'>";
   }
   worker += "</td>";
   worker += "<td rowspan=6>";
-  var image = getLookProp(lookup, "image");
+  let image = getLookProp(lookup, "image");
   if (image.length > 0)
   {
     worker += "<img style='border:1px solid gray' class='roundBorder' width='220px' src='" + image + "'>";
@@ -13872,20 +13869,13 @@ function displayLookupObject(lookup, gridPass, fromCache = false)
   worker += "</tr>";
   worker += "<tr>";
   worker += "<td>";
-  worker += joinCommaIf(
-    getLookProp(lookup, "addr2"),
-    joinSpaceIf(getLookProp(lookup, "state"), getLookProp(lookup, "zip"))
-  );
-  GT.lastLookupAddress +=
-    joinCommaIf(
-      getLookProp(lookup, "addr2"),
-      joinSpaceIf(getLookProp(lookup, "state"), getLookProp(lookup, "zip"))
-    ) + "\n";
+  worker += joinCommaIf(getLookProp(lookup, "addr2"), joinSpaceIf(getLookProp(lookup, "state"), getLookProp(lookup, "zip")));
+  GT.lastLookupAddress += joinCommaIf(getLookProp(lookup, "addr2"), joinSpaceIf(getLookProp(lookup, "state"), getLookProp(lookup, "zip"))) + "\n";
   worker += "</td>";
   worker += "</tr>";
   worker += "<tr>";
   worker += "<td>";
-  var country = getLookProp(lookup, "country");
+  let country = getLookProp(lookup, "country");
   worker += country;
   GT.lastLookupAddress += country + "\n";
 
@@ -13893,25 +13883,17 @@ function displayLookupObject(lookup, gridPass, fromCache = false)
   worker += "</tr>";
   worker += "<tr>";
   worker += "<td>";
-  var email = getLookProp(lookup, "email");
+  let email = getLookProp(lookup, "email");
   if (email.length > 0)
   {
-    worker +=
-      "<div style='cursor:pointer;font-weight:bold;vertical-align:top' onclick='window.opener.mailThem(\"" +
-      email +
-      "\");'>" +
-      email +
-      "</div>";
+    worker += "<div style='cursor:pointer;font-weight:bold;vertical-align:top' onclick='window.opener.mailThem(\"" + email + "\");'>" + email + "</div>";
     GT.lastLookupAddress += email + "\n";
   }
 
   worker += "</td>";
   worker += "</tr>";
   worker += "</table>";
-  var card =
-    "<div class='mapItem' id='callCard' style='top:0;padding:4px;'>" +
-    worker +
-    "</div>";
+  let card = "<div class='mapItem' id='callCard' style='top:0;padding:4px;'>" + worker + "</div>";
   worker = "";
   worker += "<table align='center' class='bioTable' >";
   worker += "<tr><th colspan=2>Details</th></tr>";
@@ -13920,10 +13902,7 @@ function displayLookupObject(lookup, gridPass, fromCache = false)
     worker += "<tr>";
     worker += "<td>Website</td>";
     worker += "<td  >";
-    worker +=
-      "<font color='orange'><b><div style='cursor:pointer' onClick='window.opener.openSite(\"" +
-      getLookProp(lookup, "url") +
-      "\");' >Link</div></b></font>";
+    worker += "<font color='orange'><b><div style='cursor:pointer' onClick='window.opener.openSite(\"" + getLookProp(lookup, "url") + "\");' >Link</div></b></font>";
     worker += "</td>";
     worker += "</tr>";
   }
@@ -13932,10 +13911,7 @@ function displayLookupObject(lookup, gridPass, fromCache = false)
     worker += "<tr>";
     worker += "<td>Biography</td>";
     worker += "<td>";
-    worker +=
-      "<font color='orange'><b><div style='cursor:pointer' onClick='window.opener.openSite(\"https://www.qrz.com/db/" +
-      getLookProp(lookup, "call") +
-      "\");'>Link</div></b></font>";
+    worker += "<font color='orange'><b><div style='cursor:pointer' onClick='window.opener.openSite(\"https://www.qrz.com/db/" + getLookProp(lookup, "call") + "\");'>Link</div></b></font>";
     worker += "</td>";
     worker += "</tr>";
   }
@@ -13953,35 +13929,20 @@ function displayLookupObject(lookup, gridPass, fromCache = false)
   worker += makeRow("Class", lookup, "class");
   worker += makeRow("Codes", lookup, "codes");
   worker += makeRow("QTH", lookup, "qth");
-  var dates = joinIfBothWithDash(
-    getLookProp(lookup, "efdate"),
-    getLookProp(lookup, "expdate")
-  );
+  let dates = joinIfBothWithDash(getLookProp(lookup, "efdate"), getLookProp(lookup, "expdate"));
   if (dates.length > 0)
   {
     worker += "<tr><td>Effective Dates</td><td>" + dates + "</td></tr>";
   }
-  var Aliases = joinCommaIf(
-    getLookProp(lookup, "aliases"),
-    getLookProp(lookup, "p_call")
-  );
+  let Aliases = joinCommaIf(getLookProp(lookup, "aliases"), getLookProp(lookup, "p_call"));
   if (Aliases.length > 0)
   {
-    worker +=
-      "<tr title='" +
-      Aliases +
-      "' ><td>Aliases</td><td>" +
-      Aliases +
-      "</td></tr>";
+    worker += "<tr title='" + Aliases + "' ><td>Aliases</td><td>" + Aliases + "</td></tr>";
   }
   worker += makeRow("Polish OT", lookup, "plot");
   worker += makeRow("German DOK", lookup, "dok");
   worker += makeYesNoRow("DOK is Sonder-DOK", lookup, "sondok");
-  // worker += makeRow("DXCC", lookup, "dxcc");
-  worker +=
-    "<tr><td>DXCC</td><td>" +
-    getLookProp(lookup, "dxcc") + " - " + GT.dxccToAltName[getLookProp(lookup, "dxcc")] +
-    "</td></tr>";
+  worker += "<tr><td>DXCC</td><td>" + getLookProp(lookup, "dxcc") + " - " + GT.dxccToAltName[getLookProp(lookup, "dxcc")] + "</td></tr>";
   worker += makeRow("CQ zone", lookup, "cqzone");
   worker += makeRow("ITU zone", lookup, "ituzone");
   worker += makeRow("IOTA", lookup, "iota");
@@ -14003,15 +13964,11 @@ function displayLookupObject(lookup, gridPass, fromCache = false)
           distanceUnit.value
         ) * MyCircle.validateRadius(distanceUnit.value)
       ) + distanceUnit.value.toLowerCase() + "</td></tr>";
-    var bearing = parseInt(MyCircle.bearing(GT.myLat, GT.myLon, Number(lookup.lat), Number(lookup.lon)));
+    let bearing = parseInt(MyCircle.bearing(GT.myLat, GT.myLon, Number(lookup.lat), Number(lookup.lon)));
     worker += "<tr><td>Azimuth</td><td style='color:yellow'>" + bearing + "&deg;</td></tr>";
   }
   worker += makeRow("Grid", lookup, "grid", true);
-  if (
-    getLookProp(lookup, "gtGrid").length > 0 &&
-    getLookProp(lookup, "gtGrid").toUpperCase() !=
-    getLookProp(lookup, "grid").toUpperCase()
-  )
+  if (getLookProp(lookup, "gtGrid").length > 0 && getLookProp(lookup, "gtGrid").toUpperCase() != getLookProp(lookup, "grid").toUpperCase())
   {
     worker += makeRow("GT Grid", lookup, "gtGrid");
   }
@@ -14028,10 +13985,7 @@ function displayLookupObject(lookup, gridPass, fromCache = false)
 
   if (GT.settings.callsignLookups.lotwUseEnable == true && thisCall in GT.lotwCallsigns)
   {
-    lookup.ulotw =
-      "&#10004; (" +
-      userDayString(GT.lotwCallsigns[thisCall] * 86400 * 1000) +
-      ")";
+    lookup.ulotw = "&#10004; (" + userDayString(GT.lotwCallsigns[thisCall] * 86400 * 1000) + ")";
     worker += makeRow("LoTW Member", lookup, "ulotw");
   }
   if (GT.settings.callsignLookups.eqslUseEnable == true && thisCall in GT.eqslCallsigns)
@@ -14051,28 +14005,10 @@ function displayLookupObject(lookup, gridPass, fromCache = false)
   }
 
   worker += "</table>";
-  var details =
-    "<div class='mapItem' id='callDetails' style='padding:4px;'>" +
-    worker +
-    "</div>";
+  let details = "<div class='mapItem' id='callDetails' style='padding:4px;'>" +  worker + "</div>";
+  let genMessage = "<tr><td colspan=2><div title=\"Clear\" class=\"button\" onclick=\"window.opener.clearLookup();\" >Clear</div> <div title=\"Generate Messages\" class=\"button\" onclick=\"window.opener.setCallAndGrid('" + getLookProp(lookup, "call") + "','" + getLookProp(lookup, "grid") + "');\">Generate Messages</div></td></tr>";
 
-  var genMessage =
-    "<tr><td colspan=2><div title=\"Clear\" class=\"button\" onclick=\"window.opener.clearLookup();\" >Clear</div> <div title=\"Generate Messages\" class=\"button\" onclick=\"window.opener.setCallAndGrid('" +
-    getLookProp(lookup, "call") +
-    "','" +
-    getLookProp(lookup, "grid") +
-    "');\">Generate Messages</div></td></tr>";
-
-  setLookupDiv(
-    "lookupInfoDiv",
-    "<table align='center'><tr><td>" +
-    card +
-    "</td><td>" +
-    details +
-    "</td></tr>" +
-    genMessage +
-    "</table>"
-  );
+  setLookupDiv("lookupInfoDiv", "<table align='center'><tr><td>" + card + "</td><td>" + details + "</td></tr>" + genMessage + "</table>");
   setLookupDivHeight("lookupBoxDiv", getLookupWindowHeight() + "px");
 }
 
@@ -14095,50 +14031,30 @@ function addTextToClipboard(data)
 
 function makeYesNoRow(first, object, key)
 {
-  var value = getLookProp(object, key);
+  let value = getLookProp(object, key);
   if (value.length > 0)
   {
-    var test = value.toUpperCase();
+    let test = value.toUpperCase();
     if (test == "Y") return "<tr><td>" + first + "</td><td>Yes</td></tr>";
     if (test == "N") return "<tr><td>" + first + "</td><td>No</td></tr>";
     if (test == "?") return "";
-    return (
-      "<tr><td>" +
-      first +
-      "</td><td>" +
-      (object[key] == 1 ? "Yes" : "No") +
-      "</td></tr>"
-    );
+    return ("<tr><td>" + first + "</td><td>" + (object[key] == 1 ? "Yes" : "No") + "</td></tr>");
   }
   return "";
 }
 
 function makeRow(first, object, key, clip = false)
 {
-  var value = getLookProp(object, key);
+  let value = getLookProp(object, key);
   if (value.length > 0)
   {
     if (clip)
     {
-      return (
-        "<tr><td>" +
-        first +
-        "</td><td title='Copy to clipboard' style='cursor:pointer;color:cyan;font-weight: bold;' onClick='addTextToClipboard(\"" +
-        object[key].substr(0, 45) +
-        "\")'>" +
-        object[key].substr(0, 45) +
-        "</td></tr>"
-      );
+      return ("<tr><td>" + first + "</td><td title='Copy to clipboard' style='cursor:pointer;color:cyan;font-weight: bold;' onClick='addTextToClipboard(\"" + object[key].substr(0, 45) + "\")'>" + object[key].substr(0, 45) + "</td></tr>");
     }
     else
     {
-      return (
-        "<tr><td>" +
-        first +
-        "</td><td>" +
-        object[key].substr(0, 45) +
-        "</td></tr>"
-      );
+      return ("<tr><td>" + first + "</td><td>" + object[key].substr(0, 45) + "</td></tr>");
     }
   }
   return "";
@@ -14401,10 +14317,19 @@ function addNewMqttPskSpot(json)
     nodeTimers.clearTimeout(GT.redrawSpotsTimeout);
     GT.redrawSpotsTimeout = null;
   }
-
-  let call = json.rc.replaceAll(".", "/");
+  
+  let call = String(json.rc).replaceAll(".", "/").toUpperCase();
   let report;
-  json.rl = json.rl.substring(0, 6).toUpperCase();
+  json.rl = String(json.rl).substring(0, 6).toUpperCase();
+  json.md = String(json.md).toUpperCase();
+  json.b = String(json.b).toLowerCase();
+  json.t = parseInt(json.t);
+  if (isNaN(json.t)) return;
+  json.rp = Number(json.rp);
+  if (isNaN(json.rp)) return;
+  json.f = Number(json.f);
+  if (isNaN(json.f)) return;
+  
   let hash = call + json.md + json.b;
 
   if (hash in GT.receptionReports.spots)
@@ -14420,9 +14345,9 @@ function addNewMqttPskSpot(json)
     report.mode = json.md;
   }
 
-  report.dxcc = json.ra;
-  report.when = json.t;
-  report.snr = Number(json.rp);
+  report.dxcc = callsignToDxcc(call);
+  report.when = Math.min(json.t, timeNowSec());
+  report.snr = json.rp;
   report.freq = json.f;
   report.color = clamp(parseInt((parseInt(report.snr) + 25) * 9), 0, 255);
   report.source = "M";
@@ -14431,12 +14356,7 @@ function addNewMqttPskSpot(json)
 
 function spotFeature(center)
 {
-  return new ol.Feature(
-    ol.geom.Polygon.circular(center, 30000, 63).transform(
-      "EPSG:4326",
-      GT.settings.map.projection
-    )
-  );
+  return new ol.Feature(ol.geom.Polygon.circular(center, 30000, 63).transform("EPSG:4326", GT.settings.map.projection));
 }
 
 function createSpot(report, key, fromPoint, addToLayer = true)

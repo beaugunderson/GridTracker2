@@ -505,12 +505,6 @@ table.rosterTable thead th:first-child {
   padding-right: 3px;
 }
 
-.ackBadge {
-  padding: 0px;
-  margin: 0px;
-  height: 12px;
-  margin-bottom: -2px;
-}
 
 .wantedCol {
   max-width: 160px;

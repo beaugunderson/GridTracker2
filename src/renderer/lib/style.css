@@ -725,8 +725,17 @@ a {
   /* animation: fadeEffect .3s;  Fading effect takes 1 second */
 }
 
+.ackBadge {
+  padding: 0px;
+  margin: 0px;
+  height: 16px;
+  margin-bottom: -2px;
+}
+
 .lookupAckBadge {
   padding: 0;
+  margin: 0px;
+  margin-bottom: -2px;
   width: 1em;
 }
 

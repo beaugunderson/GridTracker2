@@ -796,7 +796,7 @@ function gtSpotMessage(jsmesg)
     {
       frequency = Number(jsmesg.ex[0]);
       band = formatBand(Number(frequency / 1000000));
-      mode = String(jsmesg.ex[1]);
+      mode = String(jsmesg.ex[1]).toUpperCase();
     }
     else
     {
@@ -804,6 +804,8 @@ function gtSpotMessage(jsmesg)
       band = GT.gtFlagPins[jsmesg.cid].band;
       mode = GT.gtFlagPins[jsmesg.cid].mode;
     }
+
+    if (isNaN(frequency)) return;
 
     addNewOAMSSpot(jsmesg.cid, jsmesg.db, frequency, band, mode);
   }

@@ -3550,6 +3550,7 @@ function createRestOfMenus()
         click: function (item)
         {
           toggleColumn(item);
+          logbookValuesChanged();
         }
       });
 

@@ -216,16 +216,16 @@ const ROSTER_COLUMNS = {
   },
 
   CQz: {
-    compare: false,
+    compare: callObjSimpleComparer("cqz"),
     tableData: (callObj) => ({
       name: "CQz",
       rawAttrs: callObj.style.cqz,
-      html: [callObj.cqz, callObj.cqzSuffix].join("&nbsp;")
+      html: callObj.cqz
     })
   },
 
   ITUz: {
-    compare: false,
+    compare: callObjSimpleComparer("ituz"),
     tableData: (callObj) => ({
       name: "ITUz",
       rawAttrs: callObj.style.ituz,
