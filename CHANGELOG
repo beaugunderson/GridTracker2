@@ -31,6 +31,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Windows: Update now shows a dialog when updating
 
 - System: Fixed exception logging
+
+- App: New disable auto-update with --disable-auto-updates command line flag, yes there are two dashes
+- App: Improved multi-instance support
+- App: Warning when audio output devices have changed (opt-out in Settings -> Audio)
+- App: Fixed bad data in some PSK-MQTT spot reports
+- Main: New 'log download busy' animation
+- Main: Right-click on buttons that open windows will show vs toggle
+- Custom Alerts: Fixed QRZ callsign not populating at startup
+- Map: Overscan enabled to allow fitting more map in the window
+- POTA: Log loading now honors <SIG:4>POTA <SIG_INFO:x>PARK-ID in addition to <POTA_REF:x>
+- Stats: Logbook tab now shows "POTA" column if "POTA Hunting" enabled
+- Call Roster: POTA column 'All Time New One' (ATNO) designated with dashes around Park ID
+- Call Roster: Fixed 'Spot' column and 'Spotted Me' exception when enabled/disabled
+- Call Roster: Fixed CQz and ITUz not sortable
+- Call Roster: dB column color now white
+- Audio Alerts: Fixed broken ITUz alert
+
+- Note for Windows users where the installer refuses to launch:
+    - Find the installer file then go to the properties, you will see "Security" under the "General" tab
+    - If there's a dialog about it being blocked, check the "Unblock" checkbox
+
 ### Fixed
 
 
