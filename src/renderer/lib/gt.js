@@ -12238,7 +12238,7 @@ function postInit()
   nodeTimers.setInterval(downloadCtyDat, 86400000);  // Every 24 hours
   nodeTimers.setInterval(refreshSpotsNoTx, 300000); // Redraw spots every 5 minutes, this clears old ones
   nodeTimers.setTimeout(downloadCtyDat, 300000); // In 5 minutes, when the dust settles
-  nodeTimers.setTimeout(checkForNewVersion, 60000); // Informative check
+  nodeTimers.setTimeout(checkForNewVersion, 30000); // Informative check
 
   registerCutAndPasteContextMenu();
   registerLegendContextMenus();
@@ -12298,8 +12298,8 @@ function checkForNewVersion()
 
       let intVersion = parseInt(info.version.replaceAll(".",""));
       let difference = intVersion - gtVersion;
-      // It's been more than 3 months
-      if (difference > 2999)
+      // It's been more than 4 months
+      if (difference > 3999)
       {
         addLastTraffic("<font style='color:orange'>Current Version Expired</font></br><font style='color:yellow'>Online Mode Disabled</font>");
         if (GT.settings.map.offlineMode == false)
@@ -12312,7 +12312,7 @@ function checkForNewVersion()
     }
   }
 
-  GT.lastVersionInfo = info;
+  GT.lastVersionInfo = Object.assign({}, info);
   nodeTimers.setTimeout(checkForNewVersion, 43200000); // Informative check in 12 hours
 }
 
