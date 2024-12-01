@@ -470,7 +470,7 @@ GT.viewInfo[5] = ["dxccInfo", "DXCCs", 0, 0, 340];
 GT.viewInfo[6] = ["countyData", "US Counties", 0, 0, 3220];
 GT.viewInfo[7] = ["us48Data", "US Continental Grids", 0, 0, 488];
 GT.viewInfo[8] = ["wacpZones", "CA Provinces", 0, 0, 13];
-GT.soundCard = GT.settings.app.soundCard;
+
 GT.gridAlpha = "88";
 GT.mediaFiles = null;
 GT.qslAuthorityTimer = null;
@@ -3641,6 +3641,11 @@ function changeWantedByBandMode()
 {
   GT.settings.app.wantedByBandMode = wantedByBandMode.checked;
   updateByBandMode();
+}
+
+function changeWarnOnSoundcardsChanged()
+{
+  GT.settings.app.warnOnSoundcardsChanged = warnOnSoundcardsChanged.checked;
 }
 
 function trafficDecodeView()
@@ -11371,6 +11376,7 @@ function loadMapSettings()
 
   trafficDecode.checked = GT.settings.map.trafficDecode;
   wantedByBandMode.checked = GT.settings.app.wantedByBandMode;
+  warnOnSoundcardsChanged.checked = GT.settings.app.warnOnSoundcardsChanged;
 
   setSpotImage();
 
@@ -11703,6 +11709,7 @@ function gotAudioDevices(deviceInfos)
   newSelect.id = "soundCardInput";
   newSelect.title = "Select Sound Card";
 
+  let foundCards = {};
   for (let i = 0; i !== deviceInfos.length; ++i)
   {
     let deviceInfo = deviceInfos[i];
@@ -11710,21 +11717,69 @@ function gotAudioDevices(deviceInfos)
     {
       let option = document.createElement("option");
       option.value = deviceInfo.deviceId;
-
       option.text = deviceInfo.label || "Speaker " + (newSelect.length + 1);
       newSelect.appendChild(option);
+      foundCards[deviceInfo.deviceId] = true;
     }
   }
+
+  if (GT.settings.app.soundcards != null)
+  {
+    if (!(GT.settings.app.soundCard in foundCards))
+    {
+      GT.settings.app.soundCard = "default";
+      audioCardWarn(true);
+    }
+    else
+    {
+      // Scan for differences
+      let warn = false
+      for (let soundcard in GT.settings.app.soundcards)
+      {
+        if (!(soundcard in foundCards))
+        {
+          warn = true;
+          break;
+        }
+      }
+      if (warn == false)
+      {
+        for (let soundcard in foundCards)
+          {
+            if (!(soundcard in GT.settings.app.soundcards))
+            {
+              warn = true;
+              break;
+            }
+          }
+      }
+      if (warn == true)
+      {
+        audioCardWarn(false);
+      }
+    }
+  }
+
+  GT.settings.app.soundcards = Object.assign({}, foundCards);
+
   newSelect.oninput = soundCardChangedValue;
   soundCardDiv.appendChild(newSelect);
-  soundCardInput.value = GT.soundCard;
+  soundCardInput.value = GT.settings.app.soundCard;
+}
+
+function audioCardWarn(didSetDefault)
+{
+  if (GT.settings.app.warnOnSoundcardsChanged)
+  {
+    warnSoundcardHtml.innerHTML =  I18N(didSetDefault == false ? "settings.audio.devicesChanged.label" : "settings.audio.deviceDefaultSet.label");
+    warnSoundcardDiv.style.display = "block";
+  }
 }
 
 function soundCardChangedValue()
 {
-  GT.settings.app.soundCard = GT.soundCard = soundCardInput.value;
+  GT.settings.app.soundCard = soundCardInput.value;
   playTestFile();
-  
 }
 
 function setPins()

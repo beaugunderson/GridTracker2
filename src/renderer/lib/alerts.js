@@ -341,9 +341,10 @@ function handleAlert(nAlert, target, lastMessage, callsignRecord, grid)
   nAlert.fired++;
 }
 
-const audioElement = document.createElement("audio");
+
 function playAlertMediaFile(filename)
 {
+  let audioElement = document.createElement("audio");
   if (GT.settings.audio.alertMute == 1) return;
 
   let fpath = path.join(GT.gtMediaDir, filename);
@@ -352,7 +353,7 @@ function playAlertMediaFile(filename)
     fpath = path.join(GT.extraMediaDir, filename);
   }
   audioElement.src = "file://" + fpath;
-  audioElement.setSinkId(GT.soundCard);
+  audioElement.setSinkId(GT.settings.app.soundCard);
   audioElement.volume = GT.settings.audio.volume;
   audioElement.play();
 }
