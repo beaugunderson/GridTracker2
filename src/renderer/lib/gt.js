@@ -11888,7 +11888,7 @@ function loadViewSettings()
   spotMergeValue.checked = GT.settings.reception.mergeSpots;
 
   lookupOnTx.checked = GT.settings.app.lookupOnTx;
-  lookupCallookPreferred.checked = GT.settings.app.lookupCallookPreferred;
+  // lookupCallookPreferred.checked = GT.settings.app.lookupCallookPreferred;
   lookupCloseLog.checked = GT.settings.app.lookupCloseLog;
   lookupMerge.checked = GT.settings.app.lookupMerge;
   lookupMissingGrid.checked = GT.settings.app.lookupMissingGrid;
@@ -13109,7 +13109,7 @@ function lookupValueChanged(what)
     }
   }
   GT.settings.app.lookupService = lookupService.value;
-  GT.settings.app.lookupCallookPreferred = lookupCallookPreferred.checked;
+  // GT.settings.app.lookupCallookPreferred = lookupCallookPreferred.checked;
   lookupQrzTestResult.innerHTML = "";
   GT.qrzLookupSessionId = null;
   if (lookupService.value == "CALLOOK") { lookupCredentials.style.display = "none"; }
@@ -13170,7 +13170,7 @@ function continueWithLookup(callsign, gridPass)
     "Looking up <font color='cyan'>" + callsign + "</font>, please wait..."
   );
 
-  if (GT.settings.app.lookupCallookPreferred)
+  /* if (GT.settings.app.lookupCallookPreferred)
   {
     var dxcc = callsignToDxcc(callsign);
     var where;
@@ -13192,7 +13192,8 @@ function continueWithLookup(callsign, gridPass)
         true
       );
     }
-  }
+  } */
+ 
   if (GT.settings.app.lookupService != "CALLOOK")
   {
     GT.qrzLookupCallsign = callsign;
