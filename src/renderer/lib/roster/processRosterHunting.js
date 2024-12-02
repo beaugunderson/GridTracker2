@@ -593,9 +593,17 @@ function processRosterHunting(callRoster, rosterSettings)
               shouldRosterAlert = true;
               callObj.hunting.pota = "hunted";
 
-              potaBg = `${pota}${kInversionAlpha};`;
-              pota = kBold;
-              if (!(callObj.pota in GT.tracker.worked.pota)) pota += "text-decoration:dashed underline overline;" 
+              if (!(callObj.pota in GT.tracker.worked.pota)) 
+              {
+                // ATNO
+                potaBg = `${pota}${kInversionAlpha};`;
+                pota = kBold;
+              }
+              else
+              {
+                potaBg = `${pota}${kLayeredAlpha};`;
+                pota = kBold;
+              }
             }
           }
           else if (callObj.pota in GT.tracker.worked.pota)

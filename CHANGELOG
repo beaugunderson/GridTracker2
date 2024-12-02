@@ -42,7 +42,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Map: Overscan enabled to allow fitting more map in the window
 - POTA: Log loading now honors <SIG:4>POTA <SIG_INFO:x>PARK-ID in addition to <POTA_REF:x>
 - Stats: Logbook tab now shows "POTA" column if "POTA Hunting" enabled
-- Call Roster: POTA column 'All Time New One' (ATNO) designated with dashes around Park ID
+- Call Roster: POTA column 'All Time New One' (ATNO) Bright vs Dim
 - Call Roster: Fixed 'Spot' column and 'Spotted Me' exception when enabled/disabled
 - Call Roster: Fixed CQz and ITUz not sortable
 - Call Roster: dB column color now white
