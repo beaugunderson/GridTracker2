@@ -11828,6 +11828,7 @@ function loadViewSettings()
 {
   gtBandFilter.value = GT.settings.app.gtBandFilter;
   gtModeFilter.value = GT.settings.app.gtModeFilter;
+  if (GT.settings.app.gtPropFilter == "") GT.settings.app.gtPropFilter = "mixed";
   gtPropFilter.value = GT.settings.app.gtPropFilter;
   distanceUnit.value = GT.settings.app.distanceUnit;
   languageLocale.value = GT.settings.app.locale;
