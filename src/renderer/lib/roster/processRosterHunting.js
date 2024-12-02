@@ -601,7 +601,7 @@ function processRosterHunting(callRoster, rosterSettings)
               }
               else
               {
-                potaBg = `${pota}${kLayeredAlpha};`;
+                potaBg = `${pota}${kLayeredUnconfAlpha};`;
                 pota = kBold;
               }
             }
