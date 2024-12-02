@@ -193,7 +193,7 @@ const ROSTER_COLUMNS = {
   DT: {
     compare: callObjSimpleComparer("dt"),
     tableData: (callObj) => ({
-      style: "color: #1E90FF;",
+      style: "color: #5caeff;",
       html: callObj.dt
     })
   },
