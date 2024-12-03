@@ -579,11 +579,11 @@
                 <label data-i18n="roster.secondary.exceptions.hasGrid" for="requireGrid">Has Grid</label>
             </div>
               <div>
-                <input type="checkbox" id="noMyDxcc" onchange="onlyMyDxcc.checked=false; huntingValueChanged(this);" />
+                <input type="checkbox" id="noMyDxcc" onchange="onlyMyDxcc.checked=false; huntingValueChanged(onlyMyDxcc); huntingValueChanged(this);" />
                 <label data-i18n="roster.secondary.exceptions.noMyDXCC" for="noMyDxcc">Not My DXCC</label>
               </div>
               <div>
-                <input type="checkbox" id="onlyMyDxcc" onchange="noMyDxcc.checked=false; huntingValueChanged(this);" />
+                <input type="checkbox" id="onlyMyDxcc" onchange="noMyDxcc.checked=false; huntingValueChanged(noMyDxcc); huntingValueChanged(this);" />
                 <label data-i18n="roster.secondary.exceptions.onlyMyDXCC" for="onlyMyDxcc">Only My DXCC</label>
               </div>   
 

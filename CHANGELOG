@@ -46,7 +46,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Call Roster: Fixed 'Spot' column and 'Spotted Me' exception when enabled/disabled
 - Call Roster: Fixed CQz and ITUz not sortable
 - Call Roster: dB column color now white
+- Call Roster: Fixed "Only My DXCC" "Not My DXCC" mutual exclusion
 - Audio Alerts: Fixed broken ITUz alert
+
 
 - Note for Windows users where the installer refuses to launch:
     - Find the installer file then go to the properties, you will see "Security" under the "General" tab
