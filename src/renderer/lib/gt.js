@@ -5541,14 +5541,18 @@ function handleInstanceStatus(newMessage)
       localDXcall.innerHTML = "-";
       GT.localDXcall = "";
     }
-    localDXGrid.innerHTML = GT.myDXGrid = newMessage.DXgrid.trim();
+
+    GT.myDXGrid = newMessage.DXgrid.trim();
+
+    // MSHV provides incomplete grid!
+    if (GT.myDXGrid.length < 4) GT.myDXGrid = "";
 
     if (GT.myDXGrid.length == 0 && hash in GT.liveCallsigns)
     {
-      localDXGrid.innerHTML = GT.myDXGrid = GT.liveCallsigns[hash].grid.substr(0, 4);
+      GT.myDXGrid = GT.liveCallsigns[hash].grid.substr(0, 4);
     }
 
-    if (localDXGrid.innerHTML.length == 0)
+    if (GT.myDXGrid.length == 0)
     {
       localDXGrid.innerHTML = "-";
       localDXDistance.innerHTML = "&nbsp;";
@@ -5556,6 +5560,7 @@ function handleInstanceStatus(newMessage)
     }
     else
     {
+      localDXGrid.innerHTML = GT.myDXGrid;
       var LL = squareToCenter(GT.myDXGrid);
       localDXDistance.innerHTML = parseInt(MyCircle.distance(GT.myLat, GT.myLon, LL.a, LL.o, distanceUnit.value) * MyCircle.validateRadius(distanceUnit.value)) + distanceUnit.value.toLowerCase();
       localDXAzimuth.innerHTML = parseInt(MyCircle.bearing(GT.myLat, GT.myLon, LL.a, LL.o)) + "&deg;";
@@ -5580,8 +5585,6 @@ function handleInstanceStatus(newMessage)
 
     GT.settings.app.myCall = newMessage.DEcall;
  
-
-
     if (newMessage.Decoding == 1)
     {
       // Decoding
