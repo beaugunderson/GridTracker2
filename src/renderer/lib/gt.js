@@ -11717,7 +11717,6 @@ function errorCallback(e) { }
 
 function gotAudioDevices(deviceInfos)
 {
-  console.warn(deviceInfos);
   soundCardDiv.innerHTML = "";
   let newSelect = document.createElement("select");
   newSelect.id = "soundCardInput";
