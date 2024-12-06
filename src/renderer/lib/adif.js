@@ -1593,6 +1593,8 @@ function finishSendingReport(record)
   if (report != GT.lastReport)
   {
     GT.lastReport = report;
+
+    addLastTraffic("<font style='color:orange'>&uarr; </font><font style='color:cyan'> New QSO </font><font style='color:yellow'>" + record.CALL + "</font><font style='color:orange'> &uarr;</font>");
     
     if (GT.settings.app.potaFeatureEnabled && "POTA_REF" in record)
     {

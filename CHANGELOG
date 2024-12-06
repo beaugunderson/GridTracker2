@@ -48,11 +48,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Call Roster: dB column color now white
 - Call Roster: Fixed "Only My DXCC" "Not My DXCC" mutual exclusion
 - Audio Alerts: Fixed broken ITUz alert
-
-
 - Note for Windows users where the installer refuses to launch:
     - Find the installer file then go to the properties, you will see "Security" under the "General" tab
     - If there's a dialog about it being blocked, check the "Unblock" checkbox
+
+- Main: Fixed ignore not working on RECIEVE bar
+- Main: Added "New QSO CALLSIGN" to status messages
 
 ### Fixed
 

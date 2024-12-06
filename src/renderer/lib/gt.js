@@ -5813,6 +5813,8 @@ function fitViewBetweenPoints(points, maxZoom = 20)
 
 function handleWsjtxDecode(newMessage)
 {
+  if (GT.ignoreMessages == 1) return;
+  
   // eg: "YK7DAQ RR73; 3O5GAS <JI1BXD> +14"
   if (newMessage.Msg.indexOf(" RR73; ") > -1)
   {
