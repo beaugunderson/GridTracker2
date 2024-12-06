@@ -1963,6 +1963,7 @@ function onMyKeyDown(event)
     rootSettingsDiv.style.display = "none";
     helpDiv.style.display = "none";
     GT.helpShow = false;
+    event.preventDefault();
   }
 
   if (rootSettingsDiv.style.display == "none")
@@ -1981,10 +1982,12 @@ function onMyKeyDown(event)
           if (GT.hotKeys[event.code].param2 in event) { param2 = event[GT.hotKeys[event.code].param2]; }
         }
         GT.hotKeys[event.code].func(GT.hotKeys[event.code].param1, param2);
+        event.preventDefault();
       }
       else
       {
         GT.hotKeys[event.code].func();
+        event.preventDefault();
       }
     }
     else if (event.key in GT.hotKeys)
@@ -2001,10 +2004,12 @@ function onMyKeyDown(event)
           if (GT.hotKeys[event.key].param2 in event) { param2 = event[GT.hotKeys[event.key].param2]; }
         }
         GT.hotKeys[event.key].func(GT.hotKeys[event.key].param1, param2);
+        event.preventDefault();
       }
       else
       {
         GT.hotKeys[event.key].func();
+        event.preventDefault();
       }
     }
   }
@@ -2239,8 +2244,6 @@ function toggleHelp()
   GT.helpShow = !GT.helpShow;
   helpDiv.style.display = (GT.helpShow) ? "block" : "none";
 }
-
-function onMyKeyUp(event) { }
 
 function cycleTrophyOverlay()
 {
@@ -5813,6 +5816,7 @@ function fitViewBetweenPoints(points, maxZoom = 20)
 
 function handleWsjtxDecode(newMessage)
 {
+
   if (GT.ignoreMessages == 1) return;
   
   // eg: "YK7DAQ RR73; 3O5GAS <JI1BXD> +14"
@@ -11713,6 +11717,7 @@ function errorCallback(e) { }
 
 function gotAudioDevices(deviceInfos)
 {
+  console.warn(deviceInfos);
   soundCardDiv.innerHTML = "";
   let newSelect = document.createElement("select");
   newSelect.id = "soundCardInput";
@@ -11728,7 +11733,7 @@ function gotAudioDevices(deviceInfos)
       option.value = deviceInfo.deviceId;
       option.text = deviceInfo.label || "Speaker " + (newSelect.length + 1);
       newSelect.appendChild(option);
-      foundCards[deviceInfo.deviceId] = true;
+      foundCards[deviceInfo.deviceId] = option.text;
     }
   }
 
@@ -11736,8 +11741,29 @@ function gotAudioDevices(deviceInfos)
   {
     if (!(GT.settings.app.soundCard in foundCards))
     {
-      GT.settings.app.soundCard = "default";
-      audioCardWarn(true);
+      if (GT.settings.app.soundCardName != null)
+      {
+        let foundId = false;
+        // Search the found cards by name and see if we can find the right deviceId
+        for (let deviceId in foundCards)
+        {
+          if (foundCards[deviceId] == GT.settings.app.soundCardName)
+          {
+            // Found it!
+            GT.settings.app.soundCard = deviceId;
+            foundId = true;
+            break;
+          }
+        }
+        if (foundId == false)
+        {
+          audioCardWarn(true);
+        }
+      }
+      else
+      {
+        audioCardWarn(true);
+      }
     }
     else
     {
@@ -11771,6 +11797,8 @@ function gotAudioDevices(deviceInfos)
 
   GT.settings.app.soundcards = Object.assign({}, foundCards);
 
+  if (GT.settings.app.soundCard in GT.settings.app.soundcards) GT.settings.app.soundCardName = GT.settings.app.soundcards[GT.settings.app.soundCard];
+  
   newSelect.oninput = soundCardChangedValue;
   soundCardDiv.appendChild(newSelect);
   soundCardInput.value = GT.settings.app.soundCard;
@@ -11788,6 +11816,7 @@ function audioCardWarn(didSetDefault)
 function soundCardChangedValue()
 {
   GT.settings.app.soundCard = soundCardInput.value;
+  if (GT.settings.app.soundCard in GT.settings.app.soundcards) GT.settings.app.soundCardName = GT.settings.app.soundcards[GT.settings.app.soundCard];
   playTestFile();
 }
 
@@ -12158,9 +12187,6 @@ function startupButtonsAndInputs()
 
 function startupEventsAndTimers()
 {
-  document.addEventListener("keydown", onMyKeyDown, true);
-  document.addEventListener("keyup", onMyKeyUp, false);
-
   // Clock timer update every second
   nodeTimers.setInterval(displayTime, 1000);
   nodeTimers.setInterval(reportDecodes, 60000);

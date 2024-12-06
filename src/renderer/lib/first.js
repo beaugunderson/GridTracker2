@@ -58,9 +58,11 @@ function requireJson(filepath)
 var GT = {};
 // CallRoster object
 var CR = {};
+var isGT = false;
 
 if (document.title.substring(0, 12).trim() == "GridTracker2")
 {
+  isGT = true;
   let filename = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Ginternal", "app-settings.json");
   try
   {
@@ -130,11 +132,16 @@ function onZoomControlDown(event)
     {
       g_zoomKeys[event.code](event);
       event.preventDefault();
+      return;
     }
     else if (event.code == "KeyR" || event.code == "KeyW")
     {
       event.preventDefault();
     }
+  }
+  if (isGT == true)
+  {
+    onMyKeyDown(event);
   }
 }
 

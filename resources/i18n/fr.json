@@ -248,7 +248,7 @@
     "settings.audio.QSOLogEventFile.label": "Nuances pour les notifications",
     "settings.audio.warnOnSoundcardsChanged.label": "Avertissement en cas de changement de périphériques audio",
     "settings.audio.devicesChanged.label": "Les périphériques de sortie audio ont changé, veuillez vérifier vos paramètres audio",
-    "settings.audio.deviceDefaultSet.label": "Votre périphérique de sortie audio sélectionné n'a pas été trouvé, réinitialisation par défaut",
+    "settings.audio.deviceDefaultSet.label": "Votre périphérique de sortie audio sélectionné n'a pas été trouvé",
     "settings.logbook.callsigns.hover": "Filtrer les QSOs du Logbook pour n'inclure que ces indicatifs (séparés par des virgules)",
     "settings.logbook.callsigns.label": "Indicatif(s) de travail",
     "settings.logbook.callsigns.enable": "Activer ?",

@@ -101,6 +101,7 @@ const def_settings = {
     qrzPathWidthWeight: 1.2,
     sixWideMode: 0,
     soundCard: "default",
+    soundCardName: null,
     soundcards: null,
     warnOnSoundcardsChanged: true,
     spotView: 0,

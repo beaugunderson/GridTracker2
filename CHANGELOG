@@ -52,8 +52,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
     - Find the installer file then go to the properties, you will see "Security" under the "General" tab
     - If there's a dialog about it being blocked, check the "Unblock" checkbox
 
-- Main: Fixed ignore not working on RECIEVE bar
-- Main: Added "New QSO CALLSIGN" to status messages
+- App: Fixed audio device selected not found reset to default
+- App: Fixed issue where Windows reports different Device IDs for Audio Devices every session
+- MSHV: Fixed issue where an incomplete 'DX Grid' would break the map view
+- Main: Fixed ignore not working on RECIEVE bar left-click
+- Main: Added "New QSO CALLSIGN" to status messages on QSO log event
+- Call Roster: Added Ctrl-L toggle "Uses LoTW"
+
 
 ### Fixed
 

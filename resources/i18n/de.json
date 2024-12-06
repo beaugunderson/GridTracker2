@@ -255,7 +255,7 @@
     "settings.audio.QSOLogEventFile.label": "QSO-Log Benachrichtigung",
     "settings.audio.warnOnSoundcardsChanged.label": "Warnung bei Änderung von Audiogeräten",
     "settings.audio.devicesChanged.label": "Audioausgabegeräte geändert, bitte überprüfen Sie Ihre Audioeinstellungen",
-    "settings.audio.deviceDefaultSet.label": "Ihr ausgewähltes Audioausgabegerät wurde nicht gefunden, wird auf Standard zurückgesetzt",
+    "settings.audio.deviceDefaultSet.label": "Ihr ausgewähltes Audioausgabegerät wurde nicht gefunden",
     "settings.logbook.callsigns.hover": "Logbuch filtern, so dass nur die folgenden Rufzeichen einbezogen werden (Komma-getrennt)",
     "settings.logbook.callsigns.label": "Arbeitsrufzeichen",
     "settings.logbook.callsigns.enable": "Eingeschaltet?",

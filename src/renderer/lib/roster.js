@@ -1365,6 +1365,11 @@ function onMyKeyDown(event)
     {
       openIgnores();
     }
+    else if (event.code == "KeyL")
+    {
+      usesLoTW.checked = !usesLoTW.checked;
+      huntingValueChanged(usesLoTW);
+    }
   }
 }
 

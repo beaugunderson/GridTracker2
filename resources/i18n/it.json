@@ -248,7 +248,7 @@
     "settings.audio.QSOLogEventFile.label": "Suggerimenti per le notifiche",
     "settings.audio.warnOnSoundcardsChanged.label": "Avviso quando cambiano i dispositivi audio",
     "settings.audio.devicesChanged.label": "I dispositivi di uscita audio sono cambiati, controlla le impostazioni audio",
-    "settings.audio.deviceDefaultSet.label": "Il dispositivo di uscita audio selezionato non è stato trovato, ripristino delle impostazioni predefinite",
+    "settings.audio.deviceDefaultSet.label": "Il dispositivo di uscita audio selezionato non è stato trovato",
     "settings.logbook.callsigns.hover": "Filtrare i QSO nel Diario per includere solo questi nominativi (separati da virgole)",
     "settings.logbook.callsigns.label": "Indicativo /i di lavoro",
     "settings.logbook.callsigns.enable": "Attivare?",
