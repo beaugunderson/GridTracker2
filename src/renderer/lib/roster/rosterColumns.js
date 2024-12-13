@@ -159,7 +159,6 @@ const ROSTER_COLUMNS = {
         attrs.title = I18N("rosterColumns.County.title")
         attrs.onClick = `window.opener.lookupCallsign("${callObj.DEcall}", "${callObj.grid}")`
         attrs.html = attrs.html + " +" + String(GT.zipToCounty[callObj.zipcode].length - 1)
-        attrs.style = "cursor: pointer; color: cyan;"
       }
       return attrs
     }

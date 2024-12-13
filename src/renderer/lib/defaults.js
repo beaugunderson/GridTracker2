@@ -481,6 +481,7 @@ const def_settings = {
       Mode: false,
       Calling: true,
       Rig: false,
+      Wanted: false,
       Grid: true,
       Msg: false,
       DXCC: true,
