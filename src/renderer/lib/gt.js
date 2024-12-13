@@ -3787,7 +3787,7 @@ function animatePaths()
 {
   requestAnimationFrame(animatePaths);
 
-  GT.lastFrame ^= GT.lastFrame;
+  GT.lastFrames
   if (GT.lastFrame == 1) return;
 
   GT.animateFrame++;
@@ -5840,6 +5840,11 @@ function handleWsjtxDecode(newMessage)
   }
 }
 
+const kIsEven = {
+  FT8: { "00": 1, "30": 1 },
+  FT4: { "00": 1, "15": 1, "30": 1, "45": 1 }
+}
+
 function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
 {
   var didCustomAlert = false;
@@ -6001,6 +6006,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
       newCallsign.propMode = "";
       newCallsign.digital = true;
       newCallsign.phone = false;
+      newCallsign.even = false;
       newCallsign.IOTA = "";
       newCallsign.hash = hash;
       if (newCallsign.dxcc != -1)
@@ -6065,6 +6071,12 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
     callsign.CQ = CQ;
     callsign.RR73 = RR73;
     callsign.UTC = toColonHMS(parseInt(newMessage.TM / 1000));
+
+    if (callsign.mode in kIsEven)
+    {
+      callsign.even = (callsign.UTC.slice(-2) in kIsEven[callsign.mode]);
+    }
+
     callsign.qrz = (msgDXcallsign == GT.settings.app.myCall);
 
     if (callsign.grid.length > 0 && isKnownCallsignDXCC(callsign.dxcc))

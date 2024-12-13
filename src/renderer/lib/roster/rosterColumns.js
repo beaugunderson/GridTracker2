@@ -359,7 +359,7 @@ const ROSTER_COLUMNS = {
     compare: callObjSimpleComparer("age"),
     tableData: (callObj) => ({
       style: "color: #EEE;",
-      html: callObj.UTC
+      html: (callObj.even ? "<font style='text-decoration: underline'>" : "") + callObj.UTC + (callObj.even ? "</font>" : "")
     })
   },
 
