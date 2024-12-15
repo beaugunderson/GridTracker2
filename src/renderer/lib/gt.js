@@ -13820,7 +13820,19 @@ function cacheLookupObject(lookup, gridPass, cacheable = false)
     lookup.grid = lookup.grid.toUpperCase();
   }
 
-  if (lookup.hasOwnProperty("state") && lookup.hasOwnProperty("county"))
+  if (GT.settings.app.lookupService == "CALLOOK" && !("county" in lookup) && "lon" in lookup && "lat" in lookup)
+  {
+    if (GT.countyLookupReady == false) initCountyMap();
+    lookup.cnty = getCountyFromLongLat(lookup.lon, lookup.lat);
+    if (lookup.cnty)
+    {
+      lookup.county = GT.countyData[lookup.cnty].geo.properties.st + ", " + GT.countyData[lookup.cnty].geo.properties.n;
+      lookup.state = GT.countyData[lookup.cnty].geo.properties.st;
+    }
+  }
+  else if (GT.countyLookupReady == true && GT.settings.app.lookupService != "CALLOOK") clearCountyMap();
+
+  if ("state" in lookup && "county" in lookup)
   {
     let foundCounty = false;
 

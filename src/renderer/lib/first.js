@@ -18,7 +18,21 @@ function logErrorObject(e)
 
 function logErrorString(errorString)
 {
-  electron.ipcRenderer.send("log", errorString);
+  if (typeof errorString == "string")
+  {
+    electron.ipcRenderer.send("log", errorString);
+  }
+  else
+  {
+    try 
+    {
+      electron.ipcRenderer.send("log", JSON.stringify(errorString, null, 2));
+    }
+    catch (e)
+    {
+
+    }
+  }
 }
 
 window.onerror = function(message, source, lineNumber, colno, error) {
