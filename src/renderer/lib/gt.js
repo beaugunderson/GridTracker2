@@ -6617,8 +6617,9 @@ function setCenterQTH()
           LL.la2 - (LL.la2 - LL.la1) / 2
         ], GT.settings.map.projection)
       );
-  }
 
+    GT.map.getView().setRotation(0);
+  }
 }
 
 function saveCenterGridsquare()
