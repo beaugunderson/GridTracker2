@@ -350,6 +350,7 @@ function createMainWindow() {
     backgroundColor: 'black',
     autoHideMenuBar: true,
     enableLargerThanScreen: true,
+    acceptFirstMouse: true,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       backgroundThrottling: false,
@@ -382,6 +383,7 @@ function createMainWindow() {
         autoHideMenuBar: true,
         backgroundColor: 'black',
         enableLargerThanScreen: true,
+        acceptFirstMouse: true,
         show: false,
         // for macOS
         tabbingIdentifier: details.frameName,

@@ -6609,8 +6609,7 @@ function setCenterQTH()
     // Grab home QTH Gridsquare from Center QTH
     var LL = squareToLatLong(GT.settings.app.myGrid);
 
-    GT.map
-      .getView()
+    GT.mapView
       .setCenter(
         ol.proj.fromLonLat([
           LL.lo2 - (LL.lo2 - LL.lo1) / 2,
@@ -6618,7 +6617,8 @@ function setCenterQTH()
         ], GT.settings.map.projection)
       );
 
-    GT.map.getView().setRotation(0);
+    GT.mapView.setRotation(0);
+    GT.mapView.setZoom(4);
   }
 }
 
