@@ -80,6 +80,12 @@ function loadAllSettings()
     GT.settings.importLegacy = false;
   }
 
+  // Test for valid projections
+  if (k_valid_projections.indexOf(GT.settings.map.projection) == -1)
+  {
+    GT.settings.map.projection = k_valid_projections[0];
+  }
+
   if (GT.settings.mapMemory.length != 7)
   {
     GT.settings.mapMemory = [];
@@ -650,7 +656,7 @@ function saveAllSettings()
   }
   catch (e)
   {
-    logErrorObject(e);
+    logError(e);
   }
 }
 
@@ -6513,7 +6519,7 @@ function goProcessRoster()
     }
     catch (e)
     {
-      logErrorObject(e);
+      logError(e);
     }
   }
 }
@@ -12252,6 +12258,8 @@ function postInit()
 
     section = "DataBreakout";
     initPopupWindow();
+    section = "StatsWindow";
+    openStatsWindow(false);
     section = "LookupWindow";
     openLookupWindow(false);
     section = "BaWindow";
@@ -12271,23 +12279,22 @@ function postInit()
     displayMouseTrack();
     section = "FileSelectorHandles";
     createFileSelectorHandlers();
+    section = "registerCutAndPasteContextMenu";
+    registerCutAndPasteContextMenu();
+    section = "registerLegendContextMenus";
+    registerLegendContextMenus();
+    section = "SettingTimers";
+    nodeTimers.setInterval(saveAllSettings, 900000); // Every 10 minutes, save our settings as a safety
+    nodeTimers.setInterval(removeFlightPathsAndDimSquares, 2000); // Every 2 seconds
+    nodeTimers.setInterval(downloadCtyDat, 86400000);  // Every 24 hours
+    nodeTimers.setInterval(refreshSpotsNoTx, 300000); // Redraw spots every 5 minutes, this clears old ones
+    nodeTimers.setTimeout(downloadCtyDat, 300000); // In 5 minutes, when the dust settles
+    nodeTimers.setTimeout(checkForNewVersion, 30000); // Informative check
   }
   catch (e)
   {
     alert("!Init Failed Section!: " + section + "\nPlease report failed section");
   }
-
-  nodeTimers.setInterval(saveAllSettings, 900000); // Every 10 minutes, save our settings as a safety
-  nodeTimers.setInterval(removeFlightPathsAndDimSquares, 2000); // Every 2 seconds
-  nodeTimers.setInterval(downloadCtyDat, 86400000);  // Every 24 hours
-  nodeTimers.setInterval(refreshSpotsNoTx, 300000); // Redraw spots every 5 minutes, this clears old ones
-  nodeTimers.setTimeout(downloadCtyDat, 300000); // In 5 minutes, when the dust settles
-  nodeTimers.setTimeout(checkForNewVersion, 30000); // Informative check
-
-  registerCutAndPasteContextMenu();
-  registerLegendContextMenus();
-
-  GT.finishedLoading = true;
 }
 
 function registerLegendContextMenus()
@@ -12466,7 +12473,6 @@ function onButtonDrop(event)
     }
 
     saveButtonOrder();
-
     event.preventDefault();
   }
 }
@@ -12513,15 +12519,13 @@ function startupEngine()
     var funcInfo = GT.startupTable.shift();
     funcInfo[0] && funcInfo[0]();
     startupStatusDiv.innerHTML = funcInfo[1];
-    nodeTimers.setTimeout(startupEngine, 32);
+    nodeTimers.setTimeout(startupEngine, 64);
   }
   else
   {
     startupDiv.style.display = "none";
     main.style.display = "block";
-    GT.map.updateSize();
-
-    setTimeout(endStartup, 500);
+    nodeTimers.setTimeout(endStartup, 500);
   }
 }
 
@@ -12535,9 +12539,9 @@ function refreshI18NStrings()
 
 function endStartup()
 {
-  openStatsWindow(false);
   if (loadPsk24CheckBox.checked == true) grabPsk24();
   startupAdifLoadCheck();
+  GT.finishedLoading = true;
 }
 
 function loadPortSettings()
@@ -12803,6 +12807,8 @@ function updateWsjtxListener(port)
 
   GT.wsjtUdpServer.on("message", function (message, remote)
   {
+    if (GT.finishedLoading == false) return;
+
     if (!(remote.port in GT.lastWsjtMessageByPort))
     {
       GT.lastWsjtMessageByPort[remote.port] = Buffer.from([0x01]);
@@ -13301,13 +13307,13 @@ function continueWithLookup(callsign, gridPass)
 }
 function callookResults(buffer, gridPass)
 {
-  var results = JSON.parse(buffer);
+  let results = JSON.parse(buffer);
   if (typeof results.status != "undefined")
   {
     if (results.status == "VALID")
     {
-      var callObject = {};
-      var dxcc = callsignToDxcc(results.current.callsign);
+      let callObject = {};
+      let dxcc = callsignToDxcc(results.current.callsign);
       if (dxcc in GT.dxccToAltName) callObject.land = GT.dxccToAltName[dxcc];
       callObject.type = results.type;
       callObject.call = results.current.callsign;

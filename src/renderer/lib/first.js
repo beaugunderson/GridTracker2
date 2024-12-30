@@ -9,24 +9,19 @@ const path = require("path");
 const fs = require("fs");
 const process = require("process");
 
-console.log = logErrorString;
+console.log = logError;
 
-function logErrorObject(e)
+function logError(error)
 {
-  logErrorString(e.name + ":" + e.message);
-}
-
-function logErrorString(errorString)
-{
-  if (typeof errorString == "string")
+  if (typeof error == "string")
   {
-    electron.ipcRenderer.send("log", errorString);
+    electron.ipcRenderer.send("log", error);
   }
   else
   {
     try 
     {
-      electron.ipcRenderer.send("log", JSON.stringify(errorString, null, 2));
+      electron.ipcRenderer.send("log", JSON.stringify(error, null, 2));
     }
     catch (e)
     {
@@ -36,7 +31,7 @@ function logErrorString(errorString)
 }
 
 window.onerror = function(message, source, lineNumber, colno, error) {
-  logErrorString(`${error.stack}`);
+  logError(`${error.stack}`);
 };
 
 try
@@ -46,7 +41,7 @@ try
 }
 catch (e)
 {
-  logErrorString("Can't set dns IPv4 default order");
+  logError("Can't set dns IPv4 default order");
 }
 
 
@@ -91,7 +86,7 @@ if (document.title.substring(0, 12).trim() == "GridTracker2")
       {
         // safety catch
         GT.settings = { importLegacy: true };
-        logErrorString("Error parsing settings, defaults will be applied");
+        logError("Error parsing settings, defaults will be applied");
       }
     }
     else
@@ -99,17 +94,17 @@ if (document.title.substring(0, 12).trim() == "GridTracker2")
       // This should happen only once for new users
       // In 2025 we remove importLegacy code -Tag
       GT.settings = { importLegacy: true };
-      logErrorString("Could not load: " + filename);
-      logErrorString("Defaults will be applied");
+      logError("Could not load: " + filename);
+      logError("Defaults will be applied");
     }
   }
   catch (e)
   {
     // In 2025 we remove importLegacy code -Tag
     GT.settings = { importLegacy: true };
-    logErrorString("Could not load: " + filename);
-    logErrorObject(e);
-    logErrorString("Defaults will be applied");
+    logError("Could not load: " + filename);
+    logError(e);
+    logError("Defaults will be applied");
   }
 }
 else

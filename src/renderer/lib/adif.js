@@ -149,7 +149,7 @@ function adifFilteredLiveComplete(task)
 function exceptionComplete(task)
 {
   GT.adifLogCount--;
-  logErrorString("Expection loading last log");
+  logError("Expection loading last log");
 
   tryNextTask(task);
 }
@@ -752,7 +752,7 @@ function loadBackupLogFiles()
   }
   catch (e)
   {
-    logErrorString("Error trying to read directory: " + GT.qsoBackupDir);
+    logError("Error trying to read directory: " + GT.qsoBackupDir);
   }
 }
 
@@ -1660,7 +1660,7 @@ function finishSendingReport(record)
     }
     catch (e)
     {
-      logErrorObject(e);
+      logError(e);
       addLastTraffic("<font style='color:red'>Exception GridTracker backup</font>");
     }
 
@@ -2028,7 +2028,7 @@ function sendLotwLogEntry(report)
       {
         if (stderr.indexOf("Final Status: Success") < 0)
         {
-          logErrorString("TQSL: " + stderr);
+          logError("TQSL: " + stderr);
           addLastTraffic("<font style='color:red'>Fail log to TQSL</font>");
         }
         else

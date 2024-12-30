@@ -43,12 +43,14 @@ const def_legendColors = {
   QTH: "#FFA600"
 };
 
-var def_maps = {
+const def_maps = {
   mapIndex: "Mapnik by OpenStreetMap (Intl)",
   offlineMapIndex: "Satellite by MapTiler (No Labels)(Offline)",
   nightMapIndex: "Dark Gray by Esri (English)",
   offlineNightMapIndex: "Toner by Stamen (No Labels)(Offline)"
 };
+
+const k_valid_projections = [ "EPSG:3857", "AEQD" ];
 
 const def_settings = {
   defaultsApplied: true,
@@ -621,7 +623,7 @@ function importLegacySettings()
           }
           catch (e)
           {
-            logErrorObject(e);
+            logError(e);
           }
 
         }
@@ -633,7 +635,7 @@ function importLegacySettings()
     }
     catch (e)
     {
-      logErrorObject(e);
+      logError(e);
     }
   }
 
@@ -663,7 +665,7 @@ function importLegacySettings()
   }
   catch (e)
   {
-    logErrorString("Error copying old gridtracker log file");
-    logErrorObject(e);
+    logError("Error copying old gridtracker log file");
+    logError(e);
   }
 }
