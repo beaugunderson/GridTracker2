@@ -181,7 +181,7 @@ GT.currentOverlay = GT.settings.map.trophyOverlay;
 GT.spotCollector = {};
 GT.spotDetailsCollector = {};
 GT.decodeCollector = {};
-
+GT.currentMapIndex = "";
 GT.setNewUdpPortTimeoutHandle = null;
 GT.map = null;
 GT.menuShowing = true;
@@ -11643,6 +11643,8 @@ function changeMapLayer()
     }
   }
 
+  GT.currentMapIndex = index;
+
   if (GT.maps[index].sourceType == "Group")
   {
     ProcessGroupMapSource(index);
@@ -11655,6 +11657,22 @@ function changeMapLayer()
 
   GT.tileLayer.setOpacity(mapOpacity);
   GT.map.getLayers().insertAt(0, GT.tileLayer);
+
+  changeMapBackgroundColor(false);
+}
+
+function changeMapBackgroundColor(fromSettings = true)
+{
+  if (fromSettings == true)
+  {
+    GT.settings.map.backgroundColor[GT.currentMapIndex] = mapBackgroundColor.value;
+  }
+  else if (!(GT.currentMapIndex in GT.settings.map.backgroundColor))
+  {
+    GT.settings.map.backgroundColor[GT.currentMapIndex] = "#000000";
+  }
+
+  mapDiv.style.backgroundColor = mapBackgroundColor.value = GT.settings.map.backgroundColor[GT.currentMapIndex];
 }
 
 function voiceChangedValue()

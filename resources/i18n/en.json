@@ -312,6 +312,7 @@
     "settings.map.NightRXSpot.color.label": "Night RX Spot Path Color",
     "settings.map.NightRXSpot.color.default": "PSK-Reporter Palette",
     "settings.map.NightBrightness.label": "Night Brightness",
+    "settings.map.backgroundColor.label": "Background Color",
     "settings.logging.tableheader.source": "Source/Sync",
     "settings.logging.tableheader.menu": "Menu?",
     "settings.logging.tableheader.startup": "Startup?",

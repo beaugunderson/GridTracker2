@@ -169,7 +169,37 @@ const def_settings = {
     zoom: 4,
     mapTrans: 0.5,
     apiKeys: {},
-    projection: "EPSG:3857"
+    projection: "EPSG:3857",
+    backgroundColor: {
+      "Bathymetric Oceans by GEBCO (No Labels)": "#396ca7",
+      "City Lights by NASA (No Labels)": "#000000",
+      "Dark Gray by Esri (English)": "#232227",
+      "Dark Matter by Carto (English)": "#262626",
+      "Dark Matter by Carto (No Labels)": "#262626",
+      "HamGames by N0TTL (Intl)(Offline)": "#000000",
+      "Humanitarian by OpenStreetMap (Intl)": "#90cccb",
+      "Light Gray by Esri (English)": "#d0ced2",
+      "Mapnik by OpenStreetMap (Deutsch)": "#aad3df",
+      "Mapnik by OpenStreetMap (Intl)": "#aad3df",
+      "Mapnik by OpenStreetMap (français)": "#b4d0d0",
+      "National Geographic by Esri (English)": "#80b3de",
+      "Oceans by Esri (No Labels)": "#94b9e5",
+      "Physical by Esri (No Labels)": "#76abcb",
+      "Positron by Carto (English)": "#d4dadc",
+      "Positron by Carto (No Labels)": "#d4dadc",
+      "Satellite by Esri (No Labels)": "#002f45",
+      "Satellite by MapTiler (No Labels)(Offline)": "#0e2034",
+      "Shaded Relief by Esri (No Labels)": "#9ebcd8",
+      "Street by Esri (English)": "#99d9f2",
+      "Terrain by Esri (No Labels)": "#63d7db",
+      "Toner by Stamen (No Labels)(Offline)": "#000000",
+      "Topographical by Esri (English)": "#b8e6fe",
+      "Voyager by Carto (English)": "#d5e8eb",
+      "Voyager by Carto (No Labels)": "#d5e8eb",
+      "天地图 卫星 (Chinese)": "#000000",
+      "天地图 地形 (Chinese)": "#000000",
+      "天地图 矢量 (Chinese)": "#000000"
+    }
   },
   adifLog: {
     menu: {

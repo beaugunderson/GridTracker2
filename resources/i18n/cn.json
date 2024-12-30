@@ -313,6 +313,7 @@
     "settings.map.NightRXSpot.color.label": "夜间RX Spot路径颜色",
     "settings.map.NightRXSpot.color.default": "PSKreporter调色板",
     "settings.map.NightBrightness.label": "夜间地图区域亮度",
+    "settings.map.backgroundColor.label": "背景颜色",
     "settings.logging.tableheader.source": "日志平台/同步",
     "settings.logging.tableheader.menu": "菜单?",
     "settings.logging.tableheader.startup": "启动?",

@@ -312,6 +312,7 @@
   "settings.map.NightRXSpot.color.label": "Color de Ruta de Spot RX Nocturno",
   "settings.map.NightRXSpot.color.default": "Paleta de PSK-Reporter",
   "settings.map.NightBrightness.label": "Brillo Nocturno",
+  "settings.map.backgroundColor.label": "Color de fondo",
   "settings.logging.tableheader.source": "Origen/Sincronización",
   "settings.logging.tableheader.menu": "¿Menú?",
   "settings.logging.tableheader.startup": "¿Inicio?",
