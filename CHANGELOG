@@ -59,6 +59,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Main: Added "New QSO CALLSIGN" to status messages on QSO log event
 - Call Roster: Added Ctrl-L toggle "Uses LoTW"
 
+- App: Identified an issue where some systems would go 'black screen' on startup
+- Main: New "QTH" button: resets map to North, default zoom and re-centers on your grid (Ctrl-Z hotkey)
+- Map: Higher resolution US County shapes
+- Map: Backgroud color picker for each map: Settings -> Map -> Background Color
+- Lookups: When using CALLOOK service; uses Lat, Long from result to get county
+- Call Roster: Underline UTC timestamp on even decode cycles
+- Happy New Year!
 
 ### Fixed
 
