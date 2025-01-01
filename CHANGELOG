@@ -65,6 +65,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Map: Backgroud color picker for each map: Settings -> Map -> Background Color
 - Lookups: When using CALLOOK service; uses Lat, Long from result to get county
 - Call Roster: Underline UTC timestamp on even decode cycles
+- Call Roster: Fixed bug when Settings -> Features -> 'Clear on CQ' enabled and DX Call began with "CQ" eg: CQ3WWA would abort Tx
 - Happy New Year!
 
 ### Fixed

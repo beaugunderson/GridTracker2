@@ -5535,7 +5535,7 @@ function handleInstanceStatus(newMessage)
     if (GT.settings.app.clearOnCQ && newMessage.Transmitting == 1 && newMessage.TxMessage && GT.lastTxMessage != newMessage.TxMessage)
     {
       GT.lastTxMessage = newMessage.TxMessage;
-      if (newMessage.TxMessage.substring(0, 2) == "CQ" && DXcall.length > 0)
+      if (newMessage.TxMessage.substring(0, 3) == "CQ " && DXcall.length > 0)
       {
         setCallAndGrid("", "", newMessage.instance, false);
         DXcall = "";
