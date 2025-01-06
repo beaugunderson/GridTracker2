@@ -12187,7 +12187,11 @@ function startupButtonsAndInputs()
     if (GT.settings.app.myGrid.length > 0)
     {
       homeQTHInput.value = GT.settings.app.myGrid.substr(0, 6);
-      if (ValidateGridsquare(homeQTHInput, null)) setCenterGridsquare();
+      if (ValidateGridsquare(homeQTHInput, null)) 
+      {
+        setCenterGridsquare();
+        saveCenterGridsquare();
+      }
     }
     ValidateCallsign(alertValueInput, null);
 

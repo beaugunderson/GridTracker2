@@ -97,7 +97,7 @@ const def_settings = {
     oamsBandActivity: true,
     oamsBandActivityNeighbors: false,
     pathWidthWeight: 1.0,
-    potaFeatureEnabled: false,
+    potaFeatureEnabled: true,
     potaMapEnabled: false,
     pushPinMode: false,
     qrzPathWidthWeight: 1.2,
