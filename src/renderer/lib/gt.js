@@ -5,7 +5,6 @@ const gtVersionStr = electron.ipcRenderer.sendSync("appVersion");
 const gtVersion = parseInt(gtVersionStr.replace(/\./g, ""));
 
 // var GT is in screen.js
-GT.onlineDisable = false;
 GT.startingUp = true;
 GT.firstRun = false;
 
@@ -914,8 +913,6 @@ function toggleOffline()
 function changeOffline()
 {
   if (GT.map == null) return;
-
-  if (GT.onlineDisable == true) return;
 
   GT.settings.map.offlineMode = offlineModeEnable.checked;
 
@@ -12371,20 +12368,6 @@ function checkForNewVersion()
     if (GT.lastVersionInfo == null || GT.lastVersionInfo.version != info.version)
     {
       addLastTraffic("<font style='color:lightgreen'>New Version</font></br><font style='color:cyan'>" + info.version + "</font>");
-
-      let intVersion = parseInt(info.version.replaceAll(".",""));
-      let difference = intVersion - gtVersion;
-      // It's been more than 4 months
-      if (difference > 3999)
-      {
-        addLastTraffic("<font style='color:orange'>Current Version Expired</font></br><font style='color:yellow'>Online Mode Disabled</font>");
-        if (GT.settings.map.offlineMode == false)
-        {
-          offlineModeEnable.checked = false;
-          changeOffline();
-        }
-        GT.onlineDisable = true;
-      }
     }
   }
 
