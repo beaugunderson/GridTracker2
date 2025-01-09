@@ -8,8 +8,7 @@ GT.callsignDatabaseDXCC = {
   291: true,
   1: true,
   6: true,
-  110: true,
-  202: true
+  110: true
 };
 
 GT.callsignDatabaseUS = {

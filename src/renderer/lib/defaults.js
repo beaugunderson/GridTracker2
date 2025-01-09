@@ -105,7 +105,7 @@ const def_settings = {
     soundCard: "default",
     soundCardName: null,
     soundcards: null,
-    warnOnSoundcardsChanged: true,
+    warnOnSoundcardsChange: false,
     spotView: 0,
     windowTheme: "dark",
     useLocalTime: 0,
@@ -268,7 +268,6 @@ const def_settings = {
   },
   reception: {
     viewHistoryTimeSec: 900,
-
     pathColor: -1,
     pathNightColor: 361,
     spotWidth: 0.8,

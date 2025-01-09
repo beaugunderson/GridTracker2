@@ -527,10 +527,6 @@ function processPotaSpots(buffer)
             GT.pota.parkSpots[newSpot.reference][newSpot.activator] = newSpot;
           }
         }
-        else
-        {
-          console.log("PotaSpots: unknown park id: " + spots[spot].reference);
-        }
       }
       
       redrawParks();
@@ -591,10 +587,6 @@ function processPotaSchedule(buffer)
             newObj = Object.assign({}, newObj);
             newObj.id = schedules[i].activator;
             (GT.pota.parkSchedule[schedules[i].reference] = GT.pota.parkSchedule[schedules[i].reference] || []).push(newObj);
-          }
-          else
-          {
-            console.log("PotaSchedule: unknown park id: " + newObj.id);
           }
         }
         // else it is expired and no longer relevant

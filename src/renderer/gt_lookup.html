@@ -39,14 +39,6 @@
         window.opener.lookupCallsign(callsign, grid, cache);
       }
 
-      function statsFocus(selection) {
-        let which = document.getElementById(selection);
-        if (which != null) {
-          which.focus();
-          which.selectionStart = which.selectionEnd = which.value.length;
-        }
-      }
-
       function ValidateCallsign(inputText, validDiv) {
         if (inputText.value.length > 0) {
           let passed = false;
@@ -79,9 +71,9 @@
 
       function init() {
         ValidateCallsign(lookupCallsignInput, null);
-        GT.lookupWindowInitialized = true;
         loadChildWindowI18n();
         registerCutAndPasteContextMenu();
+        GT.lookupWindowInitialized = true;
       }
 
       function addTextToClipboard(data) {

@@ -471,7 +471,7 @@ function processRosterHunting(callRoster, rosterSettings)
         if (RW.huntState || AAW.huntState)
         {
           let stateSearch = callObj.state;
-          if (stateSearch in GT.StateData)
+          if (stateSearch in GT.StateData && isKnownCallsignDXCC(callObj.dxcc))
           {
             let hash = stateSearch + workHashSuffix;
             let layeredHash = rosterSettings.layeredMode && (stateSearch + layeredHashSuffix)
@@ -526,8 +526,7 @@ function processRosterHunting(callRoster, rosterSettings)
         // Hunting for US Counties
         if ((RW.huntCounty || AAW.huntCounty) && GT.settings.callsignLookups.ulsUseEnable == true)
         {
-          let finalDxcc = callObj.dxcc;
-          if (callObj.cnty && (finalDxcc == 291 || finalDxcc == 110 || finalDxcc == 6 || finalDxcc == 202) && callObj.cnty.length > 0)
+          if (callObj.cnty && isKnownCallsignUSplus(callObj.dxcc) && callObj.cnty.length > 0)
           {
             let hash = callObj.cnty + (rosterSettings.layeredMode ? layeredHashSuffix : workHashSuffix);
 

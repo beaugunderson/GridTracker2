@@ -3654,7 +3654,7 @@ function changeWantedByBandMode()
 
 function changeWarnOnSoundcardsChanged()
 {
-  GT.settings.app.warnOnSoundcardsChanged = warnOnSoundcardsChanged.checked;
+  GT.settings.app.warnOnSoundcardsChange = warnOnSoundcardsChanged.checked;
 }
 
 function trafficDecodeView()
@@ -6903,6 +6903,7 @@ function setLookupDivHeight(div, heightWithPx)
     GT.lookupWindowHandle.window[div].style.height = heightWithPx;
   }
 }
+
 function getLookupWindowHeight()
 {
   if (GT.lookupWindowInitialized && typeof GT.lookupWindowHandle.window.window !== "undefined")
@@ -6974,8 +6975,10 @@ function myConfirmedCompare(a, b)
 
 function myPotaCompare(a, b)
 {
-  if (a.pota && !b.pota) return 1;
-  if (!a.pota && b.pota) return -1;
+  if (a.pota && !b.pota) return -1;
+  if (!a.pota && b.pota) return 1;
+  if (a.pota > b.pota) return 1;
+  if (a.pota < b.pota) return -1;
   return 0;
 }
 
@@ -11408,7 +11411,7 @@ function loadMapSettings()
 
   trafficDecode.checked = GT.settings.map.trafficDecode;
   wantedByBandMode.checked = GT.settings.app.wantedByBandMode;
-  warnOnSoundcardsChanged.checked = GT.settings.app.warnOnSoundcardsChanged;
+  warnOnSoundcardsChanged.checked = GT.settings.app.warnOnSoundcardsChange;
 
   setSpotImage();
 
@@ -11842,7 +11845,7 @@ function gotAudioDevices(deviceInfos)
 
 function audioCardWarn(didSetDefault)
 {
-  if (GT.settings.app.warnOnSoundcardsChanged)
+  if (GT.settings.app.warnOnSoundcardsChange)
   {
     warnSoundcardHtml.innerHTML =  I18N(didSetDefault == false ? "settings.audio.devicesChanged.label" : "settings.audio.deviceDefaultSet.label");
     warnSoundcardDiv.style.display = "block";
@@ -13241,30 +13244,6 @@ function continueWithLookup(callsign, gridPass)
     "lookupInfoDiv",
     "Looking up <font color='cyan'>" + callsign + "</font>, please wait..."
   );
-
-  /* if (GT.settings.app.lookupCallookPreferred)
-  {
-    var dxcc = callsignToDxcc(callsign);
-    var where;
-    var ccode = 0;
-    if (dxcc in GT.dxccToAltName)
-    {
-      where = GT.dxccToAltName[dxcc];
-      ccode = GT.dxccInfo[dxcc].ccode;
-    }
-    else where = "Unknown";
-    if (ccode == 840)
-    {
-      getBuffer(
-        "https://callook.info/" + callsign + "/json",
-        callookResults,
-        gridPass,
-        "https",
-        443,
-        true
-      );
-    }
-  } */
  
   if (GT.settings.app.lookupService != "CALLOOK")
   {
@@ -13327,56 +13306,63 @@ function continueWithLookup(callsign, gridPass)
     }
   }
 }
+
 function callookResults(buffer, gridPass)
 {
-  let results = JSON.parse(buffer);
-  if (typeof results.status != "undefined")
-  {
-    if (results.status == "VALID")
+  try {
+    let results = JSON.parse(buffer);
+    if (typeof results.status != "undefined")
     {
-      let callObject = {};
-      let dxcc = callsignToDxcc(results.current.callsign);
-      if (dxcc in GT.dxccToAltName) callObject.land = GT.dxccToAltName[dxcc];
-      callObject.type = results.type;
-      callObject.call = results.current.callsign;
-      callObject.dxcc = dxcc;
-      callObject.email = "";
-      callObject.class = results.current.operClass;
-      callObject.aliases = results.previous.callsign;
-      callObject.trustee =
-        results.trustee.callsign +
-        (results.trustee.name.length > 0 ? "; " + results.trustee.name : "");
-      callObject.name = results.name;
-      callObject.fname = "";
-      callObject.addr1 = results.address.line1;
-      callObject.addr2 = results.address.line2;
-      callObject.addrAttn = results.address.attn;
-      callObject.lat = results.location.latitude;
-      callObject.lon = results.location.longitude;
-      callObject.grid = results.location.gridsquare;
-      callObject.efdate = results.otherInfo.grantDate;
-      callObject.expdate = results.otherInfo.expiryDate;
-      callObject.frn = results.otherInfo.frn;
-      callObject.bio = 0;
-      callObject.image = "";
-      callObject.country = "United States";
-      if (gridPass) callObject.gtGrid = gridPass;
-      callObject.source =
-        "<tr><td>Source</td><td><font color='orange'><b><div style='cursor:pointer' onClick='window.opener.openSite(\"https://callook.info/" +
-        results.current.callsign +
-        "\");'>C A L L O O K</div></b></font></td></tr>";
-      cacheLookupObject(callObject, gridPass, true);
+      if (results.status == "VALID")
+      {
+        let callObject = {};
+        let dxcc = callsignToDxcc(results.current.callsign);
+        if (dxcc in GT.dxccToAltName) callObject.land = GT.dxccToAltName[dxcc];
+        callObject.type = results.type;
+        callObject.call = results.current.callsign;
+        callObject.dxcc = dxcc;
+        callObject.email = "";
+        callObject.class = results.current.operClass;
+        callObject.aliases = results.previous.callsign;
+        callObject.trustee =
+          results.trustee.callsign +
+          (results.trustee.name.length > 0 ? "; " + results.trustee.name : "");
+        callObject.name = results.name;
+        callObject.fname = "";
+        callObject.addr1 = results.address.line1;
+        callObject.addr2 = results.address.line2;
+        callObject.addrAttn = results.address.attn;
+        callObject.lat = results.location.latitude;
+        callObject.lon = results.location.longitude;
+        callObject.grid = results.location.gridsquare;
+        callObject.efdate = results.otherInfo.grantDate;
+        callObject.expdate = results.otherInfo.expiryDate;
+        callObject.frn = results.otherInfo.frn;
+        callObject.bio = 0;
+        callObject.image = "";
+        callObject.country = "United States";
+        if (gridPass) callObject.gtGrid = gridPass;
+        callObject.source =
+          "<tr><td>Source</td><td><font color='orange'><b><div style='cursor:pointer' onClick='window.opener.openSite(\"https://callook.info/" +
+          results.current.callsign +
+          "\");'>C A L L O O K</div></b></font></td></tr>";
+        cacheLookupObject(callObject, gridPass, true);
+      }
+      else if (results.status == "INVALID")
+      {
+        setLookupDiv("lookupInfoDiv", "Invalid Lookup");
+      }
+      else
+      {
+        setLookupDiv("lookupInfoDiv", "Server is down for maintenance");
+      }
     }
-    else if (results.status == "INVALID")
-    {
-      setLookupDiv("lookupInfoDiv", "Invalid Lookup");
-    }
-    else
-    {
-      setLookupDiv("lookupInfoDiv", "Server is down for maintenance");
-    }
+    else setLookupDiv("lookupInfoDiv", "Unknown Lookup Error");
   }
-  else setLookupDiv("lookupInfoDiv", "Unknown Lookup Error");
+  catch (e)
+  {
+    console.log(e);
+  }
 }
 
 function GetSessionID(resultTd, useCache)
@@ -13602,7 +13588,7 @@ function qthHamLookupResults(buffer, gridPass, useCache)
   }
   else
   {
-    setLookupDiv("lookupInfoDiv", buffer);
+    setLookupDiv("lookupInfoDiv", String(buffer));
     GT.qrzLookupSessionId = null;
   }
 }
@@ -13652,7 +13638,7 @@ function qrzLookupResults(buffer, gridPass, useCache)
   }
   else
   {
-    setLookupDiv("lookupInfoDiv", buffer);
+    setLookupDiv("lookupInfoDiv", String(buffer));
     GT.qrzLookupSessionId = null;
   }
 }
