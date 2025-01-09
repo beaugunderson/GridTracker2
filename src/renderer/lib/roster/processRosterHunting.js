@@ -526,7 +526,7 @@ function processRosterHunting(callRoster, rosterSettings)
         // Hunting for US Counties
         if ((RW.huntCounty || AAW.huntCounty) && GT.settings.callsignLookups.ulsUseEnable == true)
         {
-          if (callObj.cnty && isKnownCallsignUSplus(callObj.dxcc) && callObj.cnty.length > 0)
+          if (callObj.cnty && callObj.cnty.length > 0 && isKnownCallsignUSplus(callObj.dxcc))
           {
             let hash = callObj.cnty + (rosterSettings.layeredMode ? layeredHashSuffix : workHashSuffix);
 
