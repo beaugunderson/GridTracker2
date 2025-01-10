@@ -455,7 +455,7 @@
 
       function makeViewMessage(className, who, msg, when)
       {
-        var who = "<text class='" + className + "'>" + formatCallsign(who) + "</text>";
+        var who = "<text class='" + className + "' style='cursor:pointer' onclick='doLookup(\"" + who + "\")'>" + formatCallsign(who) + "</text>";
         var time = "<text class='when'>" + window.opener.userTimeString(when) + "</text>";
         var worker = who + " " + time + "</br>";
         var msgTextClass = containsDoubleByte(msg) ? "msgTextUnicode" : "msgText";
@@ -499,6 +499,9 @@
         if (id in GT.gtFlagPins)
         {
           callsign.innerHTML = formatCallsign(GT.gtFlagPins[id].call);
+          callsign.call = GT.gtFlagPins[id].call;
+          callsign.onclick = doLookupContext;
+          callsign.style.cursor = "pointer";
           country.innerHTML = GT.dxccToAltName[GT.gtFlagPins[id].dxcc];
           grid.innerHTML = GT.gtFlagPins[id].grid;
           band.innerHTML = GT.gtFlagPins[id].band;
@@ -605,6 +608,15 @@
           clearSearch.style.display = "none";
         }
         showAllCallsigns(true);
+      }
+
+      function doLookupContext(event)
+      {
+        event.preventDefault();
+        if ("call" in event.currentTarget)
+        {
+          doLookup(event.currentTarget.call);
+        }
       }
 
       function doLookup(what)
