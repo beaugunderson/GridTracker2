@@ -11235,9 +11235,9 @@ function cancelVersion()
 
 function getBuffer(file_url, callback, flag, mode, port, cache = null)
 {
-  var http = require(mode);
-  var fileBuffer = null;
-  var options = null;
+  let http = require(mode);
+  let fileBuffer = null;
+  let options = null;
 
   options = {
     host: NodeURL.parse(file_url).host, // eslint-disable-line node/no-deprecated-api
@@ -11287,11 +11287,11 @@ function getPostBuffer(
   who
 )
 {
-  var querystring = require("querystring");
-  var postData = querystring.stringify(theData);
-  var http = require(mode);
-  var fileBuffer = null;
-  var options = {
+  let querystring = require("querystring");
+  let postData = querystring.stringify(theData);
+  let http = require(mode);
+  let fileBuffer = null;
+  let options = {
     host: NodeURL.parse(file_url).host, // eslint-disable-line node/no-deprecated-api
     port: port,
     path: NodeURL.parse(file_url).path, // eslint-disable-line node/no-deprecated-api
@@ -11303,10 +11303,10 @@ function getPostBuffer(
       "x-user-agent": gtUserAgent
     }
   };
-  var req = http.request(options, function (res)
+  let req = http.request(options, function (res)
   {
     // var fsize = res.headers["content-length"];
-    var cookies = null;
+    let cookies = null;
     if (typeof res.headers["set-cookie"] != "undefined") { cookies = res.headers["set-cookie"]; }
     res
       .on("data", function (data)
@@ -11340,29 +11340,31 @@ function getPostBuffer(
         req.abort();
       });
     });
-    req.on("error", function (err) // eslint-disable-line node/handle-callback-err
-    {
-      if (typeof timeoutCallback == "function")
-      {
-        timeoutCallback(
-          file_url,
-          callback,
-          flag,
-          mode,
-          port,
-          theData,
-          timeoutMs,
-          timeoutCallback,
-          who
-        );
-      }
-      else if (typeof callback == "function")
-      {
-        // Call it, since we have confirmed it is callable
-        callback(null, null);
-      }
-    });
   }
+  req.on("error", function (err) // eslint-disable-line node/handle-callback-err
+  {
+    if (typeof timeoutCallback == "function")
+    {
+      timeoutCallback(
+        file_url,
+        callback,
+        flag,
+        mode,
+        port,
+        theData,
+        timeoutMs,
+        timeoutCallback,
+        who
+      );
+    }
+    else if (typeof callback == "function")
+    {
+      // Call it, since we have confirmed it is callable
+      callback(null, null);
+    }
+    req.abort();
+  });
+  
   req.write(postData);
   req.end();
 }

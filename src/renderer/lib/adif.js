@@ -1148,7 +1148,7 @@ function getABuffer(file_url, callback, flag, mode, port, imgToGray, stringOfFla
       }
     });
 
-    req.on("error", function ()
+    res.on("error", function ()
       {
         if (typeof stringOfFlag != "undefined")
         {
@@ -1182,6 +1182,7 @@ function getABuffer(file_url, callback, flag, mode, port, imgToGray, stringOfFla
       imgToGray.parentNode.style.animation = "";
       imgToGray.style.webkitFilter = "";
     }
+    req.abort();
   });
 
   req.end();
@@ -1277,6 +1278,7 @@ function getAPostBuffer(
       imgToGray.parentNode.style.animation = "";
       imgToGray.style.webkitFilter = "";
     }
+    req.abort();
   });
 
   req.write(postData);
@@ -2673,24 +2675,26 @@ function getPostJSONBuffer(
           req.abort();
         });
       });
-      req.on("error", function (err) // eslint-disable-line node/handle-callback-err
-      {
-        if (typeof timeoutCallback == "function")
-        {
-          timeoutCallback(
-            file_url,
-            callback,
-            flag,
-            mode,
-            80,
-            theData,
-            timeoutMs,
-            timeoutCallback,
-            who
-          );
-        }
-      });
     }
+    req.on("error", function (err) // eslint-disable-line node/handle-callback-err
+    {
+      if (typeof timeoutCallback == "function")
+      {
+        timeoutCallback(
+          file_url,
+          callback,
+          flag,
+          mode,
+          80,
+          theData,
+          timeoutMs,
+          timeoutCallback,
+          who
+        );
+      }
+      req.abort();
+    });
+  
     req.write(postData);
     req.end();
   }
@@ -3112,7 +3116,7 @@ function sendTcpMessageGetResponse(msg, port, address, callback = null)
   let fileBuffer = null;
   client.setTimeout(30000);
   client.on("error", function () {
-    addLastTraffic("<font style='color:orange'>N3FJP Download Failed</font><br/><font style='color:white'>Is it running?</font>");
+    addLastTraffic("<font style='color:orange'>N3FJP Download Failed</font><br/><font style='color:white'>Is it running and<br/>TCP server enabled?</font>");
     if (callback) callback(null);
   });
 

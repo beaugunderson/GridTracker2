@@ -34,6 +34,10 @@ window.onerror = function(message, source, lineNumber, colno, error) {
   logError(`${error.stack}`);
 };
 
+process.on('uncaughtException', function (error) {
+  log.error(error);
+});
+
 try
 {
   dns.setDefaultResultOrder("ipv4first");
@@ -203,3 +207,4 @@ function registerCutAndPasteContextMenu()
     });
   }
 }
+
