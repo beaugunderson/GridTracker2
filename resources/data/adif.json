@@ -1,0 +1,788 @@
+[
+  {
+    "field": "ADDRESS",
+    "type": "MultilineString",
+    "enum": "none",
+    "desc": "the contacted station's complete mailing address: full name, street address, city, postal code, and country"
+  },
+  {
+    "field": "AGE",
+    "type": "Number",
+    "enum": "none",
+    "desc": "the contacted station's operator's age in years in the range 0 to 120 (inclusive)"
+  },
+  {
+    "field": "ALTITUDE",
+    "type": "Number",
+    "enum": "none",
+    "desc": "the height of the contacted station in meters relative to Mean Sea Level (MSL).<br/>For example 1.5&nbsp;km is &lt;ALTITUDE:4&gt;1500 and 10.5&nbsp;m is &lt;ALTITUDE:4&gt;10.5"
+  },
+  {
+    "field": "ANT_AZ",
+    "type": "Number",
+    "enum": "none",
+    "desc": "the logging station's antenna azimuth, in degrees with a value between 0 to 360 (inclusive).&nbsp; Values outside this range are import-only and must be normalized for export (e.g. 370 is exported as 10). True north is 0 degrees with values increasing in a clockwise direction."
+  },
+  {
+    "field": "ANT_EL",
+    "type": "Number",
+    "enum": "none",
+    "desc": "the logging station's antenna elevation, in degrees with a value between -90 to 90 (inclusive).&nbsp; Values outside this range are import-only and must be normalized for export (e.g. 100 is exported as 80). The horizon is 0 degrees with values increasing as the angle moves in an upward direction."
+  },
+  {
+    "field": "ANT_PATH",
+    "type": "enum",
+    "enum": "Ant Path",
+    "desc": "the signal path"
+  },
+  {
+    "field": "ARRL_SECT",
+    "type": "enum",
+    "enum": "ARRL Section",
+    "desc": "the contacted station's ARRL section"
+  },
+  {
+    "field": "A_INDEX",
+    "type": "Number",
+    "enum": "none",
+    "desc": "the geomagnetic A index at the time of the QSO in the range 0 to 400 (inclusive)"
+  },
+  {
+    "field": "BAND",
+    "type": "enum",
+    "enum": "Band",
+    "desc": "QSO Band"
+  },
+  {
+    "field": "BAND_RX",
+    "type": "enum",
+    "enum": "Band",
+    "desc": "in a split frequency QSO, the logging station's receiving band"
+  },
+  {
+    "field": "CALL",
+    "type": "String",
+    "enum": "none",
+    "desc": "the contacted station's callsign"
+  },
+  {
+    "field": "CHECK",
+    "type": "String",
+    "enum": "none",
+    "desc": "contest check (e.g. for ARRL Sweepstakes)"
+  },
+  {
+    "field": "CLASS",
+    "type": "String",
+    "enum": "none",
+    "desc": "contest class (e.g. for ARRL Field Day)"
+  },
+  {
+    "field": "CNTY",
+    "type": "enum",
+    "enum": "(Secondary Administrative Subdivision, function of DXCC field's value)",
+    "desc": "the contacted station's Secondary Administrative Subdivision (e.g. US county, JA Gun), in the   specified  format "
+  },
+  {
+    "field": "CNTY_ALT",
+    "type": "SecondaryAdministrativeSubdivisionListAlt",
+    "enum": "none",
+    "desc": "a semicolon (;) delimited, unordered list of Secondary Administrative Subdivision Alt codes for the contacted station<br/>See the Data Type for details."
+  },
+  {
+    "field": "COMMENT",
+    "type": "String",
+    "enum": "none",
+    "desc": "comment field for QSO<br/>for a message to be incorporated in a paper or electronic QSL for the contacted station's operator, use the QSLMSG field<br/>recommended use: information of interest to the contacted station's operator"
+  },
+  {
+    "field": "CONT",
+    "type": "enum",
+    "enum": "Continent",
+    "desc": "the contacted station's Continent"
+  },
+  {
+    "field": "CONTACTED_OP",
+    "type": "String",
+    "enum": "none",
+    "desc": "the callsign of the individual operating the contacted station"
+  },
+  {
+    "field": "CONTEST_ID",
+    "type": "String",
+    "enum": "Contest ID",
+    "desc": "QSO Contest Identifier<br/> use enumeration values for interoperability "
+  },
+  {
+    "field": "COUNTRY",
+    "type": "String",
+    "enum": "none",
+    "desc": "the contacted station's DXCC entity name"
+  },
+  {
+    "field": "CQZ",
+    "type": "PositiveInteger",
+    "enum": "none",
+    "desc": "the contacted station's CQ Zone in the range 1 to 40 (inclusive)"
+  },
+  {
+    "field": "DARC_DOK",
+    "type": "enum",
+    "enum": "(DOKs and Special DOKs listed on the DARC website)",
+    "desc": "the contacted station's DARC DOK (District Location Code)<br/>A DOK comprises letters and numbers, e.g. &lt;DARC_DOK:3&gt;A01"
+  },
+  {
+    "field": "DISTANCE",
+    "type": "Number",
+    "enum": "none",
+    "desc": "the distance between the logging station and the contacted station in kilometers via the specified signal path with a value greater than or equal to 0"
+  },
+  {
+    "field": "DXCC",
+    "type": "enum",
+    "enum": "DXCC Entity Code",
+    "desc": "the contacted station's DXCC Entity Code &lt;DXCC:1&gt;0 means that the contacted station is known not to be within a DXCC entity."
+  },
+  {
+    "field": "EMAIL",
+    "type": "String",
+    "enum": "none",
+    "desc": "the contacted station's email address"
+  },
+  {
+    "field": "EQ_CALL",
+    "type": "String",
+    "enum": "none",
+    "desc": "the contacted station's owner's callsign"
+  },
+  {
+    "field": "FISTS",
+    "type": "PositiveInteger",
+    "enum": "none",
+    "desc": "the contacted station's FISTS CW Club member number with a value greater than 0."
+  },
+  {
+    "field": "FISTS_CC",
+    "type": "PositiveInteger",
+    "enum": "none",
+    "desc": "the contacted station's FISTS CW Club Century Certificate (CC) number with a value greater than 0."
+  },
+  {
+    "field": "FORCE_INIT",
+    "type": "Boolean",
+    "enum": "none",
+    "desc": "new EME &quot;initial&quot;"
+  },
+  {
+    "field": "FREQ",
+    "type": "Number",
+    "enum": "none",
+    "desc": "QSO frequency in Megahertz"
+  },
+  {
+    "field": "FREQ_RX",
+    "type": "Number",
+    "enum": "none",
+    "desc": "in a split frequency QSO, the logging station's receiving frequency in Megahertz"
+  },
+  {
+    "field": "GRIDSQUARE",
+    "type": "GridSquare",
+    "enum": "none",
+    "desc": "the contacted station's 2-character, 4-character, 6-character, or 8-character Maidenhead Grid Square<br/>For 10 or 12 character locators, store the first 8 characters in GRIDSQUARE and the additional 2 or 4 characters in the GRIDSQUARE_EXT field"
+  },
+  {
+    "field": "GRIDSQUARE_EXT",
+    "type": "GridSquareExt",
+    "enum": "none",
+    "desc": "for a contacted station's 10-character Maidenhead locator, supplements the GRIDSQUARE field by containing characters 9 and 10.&nbsp; For a contacted station's 12-character Maidenhead locator, supplements the GRIDSQUARE field by containing characters 9, 10, 11 and 12.<br/> Characters 9 and 10 are case-insensitive ASCII letters in the range A-X.&nbsp;Characters 11 and 12 are Digits in the range 0 to 9.    On export, the field length must be 2 or 4.    On import, if the field length is greater than 4, the additional characters must be ignored.  <br/> Example of exporting the 10-character locator FN01MH42BQ: &lt;GRIDSQUARE:8&gt;FN01MH42 &lt;GRIDSQUARE_EXT:2&gt;BQ"
+  },
+  {
+    "field": "IOTA",
+    "type": "IOTARefNo",
+    "enum": "none",
+    "desc": "the contacted station's IOTA designator, in format CC-XXX, where<br/> CC is a member of the Continent enumeration  XXX is the island group designator, where 1 &lt;= XXX &lt;= 999&nbsp; [use leading zeroes] "
+  },
+  {
+    "field": "IOTA_ISLAND_ID",
+    "type": "PositiveInteger",
+    "enum": "none",
+    "desc": "the contacted station's IOTA Island Identifier, an 8-digit integer in the range 1 to 99999999 [leading zeroes optional]"
+  },
+  {
+    "field": "ITUZ",
+    "type": "PositiveInteger",
+    "enum": "none",
+    "desc": "the contacted station's ITU zone in the range 1 to 90 (inclusive)"
+  },
+  {
+    "field": "K_INDEX",
+    "type": "Integer",
+    "enum": "none",
+    "desc": "the geomagnetic K index at the time of the QSO in the range 0 to 9 (inclusive)"
+  },
+  {
+    "field": "LAT",
+    "type": "Location",
+    "enum": "none",
+    "desc": "the contacted station's latitude"
+  },
+  {
+    "field": "LON",
+    "type": "Location",
+    "enum": "none",
+    "desc": "the contacted station's longitude"
+  },
+  {
+    "field": "MAX_BURSTS",
+    "type": "Number",
+    "enum": "none",
+    "desc": "maximum length of meteor scatter bursts heard by the logging station, in seconds with a value greater than or equal to 0"
+  },
+  {
+    "field": "MODE",
+    "type": "enum",
+    "enum": "Mode",
+    "desc": "QSO Mode"
+  },
+  {
+    "field": "MORSE_KEY_INFO",
+    "type": "String",
+    "enum": "none",
+    "desc": "details of the contacted station's Morse key (e.g. make, model, etc).<br/>Example: &lt;MORSE_KEY_INFO:16&gt;Begali Sculpture"
+  },
+  {
+    "field": "MORSE_KEY_TYPE",
+    "type": "enum",
+    "enum": "Morse Key Type",
+    "desc": "the contacted station's Morse key type (e.g. straight key, bug, etc).<br/>Example for a dual-lever paddle: &lt;MORSE_KEY_TYPE:3&gt;DLP"
+  },
+  {
+    "field": "MS_SHOWER",
+    "type": "String",
+    "enum": "none",
+    "desc": "For Meteor Scatter QSOs, the name of the meteor shower in progress"
+  },
+  {
+    "field": "MY_ALTITUDE",
+    "type": "Number",
+    "enum": "none",
+    "desc": "the height of the logging station in meters relative to Mean Sea Level (MSL).<br/>For example 1.5&nbsp;km is &lt;MY_ALTITUDE:4&gt;1500 and 10.5&nbsp;m is &lt;MY_ALTITUDE:4&gt;10.5"
+  },
+  {
+    "field": "MY_ANTENNA",
+    "type": "String",
+    "enum": "none",
+    "desc": "the logging station's antenna"
+  },
+  {
+    "field": "MY_ARRL_SECT",
+    "type": "enum",
+    "enum": "ARRL Section",
+    "desc": "the logging station's ARRL section"
+  },
+  {
+    "field": "MY_CITY",
+    "type": "String",
+    "enum": "none",
+    "desc": "the logging station's city"
+  },
+  {
+    "field": "MY_CNTY",
+    "type": "enum",
+    "enum": "(Secondary Administrative Subdivision, function of MY_DXCC field's value)",
+    "desc": "the logging station's Secondary Administrative Subdivision (e.g. US county, JA Gun), in the specified format"
+  },
+  {
+    "field": "MY_CNTY_ALT",
+    "type": "SecondaryAdministrativeSubdivisionListAlt",
+    "enum": "none",
+    "desc": "a semicolon (;) delimited, unordered list of Secondary Administrative Subdivision Alt codes for the logging station<br/>See the Data Type for details."
+  },
+  {
+    "field": "MY_COUNTRY",
+    "type": "String",
+    "enum": "Country",
+    "desc": "the logging station's DXCC entity name"
+  },
+  {
+    "field": "MY_CQ_ZONE",
+    "type": "PositiveInteger",
+    "enum": "none",
+    "desc": "the logging station's CQ Zone in the range 1 to 40 (inclusive)"
+  },
+  {
+    "field": "MY_DARC_DOK",
+    "type": "enum",
+    "enum": "(DOKs and Special DOKs listed on the DARC website)",
+    "desc": "the logging station's DARC DOK (District Location Code)<br/>A DOK comprises letters and numbers, e.g. &lt;MY_DARC_DOK:3&gt;A01"
+  },
+  {
+    "field": "MY_DXCC",
+    "type": "enum",
+    "enum": "DXCC Entity Code",
+    "desc": "the logging station's DXCC Entity Code &lt;MY_DXCC:1&gt;0 means that the logging station is known not to be within a DXCC entity."
+  },
+  {
+    "field": "MY_FISTS",
+    "type": "PositiveInteger",
+    "enum": "none",
+    "desc": "the logging station's FISTS CW Club member number with a value greater than 0."
+  },
+  {
+    "field": "MY_GRIDSQUARE",
+    "type": "GridSquare",
+    "enum": "none",
+    "desc": "the logging station's 2-character, 4-character, 6-character, or 8-character Maidenhead Grid Square<br/>For 10 or 12 character locators, store the first 8 characters in MY_GRIDSQUARE and the additional 2 or 4 characters in the MY_GRIDSQUARE_EXT field"
+  },
+  {
+    "field": "MY_GRIDSQUARE_EXT",
+    "type": "GridSquareExt",
+    "enum": "none",
+    "desc": "for a logging station's 10-character Maidenhead locator, supplements the MY_GRIDSQUARE field by containing characters 9 and 10.&nbsp; For a logging station's 12-character Maidenhead locator, supplements the MY_GRIDSQUARE field by containing characters 9, 10, 11 and 12.<br/> Characters 9 and 10 are case-insensitive ASCII letters in the range A-X.&nbsp;Characters 11 and 12 are Digits in the range 0 to 9.    On export, the field length must be 2 or 4.    On import, if the field length is greater than 4, the additional characters must be ignored.  <br/>Example of exporting the 10-character locator FN01MH42BQ: &lt;MY_GRIDSQUARE:8&gt;FN01MH42 &lt;MY_GRIDSQUARE_EXT:2&gt;BQ"
+  },
+  {
+    "field": "MY_IOTA",
+    "type": "IOTARefNo",
+    "enum": "none",
+    "desc": "the logging station's IOTA designator, in format CC-XXX, where<br/> CC is a member of the Continent enumeration  XXX is the island group designator, where 1 &lt;= XXX &lt;= 999&nbsp; [use leading zeroes] "
+  },
+  {
+    "field": "MY_IOTA_ISLAND_ID",
+    "type": "PositiveInteger",
+    "enum": "none",
+    "desc": "the logging station's IOTA Island Identifier, an 8-digit integer in the range 1 to 99999999 [leading zeroes optional]"
+  },
+  {
+    "field": "MY_ITU_ZONE",
+    "type": "PositiveInteger",
+    "enum": "none",
+    "desc": "the logging station's ITU zone in the range 1 to 90 (inclusive)"
+  },
+  {
+    "field": "MY_LAT",
+    "type": "Location",
+    "enum": "none",
+    "desc": "the logging station's latitude"
+  },
+  {
+    "field": "MY_LON",
+    "type": "Location",
+    "enum": "none",
+    "desc": "the logging station's longitude"
+  },
+  {
+    "field": "MY_MORSE_KEY_INFO",
+    "type": "String",
+    "enum": "none",
+    "desc": "details of the logging station's Morse key (e.g. make, model, etc).<br/>Example: &lt;MY_MORSE_KEY_INFO:16&gt;Begali Sculpture"
+  },
+  {
+    "field": "MY_MORSE_KEY_TYPE",
+    "type": "enum",
+    "enum": "Morse Key Type",
+    "desc": "the logging station's Morse key type (e.g. straight key, bug, etc).<br/>Example for a dual-lever paddle: &lt;MY_MORSE_KEY_TYPE:3&gt;DLP"
+  },
+  {
+    "field": "MY_NAME",
+    "type": "String",
+    "enum": "none",
+    "desc": "the logging operator's name"
+  },
+  {
+    "field": "MY_POSTAL_CODE",
+    "type": "String",
+    "enum": "none",
+    "desc": "the logging station's postal code"
+  },
+  {
+    "field": "MY_POTA_REF",
+    "type": "POTARefList",
+    "enum": "none",
+    "desc": "a comma-delimited list of one or more of the logging station's POTA (Parks on the Air) reference(s).<br/>Examples:   &lt;MY_POTA_REF:6&gt;K-0059  &lt;MY_POTA_REF:7&gt;K-10000  &lt;MY_POTA_REF:40&gt;K-0817,K-4566,K-4576,K-4573,K-4578@US-WY "
+  },
+  {
+    "field": "MY_RIG",
+    "type": "String",
+    "enum": "none",
+    "desc": "description of the logging station's equipment"
+  },
+  {
+    "field": "MY_SIG",
+    "type": "String",
+    "enum": "none",
+    "desc": "special interest activity or event"
+  },
+  {
+    "field": "MY_SIG_INFO",
+    "type": "String",
+    "enum": "none",
+    "desc": "special interest activity or event information"
+  },
+  {
+    "field": "MY_SOTA_REF",
+    "type": "SOTARef",
+    "enum": "none",
+    "desc": "the logging station's International SOTA Reference."
+  },
+  {
+    "field": "MY_STATE",
+    "type": "enum",
+    "enum": "(Primary Administrative Subdivision, function of MY_DXCC field's value)",
+    "desc": "the code for the logging station's Primary Administrative Subdivision (e.g. US State, JA Island, VE Province)"
+  },
+  {
+    "field": "MY_STREET",
+    "type": "String",
+    "enum": "none",
+    "desc": "the logging station's street"
+  },
+  {
+    "field": "MY_USACA_COUNTIES",
+    "type": "SecondarySubdivisionList",
+    "enum": "none",
+    "desc": "two US counties in the case where the logging station is located on a border between two counties, representing counties that the contacted station may claim for the CQ Magazine USA-CA award program.&nbsp; E.g.<br/>MA,Franklin:MA,Hampshire"
+  },
+  {
+    "field": "MY_VUCC_GRIDS",
+    "type": "GridSquareList",
+    "enum": "none",
+    "desc": "two or four adjacent Maidenhead grid locators, each four or six characters long, representing the logging station's grid squares that the contacted station may claim for the ARRL VUCC award program.&nbsp; E.g.<br/>EN98,FM08,EM97,FM07"
+  },
+  {
+    "field": "MY_WWFF_REF",
+    "type": "WWFFRef",
+    "enum": "none",
+    "desc": "the logging station's WWFF (World Wildlife Flora &amp; Fauna) reference"
+  },
+  {
+    "field": "NAME",
+    "type": "String",
+    "enum": "none",
+    "desc": "the contacted station's operator's name"
+  },
+  {
+    "field": "NOTES",
+    "type": "MultilineString",
+    "enum": "none",
+    "desc": "QSO notes<br/>recommended use: information of interest to the logging station's operator"
+  },
+  {
+    "field": "NR_BURSTS",
+    "type": "Integer",
+    "enum": "none",
+    "desc": "the number of meteor scatter bursts heard by the logging station with a value greater than or equal to 0"
+  },
+  {
+    "field": "NR_PINGS",
+    "type": "Integer",
+    "enum": "none",
+    "desc": "the number of meteor scatter pings heard by the logging station with a value greater than or equal to 0"
+  },
+  {
+    "field": "OPERATOR",
+    "type": "String",
+    "enum": "none",
+    "desc": "the logging operator's callsign<br/> if STATION_CALLSIGNis absent, OPERATOR shall be treated asboth the logging station's callsign and the logging operator'scallsign   "
+  },
+  {
+    "field": "OWNER_CALLSIGN",
+    "type": "String",
+    "enum": "none",
+    "desc": "the callsign of the owner of the station used to log the contact (the callsign of the OPERATOR's host)<br/> if OWNER_CALLSIGNis absent, STATION_CALLSIGN shallbe treated as both the logging station's callsign and the callsignof the owner of the station   "
+  },
+  {
+    "field": "PFX",
+    "type": "String",
+    "enum": "none",
+    "desc": "the contacted station's WPX prefix"
+  },
+  {
+    "field": "POTA_REF",
+    "type": "POTARefList",
+    "enum": "none",
+    "desc": "a comma-delimited list of one or more of the contacted station's POTA (Parks on the Air) reference(s).<br/>Examples:   &lt;POTA_REF:6&gt;K-5033  &lt;POTA_REF:13&gt;VE-5082@CA-AB  &lt;POTA_REF:40&gt;K-0817,K-4566,K-4576,K-4573,K-4578@US-WY "
+  },
+  {
+    "field": "PRECEDENCE",
+    "type": "String",
+    "enum": "none",
+    "desc": "contest precedence (e.g. for ARRL Sweepstakes)"
+  },
+  {
+    "field": "PROP_MODE",
+    "type": "enum",
+    "enum": "Propagation Mode",
+    "desc": "QSO propagation mode"
+  },
+  {
+    "field": "PUBLIC_KEY",
+    "type": "String",
+    "enum": "none",
+    "desc": "public encryption key"
+  },
+  {
+    "field": "QSLMSG",
+    "type": "MultilineString",
+    "enum": "none",
+    "desc": "a message for the contacted station's operator to be incorporated in a paper or electronic QSL"
+  },
+  {
+    "field": "QSLMSG_RCVD",
+    "type": "MultilineString",
+    "enum": "none",
+    "desc": "a message addressed to the logging station's operator incorporated in a paper or electronic QSL"
+  },
+  {
+    "field": "QSLRDATE",
+    "type": "Date",
+    "enum": "none",
+    "desc": "QSL received date (only valid if QSL_RCVD is Y, I, or V)(V import-only)"
+  },
+  {
+    "field": "QSLSDATE",
+    "type": "Date",
+    "enum": "none",
+    "desc": "QSL sent date (only valid if QSL_SENT is Y, Q, or I)"
+  },
+  {
+    "field": "QSL_RCVD",
+    "type": "enum",
+    "enum": "QSL Rcvd",
+    "desc": "QSL received status instead of V (import-only) use &lt;CREDIT_GRANTED:39&gt;DXCC:card,DXCC_BAND:card,DXCC_MODE:card<br/>Default Value: N"
+  },
+  {
+    "field": "QSL_RCVD_VIA",
+    "type": "enum",
+    "enum": "QSL Via",
+    "desc": "if QSL_RCVD is set to 'Y' or 'V', the means by which the QSL was received by the logging station; otherwise, the means by which the logging station requested or intends to request that the QSL be conveyed.&nbsp; (Note: 'V' is import-only) use of M (manager) is import-only"
+  },
+  {
+    "field": "QSL_SENT",
+    "type": "enum",
+    "enum": "QSL Sent",
+    "desc": "QSL sent status Default Value: N"
+  },
+  {
+    "field": "QSL_SENT_VIA",
+    "type": "enum",
+    "enum": "QSL Via",
+    "desc": "if QSL_SENT is set to 'Y', the means by which the QSL was sent by the logging station; otherwise, the means by which the logging station intends to convey the QSL use of M (manager) is import-only"
+  },
+  {
+    "field": "QSL_VIA",
+    "type": "String",
+    "enum": "none",
+    "desc": "the contacted station's QSL route"
+  },
+  {
+    "field": "QSO_COMPLETE",
+    "type": "enum",
+    "enum": "QSO Complete",
+    "desc": "indicates whether the QSO was complete from the perspective of the logging station<br/> Y - yes  N - no  NIL - not heard  ? - uncertain "
+  },
+  {
+    "field": "QSO_DATE",
+    "type": "Date",
+    "enum": "none",
+    "desc": "date on which the QSO started"
+  },
+  {
+    "field": "QSO_DATE_OFF",
+    "type": "Date",
+    "enum": "none",
+    "desc": "date on which the QSO ended"
+  },
+  {
+    "field": "QSO_RANDOM",
+    "type": "Boolean",
+    "enum": "none",
+    "desc": "indicates whether the QSO was random or scheduled"
+  },
+  {
+    "field": "QTH",
+    "type": "String",
+    "enum": "none",
+    "desc": "the contacted station's city"
+  },
+  {
+    "field": "REGION",
+    "type": "enum",
+    "enum": "Region",
+    "desc": "the contacted station's WAE or CQ entity contained within a DXCC entity.<br/> the value None indicates that the WAE or CQ entity is the DXCC entity in the DXCC field.  nothing can be inferred from the absence of the REGION field "
+  },
+  {
+    "field": "RIG",
+    "type": "MultilineString",
+    "enum": "none",
+    "desc": "description of the contacted station's equipment"
+  },
+  {
+    "field": "RST_RCVD",
+    "type": "String",
+    "enum": "none",
+    "desc": "signal report from the contacted station"
+  },
+  {
+    "field": "RST_SENT",
+    "type": "String",
+    "enum": "none",
+    "desc": "signal report sent to the contacted station"
+  },
+  {
+    "field": "RX_PWR",
+    "type": "Number",
+    "enum": "none",
+    "desc": "the contacted station's transmitter power in Watts with a value greater than or equal to 0"
+  },
+  {
+    "field": "SAT_MODE",
+    "type": "String",
+    "enum": "none",
+    "desc": "satellite mode - a code representing the satellite's uplink band and downlink band"
+  },
+  {
+    "field": "SAT_NAME",
+    "type": "String",
+    "enum": "none",
+    "desc": "name of satellite"
+  },
+  {
+    "field": "SFI",
+    "type": "Integer",
+    "enum": "none",
+    "desc": "the solar flux at the time of the QSO in the range 0 to 300 (inclusive)."
+  },
+  {
+    "field": "SIG",
+    "type": "String",
+    "enum": "none",
+    "desc": "the name of the contacted station's special activity or interest group"
+  },
+  {
+    "field": "SIG_INFO",
+    "type": "String",
+    "enum": "none",
+    "desc": "information associated with the contacted station's activity or interest group"
+  },
+  {
+    "field": "SILENT_KEY",
+    "type": "Boolean",
+    "enum": "none",
+    "desc": "'Y' indicates that the contacted station's operator is now a Silent Key."
+  },
+  {
+    "field": "SKCC",
+    "type": "String",
+    "enum": "none",
+    "desc": "the contacted station's Straight Key Century Club (SKCC) member information"
+  },
+  {
+    "field": "SOTA_REF",
+    "type": "SOTARef",
+    "enum": "none",
+    "desc": "the contacted station's International SOTA Reference."
+  },
+  {
+    "field": "SRX",
+    "type": "Integer",
+    "enum": "none",
+    "desc": "contest QSO received serial number with a value greater than or equal to 0"
+  },
+  {
+    "field": "SRX_STRING",
+    "type": "String",
+    "enum": "none",
+    "desc": "contest QSO received information<br/> use Cabrilloformat to convey contest information for which ADIF fields are notspecified    in the event of a conflictbetween information in a dedicated contest field and this field,information in the dedicated contest field shall prevail   "
+  },
+  {
+    "field": "STATE",
+    "type": "enum",
+    "enum": "(Primary Administrative Subdivision, function of DXCC field's value)",
+    "desc": "the code for the contacted station's Primary Administrative Subdivision (e.g. US State, JA Island, VE Province)"
+  },
+  {
+    "field": "STATION_CALLSIGN",
+    "type": "String",
+    "enum": "none",
+    "desc": "the logging station's callsign (the callsign used over the air)<br/> if STATION_CALLSIGN is absent, OPERATOR shall be treated asboth the logging station's callsign and the logging operator's callsign   "
+  },
+  {
+    "field": "STX",
+    "type": "Integer",
+    "enum": "none",
+    "desc": "contest QSO transmitted serial number with a value greater than or equal to 0"
+  },
+  {
+    "field": "STX_STRING",
+    "type": "String",
+    "enum": "none",
+    "desc": "contest QSO transmitted information<br/> use Cabrilloformat to convey contest information for which ADIF fields are notspecified    in the event of a conflictbetween information in a dedicated contest field and this field,information in the dedicated contest field shall prevail   "
+  },
+  {
+    "field": "SUBMODE",
+    "type": "String",
+    "enum": "Submode (function of MODE field's value)",
+    "desc": "QSO Submode use enumeration values for interoperability"
+  },
+  {
+    "field": "SWL",
+    "type": "Boolean",
+    "enum": "none",
+    "desc": "indicates that the QSO information pertains to an SWL report"
+  },
+  {
+    "field": "TEN_TEN",
+    "type": "PositiveInteger",
+    "enum": "none",
+    "desc": "Ten-Ten number with a value greater than 0"
+  },
+  {
+    "field": "TIME_OFF",
+    "type": "Time",
+    "enum": "none",
+    "desc": "HHMM or HHMMSS in UTC<br/> in the absence of &lt;QSO_DATE_OFF&gt;, the QSO  duration is less than 24 hours.&nbsp;  For example, the following is a QSO starting at 14 July 2020 23:55 and finishing at 15 July 2020 01:00:  &lt;QSO_DATE:8&gt;20200714 &lt;TIME_ON:4&gt;2355 &lt;TIME_OFF:4&gt;0100 "
+  },
+  {
+    "field": "TIME_ON",
+    "type": "Time",
+    "enum": "none",
+    "desc": "HHMM or HHMMSS in UTC"
+  },
+  {
+    "field": "TX_PWR",
+    "type": "Number",
+    "enum": "none",
+    "desc": "the logging station's power in Watts with a value greater than or equal to 0"
+  },
+  {
+    "field": "UKSMG",
+    "type": "PositiveInteger",
+    "enum": "none",
+    "desc": "the contacted station's UKSMG member number with a value greater than 0"
+  },
+  {
+    "field": "USACA_COUNTIES",
+    "type": "SecondarySubdivisionList",
+    "enum": "none",
+    "desc": "two US counties in the case where the contacted station is located on a border between two counties, representing counties credited to the QSO for the CQ Magazine USA-CA award program.&nbsp; E.g.<br/>MA,Franklin:MA,Hampshire"
+  },
+  {
+    "field": "VUCC_GRIDS",
+    "type": "GridSquareList",
+    "enum": "none",
+    "desc": "two or four adjacent Maidenhead grid locators, each four or six characters long, representing the contacted station's grid squares credited to the QSO for the ARRL VUCC award program.&nbsp; E.g.<br/>EN98,FM08,EM97,FM07"
+  },
+  {
+    "field": "WEB",
+    "type": "String",
+    "enum": "none",
+    "desc": "the contacted station's URL"
+  },
+  {
+    "field": "WWFF_REF",
+    "type": "WWFFRef",
+    "enum": "none",
+    "desc": "the contacted station's WWFF (World Wildlife Flora &amp; Fauna) reference"
+  }
+]
