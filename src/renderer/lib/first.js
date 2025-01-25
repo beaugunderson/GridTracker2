@@ -118,7 +118,9 @@ else
 
 // Zoom Code Below
 var s_zoomLevel = 0;
-document.addEventListener("keydown", onZoomControlDown, true);
+document.addEventListener("keydown", onZoomControlDown, { capture: true, passive: false });
+document.addEventListener("wheel", onWheel, { capture: true, passive: false });
+document.addEventListener('auxclick', onMiddleMouse, { capture: true, passive: false });
 
 const g_zoomKeys = {
   NumpadSubtract: reduceZoom,
@@ -126,7 +128,8 @@ const g_zoomKeys = {
   NumpadAdd: increaseZoom,
   Equal: increaseZoom,
   Numpad0: resetZoom,
-  Digit0: resetZoom
+  Digit0: resetZoom,
+  "-": reduceZoom,
 };
 
 electron.ipcRenderer.on('loadZoom', (_event, value) => loadZoomCallback(value));
@@ -139,22 +142,58 @@ function loadZoomCallback(zoom)
 
 function onZoomControlDown(event)
 {
-  if (event.ctrlKey)
+  if (event.ctrlKey || event.altKey)
   {
     if (event.code in g_zoomKeys)
     {
       g_zoomKeys[event.code](event);
       event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    else if (event.key in g_zoomKeys)
+    {
+      g_zoomKeys[event.code](event);
+      event.preventDefault();
+      event.stopPropagation();
       return;
     }
     else if (event.code == "KeyR" || event.code == "KeyW")
     {
       event.preventDefault();
+      event.stopPropagation();
     }
   }
   if (isGT == true)
   {
     onMyKeyDown(event);
+  }
+}
+
+function onWheel(event)
+{
+  if (event.ctrlKey && event.altKey)
+  {
+    if (event.deltaY > 0)
+    {
+      reduceZoom();
+    }
+    else
+    {
+      increaseZoom();
+    }
+    event.preventDefault();
+    event.stopPropagation();
+  }
+}
+
+function onMiddleMouse(event)
+{
+  if (event.ctrlKey && event.altKey && event.button === 1)
+  {
+    resetZoom();
+    event.preventDefault();
+    event.stopPropagation();
   }
 }
 

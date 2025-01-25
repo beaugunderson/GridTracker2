@@ -209,12 +209,18 @@ const windowIdToAllowedWindows = {};
 const windowSettingsPath = join(gtInternalPath, 'windows.json');
 
 if (fs.existsSync(windowSettingsPath)) {
-  const settings = require(windowSettingsPath);
-  for (let windowName in settings) {
-    allowedWindows[windowName].options = {
-      ...allowedWindows[windowName].options,
-      ...settings[windowName],
-    };
+  try {
+    const settings = require(windowSettingsPath);
+    for (let windowName in settings) {
+      allowedWindows[windowName].options = {
+        ...allowedWindows[windowName].options,
+        ...settings[windowName],
+      };
+    }
+  }
+  catch (e)
+  {
+    log.error(e);
   }
 }
 
