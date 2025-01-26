@@ -120,7 +120,6 @@ else
 var s_zoomLevel = 0;
 document.addEventListener("keydown", onZoomControlDown, { capture: true, passive: false });
 document.addEventListener("wheel", onWheel, { capture: true, passive: false });
-document.addEventListener('auxclick', onMiddleMouse, { capture: true, passive: false });
 
 const g_zoomKeys = {
   NumpadSubtract: reduceZoom,
@@ -182,16 +181,6 @@ function onWheel(event)
     {
       increaseZoom();
     }
-    event.preventDefault();
-    event.stopPropagation();
-  }
-}
-
-function onMiddleMouse(event)
-{
-  if (event.ctrlKey && event.altKey && event.button === 1)
-  {
-    resetZoom();
     event.preventDefault();
     event.stopPropagation();
   }
