@@ -33,11 +33,10 @@ if (!singleInstanceLock) {
 }
 
 if (app.isPackaged) {
-  if (process.platform.toLowerCase().indexOf("win") == 0) {
-    console.log("To launch GridTracker2 from a batch file add the following before launching:");
+  if (process.platform.toLowerCase().indexOf("win") == 0 && !("ELECTRON_NO_ATTACH_CONSOLE" in process.env)) {
+    console.log("To launch GridTracker2 from command line add the following before launching:");
     console.log("\r\nset ELECTRON_NO_ATTACH_CONSOLE=true\r\n");
   }
-
   console.log("GridTracker2 starting up!\r\n");
   // we send to the log file instead
   console.log = log.error;
