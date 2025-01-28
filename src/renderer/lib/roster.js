@@ -3281,7 +3281,7 @@ function renderWatchersTab()
         worker += "<tr><td style='cursor:pointer;font-size:larger;' onclick='toggleWatcher(\"" + key + "\")'>" + (CR.watchers[key].watch ? "👀" : "🙈") + "</td>";
         worker += "<td align=left style='color:yellow;' >" + key + "</td><td>" + CR.watchers[key].type + "</td><td>" + (CR.watchers[key].regex ? "☑️" : "") + "</td>";
         let text = htmlEntities(CR.watchers[key].text);
-        worker += "<td style='color:cyan;'>" + (CR.watchers[key].regex ? text : formatCallsign(text)) + "</td>";
+        worker += "<td style='overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:250px;color:cyan;'>" + (CR.watchers[key].regex ? text : formatCallsign(text)) + "</td>";
         worker += "<td>" + (CR.watchers[key].start ? window.opener.userTimeString(CR.watchers[key].startTime) : "") + "</td>";
         worker += "<td>" + (CR.watchers[key].end ? window.opener.userTimeString(CR.watchers[key].endTime) : "") + "</td>";
         worker += "<td style='cursor:pointer;font-size:larger;' onclick='editWatcher(\"" + key + "\")'>📝</td>";
