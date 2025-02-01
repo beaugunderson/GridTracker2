@@ -588,7 +588,6 @@ const legacySettingsMapping = {
   dxkLogSettings: "dxkLog",
   HRDLogbookLogSettings: "HRDLogbookLog",
   log4OMSettings: "log4OM",
-  mapSettings: "map",
   msgSettings: "msg",
   N1MMSettings: "N1MM",
   pstrotatorSettings: "pstrotator",

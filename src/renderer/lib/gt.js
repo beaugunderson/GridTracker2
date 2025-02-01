@@ -4526,7 +4526,11 @@ function initMap()
     mapNightSelect.value = GT.settings.map.nightMapIndex;
     offlineMapNightSelect.value = GT.settings.map.offlineNightMapIndex;
   }
-  else GT.mapsLayer[0] = new ol.source.OSM();
+  else 
+  {
+    alert("Internal Map Data file Corrupt, GridTracker2 will now crash");
+  }
+
 
   if (GT.settings.map.offlineMode)
   {
