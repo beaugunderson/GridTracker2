@@ -7301,7 +7301,7 @@ function showWorkedBox(sortIndex, nextPage, redraw)
         worker += "</th>";""
       }
 
-      worker += "<th><label>Current Day UTC</label> <input type='checkbox' id='Zday' " + (GT.Zday ? "checked" : "") + " onclick='window.opener.changeZday(Zday)'/></th>";
+      worker += "<th><label>" + I18N("gt.Zday") + "</label>&nbsp;<input type='checkbox' id='Zday' " + (GT.Zday ? "checked" : "") + " onclick='window.opener.changeZday(Zday)'/></th>";
 
       worker += "</tr> ";
       worker += "<tr><th style='cursor:pointer;' align=center onclick='window.opener.showWorkedBox(0);'>" + I18N("gt.qsoPage.Station") + "</th>";
