@@ -4462,6 +4462,11 @@ function initMap()
 {
   initHoverFunctors();
 
+  mapSelect.value = def_maps.mapIndex;
+  offlineMapSelect.value = def_maps.mapIndex;
+  mapNightSelect.value = def_maps.mapIndex;
+  offlineMapNightSelect.value = def_maps.mapIndex;
+
   GT.maps = requireJson("data/maps.json");
   if (GT.maps)
   {
