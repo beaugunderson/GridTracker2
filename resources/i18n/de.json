@@ -816,6 +816,7 @@
     "gt.CurrentBandMode.Band": "Mix Bänder",
     "gt.CurrentBandMode.Mode": "Mix Betriebsarten",
     "gt.currentTime.never": "Nie",
+    "gt.Zday": "Aktueller Tag UTC",
     "gt.LighteningStrike.Global": "Globale Blitzeinschläge",
     "gt.LighteningStrike.Changed": "Entfernung für Blitzeinschläge geändert",
     "gt.LighteningStrike.Disabled": "Blitzeinschlagserkennung aus!",

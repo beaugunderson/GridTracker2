@@ -786,6 +786,7 @@
   "gt.CurrentBandMode.Band": "Bandas Mixtas",
   "gt.CurrentBandMode.Mode": "Modos Mixtos",
   "gt.currentTime.never": "Nunca",
+  "gt.Zday": "Día actual UTC",
   "gt.WSJTMessage.Generated": "Mensajes Generados",
   "gt.WSJTMessage.TransmitEnable": "Transmisión Habilitada",
   "gt.WSJTMessage.Decode": "DECODIFICAR",

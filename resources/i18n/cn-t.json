@@ -790,6 +790,7 @@
     "gt.CurrentBandMode.Band": "混合波段",
     "gt.CurrentBandMode.Mode": "混合模式",
     "gt.currentTime.never": "從未",
+    "gt.Zday": "目前UTC",
     "gt.WSJTMessage.Generated": "產生信息",
     "gt.WSJTMessage.TransmitEnable": "發射已啟用!",
     "gt.WSJTMessage.Decode": "解碼",
