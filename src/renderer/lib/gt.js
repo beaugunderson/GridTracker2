@@ -57,27 +57,17 @@ function loadAllSettings()
 
   GT.scriptPath = path.join(GT.scriptPath, (GT.platform == "windows") ? "cr-alert.bat" : "cr-alert.sh");
 
-  let importLegacy = GT.settings.importLegacy;
   // Apply defaults once if not applied
   if (!("defaultsApplied" in GT.settings))
   {
     GT.settings = { ...def_settings };
     GT.settings.defaultsApplied = true;
-    GT.settings.importLegacy = importLegacy;
   }
   else
   {
     GT.settings = deepmerge(def_settings, GT.settings, { arrayMerge: (destinationArray, sourceArray) => sourceArray } );
   }
 
-
-  if (GT.settings.importLegacy == true)
-  {
-    importLegacySettings();
-    // Yes, reset the button panel order
-    GT.settings.app.buttonPanelOrder = [];
-    GT.settings.importLegacy = false;
-  }
 
   // Test for valid projections
   if (k_valid_projections.indexOf(GT.settings.map.projection) == -1)
@@ -202,6 +192,7 @@ GT.flightPathTotal = (9 + 3 + 3) * 2;
 
 GT.lastMessages = [];
 GT.lastTraffic = [];
+GT.Zday = false;
 
 GT.maps = [];
 GT.modes = {};
@@ -7068,6 +7059,12 @@ function filterQSLFunction(event, index)
   showWorkedBox(index, 0);
 }
 
+function changeZday(element)
+{
+  GT.Zday = element.checked;
+  showWorkedBox();
+}
+
 function showWorkedBox(sortIndex, nextPage, redraw)
 {
   try
@@ -7090,6 +7087,14 @@ function showWorkedBox(sortIndex, nextPage, redraw)
     }
 
     var list = Object.values(myObjects);
+
+    if (GT.Zday)
+    {
+      list = list.filter(function (value)
+      {
+        return parseInt(value.time / 86400) == GT.currentDay;
+      });
+    }
 
     if (GT.searchWB.length > 0)
     {
@@ -7295,6 +7300,8 @@ function showWorkedBox(sortIndex, nextPage, redraw)
         }
         worker += "</th>";""
       }
+
+      worker += "<th><label>Current UTC Day</label> <input type='checkbox' id='Zday' " + (GT.Zday ? "checked" : "") + " onclick='window.opener.changeZday(Zday)'/></th>";
 
       worker += "</tr> ";
       worker += "<tr><th style='cursor:pointer;' align=center onclick='window.opener.showWorkedBox(0);'>" + I18N("gt.qsoPage.Station") + "</th>";
@@ -12317,7 +12324,7 @@ function postInit()
     section = "registerLegendContextMenus";
     registerLegendContextMenus();
     section = "SettingTimers";
-    nodeTimers.setInterval(saveAllSettings, 900000); // Every 10 minutes, save our settings as a safety
+
     nodeTimers.setInterval(removeFlightPathsAndDimSquares, 2000); // Every 2 seconds
     nodeTimers.setInterval(downloadCtyDat, 86400000);  // Every 24 hours
     nodeTimers.setInterval(refreshSpotsNoTx, 300000); // Redraw spots every 5 minutes, this clears old ones
@@ -14972,9 +14979,6 @@ function saveGridTrackerSettings()
   let filename = path.join(GT.appData, "app-settings.json");
   try
   {
-    // If we made it to saving, we never import from legacy settings again
-    // In 2025 we remove importLegacy code -Tag
-    GT.settings.importLegacy = false;
     fs.writeFileSync(filename, JSON.stringify(GT.settings, null, 2), { flush: true });
   }
   catch (e)
