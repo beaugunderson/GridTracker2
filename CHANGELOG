@@ -68,6 +68,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Call Roster: Fixed bug when Settings -> Features -> 'Clear on CQ' enabled and DX Call began with "CQ" eg: CQ3WWA would abort Tx
 - Happy New Year!
 
+- App: Windows command line notification added to help batch file use
+- App: v1.24.09xx settings no longer importing on new installs due to compatibility issues
+- App: Fixed AEQD map position on new installs
+- App: Enabled POTA by default on new installs
+- App: Updated Chinese translations
+- App: Ctrl+Alt+MouseWheel to change zoom level in any window  (Ctrl-Zero as always to reset)
+- Call Roster: Fixed PR showing as a wanted US State
+- Call Roster: Very long "Watcher" values now displayed with "..." 
+- Chat: Left-click a callsign will do a lookup
+- Stats-Logbook: Added "Current Day UTC" filter checkbox to "When" column
+
 ### Fixed
 
 
