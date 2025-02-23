@@ -1427,7 +1427,14 @@ function oldSendToLogger()
 
   report += valueToAdiField("RST_RCVD", newMessage.ReportRecieved);
   report += valueToAdiField("RST_SENT", newMessage.ReportSend);
-  report += valueToAdiField("TX_PWR", parseInt(newMessage.TXPower));
+  if ("TXPower" in newMessage)
+  {
+    let power = parseInt(newMessage.TXPower);
+    if (!isNaN(power))
+    {
+      report += valueToAdiField("TX_PWR", power);
+    }
+  }
   report += valueToAdiField("GRIDSQUARE", newMessage.DXGrid);
 
   if (newMessage.Comments.length > 0)
@@ -1504,7 +1511,15 @@ function sendToLogger(ADIF)
 
   if ("TX_PWR" in record)
   {
-    record.TX_PWR = String(parseInt(record.TX_PWR));
+    record.TX_PWR = parseInt(record.TX_PWR);
+    if (isNaN(record.TX_PWR))
+    {
+      delete record.TX_PWR;
+    }
+    else
+    {
+      record.TX_PWR = String(record.TX_PWR);
+    }
   }
 
   if ((!("STATION_CALLSIGN" in record) || record.STATION_CALLSIGN.length == 0) && GT.settings.app.myCall != "NOCALL" && GT.settings.app.myCall.length > 0)
