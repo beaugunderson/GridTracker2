@@ -163,8 +163,21 @@ GT.acknowledgedCalls = {};
 GT.flightDuration = 30;
 GT.crScript = GT.settings.app.crScript;
 GT.spotView = GT.settings.app.spotView;
-GT.myLat = GT.settings.map.latitude;
-GT.myLon = GT.settings.map.longitude;
+
+GT.myLat = Number(GT.settings.map.latitude);
+if (isNaN(GT.myLat) || Math.abs(GT.myLat) >= 90)
+{
+  GT.myLat = 0.0;
+  GT.settings.map.latitude = 0.0;
+}
+
+GT.myLon = Number(GT.settings.map.longitude);
+if (isNaN(GT.myLon) || Math.abs(GT.myLon) >= 180)
+{
+  GT.myLon = 0.0;
+  GT.settings.map.longitude = 0.0;
+}
+
 GT.useTransform = false;
 GT.currentOverlay = GT.settings.map.trophyOverlay;
 GT.spotCollector = {};
@@ -4559,6 +4572,23 @@ function initMap()
 
 function renderMap()
 {
+  if (isNaN(GT.myLat) || Math.abs(GT.myLat) >= 90)
+  {
+    GT.myLat = 0.0;
+    GT.settings.map.latitude = 0.0;
+  }
+
+  if (isNaN(GT.myLon) || Math.abs(GT.myLon) >= 180)
+  {
+    GT.myLon = 0.0;
+    GT.settings.map.longitude = 0.0;
+  }
+
+  if (k_valid_projections.indexOf(GT.settings.map.projection) == -1)
+  {
+    GT.settings.map.projection = k_valid_projections[0];
+  }
+
   initAEQDprojection();
 
   document.getElementById("mapDiv").innerHTML = "";
@@ -5509,11 +5539,15 @@ function handleInstanceStatus(newMessage)
 
     if (GT.settings.app.myRawGrid != GT.settings.app.myGrid)
     {
-      let LL = squareToCenter(GT.settings.app.myRawGrid);
-      GT.settings.map.latitude = GT.myLat = LL.a;
-      GT.settings.map.longitude = GT.myLon = LL.o;
-      tryUpdateQTH(GT.settings.app.myRawGrid);
-      nodeTimers.setTimeout(tryRecenterAEQD, 32);
+      homeQTHInput.value = GT.settings.app.myRawGrid;
+      if (ValidateGridsquare(homeQTHInput, null)) 
+      {
+        let LL = squareToCenter(homeQTHInput.value);
+        GT.settings.map.latitude = GT.myLat = LL.a;
+        GT.settings.map.longitude = GT.myLon = LL.o;
+        tryUpdateQTH(homeQTHInput.value);
+        nodeTimers.setTimeout(tryRecenterAEQD, 32);
+      }
     }
 
     dxCallBoxDiv.className = "DXCallBox";
