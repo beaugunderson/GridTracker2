@@ -2817,6 +2817,11 @@ function trophyOut(feature)
 
 function mouseDownGrid(longlat)
 {
+  if (isNaN(longlat[0]) || (GT.useTransform && ((MyCircle.distance(GT.myLat, GT.myLon, longlat[1], longlat[0]) * 3958.761) > k_max_aeqd_grid_in_miles)))
+  {
+    return null;
+  }
+
   var grid = latLonToGridSquare(longlat[1], longlat[0]);
   GT.MyCurrentGrid = grid.substr(0, 4);
   var worker = "";
@@ -2828,8 +2833,7 @@ function mouseDownGrid(longlat)
         GT.myLat,
         GT.myLon,
         longlat[1],
-        longlat[0],
-        distanceUnit.value
+        longlat[0]
       ) * MyCircle.validateRadius(distanceUnit.value)
     ) +
     distanceUnit.value.toLowerCase() +
@@ -2873,6 +2877,7 @@ function mouseDownGrid(longlat)
   }
 
   GT.tempGridBox = tempGridToBox(grid, GT.tempGridBox, "#000000FF", "#00000000");
+
   myGridTooltip.innerHTML = "<div style='font-size:14px;font-weight:bold;color:cyan;margin:0 auto' class='roundBorder'>" + grid + "</div>" + worker;
   GT.MyGridIsUp = true;
 
@@ -2930,7 +2935,7 @@ function createFlagTipTable(feature)
   var LL = squareToCenter(GT.gtFlagPins[key].grid);
   var bearing = parseInt(MyCircle.bearing(GT.myLat, GT.myLon, LL.a, LL.o));
 
-  worker += "<tr><td>Dist</td><td style='color:cyan'>" + parseInt(MyCircle.distance(GT.myLat, GT.myLon, LL.a, LL.o, distanceUnit.value) * MyCircle.validateRadius(distanceUnit.value)) + distanceUnit.value.toLowerCase() + "</td></tr>";
+  worker += "<tr><td>Dist</td><td style='color:cyan'>" + parseInt(MyCircle.distance(GT.myLat, GT.myLon, LL.a, LL.o) * MyCircle.validateRadius(distanceUnit.value)) + distanceUnit.value.toLowerCase() + "</td></tr>";
   worker += "<tr><td>Azim</td><td style='color:yellow'>" + bearing + "&deg;</td></tr>";
   worker += "</table>";
 
@@ -3265,6 +3270,15 @@ function qthToQsoBox(iQTH, iHash, locked, DE, worked, confirmed, band)
 {
   if (GT.settings.app.gridViewMode == 1) return null;
 
+  if (GT.useTransform)
+  {
+    let LL = squareToLatLong(iQTH.substr(0, 4));
+    if (MyCircle.distance(GT.myLat, GT.myLon, LL.la1, LL.lo1) * 3958.761 > k_max_aeqd_grid_in_miles)
+    {
+      return null;
+    }
+  }
+
   var borderColor = GT.mainBorderColor;
   var boxColor = GT.settings.legendColors.QSX + GT.gridAlpha;
   var borderWeight = 0.5;
@@ -3410,6 +3424,14 @@ function qthToBox(iQTH, iDEcallsign, iCQ, locked, DE, band, wspr, hash, fromLive
 {
   if (GT.settings.app.gridViewMode == 2) return null;
 
+  if (GT.useTransform)
+  {
+    let LL = squareToLatLong(iQTH.substr(0, 4));
+    if (MyCircle.distance(GT.myLat, GT.myLon, LL.la1, LL.lo1) * 3958.761 > k_max_aeqd_grid_in_miles)
+    {
+      return null;
+    }
+  }
   var borderColor = GT.mainBorderColor;
   var boxColor = GT.settings.legendColors.QSX + GT.gridAlpha;
   var borderWeight = 0.5;
@@ -3486,7 +3508,7 @@ function qthToBox(iQTH, iDEcallsign, iCQ, locked, DE, band, wspr, hash, fromLive
         }
         else entityVisibility = false;
       }
-      LL = squareToLatLong(iQTH);
+      let LL = squareToLatLong(iQTH);
       if (LL.size == 6)
       {
         borderColor = "#000000FF";
@@ -4792,7 +4814,7 @@ function mapMoveEvent(event)
       }
       else
       {
-        var dist = parseInt(MyCircle.distance(GT.myLat, GT.myLon, LL[1], LL[0], distanceUnit.value) * MyCircle.validateRadius(distanceUnit.value)) + distanceUnit.value.toLowerCase();
+        var dist = parseInt(MyCircle.distance(GT.myLat, GT.myLon, LL[1], LL[0]) * MyCircle.validateRadius(distanceUnit.value)) + distanceUnit.value.toLowerCase();
         var azim = parseInt(MyCircle.bearing(GT.myLat, GT.myLon, LL[1], LL[0])) + "&deg;";
         var gg = latLonToGridSquare(LL[1], LL[0], 6);
         mouseTrackDiv.innerHTML = LL[1].toFixed(3) + ", " + LL[0].toFixed(3) + " " + dist + " " + azim + " " + gg;
@@ -5602,7 +5624,7 @@ function handleInstanceStatus(newMessage)
     {
       localDXGrid.innerHTML = GT.myDXGrid;
       var LL = squareToCenter(GT.myDXGrid);
-      localDXDistance.innerHTML = parseInt(MyCircle.distance(GT.myLat, GT.myLon, LL.a, LL.o, distanceUnit.value) * MyCircle.validateRadius(distanceUnit.value)) + distanceUnit.value.toLowerCase();
+      localDXDistance.innerHTML = parseInt(MyCircle.distance(GT.myLat, GT.myLon, LL.a, LL.o) * MyCircle.validateRadius(distanceUnit.value)) + distanceUnit.value.toLowerCase();
       localDXAzimuth.innerHTML = parseInt(MyCircle.bearing(GT.myLat, GT.myLon, LL.a, LL.o)) + "&deg;";
     }
 
@@ -6140,7 +6162,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
     if (callsign.distance == 0 && callsign.grid.length > 0)
     {
       var LL = squareToCenter(callsign.grid);
-      callsign.distance = MyCircle.distance(GT.myLat, GT.myLon, LL.a, LL.o, distanceUnit.value);
+      callsign.distance = MyCircle.distance(GT.myLat, GT.myLon, LL.a, LL.o);
       callsign.heading = MyCircle.bearing(GT.myLat, GT.myLon, LL.a, LL.o);
     }
 
@@ -8479,7 +8501,7 @@ function renderStatsBox()
       if (finalGrid.length > 0)
       {
         LL = squareToCenter(finalGrid);
-        unit = parseInt(MyCircle.distance(GT.myLat, GT.myLon, LL.a, LL.o, distanceUnit.value) * MyCircle.validateRadius(distanceUnit.value));
+        unit = parseInt(MyCircle.distance(GT.myLat, GT.myLon, LL.a, LL.o) * MyCircle.validateRadius(distanceUnit.value));
 
         if (unit > long_distance.worked_unit)
         {

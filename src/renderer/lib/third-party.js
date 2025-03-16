@@ -66,9 +66,7 @@ const MyCircle = {
         else return unit;
     },
 
-     distance: function(lat1, lon1, lat2, lon2, unit) {
-        if ( unit == undefined ) unit = 'KM';
-        var r = this.validateRadius(unit);
+     distance: function(lat1, lon1, lat2, lon2) {
         lat1 *= Math.PI / 180;
         lon1 *= Math.PI / 180;
         lat2 *= Math.PI / 180;

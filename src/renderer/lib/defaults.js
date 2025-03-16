@@ -52,6 +52,8 @@ const def_maps = {
 
 const k_valid_projections = [ "EPSG:3857", "AEQD" ];
 
+const k_max_aeqd_grid_in_miles = 11500.0;
+
 const def_settings = {
   defaultsApplied: true,
   app: {
