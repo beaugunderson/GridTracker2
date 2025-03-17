@@ -886,9 +886,10 @@ function lookupKnownCallsign(object)
 
 function updateLookupsBigCtyUI()
 {
-  const year = parseInt(GT.dxccVersion.substring(0,4));
-  const month = parseInt(GT.dxccVersion.substring(4,6)) - 1;
-  const day = parseInt(GT.dxccVersion.substring(6,8));
+  const dxccVersion = String(GT.dxccVersion);
+  const year = parseInt(dxccVersion.substring(0,4));
+  const month = parseInt(dxccVersion.substring(4,6)) - 1;
+  const day = parseInt(dxccVersion.substring(6,8));
 
   let date = new Date(year, month, day);
   bigctyUpdatedTd.innerHTML = userTimeString(date.getTime());
@@ -920,9 +921,9 @@ function processCtyDatVer(buffer)
     let ctydatver = JSON.parse(data);
     if (ctydatver && "version" in ctydatver)
     {
-      GT.newDxccVersion = String(ctydatver.version);
+      GT.newDxccVersion = parseInt(ctydatver.version);
 
-      if (GT.newDxccVersion != GT.dxccVersion)
+      if (GT.newDxccVersion > GT.dxccVersion)
       {
         bigctyUpdatedTd.innerHTML = "<b><i>Downloading...</i></b>";
         getBuffer(
@@ -956,9 +957,9 @@ function processCtyDat(buffer)
   try
   {
     let ctydata = JSON.parse(data);
-    if (fs.existsSync(GT.dxccInfoPath))
+    if (fs.existsSync(GT.asarDxccInfoPath))
     {
-      let dxccInfo = JSON.parse(fs.readFileSync(GT.dxccInfoPath));
+      let dxccInfo = JSON.parse(fs.readFileSync(GT.asarDxccInfoPath));
       if (291 in dxccInfo && 291 in ctydata)
       {
         updateDxccInfo(dxccInfo, ctydata);

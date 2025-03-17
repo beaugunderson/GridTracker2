@@ -28,6 +28,7 @@ function loadAllSettings()
   GT.appData = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Ginternal");
   GT.qsoBackupDir = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Backup Logs");
   GT.extraMediaDir = path.join(electron.ipcRenderer.sendSync("getPath","userData"), "Extra Media");
+  GT.asarDxccInfoPath =  path.resolve(resourcesPath, "data/dxcc-info.json"),
   GT.dxccInfoPath = path.join(GT.appData, "dxcc-info.json");
   GT.tempDxccInfoPath = path.join(GT.appData, "dxcc-info-update.json");
   GT.spotsPath = path.join(GT.appData, "spots.json");
@@ -10793,7 +10794,7 @@ function loadMaidenHeadData()
 
   if ("version" in GT.dxccInfo[0])
   {
-    GT.dxccVersion = String(GT.dxccInfo[0].version);
+    GT.dxccVersion = parseInt(GT.dxccInfo[0].version);
 
     updateLookupsBigCtyUI();
   }

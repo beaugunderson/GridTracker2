@@ -204,12 +204,30 @@ if (!fs.existsSync(gtScreenshotPath)) {
 
 // We will allow updating of this by the user, copy existing into Ginternal
 let dxccInfoPath = join(gtInternalPath, 'dxcc-info.json');
+let asarInfoPath = join(asarResourcesPath, 'data/dxcc-info.json');
 if (!fs.existsSync(dxccInfoPath)) {
   fs.copyFileSync(
-    join(asarResourcesPath, 'data/dxcc-info.json'),
+    asarInfoPath,
     dxccInfoPath,
     fs.constants.COPYFILE_EXCL,
   );
+}
+else {
+  try {
+    // Update gtInternal with newer version when found
+    const asarInfo = require(asarInfoPath);
+    const gtInternalInfo = require(dxccInfoPath);
+    if (parseInt(asarInfo["0"].version) > parseInt(gtInternalInfo["0"].version)) {
+      fs.copyFileSync(
+        asarInfoPath,
+        dxccInfoPath,
+      );
+    }
+  }
+  catch (e)
+  {
+    console.log("Error checking dxcc-info files");
+  }
 }
 
 const windowIdToAllowedWindows = {};
