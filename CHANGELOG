@@ -83,6 +83,7 @@ Stats-Logbook: Added "Current Day UTC" filter checkbox to "When" column
 Map: Fixed distant grid distortions in AEQD projection
 App: Fixed missing JA grids
 App: Fixed issue where MSHV not reporting TX_PWR
+Award Tracker: Fixed QRZ.com 'Masters of ...' scoring
 
 ### Fixed
 

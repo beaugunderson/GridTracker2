@@ -2797,6 +2797,15 @@ function singleCompile(award, obj)
         }
       }
     }
+
+    if ("score" in rule && rule.score == "band")
+    {
+      comp.modes[rule.mode[mode]] = 0;
+      for (let band in comp.bands[rule.mode[mode]])
+      {
+        comp.modes[rule.mode[mode]] += comp.bands[rule.mode[mode]][band];
+      }
+    }
   }
 
   for (let mode in comp.modes)
@@ -2833,7 +2842,6 @@ function doubleCompile(award, firstLevel)
   for (let k in firstLevel)
   {
     firstLevel[k].bands = {};
-    // firstLevel[k].modes = {};
     let obj = singleCompile(award, firstLevel[k].unique);
 
     for (let mode in obj.bands)
@@ -2855,13 +2863,6 @@ function doubleCompile(award, firstLevel)
         }
       }
     }
-    /* for ( let mode in obj.modes )
-    {
-      if ( !(mode in firstLevel[k].modes) )
-        firstLevel[k].modes[mode] = 0;
-      if ( obj.modes[mode] > 0 )
-        firstLevel[k].modes[mode] +=  1;
-    } */
 
     delete firstLevel[k].unique;
     firstLevel[k].unique = null;

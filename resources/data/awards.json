@@ -43,7 +43,7 @@
             "Phone"
           ],
           "type": "dxcc2band",
-          "unique": 100
+          "unique": [100]
         },
         "sponsor": "ARRL",
         "tooltip": "Five-Band DXCC"
@@ -10093,9 +10093,8 @@
           "count": [
             66
           ],
-          "endorse": [
-            "Mixed"
-          ],
+          "endorse": ["Mixed"],
+          "score": "band",
           "mode": [
             "Mixed",
             "Digital",
@@ -10116,9 +10115,8 @@
           "count": [
             54
           ],
-          "endorse": [
-            "Mixed"
-          ],
+          "endorse": ["Mixed"],
+          "score": "band",
           "mode": [
             "Mixed",
             "Digital",
@@ -10139,9 +10137,8 @@
           "count": [
             76
           ],
-          "endorse": [
-            "Mixed"
-          ],
+          "endorse": ["Mixed"],
+          "score": "band",
           "mode": [
             "Mixed",
             "Digital",
@@ -10162,9 +10159,8 @@
           "count": [
             49
           ],
-          "endorse": [
-            "Mixed"
-          ],
+          "endorse": ["Mixed"],
+          "score": "band",
           "mode": [
             "Mixed",
             "Digital",
@@ -10185,9 +10181,8 @@
           "count": [
             31
           ],
-          "endorse": [
-            "Mixed"
-          ],
+          "endorse": ["Mixed"],
+          "score": "band",
           "mode": [
             "Mixed",
             "Digital",
@@ -10208,9 +10203,8 @@
           "count": [
             60
           ],
-          "endorse": [
-            "Mixed"
-          ],
+          "endorse": ["Mixed"],
+          "score": "band",
           "mode": [
             "Mixed",
             "Digital",
@@ -10331,15 +10325,8 @@
       "17m",
       "15m",
       "12m",
-      "11m",
       "10m",
-      "6m",
-      "4m",
-      "2m",
-      "1.25m",
-      "70cm",
-      "33cm",
-      "23cm"
+      "6m"
     ],
     "qsl_req": "confirmed",
     "sponsor": "QRZ.com",
