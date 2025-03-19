@@ -3157,12 +3157,14 @@ function sendTcpMessageGetResponse(msg, port, address, callback = null)
   });
 }
 
-function grabAcLog()
+function grabAcLog(count = 0)
 {
   AcLogImg.style.webkitFilter = "invert(100%)";
+  
+  let countString = count > 0 ? ("<VALUE>" + count + "</VALUE>") : "";
 
   let cmd = valueToXmlField("CMD", "<OPINFO>") + "\r\n";
-  cmd += valueToXmlField("CMD", "<LIST><INCLUDEALL>") + "\r\n\r\n";
+  cmd += valueToXmlField("CMD", "<LIST><INCLUDEALL>" + countString) + "\r\n\r\n";
 
   sendTcpMessageGetResponse(cmd, GT.settings.acLog.port, GT.settings.acLog.ip, acLogCallback);
 }

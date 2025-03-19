@@ -84,6 +84,8 @@ Map: Fixed distant grid distortions in AEQD projection
 App: Fixed missing JA grids
 App: Fixed issue where MSHV not reporting TX_PWR
 Award Tracker: Fixed QRZ.com 'Masters of ...' scoring
+N3FJP ACL: Fixed grid not appearing in GT status panel
+N3FJP ACL: New log entry will automatically be added when QSO completed
 
 ### Fixed
 

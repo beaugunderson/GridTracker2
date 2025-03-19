@@ -772,7 +772,7 @@ function parseAcLog(task)
           if (qso.mode in GT.modes) qso.digital = GT.modes[qso.mode];
           if (qso.mode in GT.modes_phone) qso.phone = GT.modes_phone[qso.mode];
 
-          let finalPOTA = (object.POTA_REF ||null);
+          let finalPOTA = (object.POTA_REF || null);
           if (finalPOTA) 
           {
             qso.pota = finalPOTA.toUpperCase();

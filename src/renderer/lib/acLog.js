@@ -98,12 +98,20 @@ function handleAcLogAPIMessage(buffer)
       else if (object.type == "CALLTABEVENT")
       {
         GT.acLogStatus.DXcall = object.CALL.toUpperCase();
-        if (object.GRID) GT.acLogStatus.DXgrid = object.GRID.substring(0, 4).toUpperCase();
+        if (object.GRID)
+        {
+           GT.acLogStatus.DXgrid = object.GRID.substring(0, 4).toUpperCase();
+        }
+        else if (object.LAT && object.LON)
+        {
+          GT.acLogStatus.DXgrid = latLonToGridSquare(Number(object.LAT), Number(object.LON));
+        }
         updateStatus = true;
       }
       else if (object.type == "ENTEREVENT")
       {
- 
+        // Grab the last log entry in a 1/4 second
+        nodeTimers.setTimeout(grabAcLog, 250, 1);
       }
 
       var notify = false;

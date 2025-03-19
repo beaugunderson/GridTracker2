@@ -481,6 +481,8 @@ GT.viewInfo[6] = ["countyData", "US Counties", 0, 0, 3220];
 GT.viewInfo[7] = ["us48Data", "US Continental Grids", 0, 0, 488];
 GT.viewInfo[8] = ["wacpZones", "CA Provinces", 0, 0, 13];
 
+GT.dazzleGrid = null;
+GT.dazzleTimeout = null;
 GT.gridAlpha = "88";
 GT.mediaFiles = null;
 GT.qslAuthorityTimer = null;
@@ -3782,6 +3784,19 @@ function changeAnimate()
     featureStyle.setStroke(featureStroke);
     GT.transmitFlightPath.setStyle(featureStyle);
   }
+
+  if (GT.dazzleGrid != null)
+  {
+    var featureStyle = GT.dazzleGrid.getStyle();
+    var featureStroke = featureStyle.getStroke();
+
+    featureStroke.setLineDash(dash);
+    featureStroke.setLineDashOffset(dashOff);
+
+    featureStyle.setStroke(featureStroke);
+    GT.dazzleGrid.setStyle(featureStyle);
+  }
+
   setAnimateView();
 }
 
@@ -3853,6 +3868,17 @@ function animatePaths()
 
     featureStyle.setStroke(featureStroke);
     GT.transmitFlightPath.setStyle(featureStyle);
+  }
+
+  if (GT.dazzleGrid != null)
+  {
+    var featureStyle = GT.dazzleGrid.getStyle();
+    var featureStroke = featureStyle.getStroke();
+
+    featureStroke.setLineDashOffset(targetOffset);
+
+    featureStyle.setStroke(featureStroke);
+    GT.dazzleGrid.setStyle(featureStyle);
   }
 }
 
@@ -4408,7 +4434,7 @@ function tryRecenterAEQD()
     // we fake a change
     GT.settings.map.projection = "EPSG:3857";
     changeMapProjection(false);
-    centerOn(GT.settings.app.myGrid);
+    centerOn(GT.settings.app.myGrid, false);
   }
 }
 
@@ -5005,7 +5031,7 @@ function lineString(points, count)
   return rect;
 }
 
-function rectangle(bounds, options)
+function rectangle(bounds, property = "grid")
 {
   var thing = new ol.geom.Polygon([
     [
@@ -5016,7 +5042,7 @@ function rectangle(bounds, options)
     ]
   ]);
   var rect = new ol.Feature({
-    prop: "grid",
+    prop: property,
     geometry: thing
   });
   if (GT.useTransform)
@@ -5836,7 +5862,7 @@ function drawTraffic()
 
 function getPoint(grid)
 {
-  var LL = squareToCenter(grid);
+  let LL = squareToCenter(grid);
   return ol.proj.fromLonLat([LL.o, LL.a]);
 }
 
@@ -6646,11 +6672,56 @@ function handleWsjtxWSPR(newMessage)
   updateCountStats();
 }
 
-function centerOn(grid)
+function removeDazzleGrid()
+{
+  if (GT.dazzleTimeout)
+  {
+    nodeTimers.clearTimeout(GT.dazzleTimeout);
+    GT.dazzleTimeout = null;
+  }
+
+  if (GT.dazzleGrid)
+  {
+    if (GT.layerSources.temp.hasFeature(GT.dazzleGrid)) { GT.layerSources.temp.removeFeature(GT.dazzleGrid); }
+    GT.dazzleGrid = null;
+  }
+}
+
+function dazzleGrid(LL)
+{
+  removeDazzleGrid();
+
+  let borderWeight = 5;
+  let bounds = [[LL.lo1, LL.la1], [LL.lo2, LL.la2]];
+
+  GT.dazzleGrid = rectangle(bounds, "dazzle");
+
+  const featureStyle = new ol.style.Style({
+    stroke: new ol.style.Stroke({
+      color: "#000",
+      width: borderWeight,
+      lineJoin: "round",
+      lineDash: GT.flightPathLineDash,
+      lineDashOffset: GT.flightPathTotal - GT.flightPathOffset
+    }),
+    zIndex: 60
+  });
+
+  GT.dazzleGrid.setStyle(featureStyle);
+
+  GT.layerSources.temp.addFeature(GT.dazzleGrid);
+
+  GT.dazzleTimeout = nodeTimers.setTimeout(removeDazzleGrid, 3000);
+}
+
+function centerOn(grid, dazzle = true)
 {
   if (grid.length >= 4)
   {
-    var LL = squareToLatLong(grid);
+    let LL = squareToLatLong(grid);
+
+    if (dazzle) dazzleGrid(LL);
+
     GT.map
       .getView()
       .setCenter(
