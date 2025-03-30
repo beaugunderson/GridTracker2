@@ -703,6 +703,8 @@ function gtChatMessage(jsmesg)
         {
           sendPushOverMessage(jsmesg);
         }
+
+        alertChatMessage();
       }
     }
   }

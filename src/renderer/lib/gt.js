@@ -623,6 +623,7 @@ GT.spotNightFlightColor = "#FFFFFFBB";
 
 GT.startupTable = [
   [loadI18n, "Loading Locales", "gt.startupTable.loadi18n"],
+  [mediaCheck, "Media Check", ""],
   [callsignServicesInit, "Callsign Services Initialized", "gt.startupTable.callsigns"],
   [loadMapSettings, "Map Settings Initialized", "gt.startupTable.mapSettings"],
   [initMap, "Loaded Map", "gt.startupTable.loadMap"],
@@ -9771,11 +9772,13 @@ function updateChatMessagingViews()
   if (GT.settings.map.offlineMode == true || GT.settings.app.offAirServicesEnable == false || GT.settings.app.oamsMsgEnable == false)
   {
     msgButton.style.display = "none";
+    oamsMsgAlertTr.style.display = "none";
     showMessaging(false);
   }
   else
   {
     msgButton.style.display = "";
+    oamsMsgAlertTr.style.display = "";
   }
 }
 
@@ -9978,6 +9981,11 @@ function setMsgEnable()
   goProcessRoster();
 }
 
+function setMsgAlert()
+{
+  GT.settings.app.msgAlertMedia = msgAlertMedia.value;
+}
+
 function newMessageSetting(whichSetting)
 {
   if (whichSetting.id in GT.settings.msg && whichSetting.value != "none")
@@ -10094,9 +10102,9 @@ function renderBandActivity()
 
       if (GT.settings.app.offAirServicesEnable == true && GT.settings.app.oamsBandActivity == true)
       {
-        title = "OAMS\n";
+        title = "OAMS (blue)\n";
         title += "\tScore: " + bandData[band].oamsScore + "\n\tDecodes: " + bandData[band].oamsDecodes + "\n\tTX-Spots: " + bandData[band].oamsTxSpots + "\n\tRX-Spots: " + bandData[band].oamsRxSpots + "\n\tTx: " + bandData[band].oamsTx + "\tRx: " + bandData[band].oamsRx;
-        title += "\nPSK-Reporter\n";
+        title += "\nPSK-Reporter (red)\n";
         title += "\tScore: " + bandData[band].pskScore + "\n\tSpots: " + bandData[band].pskSpots + "\n\tTx: " + bandData[band].pskTx + "\tRx: " + bandData[band].pskRx;
         blueBarValue = (bandData[band].oamsScore * scaleFactor + 1);
       }
@@ -12123,6 +12131,7 @@ function loadViewSettings()
 function loadMsgSettings()
 {
   oamsMsgEnable.checked = GT.settings.app.oamsMsgEnable;
+  msgAlertMedia.value = GT.settings.app.msgAlertMedia;
   spottingEnable.checked = GT.settings.app.spottingEnable;
 
   oamsBandActivity.checked = GT.settings.app.oamsBandActivity;
@@ -12658,8 +12667,6 @@ function init()
 
   aboutVersionText.innerHTML = gtShortVersion;
   GT.currentDay = parseInt(timeNowSec() / 86400);
-
-  mediaCheck();
 
   startupDiv.style.display = "block";
   startupStatusDiv.innerHTML = "Starting...";
@@ -14304,29 +14311,29 @@ function startLookup(call, grid)
 function searchLogForCallsign(call)
 {
   setLookupDiv("lookupLocalDiv", "");
-  var list = Object.values(GT.QSOhash)
+  let list = Object.values(GT.QSOhash)
     .filter(function (value)
     {
       return value.DEcall == call;
     })
     .sort(GT.settings.app.myBandCompare);
 
-  var worker = "";
+    let worker = "";
 
   if (call in GT.acknowledgedCalls)
   {
     worker = "<h3>" + I18N("gt.lookup.acks") + " " + formatCallsign(call) + " <img class='lookupAckBadge' src='" + GT.acknowledgedCalls[call].badge + "'> " + GT.acknowledgedCalls[call].message + "</h3>";
   }
 
-  var work = {};
-  var conf = {};
-  var lastTime = 0;
-  var lastRow = null;
-  var dxcc = (list.length > 0 ? list[0].dxcc : callsignToDxcc(call));
+  let work = {};
+  let conf = {};
+  let lastTime = 0;
+  let lastRow = null;
+  let dxcc = (list.length > 0 ? list[0].dxcc : callsignToDxcc(call));
 
-  for (row in list)
+  for (let row in list)
   {
-    var what = list[row].band + "," + list[row].mode;
+    let what = list[row].band + "," + list[row].mode;
     if (list[row].time > lastTime)
     {
       lastRow = row;
@@ -14343,8 +14350,8 @@ function searchLogForCallsign(call)
   if (Object.keys(work).length > 0)
   {
     worker += "<tr><th style='color:yellow'>Worked</th><td>";
-    var k = Object.keys(work).sort();
-    for (var key in k)
+    let k = Object.keys(work).sort();
+    for (let key in k)
     {
       worker += "<font color='#" + work[k[key]] + "'>" + k[key] + " </font>";
     }
@@ -14353,8 +14360,8 @@ function searchLogForCallsign(call)
   if (Object.keys(conf).length > 0)
   {
     worker += "<tr><th style='color:lightgreen'>Confirmed</th><td>";
-    var k = Object.keys(conf).sort();
-    for (var key in k)
+    let k = Object.keys(conf).sort();
+    for (let key in k)
     {
       worker += "<font color='#" + conf[k[key]] + "'>" + k[key] + " </font>";
     }
@@ -14368,11 +14375,11 @@ function searchLogForCallsign(call)
   }
 
   worker += "<tr><th style='color:orange'>" + GT.dxccToAltName[dxcc] + " (" + GT.dxccInfo[dxcc].pp + ")</th><td>";
-  for (var band in GT.colorBands)
+  for (let band in GT.colorBands)
   {
     if (String(dxcc) + "|" + GT.colorBands[band] in GT.tracker.worked.dxcc)
     {
-      var strike = "";
+      let strike = "";
       if (String(dxcc) + "|" + GT.colorBands[band] in GT.tracker.confirmed.dxcc) { strike = "text-decoration: underline overline;"; }
       worker += "<div style='" + strike + "display:inline-block;color:#" + GT.pskColors[GT.colorBands[band]] + "'>" + GT.colorBands[band] + "</div>&nbsp;";
     }
@@ -14396,9 +14403,10 @@ function mediaCheck()
   GT.QrzLogFile = path.join(GT.appData, "qrz.adif");
   GT.clublogLogFile = path.join(GT.appData, "clublog.adif");
 
-  logEventMedia.appendChild(newOption("none", "None"));
+  logEventMedia.appendChild(newOption("none", I18N("settings.OAMS.message.newAlert.none")));
+  msgAlertMedia.appendChild(newOption("", I18N("settings.OAMS.message.newAlert.none")));
 
-  alertMediaSelect.appendChild(newOption("none", "Select File"));
+  alertMediaSelect.appendChild(newOption("none", I18N("alerts.addNew.SelectFile")));
 
   GT.mediaFiles = [ ...fs.readdirSync(GT.extraMediaDir), ...fs.readdirSync(GT.gtMediaDir) ];
 
@@ -14406,6 +14414,7 @@ function mediaCheck()
   {
     let noExt = path.parse(filename).name;
     logEventMedia.appendChild(newOption(filename, noExt));
+    msgAlertMedia.appendChild(newOption(filename, noExt));
     alertMediaSelect.appendChild(newOption(filename, noExt));
 
   });

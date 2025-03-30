@@ -326,6 +326,7 @@ function trackQSO(details, currentYear, currentDay)
     if (isPhone == true)
     {
       GT.tracker.worked.dxcc[sDXCC + "|ph"] = true;
+      GT.tracker.worked.dxcc[sDXCC + "|" + details.band + "ph"] = true;
     }
     if (isCurrentYear)
     {
@@ -475,6 +476,7 @@ function trackQSO(details, currentYear, currentDay)
       if (isPhone == true)
       {
         GT.tracker.confirmed.dxcc[sDXCC + "|ph"] = true;
+        GT.tracker.confirmed.dxcc[sDXCC + "|" + details.band + "ph"] = true;
       }
     }
 

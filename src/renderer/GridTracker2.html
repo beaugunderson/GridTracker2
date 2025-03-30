@@ -1078,6 +1078,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               <input type="checkbox" id="oamsMsgEnable" onclick="setMsgEnable();" />
             </td>
           </tr>
+          <tr id="oamsMsgAlertTr">
+            <td data-i18n="settings.OAMS.message.newAlert.label" for="msgAlertMedia">New Message Alert</td>
+            <td>
+              <select id="msgAlertMedia" onchange="setMsgAlert(); alertChatMessage();">
+              </select>
+            </td>
+          </tr>
           </table>
         </div>
         <div class="mapItem" style="border:0">

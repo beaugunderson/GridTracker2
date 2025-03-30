@@ -589,7 +589,7 @@ GT.wsjtLogFileSelector.onchange = function ()
 {
   if (this.files && this.files[0])
   {
-    let fullPath = this.files[0].path;
+    let fullPath = webUtils.getPathForFile(this.files[0]);
 
     if (ValidatePotentialAdifLogFileAgainstInternal(fullPath))
     {
@@ -607,7 +607,7 @@ GT.fileSelector.onchange = function ()
 {
   if (this.files && this.files[0])
   {
-    addLogToStartupList(this.files[0]);
+    addLogToStartupList(this.files[0].name, webUtils.getPathForFile(this.files[0]));
   }
 };
 
@@ -629,36 +629,37 @@ function ValidatePotentialAdifLogFileAgainstInternal(fullPath)
   return true;
 }
 
-function addLogToStartupList(fileObject)
+function addLogToStartupList(name, path)
 {
   loadAdifCheckBox.checked = true;
   adifStartupCheckBoxChanged(loadAdifCheckBox);
 
-  let buffer = fs.readFileSync(fileObject.path, "utf-8");
+
+  let buffer = fs.readFileSync(path, "utf-8");
   if (buffer) onAdiLoadComplete(buffer);
   
   for (const i in GT.settings.startupLogs)
   {
-    if (fileObject.path == GT.settings.startupLogs[i].file)
+    if (path == GT.settings.startupLogs[i].file)
     {
-      addLastTraffic("<font color='white'>Dupe</font> <font color='orange'>" + fileObject.name + "</font>");
+      addLastTraffic("<font color='white'>Dupe</font> <font color='orange'>" +name + "</font>");
       return;
     }
   }
-  if (ValidatePotentialAdifLogFileAgainstInternal(fileObject.path) == false)
+  if (ValidatePotentialAdifLogFileAgainstInternal(path) == false)
   {
-    addLastTraffic("<font color='white'>Not Allowed</font> <font color='orange'>" + fileObject.name + "</font>");
+    addLastTraffic("<font color='white'>Not Allowed</font> <font color='orange'>" + name + "</font>");
     return;
   }
 
   let newObject = Object();
-  newObject.name = fileObject.name;
-  newObject.file = fileObject.path;
+  newObject.name = name;
+  newObject.file = path;
   GT.settings.startupLogs.push(newObject);
 
   setAdifStartup(loadAdifCheckBox);
 
-  addLastTraffic("<font color='white'>Added</font> <font color='cyan'>" + fileObject.name + "</font>");
+  addLastTraffic("<font color='white'>Added</font> <font color='cyan'>" + name + "</font>");
 }
 
 function adifLoadDialog()
@@ -674,7 +675,7 @@ GT.startupFileSelector.onchange = function ()
 {
   if (this.files && this.files[0])
   {
-    addLogToStartupList(this.files[0]);
+    addLogToStartupList(this.files[0].name, webUtils.getPathForFile(this.files[0]));
   }
 };
 
@@ -714,12 +715,10 @@ GT.tqslFileSelector.onchange = function ()
 {
   if (this.files && this.files[0])
   {
-    GT.settings.trustedQsl.binaryFile = this.files[0].path;
-    if (
-      fs.existsSync(GT.settings.trustedQsl.binaryFile) &&
-      (GT.settings.trustedQsl.binaryFile.endsWith("tqsl.exe") ||
-        GT.settings.trustedQsl.binaryFile.endsWith("tqsl"))
-    )
+    GT.settings.trustedQsl.binaryFile = webUtils.getPathForFile(this.files[0]);
+    if (fs.existsSync(GT.settings.trustedQsl.binaryFile) &&
+       (GT.settings.trustedQsl.binaryFile.endsWith("tqsl.exe") ||
+        GT.settings.trustedQsl.binaryFile.endsWith("tqsl")))
     {
       GT.settings.trustedQsl.binaryFileValid = true;
     }
@@ -734,7 +733,7 @@ GT.tqslFileSelector.onchange = function ()
       tqslFileDiv.style.backgroundColor = "rgb(199, 113, 0)";
     }
 
-    tqslFileDiv.innerHTML = "<b>" + start_and_end(this.files[0].path) + "</b>";
+    tqslFileDiv.innerHTML = "<b>" + start_and_end(GT.settings.trustedQsl.binaryFile) + "</b>";
   }
 };
 
@@ -998,8 +997,7 @@ function setAdifStartup(checkbox)
   {
     tqslFileDiv.style.backgroundColor = "rgb(199, 113, 0)";
   }
-  tqslFileDiv.innerHTML =
-    "<b>" + start_and_end(GT.settings.trustedQsl.binaryFile) + "</b>";
+  tqslFileDiv.innerHTML = "<b>" + start_and_end(GT.settings.trustedQsl.binaryFile) + "</b>";
 
   if (buttonAdifCheckBox.checked || loadAdifCheckBox.checked)
   {
@@ -1573,7 +1571,7 @@ function sendToLogger(ADIF)
 
 function finishSendingReport(record)
 {
-  var report = "";
+  let report = "";
   for (const key in record)
   {
     if (record[key] == null)
@@ -1581,14 +1579,11 @@ function finishSendingReport(record)
       delete record[key];
       continue;
     }
-    if (key != "POTA_REF")
-    {
-      report += "<" + key + ":" + Buffer.byteLength(record[key]) + ">" + record[key] + " ";
-    }
+    report += "<" + key + ":" + Buffer.byteLength(record[key]) + ">" + record[key] + " ";
   }
   report += "<EOR>";
 
-  var reportNoPotaNoStateNoCnty = "";
+  let reportNoPotaNoStateNoCnty = "";
   for (const key in record)
   {
     if (key != "POTA_REF" && key != "STATE" && key != "CNTY")
@@ -1598,14 +1593,6 @@ function finishSendingReport(record)
   }
   reportNoPotaNoStateNoCnty += "<EOR>";
   
-  // this report is for internal use ONLY!
-  var reportWithPota = "";
-  for (const key in record)
-  {
-    reportWithPota += "<" + key + ":" + Buffer.byteLength(record[key]) + ">" + record[key] + " ";
-  }
-  reportWithPota += "<EOR>";
-
   // Full record dupe check
   if (report != GT.lastReport)
   {
@@ -1643,7 +1630,7 @@ function finishSendingReport(record)
 
     try
     {
-      onAdiLoadComplete(reportWithPota, null, true);
+      onAdiLoadComplete(report, null, true);
     }
     catch (e)
     {
@@ -1671,7 +1658,7 @@ function finishSendingReport(record)
           fs.writeFileSync(fullPath, backupAdifHeader);
         }
 
-        fs.appendFileSync(fullPath, reportWithPota + "\r\n", { flush: true });
+        fs.appendFileSync(fullPath, report + "\r\n", { flush: true });
         addLastTraffic("<font style='color:white'>Logged to Backup</font>");
       }
     }
@@ -1745,10 +1732,8 @@ function finishSendingReport(record)
           {
             record.GRIDSQUARE = record.GRIDSQUARE.substr(0, 6);
           }
-          if (key != "POTA_REF")
-          {
-            DXreport += "<" + key + ":" + Buffer.byteLength(record[key]) + ">" + record[key] + " ";
-          }
+
+          DXreport += "<" + key + ":" + Buffer.byteLength(record[key]) + ">" + record[key] + " ";
         }
         DXreport += "<EOR>";
 

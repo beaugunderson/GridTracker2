@@ -1057,3 +1057,12 @@ function openWatcher()
     }
   }
 }
+
+function alertChatMessage()
+{
+  if (GT.settings.app.msgAlertMedia.length > 0)
+  {
+    playAlertMediaFile(GT.settings.app.msgAlertMedia);
+  }
+}
+

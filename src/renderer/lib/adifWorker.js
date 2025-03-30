@@ -331,7 +331,9 @@ function onAdiLoadComplete(task)
 
           qso.confirmed = confirmed;
 
+          qso.digital = false;
           if (finalMode in GT.modes) qso.digital = GT.modes[finalMode];
+          qso.phone = false;
           if (finalMode in GT.modes_phone) qso.phone = GT.modes_phone[finalMode];
 
           let finalPOTA = (object.POTA_REF || object.POTA || null);
@@ -769,7 +771,9 @@ function parseAcLog(task)
           qso.confirmed = confirmed;
           if (confSource) { qso.confSrcs = {}; qso.confSrcs[confSource] = true; }
 
+          qso.digital = false;
           if (qso.mode in GT.modes) qso.digital = GT.modes[qso.mode];
+          qso.phone = false;
           if (qso.mode in GT.modes_phone) qso.phone = GT.modes_phone[qso.mode];
 
           let finalPOTA = (object.POTA_REF || null);

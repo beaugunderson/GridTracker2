@@ -87,6 +87,11 @@ Award Tracker: Fixed QRZ.com 'Masters of ...' scoring
 N3FJP ACL: Fixed grid not appearing in GT status panel
 N3FJP ACL: New log entry will automatically be added when QSO completed
 
+App: Updated Electron to v35.1.2 (except for Windows 7)
+App: Added DYNAMIC as recognized mode
+App: Added "New Message Alert" to Settings -> Features -> Online -> Chat Messaging .. default is none
+App: Added new media files "Message-Abrupt|AIM|Bosun|Bright|Gentle|ICQ|Mild-Echo|MSN|Nokia|RIM"
+
 ### Fixed
 
 

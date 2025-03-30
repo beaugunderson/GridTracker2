@@ -8,6 +8,7 @@ const dns = require("node:dns");
 const path = require("path");
 const fs = require("fs");
 const process = require("process");
+const { webUtils } = require('electron');
 
 console.log = logError;
 

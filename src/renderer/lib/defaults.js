@@ -70,6 +70,7 @@ const def_settings = {
     gtModeFilter: "",
     gtPropFilter: "mixed",
     oamsMsgEnable: true,
+    msgAlertMedia: "",
     offAirServicesEnable: true,
     spottingEnable: true,
     loadAdifAtStartup: false,
