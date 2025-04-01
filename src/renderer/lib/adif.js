@@ -1644,7 +1644,7 @@ function finishSendingReport(record)
         let logNameArray = [ "GridTracker2"];
         if ("STATION_CALLSIGN" in record)
         {
-          logNameArray.push(record["STATION_CALLSIGN"]);
+          logNameArray.push(record["STATION_CALLSIGN"].replaceAll("/","_"));
         }
         if ("MY_GRIDSQUARE" in record)
         {
