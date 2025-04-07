@@ -12578,7 +12578,7 @@ function postInit()
     nodeTimers.setInterval(removeFlightPathsAndDimSquares, 2000); // Every 2 seconds
     nodeTimers.setInterval(downloadCtyDat, 86400000);  // Every 24 hours
     nodeTimers.setInterval(refreshSpotsNoTx, 300000); // Redraw spots every 5 minutes, this clears old ones
-    nodeTimers.setTimeout(downloadCtyDat, 300000); // In 5 minutes, when the dust settles
+    nodeTimers.setTimeout(downloadCtyDat, 120000);    // In 2 minutes, when the dust settles
     nodeTimers.setTimeout(checkForNewVersion, 30000); // Informative check
   }
   catch (e)
