@@ -63,7 +63,7 @@ linux:
     # requires building on a linux machine or a multipass.run account
     #- snap
   maintainer: gridtracker.org
-  category: Utility
+  category: Utility;HamRadio
   artifactName: ${name}-${version}-${arch}.${ext}
 flatpak:
   runtimeVersion: 23.08
