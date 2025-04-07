@@ -973,7 +973,7 @@ function processCtyDat(buffer)
           fs.renameSync(GT.tempDxccInfoPath, GT.dxccInfoPath);
           bigctyUpdatedTd.innerHTML = "<div style='color:cyan;font-weight:bold'>" + I18N("gt.NewVersion.Release") + "</div>";
           bigctyDetailsTd.innerHTML = "<div class='button' onclick='saveAndCloseApp(true)'>Restart</div>";
-          addLastTraffic("<font style='color:yellow'>" + I18N("gt.NewVersion.Release") + " - BIG CTY</br><div class='button' onclick='saveAndCloseApp(true)'>Restart</div></font>");
+          addLastTraffic("<font style='color:yellow'>" + I18N("gt.NewVersion.Release") + " - Big CTY</br><div class='button' onclick='saveAndCloseApp(true)'>Restart</div></font>");
         }
         else
         {

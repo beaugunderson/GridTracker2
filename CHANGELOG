@@ -93,6 +93,14 @@ App: Added "New Message Alert" to Settings -> Features -> Online -> Chat Messagi
 App: Added new media files "Message-Abrupt|AIM|Bosun|Bright|Gentle|ICQ|Mild-Echo|MSN|Nokia|RIM"
 Logging: Fixed issue when logging to the backup log (if enabled) when callsign contains '/' 
 
+
+Logging: New optional feature to receive ADIF UDP Broadcasts from apps like fldigi and log just like WSJT-X log events
+            (Settings -> General -> Recive ADIF UDP Broadcasts For Logging)
+Linux: Added "HamRadio" to the gridtracker2.desktop category
+App: Updated initial install Big CTY data to version April 6th, 2025
+App: Big CTY update check now at 2 miuntes from start instead of 5 minutes
+            (Provides additional notification of update in the waterfall as well as Settings -> Lookups)
+
 ### Fixed
 
 
