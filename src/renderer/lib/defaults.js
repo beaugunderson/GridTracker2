@@ -118,6 +118,12 @@ const def_settings = {
     wsjtIP: "",
     wsjtUdpPort: 0,
     wsjtLogPath: "",
+
+    adifBroadcastEnable: false,
+    adifBroadcastPort: 2333,
+    adifBroadcastIP: "",
+    adifBroadcastMulticast: false,
+
     workingCallsignEnable: false,
     workingCallsigns: {},
     workingGridEnable: false,

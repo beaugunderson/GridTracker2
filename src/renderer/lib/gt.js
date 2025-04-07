@@ -597,9 +597,9 @@ GT.statBoxTimer = null;
 GT.timezoneLayer = null;
 GT.redrawFromLegendTimeoutHandle = null;
 GT.defaultButtons = [];
-
 GT.finishedLoading = false;
 GT.wsjtCurrentPort = -1;
+GT.wsjtCurrentIP = "";
 GT.wsjtUdpServer = null;
 GT.wsjtUdpSocketReady = false;
 GT.wsjtUdpSocketError = false;
@@ -609,6 +609,15 @@ GT.instances = {};
 GT.instanceCount = 0;
 GT.activeInstance = "";
 GT.activeIndex = 0;
+
+GT.adifBroadcastServer = null;
+GT.adifBroadcastSocketReady = false;
+GT.adifBroadcastSocketError = false;
+
+GT.adifBroadcastCurrentPort = -1;
+GT.adifBroadcastCurrentIP = "";
+
+
 GT.currentID = null;
 GT.lastWsjtMessageByPort = {};
 GT.qrzLookupSessionId = null;
@@ -689,6 +698,22 @@ function saveAndCloseApp(shouldRestart = false)
     }
   }
 
+  if (GT.adifBroadcastServer != null)
+  {
+    try
+    {
+      if (adifBroadcastMulticast.checked == true && GT.settings.app.adifBroadcastIP != "")
+      {
+        GT.adifBroadcastServer.dropMembership(GT.settings.app.adifBroadcastIP);
+      }
+      GT.adifBroadcastServer.close();
+    }
+    catch (e)
+    {
+      console.error(e);
+    }
+  }
+
   if (GT.forwardUdpServer != null)
   {
     try
@@ -722,6 +747,22 @@ function clearAndReload()
         GT.wsjtUdpServer.dropMembership(GT.settings.app.wsjtIP);
       }
       GT.wsjtUdpServer.close();
+    }
+    catch (e)
+    {
+      console.error(e);
+    }
+  }
+
+  if (GT.adifBroadcastServer != null)
+  {
+    try
+    {
+      if (adifBroadcastMulticast.checked == true && GT.settings.app.adifBroadcastIP != "")
+      {
+        GT.adifBroadcastServer.dropMembership(GT.settings.app.adifBroadcastIP);
+      }
+      GT.adifBroadcastServer.close();
     }
     catch (e)
     {
@@ -929,7 +970,6 @@ function changeOffline()
     conditionsButton.style.display = "";
     lookupButton.style.display = "";
 
-    donateButton.style.display = (GT.settings.app.myCall in GT.acknowledgedCalls) ? "none" : "";
     radarButton.style.display = "";
     mapSelect.style.display = "";
     mapNightSelect.style.display = "";
@@ -1226,6 +1266,10 @@ function addLiveCallsign(
 function timeoutSetUdpPort()
 {
   GT.settings.app.wsjtUdpPort = udpPortInput.value;
+
+  // Make sure the broadcast Port isn't on our recieve port!
+  ValidatePort(adifBroadcastPort, adifBroadcastEnable, CheckAdifBroadcastPortIsNotReceivePort);
+
   lastMsgTimeDiv.innerHTML = I18N("gt.timeoutSetUdpPort");
   GT.setNewUdpPortTimeoutHandle = null;
 }
@@ -4206,6 +4250,7 @@ function displayTime()
   else secondsAgoMsg.innerHTML = "<b>Never</b>";
 
   checkWsjtxListener();
+  checkAdifBroadcastListener();
   connectToAcLogAPI();
 
   if (GT.timeNow % 22 == 0)
@@ -9869,6 +9914,62 @@ function setMulticastEnable(checkbox)
     GT.settings.app.wsjtIP = "";
   }
   GT.settings.app.multicast = checkbox.checked;
+
+  setAdifBroadcastEnable(adifBroadcastEnable);
+}
+
+function setAdifBroadcastMulticast(checkbox)
+{
+  if (checkbox.checked == true)
+  {
+    adifBroadcastIpTD.style.display = "";
+    if (ValidateMulticast(adifBroadcastIP))
+    {
+      GT.settings.app.adifBroadcastIP = adifBroadcastIP.value;
+    }
+    else
+    {
+      GT.settings.app.adifBroadcastIP = "";
+    }
+  }
+  else
+  {
+    adifBroadcastIpTD.style.display = "none";
+    GT.settings.app.adifBroadcastIP = "";
+  }
+  GT.settings.app.adifBroadcastMulticast = checkbox.checked;
+
+  setAdifBroadcastEnable(adifBroadcastEnable);
+}
+
+function setAdifBroadcastIp()
+{
+  GT.settings.app.adifBroadcastIP = adifBroadcastIP.value;
+  setAdifBroadcastEnable(adifBroadcastEnable);
+}
+
+function setAdifBroadcastPort()
+{
+  GT.settings.app.adifBroadcastPort = Number(adifBroadcastPort.value);
+  setAdifBroadcastEnable(adifBroadcastEnable);
+}
+
+function setAdifBroadcastEnable(checkbox)
+{
+  if (checkbox.checked)
+  {
+    if (ValidatePort(adifBroadcastPort, null, CheckAdifBroadcastPortIsNotReceivePort))
+    {
+      if (GT.settings.app.adifBroadcastMulticast)
+      {
+        checkbox.checked = ValidateMulticast(adifBroadcastIP);
+      }
+      GT.settings.app.adifBroadcastEnable = checkbox.checked;
+      return;
+    }
+  }
+
+  GT.settings.app.adifBroadcastEnable = checkbox.checked = false;
 }
 
 function setUdpForwardEnable(checkbox)
@@ -10322,7 +10423,7 @@ function updateBasedOnIni()
   if (GT.settings.app.wsjtUdpPort == 0)
   {
     GT.settings.app.wsjtUdpPort = 2237;
-    GT.settings.app.wsjtIP = "127.0.0.1";
+    GT.settings.app.wsjtIP = "";
     GT.settings.app.multicast = false;
   }
   // Which INI do we load?
@@ -10366,6 +10467,19 @@ function CheckForwardPortIsNotReceivePort(value)
     return false;
   }
 
+  return true;
+}
+
+function CheckAdifBroadcastPortIsNotReceivePort(value)
+{
+  if (GT.settings.app.adifBroadcastMulticast == false && GT.settings.app.multicast == false && udpPortInput.value == value)
+  {
+    return false;
+  }
+  if (GT.settings.app.adifBroadcastIP == GT.settings.app.wsjtIP && udpPortInput.value == value)
+  {
+    return false;
+  }
   return true;
 }
 
@@ -11355,7 +11469,6 @@ function updateAcks(buffer)
   try
   {
     GT.acknowledgedCalls = JSON.parse(buffer);
-    donateButton.style.display = (GT.settings.app.myCall in GT.acknowledgedCalls) ? "none" : "";
   }
   catch (e)
   {
@@ -12329,6 +12442,7 @@ function startupButtonsAndInputs()
     togglePushPinMode();
     udpForwardEnable.checked = GT.settings.app.wsjtForwardUdpEnable;
     multicastEnable.checked = GT.settings.app.multicast;
+    adifBroadcastMulticast.checked = GT.settings.app.adifBroadcastMulticast;
 
     GT.settings.app.gridViewMode = clamp(GT.settings.app.gridViewMode, 1, 3);
     gtGridViewMode.value = GT.settings.app.gridViewMode;
@@ -12358,7 +12472,6 @@ function startupButtonsAndInputs()
       buttonLOTWCheckBoxDiv.style.display = "none";
       buttonClubCheckBoxDiv.style.display = "none";
 
-      donateButton.style.display = "none";
       potaButton.style.display = "none";
       lookupButton.style.display = "none";
       radarButton.style.display = "none";
@@ -12709,6 +12822,12 @@ function loadPortSettings()
 {
   multicastEnable.checked = GT.settings.app.multicast;
   multicastIpInput.value = GT.settings.app.wsjtIP;
+
+  adifBroadcastPort.value = GT.settings.app.adifBroadcastPort;
+  adifBroadcastIP.value = GT.settings.app.adifBroadcastIP;
+  adifBroadcastMulticast.checked = GT.settings.app.adifBroadcastMulticast;
+  adifBroadcastEnable.checked = GT.settings.app.adifBroadcastEnable;
+  
   setMulticastEnable(multicastEnable);
   udpPortInput.value = GT.settings.app.wsjtUdpPort;
   ValidatePort(udpPortInput, null, CheckReceivePortIsNotForwardPort);
@@ -12718,6 +12837,10 @@ function loadPortSettings()
   ValidateIPaddress(udpForwardIpInput, null);
   udpForwardEnable.checked = GT.settings.app.wsjtForwardUdpEnable;
   setUdpForwardEnable(udpForwardEnable);
+
+  setAdifBroadcastMulticast(adifBroadcastMulticast);
+  ValidatePort(adifBroadcastPort, adifBroadcastEnable, CheckAdifBroadcastPortIsNotReceivePort);
+  setAdifBroadcastEnable(adifBroadcastEnable);
 }
 
 function decodeQUINT8(byteArray)
@@ -12817,7 +12940,7 @@ function updateForwardListener()
   }
   if (GT.closing == true) return;
 
-  var dgram = require("dgram");
+  const dgram = require("dgram");
   GT.forwardUdpServer = dgram.createSocket({
     type: "udp4",
     reuseAddr: true
@@ -12923,7 +13046,7 @@ function updateWsjtxListener(port)
   }
   if (GT.closing == true) return;
   GT.wsjtUdpSocketError = false;
-  var dgram = require("dgram");
+  const dgram = require("dgram");
   GT.wsjtUdpServer = dgram.createSocket({
     type: "udp4",
     reuseAddr: true
@@ -12934,10 +13057,10 @@ function updateWsjtxListener(port)
     {
       GT.wsjtUdpServer.setBroadcast(true);
       GT.wsjtUdpServer.setMulticastTTL(3);
-      var interfaces = os.networkInterfaces();
-      for (var i in interfaces)
+      let interfaces = os.networkInterfaces();
+      for (let i in interfaces)
       {
-        for (var x in interfaces[i])
+        for (let x in interfaces[i])
         {
           if (interfaces[i][x].family == "IPv4")
           {
@@ -14903,11 +15026,6 @@ function updateSpottingViews()
   }
 
   openPskMqtt();
-}
-
-function gotoDonate()
-{
-  window.open("https://gridtracker.org/donations/");
 }
 
 function getSpotTime(hash)

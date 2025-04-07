@@ -523,9 +523,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <div id="buttonSpotsBoxDiv" onclick="cycleSpotsView()" class="iconButton" title="View Spot Reports">
           <img id="spotsButtonImg" src="img/spots.png" class="buttonImg" />
         </div>
-        <div id="donateButton" onclick="gotoDonate();" class="iconButton" title="Support GridTracker with a donation">
-          <img style="-webkit-filter: brightness(70%); filter: brightness(70%)" src="img/donate.png" class="buttonImg" />
-        </div>
         <div id="lookupButton" onclick="toggleLookupWindow()" oncontextmenu="toggleLookupWindow(false)" class="iconButton" title="Open Lookup Window">
           <img src="img/lookup.png" class="buttonImg" />
         </div>
@@ -773,7 +770,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                   </tr>
                   <tr>
                     <td>
-                      <label data-i18n="settings.general.Fwd.Enabled.label" for="udpForwardEnable">Enabled?</label>
+                      <label data-i18n="settings.general.Enabled.label" for="udpForwardEnable">Enabled?</label>
                       <input title="Enable / Disable UDP Message forwarding" type="checkbox" id="udpForwardEnable"
                         onclick="setUdpForwardEnable(this);" />
                     </td>
@@ -782,6 +779,50 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               </div>
             </td>
             <td>
+              <div class="mapItem">
+                <table align="center">
+                  <tr>
+                    <td data-i18n="settings.general.adifBroadcastMessage.label1"><b>Receive ADIF UDP</b></td>
+                  </tr>
+                  <tr>
+                    <td data-i18n="settings.general.adifBroadcastMessage.label2"><b>Broadcasts For Logging</b></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label data-i18n="settings.general.UDP.Multicast.label" for="adifBroadcastMulticast">Multicast?</label>
+                      <input title="Enable / Disable Multicast" type="checkbox" id="adifBroadcastMulticast"
+                        onclick="setAdifBroadcastMulticast(this);" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td id="adifBroadcastIpTD" >
+                      <label data-i18n="settings.general.UDP.IP.label" for="adifBroadcastIP">IP</label>
+                      <input id="adifBroadcastIP" type="text" class="inputTextValue" maxlength="15" size="11"
+                        onkeypress="return validIpKeys(event.charCode);"
+                        oninput=" if ( ValidateMulticast(this) ) setAdifBroadcastIp();" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label data-i18n="settings.general.UDP.Port.label" for="adifBroadcastPort">Port</label>
+                      <input id="adifBroadcastPort" type="text" class="inputTextValue" maxlength="5" size="5"
+                        onkeypress="return validNumberKeys(event.charCode);"
+                        oninput="if ( ValidatePort(this, adifBroadcastEnable, CheckAdifBroadcastPortIsNotReceivePort) ) setAdifBroadcastPort();" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label data-i18n="settings.general.Enabled.label" for="adifBroadcastEnable">Enabled?</label>
+                      <input title="Enable / Disable ADIF UDP Broadcast Logging" type="checkbox" id="adifBroadcastEnable"
+                        onclick="setAdifBroadcastEnable(this);" />
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+            </tr>
+            <tr>
+            <td colspan="3">
               <div class="mapItem" id="multiRigCRDiv" style="display:none;">
                 <table align="center">
                   <tr align="center">

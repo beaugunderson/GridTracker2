@@ -1479,10 +1479,26 @@ GT.adifLookupMap = {
   county: "CNTY"
 };
 
+GT.lastADIFrx = "";
+
 function sendToLogger(ADIF)
 {
   let regex = new RegExp("<EOH>", "i");
-  let record = parseADIFRecord(ADIF.split(regex)[1]);
+  let message = ADIF.split(regex)[1].trim();
+
+  // is it a dupe?
+  if (message == GT.lastADIFrx) return;
+
+  GT.lastADIFrx = message;
+
+  let record = parseADIFRecord(message);
+  if (!("MODE" in record) || !("CALL" in record) || !("BAND" in record)) 
+  {
+    console.log("Invalid ADIF Record");
+    console.log(message);
+    return;
+  }
+
   let localMode = record.MODE;
 
   if (localMode == "MFSK" && "SUBMODE" in record)
@@ -1641,7 +1657,7 @@ function finishSendingReport(record)
       // Log worthy
       if (logGTqsoCheckBox.checked == true)
       {
-        let logNameArray = [ "GridTracker2"];
+        let logNameArray = ["GridTracker2"];
         if ("STATION_CALLSIGN" in record)
         {
           logNameArray.push(record["STATION_CALLSIGN"].replaceAll("/","_"));
@@ -1821,8 +1837,6 @@ function finishSendingReport(record)
       }
     }
   }
-
-  return report;
 }
 
 function alertLogMessage()
@@ -3172,4 +3186,99 @@ function acLogCallback(buffer)
     GT.adifLogCount++;
     GT.adifWorker.postMessage(task);
   }
+}
+
+function checkAdifBroadcastListener()
+{
+  if (GT.adifBroadcastServer == null || (GT.adifBroadcastSocketReady == false && GT.adifBroadcastSocketError == true))
+  {
+    GT.adifBroadcastCurrentPort = -1;
+    GT.adifBroadcastCurrentIP = "";
+  }
+
+  updateAdifBroadcast(GT.settings.app.adifBroadcastPort);
+}
+
+function updateAdifBroadcast(port)
+{
+  if (adifBroadcastEnable.checked == true && port == GT.adifBroadcastCurrentPort && GT.settings.app.adifBroadcastIP == GT.adifBroadcastCurrentIP) { return; }
+
+  if (GT.adifBroadcastServer != null)
+  {
+    if (GT.adifBroadcastCurrentIP != "")
+    {
+      try
+      {
+        GT.adifBroadcastServer.dropMembership(GT.adifBroadcastCurrentIP);
+      }
+      catch (e)
+      {
+        console.error(e);
+      }
+    }
+
+    GT.adifBroadcastCurrentIP = "";
+    GT.adifBroadcastServer.close();
+    GT.adifBroadcastServer = null;
+    GT.adifBroadcastSocketReady = false;
+  }
+
+  if (port == -1 || GT.closing == true || GT.settings.app.adifBroadcastEnable == false || adifBroadcastEnable.checked == false) return;
+
+  GT.adifBroadcastSocketError = false;
+  const dgram = require("dgram");
+  GT.adifBroadcastServer = dgram.createSocket({
+    type: "udp4",
+    reuseAddr: true
+  });
+
+  if (adifBroadcastMulticast.checked == true && GT.settings.app.adifBroadcastIP != "")
+  {
+    GT.adifBroadcastServer.on("listening", function ()
+    {
+      GT.adifBroadcastServer.setBroadcast(true);
+      GT.adifBroadcastServer.setMulticastTTL(3);
+      let interfaces = os.networkInterfaces();
+      for (let i in interfaces)
+      {
+        for (let x in interfaces[i])
+        {
+          if (interfaces[i][x].family == "IPv4")
+          {
+            GT.adifBroadcastServer.addMembership(GT.settings.app.adifBroadcastIP, interfaces[i][x].address);
+          }
+        }
+      }
+      GT.adifBroadcastSocketReady = true;
+    });
+  }
+  else
+  {
+    GT.settings.app.adifBroadcastMulticast = adifBroadcastMulticast.checked = false;
+    GT.adifBroadcastCurrentIP = GT.settings.app.adifBroadcastIP = adifBroadcastIP.value = "";
+    GT.adifBroadcastServer.on("listening", function ()
+    {
+      GT.adifBroadcastServer.setBroadcast(true);
+      GT.adifBroadcastSocketReady = true;
+    });
+  }
+
+  GT.adifBroadcastServer.on("error", function ()
+  {
+    GT.adifBroadcastServer.close();
+    GT.adifBroadcastServer = null;
+    GT.adifBroadcastSocketReady = false;
+    GT.adifBroadcastSocketError = true;
+  });
+
+  GT.adifBroadcastServer.on("message", function (incoming, remote)
+  {
+    if (GT.finishedLoading == false) return;
+
+    sendToLogger("<EOH>" +  String(incoming).replaceAll("<eor>", "<EOR>"));
+  });
+
+  GT.adifBroadcastServer.bind(port);
+  GT.adifBroadcastCurrentPort = port;
+  GT.adifBroadcastCurrentIP = GT.settings.app.adifBroadcastIP;
 }
