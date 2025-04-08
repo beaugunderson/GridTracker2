@@ -100,6 +100,7 @@ Linux: Added "HamRadio" to the gridtracker2.desktop category
 App: Updated initial install Big CTY data to version April 6th, 2025
 App: Big CTY update check now at 2 miuntes from start instead of 5 minutes
             (Provides additional notification of update in the waterfall as well as Settings -> Lookups)
+Logging: Fixed ADIF CNTY field when logging (removed space after comma)
 
 ### Fixed
 

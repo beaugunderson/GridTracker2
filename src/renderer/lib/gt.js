@@ -14099,7 +14099,7 @@ function cacheLookupObject(lookup, gridPass, cacheable = false)
     lookup.cnty = getCountyFromLongLat(lookup.lon, lookup.lat);
     if (lookup.cnty)
     {
-      lookup.county = GT.countyData[lookup.cnty].geo.properties.st + ", " + GT.countyData[lookup.cnty].geo.properties.n;
+      lookup.county = GT.countyData[lookup.cnty].geo.properties.st + "," + GT.countyData[lookup.cnty].geo.properties.n;
       lookup.state = GT.countyData[lookup.cnty].geo.properties.st;
     }
   }
@@ -14111,7 +14111,7 @@ function cacheLookupObject(lookup, gridPass, cacheable = false)
 
     if (lookup.cnty == null)
     {
-      lookup.county = lookup.state + ", " + lookup.county;
+      lookup.county = lookup.state + "," + lookup.county;
       lookup.cnty = replaceAll(lookup.county.toUpperCase(), " ", "");
     }
 
