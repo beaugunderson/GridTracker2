@@ -3275,7 +3275,15 @@ function updateAdifBroadcast(port)
   {
     if (GT.finishedLoading == false) return;
 
-    sendToLogger("<EOH>" +  String(incoming).replaceAll("<eor>", "<EOR>"));
+    let message =  String(incoming);
+    if (message.indexOf("FLDIGI_TEST") == -1)
+    {
+      sendToLogger("<EOH>" + message.replaceAll("<eor>", "<EOR>"));
+    }
+    else
+    {
+      addLastTraffic("<font color='cyan'>✅ fldigi log test ✅</font>");
+    }
   });
 
   GT.adifBroadcastServer.bind(port);
