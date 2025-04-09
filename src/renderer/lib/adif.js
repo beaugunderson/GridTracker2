@@ -2167,7 +2167,8 @@ function CloudlogGetProfiles()
   }
   else
   {
-    CloudlogTestResult.innerHTML = "Missing Fields</br>Test Aborted";
+    CloudlogTestResult.innerHTML = "Missing Fields";
+    GT.settings.adifLog.text.CloudlogStationProfileID = CloudlogStationProfileID.value = "1";
   }
 }
 
@@ -2219,7 +2220,7 @@ function CloudlogFillProfiles(buffer, flag)
   {
     if (buffer)
     {
-      select = document.getElementById("CloudlogStationProfile");
+      select = document.getElementById("CloudlogStationProfileID");
       select.options.length = 0;
       jsonData = JSON.parse(buffer);
       for (var i = 0; i < jsonData.length; i++)
@@ -2227,17 +2228,11 @@ function CloudlogFillProfiles(buffer, flag)
         var item = jsonData[i];
         var opt = document.createElement("option");
         opt.value = item.station_id;
-        if (item.station_active == 1)
-        {
-          opt.style.fontWeight = "bold";
-        }
         if (item.station_id == GT.settings.adifLog.text.CloudlogStationProfileID)
         {
-          opt.style.color = "yellow";
-          opt.style.backgroundColor = "darkblue";
           opt.selected = true;
         }
-        opt.innerHTML = item.station_profile_name + " (" + item.station_id + ")";
+        opt.innerHTML = item.station_profile_name + " (" + item.station_callsign + ")";
         select.appendChild(opt);
       }
     }
@@ -2412,7 +2407,7 @@ function sendCloudlogEntry(report)
   {
     CloudLogValidateURL(true);
     CloudlogURL.value = CloudlogURL.value.endsWith("/") ? CloudlogURL.value.slice(0, -1) : CloudlogURL.value;
-    var postData = { key: CloudlogAPI.value, station_profile_id: CloudlogStationProfile.value, type: "adif", string: report };
+    var postData = { key: CloudlogAPI.value, station_profile_id: CloudlogStationProfileID.value, type: "adif", string: report };
     getPostJSONBuffer(
       CloudlogURL.value + "/index.php/api/qso",
       CloudlogSendLogResult,
@@ -2507,9 +2502,7 @@ function CloudLogValidateURL(shouldSaveIfChanged = false)
 
 function CloudLogProfileChanged(obj)
 {
-  GT.settings.adifLog.text.CloudlogStationProfileID = obj.options[obj.selectedIndex].value;
-  GT.settings.adifLog.text.CloudlogStationProfileName = obj.options[obj.selectedIndex].text;
-  
+  GT.settings.adifLog.text.CloudlogStationProfileID = obj.value;
 }
 
 function CloudlogTest(test)

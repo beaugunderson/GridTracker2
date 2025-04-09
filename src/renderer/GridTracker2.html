@@ -2002,8 +2002,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td></td>
             <td></td>
             <td>
-              <input type="checkbox" checked="false" id="logCloudlogQSOCheckBox"
-                onclick="adifLogQsoCheckBoxChanged(this);" />
+              <input type="checkbox" checked="false" id="logCloudlogQSOCheckBox" onclick="adifLogQsoCheckBoxChanged(this);" />
             </td>
             <td>
               <label data-i18n="settings.logging.CloudLog.details.URL" for="CloudlogURL">URL</label>
@@ -2014,16 +2013,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               <input id="CloudlogAPI" type="password" class="inputTextValue" size="12"
                 oninput="ValidateText(this); adifTextValueChange(this);" />
               <br />
-              <label data-i18n="settings.logging.CloudLog.details.StationProfile" for="CloudlogStationProfile">Station Profile</label>
-              <select id="CloudlogStationProfile"  onChange="CloudLogProfileChanged(this)" />
-                <option value="0">Press Test</option>
+              <label data-i18n="settings.logging.CloudLog.details.StationProfile" for="CloudlogStationProfileID">Station Profile</label>
+              <select id="CloudlogStationProfileID" onchange="CloudLogProfileChanged(this)">
+                <option value="1" selected="true">Press Test</option>
               </select>
             </td>
             <td>
-              <div data-i18n="settings.logging.CloudLog.test.button" class="button"
-                onclick="CloudlogTest(true);">
-                Test
-              </div>
+              <div data-i18n="settings.logging.CloudLog.test.button" class="button" onclick="CloudlogTest(true);">Test</div>
             </td>
             <td id="CloudlogTestResult"></td>
           </tr>

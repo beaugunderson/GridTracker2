@@ -12423,18 +12423,18 @@ function loadAdifSettings()
     }
   }
 
-  if (GT.settings.adifLog.text.CloudlogStationProfileName.length > 0)
+  CloudlogStationProfileID.style.color = "#FF0";
+  CloudlogStationProfileID.style.backgroundColor = "darkblue";
+  
+  if (logCloudlogQSOCheckBox.checked == true)
   {
-    select = document.getElementById("CloudlogStationProfile");
-    select.options.length = 0;
-    var opt = document.createElement("option");
-    opt.value = GT.settings.adifLog.text.CloudlogStationProfileID;
-    opt.innerHTML = GT.settings.adifLog.text.CloudlogStationProfileName;
-    opt.selected = true;
-    select.appendChild(opt);
+    CloudlogGetProfiles();
+  }
+  else
+  {
+    GT.settings.adifLog.text.CloudlogStationProfileID = CloudlogStationProfileID.value = "1";
   }
   
-  CloudLogValidateURL(true);
   setAdifStartup(loadAdifCheckBox);
   ValidateQrzApi(qrzApiKey);
 }
