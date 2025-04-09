@@ -253,7 +253,7 @@ const def_settings = {
       HRDLOGUploadCode: "",
       CloudlogURL: "http://127.0.0.1",
       CloudlogAPI: "",
-      CloudlogStationProfileID: "1",
+      CloudlogStationProfileID: "",
       CloudlogStationProfileName: "",
       eQSLUser: "",
       eQSLPassword: "",

@@ -12422,12 +12422,18 @@ function loadAdifSettings()
       logLOTWqsoCheckBox.checked = false;
     }
   }
-  select = document.getElementById("CloudlogStationProfile");
-  select.options.length = 0;
-  var opt = document.createElement("option");
-  opt.value = GT.settings.adifLog.text.CloudlogStationProfileID;
-  opt.innerHTML = GT.settings.adifLog.text.CloudlogStationProfileName;
-  select.appendChild(opt);
+
+  if (GT.settings.adifLog.text.CloudlogStationProfileName.length > 0)
+  {
+    select = document.getElementById("CloudlogStationProfile");
+    select.options.length = 0;
+    var opt = document.createElement("option");
+    opt.value = GT.settings.adifLog.text.CloudlogStationProfileID;
+    opt.innerHTML = GT.settings.adifLog.text.CloudlogStationProfileName;
+    opt.selected = true;
+    select.appendChild(opt);
+  }
+  
   CloudLogValidateURL(true);
   setAdifStartup(loadAdifCheckBox);
   ValidateQrzApi(qrzApiKey);

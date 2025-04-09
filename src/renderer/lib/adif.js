@@ -2114,8 +2114,9 @@ function CloudUrlErrorCallback(
   CloudlogTestResult.innerHTML = message;
 }
 
-function CloudlogSendLogResult(buffer, flag)
+function CloudlogSendLogResult(input, flag)
 {
+  let buffer = String(input);
   if (flag && flag == true)
   {
     if (buffer)
@@ -2234,7 +2235,7 @@ function CloudlogFillProfiles(buffer, flag)
         {
           opt.style.color = "yellow";
           opt.style.backgroundColor = "darkblue";
-          opt.selected = "selected";
+          opt.selected = true;
         }
         opt.innerHTML = item.station_profile_name + " (" + item.station_id + ")";
         select.appendChild(opt);
