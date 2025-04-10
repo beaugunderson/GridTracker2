@@ -2149,8 +2149,9 @@ function CloudlogSendLogResult(input, flag)
 
 function CloudlogGetProfiles()
 {
-  CloudLogValidateURL(true);
-  CloudlogURL.value = CloudlogURL.value.endsWith("/") ? CloudlogURL.value.slice(0, -1) : CloudlogURL.value;
+  if (GT.settings.map.offlineMode == true) return;
+
+  CloudLogCorrectURL();
   if (ValidateText(CloudlogURL) && ValidateText(CloudlogAPI))
   {
     getPostJSONBuffer(
@@ -2165,9 +2166,9 @@ function CloudlogGetProfiles()
       "No Response<br/>or</br>Timeout"
     );
   }
-  else
+  else if (logCloudlogQSOCheckBox.checked == true)
   {
-    CloudlogTestResult.innerHTML = "Missing Fields";
+    CloudlogTestResult.innerHTML = "Invalid Fields";
     GT.settings.adifLog.text.CloudlogStationProfileID = CloudlogStationProfileID.value = "1";
   }
 }
@@ -2405,9 +2406,8 @@ function sendCloudlogEntry(report)
 
   if (logCloudlogQSOCheckBox.checked == true)
   {
-    CloudLogValidateURL(true);
-    CloudlogURL.value = CloudlogURL.value.endsWith("/") ? CloudlogURL.value.slice(0, -1) : CloudlogURL.value;
-    var postData = { key: CloudlogAPI.value, station_profile_id: CloudlogStationProfileID.value, type: "adif", string: report };
+    CloudLogCorrectURL();
+    var postData = { key: CloudlogAPI.value, station_profile_id: parseInt(GT.settings.adifLog.text.CloudlogStationProfileID), type: "adif", string: report };
     getPostJSONBuffer(
       CloudlogURL.value + "/index.php/api/qso",
       CloudlogSendLogResult,
@@ -2490,10 +2490,12 @@ function hrdCredentialTest(test)
   }
 }
 
-function CloudLogValidateURL(shouldSaveIfChanged = false)
+function CloudLogCorrectURL(shouldSaveIfChanged = true)
 {
   var initialValue = CloudlogURL.value;
-  CloudlogURL.value = CloudlogURL.value.replace("/index.php/api/qso", "")
+  CloudlogURL.value = CloudlogURL.value.replace("/index.php/api/qso", "");
+  CloudlogURL.value = CloudlogURL.value.endsWith("/") ? CloudlogURL.value.slice(0, -1) : CloudlogURL.value;
+
   if (shouldSaveIfChanged == true && CloudlogURL.value != initialValue)
   {
     GT.settings.adifLog.text.CloudlogURL = CloudlogURL.value;
@@ -2509,8 +2511,7 @@ function CloudlogTest(test)
 {
   if (test && test == true)
   {
-    CloudLogValidateURL(true);
-    CloudlogURL.value = CloudlogURL.value.endsWith("/") ? CloudlogURL.value.slice(0, -1) : CloudlogURL.value;
+    CloudLogCorrectURL();
     if (ValidateText(CloudlogURL) && ValidateText(CloudlogAPI))
     {
       CloudlogTestResult.innerHTML = "Testing API Key";

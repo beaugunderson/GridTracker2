@@ -1013,6 +1013,7 @@ function changeOffline()
     offlineMapNightSelect.style.display = "";
 
   }
+  CloudlogGetProfiles();
   changePotaEnable();
   displayRadar();
   displayPredLayer();
@@ -12425,16 +12426,8 @@ function loadAdifSettings()
 
   CloudlogStationProfileID.style.color = "#FF0";
   CloudlogStationProfileID.style.backgroundColor = "darkblue";
-  
-  if (logCloudlogQSOCheckBox.checked == true)
-  {
-    CloudlogGetProfiles();
-  }
-  else
-  {
-    GT.settings.adifLog.text.CloudlogStationProfileID = CloudlogStationProfileID.value = "1";
-  }
-  
+  CloudlogGetProfiles();
+
   setAdifStartup(loadAdifCheckBox);
   ValidateQrzApi(qrzApiKey);
 }
