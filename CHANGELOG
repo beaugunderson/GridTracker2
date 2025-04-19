@@ -107,6 +107,7 @@ Logging -> Cloudlog: Fixed logging issue after startup
 Stats -> Logbook: Added County column
 Stats -> Logbook: Added State and County searching, sorting
 Stats -> WPX: Added US counties, now [WPX / USC] tab
+Stats -> Live: Fixed issue with DXCC count and live refresh
 App: Updated initial install Big CTY data to version April 12th, 2025
 
 ### Fixed

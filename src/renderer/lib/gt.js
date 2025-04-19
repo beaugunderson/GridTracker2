@@ -3960,6 +3960,12 @@ function dimGridsquare()
       {
         if (CallIsKey in GT.liveCallsigns)
         {
+          let dxcc = GT.liveCallsigns[CallIsKey].dxcc;
+          if (dxcc in GT.dxccCount)
+          {
+            GT.dxccCount[dxcc]--;
+            if (GT.dxccCount[dxcc] < 1) delete GT.dxccCount[dxcc];
+          }
           delete GT.liveCallsigns[CallIsKey];
         }
       }
@@ -5759,6 +5765,7 @@ function handleInstanceStatus(newMessage)
 
         setStatsDiv("decodeLastListDiv", worker);
         setStatsDivHeight("decodeLastListDiv", getStatsWindowHeight() + 26 + "px");
+        showCallsignBoxIfTabOpen();
 
         if (GT.settings.app.offAirServicesEnable == true && Object.keys(GT.spotCollector).length > 0)
         {
@@ -6612,6 +6619,12 @@ function handleWsjtxClear(newMessage)
   {
     if (GT.liveCallsigns[hash].instance == newMessage.instance || GT.liveCallsigns[hash].mode == GT.instances[newMessage.instance].status.MO)
     {
+      let dxcc = GT.liveCallsigns[hash].dxcc;
+      if (dxcc in GT.dxccCount)
+      {
+        GT.dxccCount[dxcc]--;
+        if (GT.dxccCount[dxcc] < 1) delete GT.dxccCount[dxcc];
+      }
       delete GT.liveCallsigns[hash];
     }
   }
@@ -6890,19 +6903,20 @@ function importSettings(contents)
 
 function showCallsignBox(redraw)
 {
-  var worker = "<div style='vertical-align:top;display:inline-block;margin:2px;color:cyan;font-weight:bold'>" + I18N("gt.callsignBox.title") + "</div><br/>";
+  let worker = "<div style='vertical-align:top;display:inline-block;margin:2px;color:cyan;font-weight:bold'>" + I18N("gt.callsignBox.title") + "</div><br/>";
 
   GT.newCallsignCount = Object.keys(GT.liveCallsigns).length;
   if (GT.newCallsignCount > 0)
   {
-    var newCallList = Array();
+    let newCallList = Array();
 
     worker +=
-      "<div  style='display:inline-block;padding-right:8px;overflow:auto;overflow-x:hidden;height:" +
+      "<div  style='display:inline-block;padding-right:4px;margin-right:8px; overflow:auto;overflow-x:hidden;height:" +
       Math.min(GT.newCallsignCount * 24 + 26, getStatsWindowHeight()) + "px;'>" +
         "<table class='darkTable' align=center>" +
         "<th align=left>" + I18N("gt.callsignBox.callsign") + "</th>" +
         "<th align=left>" + I18N("gt.callsignBox.Grid") + "</th>" +
+        "<th>" + I18N("gt.newCallList.Band") + "</th>" +
         "<th>" + I18N("gt.callsignBox.DXCC") + "</th>" +
         "<th>" + I18N("gt.callsignBox.CQ") + "</th>" +
         "<th>" + I18N("gt.callsignBox.ITU") + "</th>" +
@@ -6913,7 +6927,7 @@ function showCallsignBox(redraw)
     if (GT.settings.callsignLookups.lotwUseEnable == true) worker += "<th>" + I18N("gt.callsignBox.LoTW") + "</th>";
     if (GT.settings.callsignLookups.eqslUseEnable == true) worker += "<th>" + I18N("gt.callsignBox.eQSL") + "</th>";
     if (GT.settings.callsignLookups.oqrsUseEnable == true) worker += "<th>" + I18N("gt.callsignBox.OQRS") + "</th>";
-    for (var x in GT.liveCallsigns)
+    for (let x in GT.liveCallsigns)
     {
       if (GT.liveCallsigns[x].dxcc != -1)
       {
@@ -6921,40 +6935,24 @@ function showCallsignBox(redraw)
       }
     }
     newCallList.sort(compareCallsignTime).reverse();
-    for (var x in newCallList)
+    for (let x in newCallList)
     {
       if (newCallList[x].DEcall == GT.settings.app.myRawCall) continue;
-      var grid = newCallList[x].grid ? newCallList[x].grid : "-";
-      var cqzone = newCallList[x].cqz ? newCallList[x].cqz : "-";
-      var ituzone = newCallList[x].ituz ? newCallList[x].ituz : "-";
-      var geo = GT.dxccInfo[newCallList[x].dxcc];
-      var thisCall = formatCallsign(newCallList[x].DEcall);
-      worker +=
-        "<tr><td align=left style='color:#ff0;cursor:pointer'  onClick='window.opener.startLookup(\"" +
-        newCallList[x].DEcall +
-        "\",\"" +
-        grid +
-        "\");'>" +
-        thisCall +
-        "</td><td align=left style='color:cyan;' >" +
-        grid +
-        "</td><td  style='color:orange;'>" +
-        geo.name +
-        "<font style='color:lightgreen;'> (" +
-        geo.pp +
-        ")<font></td>";
+      let grid = newCallList[x].grid ? newCallList[x].grid : "-";
+      let cqzone = newCallList[x].cqz ? newCallList[x].cqz : "-";
+      let ituzone = newCallList[x].ituz ? newCallList[x].ituz : "-";
+      let geo = GT.dxccInfo[newCallList[x].dxcc];
+      let thisCall = formatCallsign(newCallList[x].DEcall);
+      let bandColor = newCallList[x].band in GT.pskColors ? GT.pskColors[newCallList[x].band] : GT.pskColors.OOB;
+
+      worker += "<tr><td align=left style='color:#ff0;cursor:pointer'  onClick='window.opener.startLookup(\"" + newCallList[x].DEcall + "\",\"" + grid + "\");'>" + thisCall + "</td>";
+      worker += "<td align=left style='color:cyan;' >" + grid + "</td>";
+      worker += "<td style='color:#" + bandColor + ";'>" + newCallList[x].band + "</td>";
+      worker += "<td style='color:orange;'>" + geo.name + "<font style='color:lightgreen;'> (" + geo.pp + ")<font></td>";
       worker += "<td>" + cqzone + "</td><td>" + ituzone + "</td>";
-      worker +=
-        "<td align='center' style='margin:0;padding:0'><img style='padding-top:4px' src='img/flags/16/" +
-        geo.flag +
-        "'></td>";
-      worker +=
-        "<td>" +
-        (thisCall in GT.tracker.worked.call ? "&#10004;" : "") +
-        "</td><td>" +
-        (thisCall in GT.tracker.confirmed.call ? "&#10004;" : "") +
-        "</td>";
-      var ageString = "";
+      worker += "<td align='center' style='margin:0;padding:0'><img style='padding-top:4px' src='img/flags/16/" + geo.flag + "'></td>";
+      worker += "<td>" + (thisCall in GT.tracker.worked.call ? "&#10004;" : "") + "</td><td>" + (thisCall in GT.tracker.confirmed.call ? "&#10004;" : "") + "</td>";
+      let ageString = "";
       if (timeNowSec() - newCallList[x].time < 3601) { ageString = toDHMS(timeNowSec() - newCallList[x].time); }
       else
       {
@@ -6963,39 +6961,30 @@ function showCallsignBox(redraw)
       worker += "<td>" + ageString + "</td>";
       if (GT.settings.callsignLookups.lotwUseEnable == true)
       {
-        worker +=
-          "<td align='center'>" +
-          (thisCall in GT.lotwCallsigns ? "&#10004;" : "") +
-          "</td>";
+        worker += "<td align='center'>" + (thisCall in GT.lotwCallsigns ? "&#10004;" : "") + "</td>";
       }
       if (GT.settings.callsignLookups.eqslUseEnable == true)
       {
-        worker +=
-          "<td align='center'>" +
-          (thisCall in GT.eqslCallsigns ? "&#10004;" : "") +
-          "</td>";
+        worker += "<td align='center'>" + (thisCall in GT.eqslCallsigns ? "&#10004;" : "") + "</td>";
       }
       if (GT.settings.callsignLookups.oqrsUseEnable == true)
       {
-        worker +=
-          "<td align='center'>" +
-          (thisCall in GT.oqrsCallsigns ? "&#10004;" : "") +
-          "</td>";
+        worker += "<td align='center'>" + (thisCall in GT.oqrsCallsigns ? "&#10004;" : "") + "</td>";
       }
       worker += "</tr>";
     }
     worker += "</table></div>";
   }
 
-  var heard = 0;
-  var List = {};
+  let heard = 0;
+  let List = {};
   if (Object.keys(GT.dxccCount).length > 0)
   {
-    for (var key in GT.dxccCount)
+    for (let key in GT.dxccCount)
     {
       if (key != -1)
       {
-        var item = {};
+        let item = {};
         item.total = GT.dxccCount[key];
         item.confirmed = GT.dxccInfo[key].confirmed;
         item.worked = GT.dxccInfo[key].worked;
@@ -7037,7 +7026,19 @@ function showCallsignBox(redraw)
     worker += "</table></div>";
   }
   worker += "</div>";
+
   setStatsDiv("callsignListDiv", worker);
+}
+
+function showCallsignBoxIfTabOpen()
+{
+  if (GT.statsWindowInitialized)
+  {
+    if (GT.statsWindowHandle.window["callsignBoxDiv"].style.display == "block")
+    {
+      showCallsignBox(true);
+    }
+  }
 }
 
 function setStatsDiv(div, worker)
