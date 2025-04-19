@@ -578,7 +578,9 @@ GT.sortFunction = [
   myTimeCompare,
   myBandCompare,
   myConfirmedCompare,
-  myPotaCompare
+  myPotaCompare,
+  myStateCompare,
+  myCntyCompare
 ];
 
 GT.lastSortIndex = 4;
@@ -588,6 +590,8 @@ GT.lastSortType = 0;
 GT.searchWB = "";
 GT.gridSearch = "";
 GT.potaSearch = "";
+GT.stateSearch = "";
+GT.cntySearch = "";
 GT.filterBand = "Mixed";
 GT.filterMode = "Mixed";
 GT.filterDxcc = 0;
@@ -7145,6 +7149,24 @@ function myConfirmedCompare(a, b)
   return 0;
 }
 
+function myStateCompare(a, b)
+{
+  if (a.state && !b.state) return -1;
+  if (!a.state && b.state) return 1;
+  if (a.state > b.state) return 1;
+  if (a.state < b.state) return -1;
+  return 0;
+}
+
+function myCntyCompare(a, b)
+{
+  if (a.cnty && !b.cnty) return -1;
+  if (!a.cnty && b.cnty) return 1;
+  if (a.cnty > b.cnty) return 1;
+  if (a.cnty < b.cnty) return -1;
+  return 0;
+}
+
 function myPotaCompare(a, b)
 {
   if (a.pota && !b.pota) return -1;
@@ -7162,6 +7184,8 @@ function resetSearch()
   GT.lastSortType = 2;
   GT.searchWB = "";
   GT.gridSearch = "";
+  GT.stateSearch = "";
+  GT.cntySearch = "";
   GT.potaSearch = "";
 
   GT.filterBand = "Mixed";
@@ -7186,6 +7210,22 @@ function showWorkedSearchChanged(object, index)
 {
   ValidateCallsign(object, null);
   GT.searchWB = object.value.toUpperCase();
+  GT.lastSearchSelection = object.id;
+  showWorkedBox(index, 0);
+}
+
+function showWorkedSearchState(object, index)
+{
+  ValidateCallsign(object, null);
+  GT.stateSearch = object.value.toUpperCase();
+  GT.lastSearchSelection = object.id;
+  showWorkedBox(index, 0);
+}
+
+function showWorkedSearchCnty(object, index)
+{
+  ValidateCallsign(object, null);
+  GT.cntySearch = object.value.toUpperCase();
   GT.lastSearchSelection = object.id;
   showWorkedBox(index, 0);
 }
@@ -7287,6 +7327,27 @@ function showWorkedBox(sortIndex, nextPage, redraw)
         var x = value.grid.indexOf(GT.gridSearch);
         var y = value.vucc_grids.indexOf(GT.gridSearch);
         return x == 0 || y == 0;
+      });
+    }
+
+    if (GT.stateSearch.length > 0)
+    {
+      let regExTest = new RegExp(GT.stateSearch, "gi")
+      list = list.filter(function (value)
+      {
+        if (!value.state) return false;
+        return value.state.match(regExTest);
+      });
+    }
+
+    if (GT.cntySearch.length > 0)
+    {
+      let regExTest = new RegExp(GT.cntySearch, "gi")
+      list = list.filter(function (value)
+      {
+        if (!value.cnty) return false;
+        if (!(value.cnty in GT.countyData)) return false;
+        return GT.countyData[value.cnty].geo.properties.n.match(regExTest);
       });
     }
 
@@ -7464,11 +7525,26 @@ function showWorkedBox(sortIndex, nextPage, redraw)
       }
       else
       {
-        worker += "<th colspan=2><div id='dxccFilterDiv'></div><th>";
+        worker += "<th colspan='1'><div id='dxccFilterDiv'></div><th>";
       }
+
+      worker += "<th><input type='text' id='searchState' style='margin:0px'  oncontextmenu='contextMenu()' class='inputTextValue' value='" + GT.stateSearch + "' size='3' oninput='window.opener.showWorkedSearchState(this);' / >";
+      if (GT.stateSearch.length > 0)
+      {
+        worker += "<img title='Clear Park' onclick='searchState.value=\"\";window.opener.showWorkedSearchState(searchState);' src='img/trash_24x48.png' style='width: 30px; margin:0px; padding:0px; margin-bottom: -4px; cursor: pointer;'/>";
+      }
+      worker += "</th>";""
+
+      worker += "<th><input type='text' id='searchCnty' style='margin:0px'  oncontextmenu='contextMenu()' class='inputTextValue' value='" + GT.cntySearch + "' size='4' oninput='window.opener.showWorkedSearchCnty(this);' / >";
+      if (GT.cntySearch.length > 0)
+      {
+        worker += "<img title='Clear County' onclick='searchCnty.value=\"\";window.opener.showWorkedSearchCnty(searchCnty);' src='img/trash_24x48.png' style='width: 30px; margin:0px; padding:0px; margin-bottom: -4px; cursor: pointer;'/>";
+      }
+      worker += "</th>";""
+
       if (GT.settings.app.potaFeatureEnabled) 
       {
-        worker += "<th><input type='text' id='searchPOTA' style='margin:0px'  oncontextmenu='contextMenu()' class='inputTextValue' value='" + GT.potaSearch + "' size='8' oninput='window.opener.showWorkedSearchPOTA(this);' / >";
+        worker += "<th><input type='text' id='searchPOTA' style='margin:0px'  oncontextmenu='contextMenu()' class='inputTextValue' value='" + GT.potaSearch + "' size='4' oninput='window.opener.showWorkedSearchPOTA(this);' / >";
         if (GT.potaSearch.length > 0)
         {
           worker += "<img title='Clear Park' onclick='searchPOTA.value=\"\";window.opener.showWorkedSearchPOTA(searchPOTA);' src='img/trash_24x48.png' style='width: 30px; margin:0px; padding:0px; margin-bottom: -4px; cursor: pointer;'/>";
@@ -7488,7 +7564,8 @@ function showWorkedBox(sortIndex, nextPage, redraw)
       worker += "<th align=center>" + I18N("gt.qsoPage.Rcvd") + "</th>";
       worker += "<th style='cursor:pointer;' align=center onclick='window.opener.showWorkedBox(3);'>" + I18N("gt.qsoPage.DXCC") + "</th>";
       worker += "<th style='cursor:pointer;' align=center onclick='window.opener.showWorkedBox(3);'>" + I18N("gt.qsoPage.Flag") + "</th>";
-      worker += "<th align=center>" + I18N("roster.secondary.wanted.state") + "</th>";
+      worker += "<th style='cursor:pointer;' align=center onclick='window.opener.showWorkedBox(8);'>" + I18N("roster.secondary.wanted.state") + "</th>";
+      worker += "<th style='cursor:pointer;' align=center onclick='window.opener.showWorkedBox(9);'>" + I18N("roster.secondary.wanted.county") + "</th>";
       if (GT.settings.app.potaFeatureEnabled) worker += "<th style='cursor:pointer;' align=center onclick='window.opener.showWorkedBox(7);'>POTA</th>";
       worker += "<th style='cursor:pointer;' align=center onclick='window.opener.showWorkedBox(4);'>" + I18N("gt.qsoPage.When") + "</th>";
 
@@ -7522,6 +7599,14 @@ function showWorkedBox(sortIndex, nextPage, redraw)
         {
           let title = (key.state in GT.StateData) ? "title='" + GT.StateData[key.state].name + "'" : "";
           worker += "<td align=center style='color:lightgreen' " + title + ">" + key.state.substr(3) + "</td>";
+        }
+        else
+        {
+          worker += "<td></td>";
+        }
+        if (key.cnty && key.cnty in GT.countyData)
+        {
+          worker += "<td align=center style='color:cyran'>" + GT.countyData[key.cnty].geo.properties.n + "</td>";
         }
         else
         {
@@ -7571,6 +7656,10 @@ function showWorkedBox(sortIndex, nextPage, redraw)
 
       statsValidateCallByElement("searchWB");
       statsValidateCallByElement("searchGrid");
+      statsValidateCallByElement("searchState");
+      statsValidateCallByElement("searchCnty");
+
+      if (GT.settings.app.potaFeatureEnabled) statsValidateCallByElement("searchPOTA");
 
       var newSelect = document.createElement("select");
       newSelect.id = "bandFilter";
@@ -7964,11 +8053,11 @@ function showZonesBox()
 {
   var worker = getCurrentBandModeHTML();
 
-  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'>" + "<b>" + I18N("gt.CQZoneBox.Worked") + "</b><br/>";
+  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.CQZoneBox.Worked") + "</b><br/>";
   worker += displayItemList(GT.cqZones, "#FFA500");
   worker += "</div>";
 
-  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'>" + "<b>" + I18N("gt.ITUZoneBox.Worked") + "</b><br/>";
+  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.ITUZoneBox.Worked") + "</b><br/>";
   worker += displayItemList(GT.ituZones, "#00DDDD");
   worker += "</div>";
 
@@ -7983,7 +8072,7 @@ function showWASPlusBox()
 {
   var worker = getCurrentBandModeHTML();
 
-  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'<b>" + I18N("gt.WASWACBox.WAS") + "</b><br/>";
+  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.WASWACBox.WAS") + "</b><br/>";
   worker += displayItemList(GT.wasZones, "#00DDDD");
   worker += "</div>";
 
@@ -8000,10 +8089,10 @@ function showWASPlusBox()
 
 function displayItemList(table, color)
 {
-  var worked = 0;
-  var needed = 0;
-  var confirmed = 0;
-  for (var key in table)
+  let worked = 0;
+  let needed = 0;
+  let confirmed = 0;
+  for (let key in table)
   {
     if (table[key].worked == true)
     {
@@ -8018,7 +8107,7 @@ function displayItemList(table, color)
       needed++;
     }
   }
-  var worker =
+  let worker =
     "<div style='color:white;vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;height:" +
     Math.min(
       Object.keys(table).length * 23 + (23 + 45),
@@ -8026,24 +8115,21 @@ function displayItemList(table, color)
     ) +
     "px;'>";
   worker += "<table class='darkTable' align=center>";
-  worker +=
-    "<tr><th style='font-weight:bold'>" + I18N("gt.displayItemsList.Worked") + " (" + worked + ")</th></tr>";
-  worker +=
-    "<tr><th style='font-weight:bold'>" + I18N("gt.displayItemsList.Confirmed") + " (" + confirmed + ")</th></tr>";
-  worker +=
-    "<tr><th style='font-weight:bold'>" + I18N("gt.displayItemsList.Needed") + " (" + needed + ")</th></tr>";
+  worker += "<tr><th style='font-weight:bold'>" + I18N("gt.displayItemsList.Worked") + " (" + worked + ")</th></tr>";
+  worker += "<tr><th style='font-weight:bold'>" + I18N("gt.displayItemsList.Confirmed") + " (" + confirmed + ")</th></tr>";
+  worker += "<tr><th style='font-weight:bold'>" + I18N("gt.displayItemsList.Needed") + " (" + needed + ")</th></tr>";
   worker += "<tr><th align=left>Name</th></tr>";
 
-  var confirmed = "";
-  var bold = "text-shadow: 0px 0px 1px black;";
-  var unconf = "background-clip:content-box;box-shadow: 0 0 8px 3px inset ";
+  confirmed = "";
+  let bold = "text-shadow: 0px 0px 1px black;";
+  let unconf = "background-clip:content-box;box-shadow: 0 0 8px 3px inset ";
 
   Object.keys(table)
     .sort()
     .forEach(function (key, i)
     {
-      var style;
-      var name;
+      let style;
+      let name;
       if (typeof table[key].name !== "undefined" && table[key].name != key)
       {
         name = key + " / " + table[key].name;
@@ -8065,8 +8151,7 @@ function displayItemList(table, color)
         // needed
         style = "color:#000000;background-color:" + color + ";" + bold;
       }
-      worker +=
-        "<tr><td align=left style='" + style + "'>" + name + "</td></tr>";
+      worker += "<tr><td align=left style='" + style + "'>" + name + "</td></tr>";
     });
   worker += "</table></div>";
   return worker;
@@ -8074,21 +8159,21 @@ function displayItemList(table, color)
 
 function showWPXBox()
 {
-  var worker = getCurrentBandModeHTML();
+  let worker = getCurrentBandModeHTML();
 
-  var band = GT.settings.app.gtBandFilter == "auto" ? GT.settings.app.myBand : GT.settings.app.gtBandFilter.length == 0 ? "" : GT.settings.app.gtBandFilter;
-  var mode = GT.settings.app.gtModeFilter == "auto" ? GT.settings.app.myMode : GT.settings.app.gtModeFilter.length == 0 ? "" : GT.settings.app.gtModeFilter;
+  let band = GT.settings.app.gtBandFilter == "auto" ? GT.settings.app.myBand : GT.settings.app.gtBandFilter.length == 0 ? "" : GT.settings.app.gtBandFilter;
+  let mode = GT.settings.app.gtModeFilter == "auto" ? GT.settings.app.myMode : GT.settings.app.gtModeFilter.length == 0 ? "" : GT.settings.app.gtModeFilter;
 
   if (mode == "Digital") { mode = "dg"; }
   if (mode == "Phone") { mode = "ph"; }
 
-  var modifier = String(band) + String(mode);
-  var worked = 0;
-  var confirmed = 0;
-  var List = {};
-  var ListConfirmed = {};
+  let modifier = String(band) + String(mode);
+  let worked = 0;
+  let confirmed = 0;
+  let List = {};
+  let ListConfirmed = {};
 
-  for (var key in GT.tracker.worked.px)
+  for (let key in GT.tracker.worked.px)
   {
     if (typeof GT.tracker.worked.px[key] == "string" && key + modifier in GT.tracker.worked.px)
     {
@@ -8096,7 +8181,7 @@ function showWPXBox()
     }
   }
 
-  for (var key in GT.tracker.confirmed.px)
+  for (let key in GT.tracker.confirmed.px)
   {
     if (typeof GT.tracker.confirmed.px[key] == "string" && key + modifier in GT.tracker.confirmed.px)
     {
@@ -8137,7 +8222,7 @@ function showWPXBox()
   if (confirmed > 0)
   {
     worker +=
-      "<div  style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'>" +
+      "<div  style='vertical-align:top;display:inline-block;margin-right:16px;overflow:auto;overflow-x:hidden;color:cyan;'>" +
         "<b>" + I18N("gt.WPXBox.confirmed") + " (<font color='#fff'>" +
       confirmed +
       "</font>)</b><br/>";
@@ -8161,6 +8246,10 @@ function showWPXBox()
     worker += "</div>";
   }
 
+  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.viewInfo.countyData") + "</b><br/>";
+  worker += displayItemList(GT.countyData, "orange");
+  worker += "</div>";
+  
   setStatsDiv("wpxListDiv", worker);
 }
 
