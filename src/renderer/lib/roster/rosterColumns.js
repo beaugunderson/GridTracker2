@@ -48,7 +48,7 @@ const ROSTER_COLUMNS = {
       if (acks[callObj.DEcall])
       {
         attrs.html = `${attrs.html} <span class='acknowledged'><img class='ackBadge' src='${acks[callObj.DEcall].badge}'></span>`
-        attrs.title = `${attrs.title} - ${acks[callObj.DEcall].message}`
+        attrs.title = `${acks[callObj.DEcall].message}`
       }
 
       return attrs

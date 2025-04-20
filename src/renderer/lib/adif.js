@@ -1548,7 +1548,7 @@ function sendToLogger(ADIF)
 
   if (!("DXCC" in record))
   {
-    var dxcc = callsignToDxcc(record.CALL);
+    let dxcc = callsignToDxcc(record.CALL);
     if (dxcc == -1) dxcc = 0;
     record.DXCC = String(dxcc);
   }
@@ -1561,8 +1561,8 @@ function sendToLogger(ADIF)
 
   if (GT.settings.app.lookupMerge == true && record.CALL in GT.lookupCache)
   {
-    var lookup = GT.lookupCache[record.CALL];
-    for (var key in lookup)
+    let lookup = GT.lookupCache[record.CALL];
+    for (const key in lookup)
     {
       if (key in GT.adifLookupMap)
       {
