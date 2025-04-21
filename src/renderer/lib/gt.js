@@ -11751,6 +11751,8 @@ function loadMapSettings()
 
   offlineModeEnable.checked = GT.settings.map.offlineMode;
 
+  allGridOpacityValue.value = GT.settings.map.allGridOpacity;
+  
   mapSelect.value = GT.settings.map.mapIndex;
   mapNightSelect.value = GT.settings.map.nightMapIndex;
 
@@ -12017,6 +12019,7 @@ function changeMapLayer()
   GT.map.getLayers().insertAt(0, GT.tileLayer);
 
   changeMapBackgroundColor(false);
+  setAllGridOpacity();
 }
 
 function changeMapBackgroundColor(fromSettings = true)
@@ -15157,6 +15160,19 @@ function changePredOpacityValue()
   if (GT.PredLayer != null)
   {
     GT.PredLayer.setOpacity(Number(GT.settings.map.predOpacity));
+  }
+}
+
+function setAllGridOpacity()
+{
+  GT.settings.map.allGridOpacity = allGridOpacityValue.value;
+  allGridOpacityTd.innerHTML = parseInt(allGridOpacityValue.value * 100) + "%";
+
+  if (GT.layerVectors.lineGrids)
+  {
+    GT.layerVectors.lineGrids.setOpacity(Number(GT.settings.map.allGridOpacity));
+    GT.layerVectors.longGrids.setOpacity(Number(GT.settings.map.allGridOpacity));
+    GT.layerVectors.bigGrids.setOpacity(Number(GT.settings.map.allGridOpacity));
   }
 }
 

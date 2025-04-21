@@ -137,6 +137,7 @@ const def_settings = {
     buttonPanelOrder: []
   },
   map: {
+    allGridOpacity: 1,
     animate: true,
     animateSpeed: 4,
     CQhilite: true,
