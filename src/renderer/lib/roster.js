@@ -1383,6 +1383,8 @@ function blurOnEnter(ele)
 
 function resize()
 {
+  if (GT.callRosterWindowInitialized == false) return;
+
   if (ignoresBoxDiv.style.display != "none")
   {
     renderIgnoresTab();
@@ -1402,22 +1404,16 @@ function init()
   CR.callsignDatabaseDXCC = GT.callsignDatabaseDXCC;
   CR.callsignDatabaseUS = GT.callsignDatabaseUS;
   CR.callsignDatabaseUSplus = GT.callsignDatabaseUSplus;
+
   loadAwardJson();
-
   updateWorked();
-  // addAllAwards();
-
   loadFilterSettings();
   updateInstances();
-
-  // callback to addControls();
   loadRosterI18n();
-
   setRosterTop();
-
   createActiveAwardsFromSettings();
-  
   registerCutAndPasteContextMenu();
+  
   GT.callRosterWindowInitialized = true;
 }
 

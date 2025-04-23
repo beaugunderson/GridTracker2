@@ -87,6 +87,8 @@
       }
 
       function Resize() {
+        if ( GT.lookupWindowInitialized == false) return;
+        
         lookupBoxDiv.style.height = window.innerHeight + "px";
       }
     </script>

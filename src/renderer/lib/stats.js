@@ -151,6 +151,8 @@ function resizeWorked()
 
 function Resize()
 {
+  if (GT.statsWindowInitialized == false) return;
+  
   if (statBoxDiv.style.display == "block")
   {
     window.opener.showStatBox(true);

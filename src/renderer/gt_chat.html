@@ -581,6 +581,8 @@
 
       function Resize()
       {
+        if (GT.chatWindowInitialized == false) return;
+        
         var height = window.innerHeight;
         var width = window.innerWidth;
 
@@ -625,7 +627,7 @@
       }
     </script>
   </head>
-  <body onLoad="init();" style="height: 100%; width: 100%" onresize="Resize();">
+  <body onLoad="init()" style="height: 100%; width: 100%" onresize="Resize()">
     <div id="wrapperDiv">
       <div
         id="messageAreaDiv"
