@@ -2114,36 +2114,18 @@ function CloudUrlErrorCallback(
   CloudlogTestResult.innerHTML = message;
 }
 
-function CloudlogSendLogResult(input, flag)
+function CloudlogSendLogResult(input)
 {
   let buffer = String(input);
-  if (flag && flag == true)
+  if (buffer && buffer.indexOf("created") > -1)
   {
-    if (buffer)
-    {
-      if (buffer.indexOf("missing api key") > -1)
-      {
-        CloudlogTestResult.innerHTML = "API Key Invalid";
-      }
-      else if (buffer.indexOf("created") > -1)
-      {
-        CloudlogTestResult.innerHTML = "Passed";
-      }
-      else
-      {
-        CloudlogTestResult.innerHTML = "Invalid Response";
-      }
-    }
-    else
-    {
-      CloudlogTestResult.innerHTML = "Invalid Response";
-    }
+    addLastTraffic("<font style='color:white'>Logged to Cloudlog</font>");
   }
-  else
+  else 
   {
-    if (buffer && buffer.indexOf("created") > -1)
-    { addLastTraffic("<font style='color:white'>Logged to Cloudlog</font>"); }
-    else addLastTraffic("<font style='color:red'>Fail log to Cloudlog</font>");
+    addLastTraffic("<font style='color:red'>Fail log to Cloudlog</font><br/><font style='color:orange'>See main.log for error</font>");
+    console.log("Cloudlog/Wavelog response:");
+    console.log(buffer);
   }
 }
 
