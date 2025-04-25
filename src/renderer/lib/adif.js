@@ -2229,7 +2229,7 @@ function CloudlogFillProfiles(buffer, flag)
         var item = jsonData[i];
         var opt = document.createElement("option");
         opt.value = item.station_id;
-        if (item.station_id == GT.settings.adifLog.text.CloudlogStationProfileID)
+        if ((jsonData.length == 1) || (item.station_id == GT.settings.adifLog.text.CloudlogStationProfileID))
         {
           opt.selected = true;
         }
