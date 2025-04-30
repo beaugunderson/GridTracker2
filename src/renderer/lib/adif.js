@@ -2236,6 +2236,9 @@ function CloudlogFillProfiles(buffer, flag)
         opt.innerHTML = item.station_profile_name + " (" + item.station_callsign + ")";
         select.appendChild(opt);
       }
+      if (jsonData.length == 1) {
+        CloudLogProfileChanged(select);
+      }
     }
     else
     {
