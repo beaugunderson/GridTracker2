@@ -2212,16 +2212,17 @@ function CloudlogFillProfiles(buffer, flag)
         var item = jsonData[i];
         var opt = document.createElement("option");
         opt.value = item.station_id;
-        if ((item.station_id == GT.settings.adifLog.text.CloudlogStationProfileID) // Selection from config fits to this station? select it
-	|| ((i == (jsonData.length-1)) && (!selected)))	// Old selection in config never set/fit to a station? so take last one as default
+        // Selection from config fits to this station? select it                   or Old selection in config never set/fit to a station? so take last one as default
+        if ((item.station_id == GT.settings.adifLog.text.CloudlogStationProfileID) || ((i == (jsonData.length-1)) && (!selected)))
         {
           opt.selected = true;
-	  selected=true;
+          selected=true;
         }
         opt.innerHTML = item.station_profile_name + " (" + item.station_callsign + ")";
         select.appendChild(opt);
       }
-      if (selected) {
+      if (selected)
+      {
         CloudLogProfileChanged(select);
       }
     }
