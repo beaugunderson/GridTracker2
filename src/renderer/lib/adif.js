@@ -2206,19 +2206,23 @@ function CloudlogFillProfiles(buffer, flag)
       select = document.getElementById("CloudlogStationProfileID");
       select.options.length = 0;
       jsonData = JSON.parse(buffer);
+      let selected = false;
       for (var i = 0; i < jsonData.length; i++)
       {
         var item = jsonData[i];
         var opt = document.createElement("option");
         opt.value = item.station_id;
-        if ((jsonData.length == 1) || (item.station_id == GT.settings.adifLog.text.CloudlogStationProfileID))
+        // Selection from config fits to this station? select it                   or Old selection in config never set/fit to a station? so take last one as default
+        if ((item.station_id == GT.settings.adifLog.text.CloudlogStationProfileID) || ((i == (jsonData.length-1)) && (!selected)))
         {
           opt.selected = true;
+          selected=true;
         }
         opt.innerHTML = item.station_profile_name + " (" + item.station_callsign + ")";
         select.appendChild(opt);
       }
-      if (jsonData.length == 1) {
+      if (selected)
+      {
         CloudLogProfileChanged(select);
       }
     }
