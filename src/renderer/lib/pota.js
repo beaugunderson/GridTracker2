@@ -673,7 +673,7 @@ function createParkTipTable(toolElement)
     key +
     " : <font color='cyan'>" + GT.pota.parks[key].name + "" +
     " (<font color='yellow'>" + GT.dxccToAltName[Number(GT.pota.parks[key].entityId)] + "</font>)" +
-    "</font></br><font color='lightblue'>" + GT.pota.parks[key].locationDesc + "</font></div>";
+    "</font><br><font color='lightblue'>" + GT.pota.parks[key].locationDesc + "</font></div>";
 
   worker += "<table id='potaSpotsTable' class='darkTable' style='margin: 0 auto;'>";
   worker += "<tr><th>Activator</th><th>Spotter</th><th>Freq</th><th>Mode</th><th>Count</th><th>When</th><th>Source</th><th>Comment</th></tr>";

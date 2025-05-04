@@ -2919,7 +2919,7 @@ function mouseDownGrid(longlat)
           {
             if (GT.gridToDXCC[grid][x] == GT.StateData[GT.gridToState[grid][y]].dxcc)
             {
-              worker += GT.StateData[GT.gridToState[grid][y]].name + "<br/>";
+              worker += GT.StateData[GT.gridToState[grid][y]].name + "<br>";
             }
           }
         }
@@ -4219,7 +4219,7 @@ function getCurrentBandModeHTML()
     band +
     "</text> / <text style='color:orange'>" +
     mode +
-    "</text></b></div><br/>"
+    "</text></b></div><br>"
   );
 }
 
@@ -5423,7 +5423,7 @@ function setCallAndGrid(callsign, grid, instance = null, genMessages = true)
   }
   if (thisInstance && thisInstance.TxEnabled == 1 && genMessages == true)
   {
-    addLastTraffic("<font color='yellow'>Transmit Enabled!</font><br/><font color='yellow'>Generate Msgs Aborted</font>");
+    addLastTraffic("<font color='yellow'>Transmit Enabled!</font><br><font color='yellow'>Generate Msgs Aborted</font>");
   }
 }
 
@@ -5901,8 +5901,8 @@ function drawTraffic()
 {
   while (GT.lastTraffic.length > 60) GT.lastTraffic.pop();
 
-  var worker = GT.lastTraffic.join("<br/>");
-  worker = worker.split("80%'><br/>").join("80%'>");
+  var worker = GT.lastTraffic.join("<br>");
+  worker = worker.split("80%'><br>").join("80%'>");
   if (GT.localDXcall.length > 1)
   {
     worker = worker
@@ -6903,7 +6903,7 @@ function importSettings(contents)
 
 function showCallsignBox(redraw)
 {
-  let worker = "<div style='vertical-align:top;display:inline-block;margin:2px;color:cyan;font-weight:bold'>" + I18N("gt.callsignBox.title") + "</div><br/>";
+  let worker = "<div style='vertical-align:top;display:inline-block;margin:2px;color:cyan;font-weight:bold'>" + I18N("gt.callsignBox.title") + "</div><br>";
 
   GT.newCallsignCount = Object.keys(GT.liveCallsigns).length;
   if (GT.newCallsignCount > 0)
@@ -7492,7 +7492,7 @@ function showWorkedBox(sortIndex, nextPage, redraw)
 
     if (GT.qsoPages > 1)
     {
-      workHead += "<br/><font  style='font-size:15px;' color='cyan' onClick='window.opener.showWorkedBox(" + mySort + ", -1);'>&#8678;&nbsp;</font>";
+      workHead += "<br><font  style='font-size:15px;' color='cyan' onClick='window.opener.showWorkedBox(" + mySort + ", -1);'>&#8678;&nbsp;</font>";
       workHead += " Page " + (GT.qsoPage + 1) + " of " + GT.qsoPages + " (" + (endIndex - startIndex) + ") ";
       workHead += "<font  style='font-size:16px;' color='cyan' onClick='window.opener.showWorkedBox(" + mySort + ", 1);'>&nbsp;&#8680;</font>";
     }
@@ -7908,7 +7908,7 @@ function getBandSlots()
     total += bandslots[bands[band]];
     worker += "<td>" + bandslots[bands[band]] + "</td>";
   }
-  worker += "<td>" + total + "</td></tr></table><br/>";
+  worker += "<td>" + total + "</td></tr></table><br>";
 
   return worker;
 }
@@ -8054,15 +8054,15 @@ function showZonesBox()
 {
   var worker = getCurrentBandModeHTML();
 
-  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.CQZoneBox.Worked") + "</b><br/>";
+  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.CQZoneBox.Worked") + "</b><br>";
   worker += displayItemList(GT.cqZones, "#FFA500");
   worker += "</div>";
 
-  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.ITUZoneBox.Worked") + "</b><br/>";
+  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.ITUZoneBox.Worked") + "</b><br>";
   worker += displayItemList(GT.ituZones, "#00DDDD");
   worker += "</div>";
 
-  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.WASWACBox.WAC") + "</b><br/>";
+  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.WASWACBox.WAC") + "</b><br>";
   worker += displayItemList(GT.wacZones, "#90EE90");
   worker += "</div>";
 
@@ -8073,15 +8073,15 @@ function showWASPlusBox()
 {
   var worker = getCurrentBandModeHTML();
 
-  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.WASWACBox.WAS") + "</b><br/>";
+  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.WASWACBox.WAS") + "</b><br>";
   worker += displayItemList(GT.wasZones, "#00DDDD");
   worker += "</div>";
 
-  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.WASWACBox.WACP") + "</b><br/>";
+  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.WASWACBox.WACP") + "</b><br>";
   worker += displayItemList(GT.wacpZones, "#FFA500");
   worker += "</div>";
 
-  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.viewInfo.us48Data") + "</b><br/>";
+  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.viewInfo.us48Data") + "</b><br>";
   worker += displayItemList(GT.us48Data, "#DDDD00");
   worker += "</div>";
 
@@ -8199,7 +8199,7 @@ function showWPXBox()
       "<div  style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'>" +
         "<b>" + I18N("gt.WPXBox.worked") + " (<font color='#fff'>" +
       worked +
-      "</font>)</b><br/>";
+      "</font>)</b><br>";
     worker +=
       "<div  style='color:white;vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;height:" +
       Math.min(worked * 23 + 45, getStatsWindowHeight() - 6) +
@@ -8226,7 +8226,7 @@ function showWPXBox()
       "<div  style='vertical-align:top;display:inline-block;margin-right:16px;overflow:auto;overflow-x:hidden;color:cyan;'>" +
         "<b>" + I18N("gt.WPXBox.confirmed") + " (<font color='#fff'>" +
       confirmed +
-      "</font>)</b><br/>";
+      "</font>)</b><br>";
     worker +=
       "<div  style='color:white;vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;height:" +
       Math.min(confirmed * 23 + 45, getStatsWindowHeight() - 6) +
@@ -8247,7 +8247,7 @@ function showWPXBox()
     worker += "</div>";
   }
 
-  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.viewInfo.countyData") + "</b><br/>";
+  worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.viewInfo.countyData") + "</b><br>";
   worker += displayItemList(GT.countyData, "orange");
   worker += "</div>";
   
@@ -8515,7 +8515,7 @@ function showStatBox(resize)
   {
     setStatsDiv(
       "statViewDiv",
-      "&nbsp;<br/>" + I18N("gt.statBox.NoEntries") + "<br/>&nbsp;"
+      "&nbsp;<br>" + I18N("gt.statBox.NoEntries") + "<br>&nbsp;"
     );
     setStatsDivHeight("statViewDiv", "auto");
     GT.statBoxTimer = nodeTimers.setTimeout(renderStatsBox, 250);
@@ -8524,7 +8524,7 @@ function showStatBox(resize)
   {
     setStatsDiv(
       "statViewDiv",
-      "&nbsp;<br/>" + I18N("gt.statBox.NoEntries") + "<br/>&nbsp;"
+      "&nbsp;<br>" + I18N("gt.statBox.NoEntries") + "<br>&nbsp;"
     );
     setStatsDivHeight("statViewDiv", "auto");
   }
@@ -9000,7 +9000,7 @@ function renderStatsBox()
       userTimeString(details.newest * 1000) +
       "</td></tr>";
     worker += "</table>";
-    worker += "</br>";
+    worker += "<br>";
     worker += "<h1>" + I18N("gt.logbook.scoreCard") + "</h1>";
     worker += "<table style='display:inline-table;margin:5px;' class='darkTable'>";
     worker += "<tr><th>" + I18N("gt.logbook.topScore") + "</th>" + "<th style='color:yellow'>" + I18N("gt.logbook.worked") + "</th>" + "<th style='color:lightgreen'>" + I18N("gt.logbook.confirmed") + "</th></tr>";
@@ -9107,7 +9107,7 @@ function renderStatsBox()
 
     worker += "</tr>";
     worker += "</table>";
-    worker += "</br>";
+    worker += "<br>";
 
     scoreSection = "DX Marathon";
 
@@ -9125,7 +9125,7 @@ function renderStatsBox()
       );
     }
 
-    worker += "<br/>";
+    worker += "<br>";
 
     scoreSection = "Mode Types";
 
@@ -9139,20 +9139,20 @@ function renderStatsBox()
       );
     }
 
-    worker += "<br/>";
+    worker += "<br>";
 
     worker += "<h1>" + I18N("gt.Distances") + "</h1>";
     scoreSection = "Distances";
     worker += createDistanceTable(long_distance, I18N("gt.LongestDist"));
     worker += createDistanceTable(short_distance, I18N("gt.ShortestDist"));
-    worker += "<br/>";
+    worker += "<br>";
   }
   catch (e)
   {
     worker +=
-      "<br/> In Section: " +
+      "<br> In Section: " +
       scoreSection +
-      "<br/>" + I18N("gt.scorecardError");
+      "<br>" + I18N("gt.scorecardError");
   }
 
   setStatsDiv("statViewDiv", worker);
@@ -12620,7 +12620,7 @@ function postInit()
     section = "UDPListenerForward";
     updateForwardListener();
     section = "LastTraffic";
-    addLastTraffic("GridTracker2</br>" + gtShortVersion);
+    addLastTraffic("GridTracker2<br>" + gtShortVersion);
     section = "displayRadar";
     displayRadar();
     section = "PredictionInit";
@@ -12727,7 +12727,7 @@ function checkForNewVersion()
   {
     if (GT.lastVersionInfo == null || GT.lastVersionInfo.version != info.version)
     {
-      addLastTraffic("<font style='color:lightgreen'>New Version</font></br><font style='color:cyan'>" + info.version + "</font>");
+      addLastTraffic("<font style='color:lightgreen'>New Version</font><br><font style='color:cyan'>" + info.version + "</font>");
     }
   }
 
@@ -13641,17 +13641,17 @@ function continueWithLookup(callsign, gridPass)
     {
       var worker =
         "<center>" + I18N("gt.callookDX1") +
-          "<br/>" + I18N("gt.callookDX2") +
-          "<br/>" + I18N("gt.callookDX3") + "<br/>";
+          "<br>" + I18N("gt.callookDX2") +
+          "<br>" + I18N("gt.callookDX3") + "<br>";
       worker +=
-        "<br/>" + I18N("gt.callookDX4") + " <font color='orange'> " +
+        "<br>" + I18N("gt.callookDX4") + " <font color='orange'> " +
         callsign +
         "</font> " + I18N("gt.callookDX5") + " <font color='yellow'> " +
         where +
-        "</font><br/>";
+        "</font><br>";
       worker +=
-        "<br/><br/>" + I18N("gt.callookDX6") + "<br/>";
-      worker += I18N("gt.callookDX7") + "<br/></center>";
+        "<br><br>" + I18N("gt.callookDX6") + "<br>";
+      worker += I18N("gt.callookDX7") + "<br></center>";
 
       setLookupDiv("lookupInfoDiv", worker);
     }
@@ -13712,7 +13712,6 @@ function callookResults(buffer, gridPass)
   }
   catch (e)
   {
-    console.log(e);
   }
 }
 
@@ -13933,7 +13932,7 @@ function qthHamLookupResults(buffer, gridPass, useCache)
       GT.qrzLookupSessionId = null;
       setLookupDiv(
         "lookupInfoDiv",
-        "<br/><b>" + I18N("gt.lookup.NoResult") + "</b><br/><br/>"
+        "<br><b>" + I18N("gt.lookup.NoResult") + "</b><br><br>"
       );
     }
   }
@@ -13982,7 +13981,7 @@ function qrzLookupResults(buffer, gridPass, useCache)
     {
       setLookupDiv(
         "lookupInfoDiv",
-        "<br/><b>" + I18N("gt.lookup.NoResult") + "</b><br/><br/>"
+        "<br><b>" + I18N("gt.lookup.NoResult") + "</b><br><br>"
       );
       GT.qrzLookupSessionId = null;
     }
@@ -15330,7 +15329,7 @@ function handleKpIndexJSON(json)
     let trend = (preK == curK ? "" : preK < curK ? "▲" : "▼");
 
     conditionsButton.style = geoStorm + "height:32px;width:32px;vertical-align:bottom;background:radial-gradient(" + GT.KColors[K] + ", #000)";
-    conditionsButton.innerHTML = "<div style='display:block'><font style='text-shadow:1px 1px 2px #000;color: #0FF;'>Kp</font><br/><font style='font-weight:bold;font-size:16px;text-shadow:1px 1px 1px #000;color: #FFF;'>" + K + "<font style='font-weight:normal;font-size:10px'>" + trend + "</font></font><div>";
+    conditionsButton.innerHTML = "<div style='display:block'><font style='text-shadow:1px 1px 2px #000;color: #0FF;'>Kp</font><br><font style='font-weight:bold;font-size:16px;text-shadow:1px 1px 1px #000;color: #FFF;'>" + K + "<font style='font-weight:normal;font-size:10px'>" + trend + "</font></font><div>";
   }
 }
 

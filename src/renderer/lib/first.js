@@ -36,7 +36,7 @@ window.onerror = function(message, source, lineNumber, colno, error) {
 };
 
 process.on('uncaughtException', function (error) {
-  log.error(error);
+  logError(error);
 });
 
 try

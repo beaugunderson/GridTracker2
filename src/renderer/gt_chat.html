@@ -457,9 +457,9 @@
       {
         var who = "<text class='" + className + "' style='cursor:pointer' onclick='doLookup(\"" + who + "\")'>" + formatCallsign(who) + "</text>";
         var time = "<text class='when'>" + window.opener.userTimeString(when) + "</text>";
-        var worker = who + " " + time + "</br>";
+        var worker = who + " " + time + "<br>";
         var msgTextClass = containsDoubleByte(msg) ? "msgTextUnicode" : "msgText";
-        worker += "<text class='" + msgTextClass + "' >" + msg.linkify() + "</text><br/>";
+        worker += "<text class='" + msgTextClass + "' >" + msg.linkify() + "</text><br>";
         return worker;
       }
 

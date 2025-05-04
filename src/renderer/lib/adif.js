@@ -34,14 +34,14 @@ GT.adifWorker.onmessage = function(event)
     {
       GT.adifWorkerCallbacks[event.data.type](event.data);
     }
-    else console.log("adifWorkerCallback: unknown event type : " + event.data.type);
+    else logError("adifWorkerCallback: unknown event type : " + event.data.type);
   }
-  else console.log("adifWorkerCallback: no event type");
+  else logError("adifWorkerCallback: no event type");
 };
 
 function initAdifWorker()
 {
-  var task = {};
+  let task = {};
   task.type = "init";
   task.dxccInfo = GT.dxccInfo;
   task.dxccToCountryCode = GT.dxccToCountryCode;
@@ -63,12 +63,12 @@ function initAdifWorker()
 
 function initAdifComplete()
 {
-  // console.log("Adif Worker Initialized");
+  // logError("Adif Worker Initialized");
 }
 
 function clearAdifWorkerQSO(clearFiles, nextFunc = null)
 {
-  var task = {};
+  let task = {};
   task.type = "clear";
   task.clearFiles = clearFiles;
   task.nextFunc = nextFunc;
@@ -85,7 +85,7 @@ function onAdiLoadComplete(rawAdiBuffer, nextFunc = null, liveLog = false)
   clearOrLoadButton.style.display = "none";
   busyDiv.style.display = "block";
 
-  var task = {};
+  let task = {};
   task.type = "parse";
   task.appSettings = GT.settings.app;
 
@@ -96,7 +96,7 @@ function onAdiLoadComplete(rawAdiBuffer, nextFunc = null, liveLog = false)
 
   if (typeof rawAdiBuffer == "object")
   {
-    console.log("ADIF buffer is an object!");
+    logError("ADIF buffer is an object!");
     return;
   }
   else task.rawAdiBuffer = rawAdiBuffer;
@@ -122,7 +122,7 @@ function tryNextTask(task)
     }
     else
     {
-      console.log("tryNextTask: nextFunc not a function: " + task.nextFunc);
+      logError("tryNextTask: nextFunc not a function: " + task.nextFunc);
     }
   }
 }
@@ -201,7 +201,7 @@ function aclogParseComplete(task)
 
 function clubLogCallback(buffer, flag, cookie)
 {
-  var rawAdiBuffer = String(buffer);
+  let rawAdiBuffer = String(buffer);
   if (rawAdiBuffer.indexOf("Invalid login") > -1)
   {
     if (flag) clubTestResult.innerHTML = "Invalid";
@@ -235,7 +235,7 @@ function grabClubLog(test)
   {
     if (test) clubTestResult.innerHTML = "Testing";
 
-    var postData = {
+    let postData = {
       email: clubEmail.value,
       password: clubPassword.value,
       call: clubCall.value
@@ -255,7 +255,7 @@ function grabClubLog(test)
 
 function tryToWriteAdifToDocFolder(filename, buffer, append = false)
 {
-  var finalFile = path.join(GT.appData, filename);
+  let finalFile = path.join(GT.appData, filename);
   try
   {
     if (append == false)
@@ -286,18 +286,18 @@ function addZero(i)
 
 function getUTCStringForLoTW(d)
 {
-  var Y = d.getUTCFullYear();
-  var M = addZero(d.getUTCMonth() + 1);
-  var D = addZero(d.getUTCDate());
-  var h = addZero(d.getUTCHours());
-  var m = addZero(d.getUTCMinutes());
-  var s = addZero(d.getUTCSeconds());
+  let Y = d.getUTCFullYear();
+  let M = addZero(d.getUTCMonth() + 1);
+  let D = addZero(d.getUTCDate());
+  let h = addZero(d.getUTCHours());
+  let m = addZero(d.getUTCMinutes());
+  let s = addZero(d.getUTCSeconds());
   return Y + "-" + M + "-" + D + " " + h + ":" + m + ":" + s;
 }
 
 function lotwCallback(buffer, flag, cookies, url)
 {
-  var rawAdiBuffer = String(buffer);
+  let rawAdiBuffer = String(buffer);
   if (rawAdiBuffer.indexOf("password incorrect") > -1)
   {
     if (flag)
@@ -313,9 +313,9 @@ function lotwCallback(buffer, flag, cookies, url)
     }
     else
     {
-      var shouldAppend = true;
-      var adiFileName = "LoTW_QSL.adif";
-      var eorRegEx = new RegExp("<EOR>", "i");
+      let shouldAppend = true;
+      let adiFileName = "LoTW_QSL.adif";
+      let eorRegEx = new RegExp("<EOR>", "i");
   
       // don't write just an empty <EOH> only result
       if (rawAdiBuffer.search(eorRegEx) > 0)
@@ -330,7 +330,7 @@ function lotwCallback(buffer, flag, cookies, url)
 
 function tryToDeleteLog(filename)
 {
-  var finalFile = path.join(GT.appData, filename);
+  let finalFile = path.join(GT.appData, filename);
   try
   {
     if (fs.existsSync(finalFile))
@@ -348,7 +348,7 @@ GT.lotwTest = false;
 
 function grabLOtWLog(test)
 {
-  var lastQSLDateString = "";
+  let lastQSLDateString = "";
 
   if (test == true && GT.isGettingLOTW == false)
   {
@@ -382,8 +382,8 @@ function grabLOtWLog(test)
 
 function grabLoTWQSL()
 {
-  var qsoDate = new Date(GT.settings.adifLog.lastFetch.lotw_qsl);
-  var qsoDateAsString = getUTCStringForLoTW(qsoDate);
+  let qsoDate = new Date(GT.settings.adifLog.lastFetch.lotw_qsl);
+  let qsoDateAsString = getUTCStringForLoTW(qsoDate);
 
   // Don't grab if the last QSL was less than 5 minutes ago
   if (GT.isGettingLOTW == false)
@@ -757,8 +757,8 @@ function loadBackupLogFiles()
 
 function getFilesizeInBytes(filename)
 {
-  var stats = fs.statSync(filename);
-  var fileSizeInBytes = stats.size;
+  let stats = fs.statSync(filename);
+  let fileSizeInBytes = stats.size;
   return fileSizeInBytes;
 }
 
@@ -788,7 +788,7 @@ function loadWsjtLogFile()
 
 function findTrustedQSLPaths()
 {
-  var base = null;
+  let base = null;
 
   if (GT.settings.trustedQsl.stationFileValid == true)
   {
@@ -830,17 +830,17 @@ function findTrustedQSLPaths()
   }
   if (GT.settings.trustedQsl.stationFileValid == true)
   {
-    var validate = false;
-    var option = document.createElement("option");
+    let validate = false;
+    let option = document.createElement("option");
     option.value = "";
     option.text = "Select a Station";
     lotwStation.appendChild(option);
 
-    var buffer = fs.readFileSync(GT.settings.trustedQsl.stationFile, "UTF-8");
+    let buffer = fs.readFileSync(GT.settings.trustedQsl.stationFile, "UTF-8");
     parser = new DOMParser();
     xmlDoc = parser.parseFromString(buffer, "text/xml");
-    var x = xmlDoc.getElementsByTagName("StationData");
-    for (var i = 0; i < x.length; i++)
+    let x = xmlDoc.getElementsByTagName("StationData");
+    for (let i = 0; i < x.length; i++)
     {
       option = document.createElement("option");
       option.value = x[i].getAttribute("name");
@@ -961,7 +961,7 @@ function findTrustedQSLPaths()
 
 function startupAdifLoadFunction()
 {
-  for (var i in GT.settings.startupLogs)
+  for (let i in GT.settings.startupLogs)
   {
     try
     {
@@ -1186,23 +1186,14 @@ function getABuffer(file_url, callback, flag, mode, port, imgToGray, stringOfFla
   req.end();
 }
 
-function getAPostBuffer(
-  file_url,
-  callback,
-  flag,
-  mode,
-  port,
-  theData,
-  imgToGray,
-  stringOfFlag
-)
+function getAPostBuffer(file_url, callback, flag, mode, port, theData, imgToGray, stringOfFlag)
 {
-  var querystring = require("querystring");
-  var postData = querystring.stringify(theData);
-  var http = require(mode);
-  var fileBuffer = null;
+  const querystring = require("querystring");
+  let postData = querystring.stringify(theData);
+  const http = require(mode);
+  let fileBuffer = null;
 
-  var options = {
+  let options = {
     host: NodeURL.parse(file_url).host, // eslint-disable-line node/no-deprecated-api
     port: port,
     path: NodeURL.parse(file_url).path, // eslint-disable-line node/no-deprecated-api
@@ -1221,10 +1212,10 @@ function getAPostBuffer(
     imgToGray.style.webkitFilter = "invert(100%)";
   }
 
-  var req = http.request(options, function (res)
+  let req = http.request(options, function (res)
   {
-    var fsize = res.headers["content-length"];
-    var cookies = null;
+    let fsize = res.headers["content-length"];
+    let cookies = null;
     if (typeof res.headers["set-cookie"] != "undefined")
     { cookies = res.headers["set-cookie"]; }
 
@@ -1285,8 +1276,8 @@ function getAPostBuffer(
 
 function sendUdpMessage(msg, length, port, address)
 {
-  var dgram = require("dgram");
-  var socket = dgram.createSocket({ type: "udp4", reuseAddr: true });
+  const dgram = require("dgram");
+  let socket = dgram.createSocket({ type: "udp4", reuseAddr: true });
   socket.send(msg, 0, length, port, address, (err) => // eslint-disable-line node/handle-callback-err
   {
     socket.close();
@@ -1295,8 +1286,8 @@ function sendUdpMessage(msg, length, port, address)
 
 function sendTcpMessage(msg, length, port, address)
 {
-  var net = require("net");
-  var client = new net.Socket();
+  const net = require("net");
+  let client = new net.Socket();
   client.setTimeout(30000);
   client.connect(port, address, function ()
   {
@@ -1315,7 +1306,7 @@ function sendTcpMessage(msg, length, port, address)
 
 function valueToAdiField(field, value)
 {
-  var adi = "<" + field + ":";
+  let adi = "<" + field + ":";
   adi += Buffer.byteLength(String(value)) + ">";
   adi += String(value) + " ";
   return adi;
@@ -1335,12 +1326,12 @@ function pad(value)
 
 function HMSfromMilli(milli)
 {
-  var seconds = parseInt(milli / 1000);
-  var days = Math.floor(seconds / (3600 * 24));
+  let seconds = parseInt(milli / 1000);
+  let days = Math.floor(seconds / (3600 * 24));
   seconds -= days * 3600 * 24;
-  var hrs = Math.floor(seconds / 3600);
+  let hrs = Math.floor(seconds / 3600);
   seconds -= hrs * 3600;
-  var mnts = Math.floor(seconds / 60);
+  let mnts = Math.floor(seconds / 60);
   seconds -= mnts * 60;
 
   val = String(pad(hrs)) + String(pad(mnts)) + String(pad(seconds));
@@ -1349,12 +1340,12 @@ function HMSfromMilli(milli)
 
 function colonHMSfromMilli(milli)
 {
-  var seconds = parseInt(milli / 1000);
-  var days = Math.floor(seconds / (3600 * 24));
+  let seconds = parseInt(milli / 1000);
+  let days = Math.floor(seconds / (3600 * 24));
   seconds -= days * 3600 * 24;
-  var hrs = Math.floor(seconds / 3600);
+  let hrs = Math.floor(seconds / 3600);
   seconds -= hrs * 3600;
-  var mnts = Math.floor(seconds / 60);
+  let mnts = Math.floor(seconds / 60);
   seconds -= mnts * 60;
 
   val = String(pad(hrs)) + ":" + String(pad(mnts)) + ":" + String(pad(seconds));
@@ -1363,12 +1354,12 @@ function colonHMSfromMilli(milli)
 
 function colonHMSfromSeconds(secondsIn)
 {
-  var seconds = secondsIn;
-  var days = Math.floor(seconds / (3600 * 24));
+  let seconds = secondsIn;
+  let days = Math.floor(seconds / (3600 * 24));
   seconds -= days * 3600 * 24;
-  var hrs = Math.floor(seconds / 3600);
+  let hrs = Math.floor(seconds / 3600);
   seconds -= hrs * 3600;
-  var mnts = Math.floor(seconds / 60);
+  let mnts = Math.floor(seconds / 60);
   seconds -= mnts * 60;
 
   val = String(pad(hrs)) + ":" + String(pad(mnts)) + ":" + String(pad(seconds));
@@ -1377,10 +1368,10 @@ function colonHMSfromSeconds(secondsIn)
 
 function convertToDate(julian)
 {
-  var DAY = 86400000;
-  var HALF_DAY = DAY / 2;
-  var UNIX_EPOCH_JULIAN_DATE = 2440587.5;
-  var UNIX_EPOCH_JULIAN_DAY = 2440587;
+  let DAY = 86400000;
+  let HALF_DAY = DAY / 2;
+  let UNIX_EPOCH_JULIAN_DATE = 2440587.5;
+  let UNIX_EPOCH_JULIAN_DAY = 2440587;
   return new Date((Number(julian) - UNIX_EPOCH_JULIAN_DATE) * DAY);
 }
 
@@ -1392,23 +1383,23 @@ GT.oldStyleLogMessage = null;
 
 function oldSendToLogger()
 {
-  var newMessage = Object.assign({}, GT.oldStyleLogMessage);
+  let newMessage = Object.assign({}, GT.oldStyleLogMessage);
 
-  var band = formatBand(Number(newMessage.Frequency / 1000000));
+  let band = formatBand(Number(newMessage.Frequency / 1000000));
 
   if (newMessage.DXGrid.length == 0 && newMessage.DXCall + band + newMessage.MO in GT.liveCallsigns)
   {
     newMessage.DXGrid = GT.liveCallsigns[newMessage.DXCall + band + newMessage.MO].grid.substr(0, 4);
   }
 
-  var report = "<EOH>";
+  let report = "<EOH>";
 
   report += valueToAdiField("BAND", formatBand(Number(newMessage.Frequency / 1000000)));
   report += valueToAdiField("CALL", newMessage.DXCall.toUpperCase());
   report += valueToAdiField("FREQ", Number(newMessage.Frequency / 1000000).toFixed(6));
   report += valueToAdiField("MODE", newMessage.MO.toUpperCase());
-  var date = convertToDate(parseInt(newMessage.DateOn));
-  var dataString =
+  let date = convertToDate(parseInt(newMessage.DateOn));
+  let dataString =
     date.getUTCFullYear() +
     ("0" + (date.getUTCMonth() + 1)).slice(-2) +
     ("0" + date.getUTCDate()).slice(-2);
@@ -1494,8 +1485,8 @@ function sendToLogger(ADIF)
   let record = parseADIFRecord(message);
   if (!("MODE" in record) || !("CALL" in record) || !("BAND" in record)) 
   {
-    console.log("Invalid ADIF Record");
-    console.log(message);
+    logError("Invalid ADIF Record");
+    logError(message);
     return;
   }
 
@@ -1800,7 +1791,7 @@ function finishSendingReport(record)
         record.APP_EQSL_QTH_NICKNAME = eQSLNickname.value.trim();
       }
       let eQSLreport = "";
-      for (var key in record)
+      for (let key in record)
       {
         eQSLreport += "<" + key + ":" + Buffer.byteLength(record[key]) + ">" + record[key] + " ";
       }
@@ -1849,18 +1840,18 @@ function alertLogMessage()
 
 function eqslCallback(buffer, flag)
 {
-  var result = String(buffer);
+  let result = String(buffer);
   if (flag)
   {
     if (result.indexOf("No such Username/Password found") != -1)
     {
-      eQSLTestResult.innerHTML = "Bad<br/>Password<br/>or<br/>Nickname";
+      eQSLTestResult.innerHTML = "Bad<br>Password<br>or<br>Nickname";
       logeQSLQSOCheckBox.checked = false;
       adifLogQsoCheckBoxChanged(logeQSLQSOCheckBox);
     }
     else if (result.indexOf("No such Callsign found") != -1)
     {
-      eQSLTestResult.innerHTML = "Unknown<br/>Callsign";
+      eQSLTestResult.innerHTML = "Unknown<br>Callsign";
       logeQSLQSOCheckBox.checked = false;
       adifLogQsoCheckBoxChanged(logeQSLQSOCheckBox);
     }
@@ -1870,11 +1861,11 @@ function eqslCallback(buffer, flag)
     }
     else if (result.indexOf("specify the desired User by using the QTHNickname") != -1)
     {
-      eQSLTestResult.innerHTML = "QTH Nickname<br/>Needed";
+      eQSLTestResult.innerHTML = "QTH Nickname<br>Needed";
     }
     else
     {
-      eQSLTestResult.innerHTML = "Unknown<br/>Error";
+      eQSLTestResult.innerHTML = "Unknown<br>Error";
       logeQSLQSOCheckBox.checked = false;
       adifLogQsoCheckBoxChanged(logeQSLQSOCheckBox);
     }
@@ -1916,7 +1907,7 @@ function eQSLTest(test)
 
   eQSLTestResult.innerHTML = "Testing";
 
-  var fUrl =
+  let fUrl =
     "https://www.eQSL.cc/qslcard/DownloadInBox.cfm?UserName=" +
     encodeURIComponent(eQSLUser.value) +
     "&Password=" +
@@ -1932,13 +1923,13 @@ function sendeQSLEntry(report)
 {
   if (GT.settings.map.offlineMode == true) return;
 
-  var pid = "GridTracker";
-  var pver = String(gtVersion);
-  var header = "<PROGRAMID:" + pid.length + ">" + pid + "\r\n";
+  let pid = "GridTracker";
+  let pver = String(gtVersion);
+  let header = "<PROGRAMID:" + pid.length + ">" + pid + "\r\n";
   header += "<PROGRAMVERSION:" + pver.length + ">" + pver + "\r\n";
   header += "<EOH>\r\n";
-  var eReport = encodeURIComponent(header + report);
-  var fUrl =
+  let eReport = encodeURIComponent(header + report);
+  let fUrl =
     "https://www.eQSL.cc/qslcard/importADIF.cfm?ADIFData=" +
     eReport +
     "&EQSL_USER=" +
@@ -1953,7 +1944,7 @@ function testTrustedQSL(test)
 {
   if (GT.settings.map.offlineMode == true)
   {
-    lotwTestResult.innerHTML = "Currently<br/>offline";
+    lotwTestResult.innerHTML = "Currently<br>offline";
     return;
   }
 
@@ -1966,8 +1957,8 @@ function testTrustedQSL(test)
   {
     lotwTestResult.innerHTML = "Testing Upload";
 
-    var child_process = require("child_process");
-    var options = Array();
+    const child_process = require("child_process");
+    let options = Array();
     options.push("-q");
     options.push("-v");
 
@@ -1986,13 +1977,13 @@ function testTrustedQSL(test)
   }
   else
   {
-    var worker = "";
+    let worker = "";
     if (GT.settings.trustedQsl.binaryFileValid == false)
-    { worker += "Invalid tqsl executable<br/>"; }
+    { worker += "Invalid tqsl executable<br>"; }
     if (GT.settings.trustedQsl.stationFileValid == false)
-    { worker += "TrustQSL not installed<br/>"; }
-    if (!ValidateText(lotwTrusted)) worker += "TQSL Password missing<br/>";
-    if (!ValidateText(lotwStation)) worker += "Select Station<br/>";
+    { worker += "TrustQSL not installed<br>"; }
+    if (!ValidateText(lotwTrusted)) worker += "TQSL Password missing<br>";
+    if (!ValidateText(lotwStation)) worker += "Select Station<br>";
     lotwTestResult.innerHTML = worker;
   }
 }
@@ -2009,19 +2000,19 @@ function sendLotwLogEntry(report)
     lotwStation.value.length > 0
   )
   {
-    var header = "Generated " + userTimeString(null) + " for " + GT.settings.app.myCall + "\r\n\r\n";
-    var pid = "GridTracker";
-    var pver = String(gtVersion);
+    let header = "Generated " + userTimeString(null) + " for " + GT.settings.app.myCall + "\r\n\r\n";
+    let pid = "GridTracker";
+    let pver = String(gtVersion);
     header += "<PROGRAMID:" + pid.length + ">" + pid + "\r\n";
     header += "<PROGRAMVERSION:" + pver.length + ">" + pver + "\r\n";
     header += "<EOH>\r\n";
-    var finalLog = header + report + "\r\n";
+    let finalLog = header + report + "\r\n";
 
     GT.trustTempPath = path.join(os.tmpdir(), unique(report) + ".adif");
     fs.writeFileSync(GT.trustTempPath, finalLog, { flush: true });
 
-    var child_process = require("child_process");
-    var options = Array();
+    const child_process = require("child_process");
+    let options = Array();
     options.push("-a");
     options.push("all");
     options.push("-l");
@@ -2123,9 +2114,9 @@ function CloudlogSendLogResult(input)
   }
   else 
   {
-    addLastTraffic("<font style='color:red'>Fail log to Cloudlog</font><br/><font style='color:orange'>See main.log for error</font>");
-    console.log("Cloudlog/Wavelog response:");
-    console.log(buffer);
+    addLastTraffic("<font style='color:red'>Fail log to Cloudlog</font><br><font style='color:orange'>See main.log for error</font>");
+    logError("Cloudlog/Wavelog response:");
+    logError(buffer);
   }
 }
 
@@ -2145,7 +2136,7 @@ function CloudlogGetProfiles()
       null,
       10000,
       CloudUrlErrorCallback,
-      "No Response<br/>or</br>Timeout"
+      "No Response<br>or<br>Timeout"
     );
   }
   else if (logCloudlogQSOCheckBox.checked == true)
@@ -2207,10 +2198,10 @@ function CloudlogFillProfiles(buffer, flag)
       select.options.length = 0;
       jsonData = JSON.parse(buffer);
       let selected = false;
-      for (var i = 0; i < jsonData.length; i++)
+      for (let i = 0; i < jsonData.length; i++)
       {
-        var item = jsonData[i];
-        var opt = document.createElement("option");
+        let item = jsonData[i];
+        let opt = document.createElement("option");
         opt.value = item.station_id;
         // Selection from config fits to this station? select it                   or Old selection in config never set/fit to a station? so take last one as default
         if ((item.station_id == GT.settings.adifLog.text.CloudlogStationProfileID) || ((i == (jsonData.length-1)) && (!selected)))
@@ -2239,14 +2230,14 @@ function qrzSendLogResult(buffer, flag)
 
   if (typeof buffer != "undefined" && buffer != null)
   {
-    var data = String(buffer);
-    var kv = data.split("&");
+    let data = String(buffer);
+    let kv = data.split("&");
     if (kv.length > 0)
     {
-      var arrData = Object();
-      for (var x in kv)
+      let arrData = Object();
+      for (let x in kv)
       {
-        var split = kv[x].split("=");
+        let split = kv[x].split("=");
         arrData[split[0]] = split[1];
       }
       if (!("RESULT" in arrData))
@@ -2293,6 +2284,8 @@ function qrzSendLogResult(buffer, flag)
     {
       error = "Missing Response";
     }
+    logError("QRZ.com response:");
+    logError(data);
   }
   else
   {
@@ -2301,7 +2294,7 @@ function qrzSendLogResult(buffer, flag)
 
   if (error != null)
   {
-    addLastTraffic("<font style='font-size: smaller; color:orange'>" + error + "</font>");
+    addLastTraffic("<font style='font-size: smaller; color:orange'>" + error.replaceAll("ror:", "ror:<br>") + "</font>");
   }
   addLastTraffic("<font style='color:red'>Failed log to QRZ.com</font>");
 }
@@ -2337,7 +2330,7 @@ function sendQrzLogEntry(report)
 
   if (logQRZqsoCheckBox.checked == true && ValidateQrzApi(qrzApiKey))
   {
-    var postData = {
+    let postData = {
       KEY: qrzApiKey.value,
       ACTION: "INSERT",
       ADIF: report
@@ -2367,7 +2360,7 @@ function sendClubLogEntry(report)
 
   if (logClubqsoCheckBox.checked == true)
   {
-    var postData = {
+    let postData = {
       email: clubEmail.value,
       password: clubPassword.value,
       callsign: clubCall.value,
@@ -2396,7 +2389,7 @@ function sendCloudlogEntry(report)
   if (logCloudlogQSOCheckBox.checked == true)
   {
     CloudLogCorrectURL();
-    var postData = { key: CloudlogAPI.value, station_profile_id: parseInt(GT.settings.adifLog.text.CloudlogStationProfileID), type: "adif", string: report };
+    let postData = { key: CloudlogAPI.value, station_profile_id: parseInt(GT.settings.adifLog.text.CloudlogStationProfileID), type: "adif", string: report };
     getPostJSONBuffer(
       CloudlogURL.value + "/index.php/api/qso",
       CloudlogSendLogResult,
@@ -2438,7 +2431,7 @@ function sendHrdLogEntry(report)
 
   if (logHRDLOGqsoCheckBox.checked == true)
   {
-    var postData = {
+    let postData = {
       Callsign: HRDLOGCallsign.value,
       Code: HRDLOGUploadCode.value,
       App: "GridTracker " + gtVersion,
@@ -2464,7 +2457,7 @@ function hrdCredentialTest(test)
   {
     HRDLogTestResult.innerHTML = "Testing";
 
-    var postData = {
+    let postData = {
       Callsign: HRDLOGCallsign.value,
       Code: HRDLOGUploadCode.value
     };
@@ -2481,7 +2474,7 @@ function hrdCredentialTest(test)
 
 function CloudLogCorrectURL(shouldSaveIfChanged = true)
 {
-  var initialValue = CloudlogURL.value;
+  let initialValue = CloudlogURL.value;
   CloudlogURL.value = CloudlogURL.value.replace("/index.php/api/qso", "");
   CloudlogURL.value = CloudlogURL.value.endsWith("/") ? CloudlogURL.value.slice(0, -1) : CloudlogURL.value;
 
@@ -2514,12 +2507,12 @@ function CloudlogTest(test)
         null,
         10000,
         CloudUrlErrorCallback,
-        "No Response<br/>or</br>Timeout"
+        "No Response<br>or<br>Timeout"
       );
     }
     else
     {
-      CloudlogTestResult.innerHTML = "Missing Fields</br>Test Aborted";
+      CloudlogTestResult.innerHTML = "Missing Fields<br>Test Aborted";
     }
   }
 }
@@ -2530,7 +2523,7 @@ function HamCQTest(test)
   {
     HamCQTestResult.innerHTML = "Testing";
 
-    var postData = { key: HamCQApiKey.value };
+    let postData = { key: HamCQApiKey.value };
     getPostJSONBuffer(
       "https://www.hamcq.cn/v1/logbook?from=gridtracker",
       HamCQSendResult,
@@ -2592,7 +2585,7 @@ function sendHamCQEntry(report)
 
   if (logHamCQqsoCheckBox.checked == true)
   {
-    var postData = {
+    let postData = {
       key: HamCQApiKey.value,
       app: "GridTracker " + gtVersion,
       adif: report
@@ -2625,11 +2618,11 @@ function getPostJSONBuffer(
 {
   try
   {
-    var postData = JSON.stringify(theData);
-    var protocol = NodeURL.parse(file_url).protocol; // eslint-disable-line node/no-deprecated-api
-    var http = require(protocol.replace(":", ""));
-    var fileBuffer = null;
-    var options = {
+    let postData = JSON.stringify(theData);
+    let protocol = NodeURL.parse(file_url).protocol; // eslint-disable-line node/no-deprecated-api
+    const http = require(protocol.replace(":", ""));
+    let fileBuffer = null;
+    let options = {
       host: NodeURL.parse(file_url).hostname, // eslint-disable-line node/no-deprecated-api
       port: NodeURL.parse(file_url).port, // eslint-disable-line node/no-deprecated-api
       path: NodeURL.parse(file_url).path, // eslint-disable-line node/no-deprecated-api
@@ -2641,10 +2634,10 @@ function getPostJSONBuffer(
         "x-user-agent": gtUserAgent
       }
     };
-    var req = http.request(options, function (res)
+    let req = http.request(options, function (res)
     {
-      var fsize = res.headers["content-length"];
-      var cookies = null;
+      let fsize = res.headers["content-length"];
+      let cookies = null;
       if (typeof res.headers["set-cookie"] != "undefined")
       { cookies = res.headers["set-cookie"]; }
       res
@@ -2717,30 +2710,17 @@ function getPostJSONBuffer(
 
 function valueToXmlField(field, value)
 {
-  var adi = "<" + field + ">";
-  adi += String(value);
-  adi += "</" + field + ">";
-  return adi;
+  return "<" + field + ">" + String(value) + "</" + field + ">";
 }
 
 function aclUpdateControlValue(control, value)
 {
-  return (
-    valueToXmlField(
-      "CMD",
-      "<UPDATE>" +
-        valueToXmlField("CONTROL", control) +
-        valueToXmlField("VALUE", value)
-    ) + "\r\n"
-  );
+  return (valueToXmlField("CMD", "<UPDATE>" + valueToXmlField("CONTROL", control) + valueToXmlField("VALUE", value)) + "\r\n");
 }
 
 function aclAction(action)
 {
-  return (
-    valueToXmlField("CMD", "<ACTION>" + valueToXmlField("VALUE", action)) +
-    "\r\n"
-  );
+  return (valueToXmlField("CMD", "<ACTION>" + valueToXmlField("VALUE", action)) + "\r\n");
 }
 
 function adifField(record, key)
@@ -2750,117 +2730,66 @@ function adifField(record, key)
 }
 function sendACLogMessage(record, port, address)
 {
-  var report = "";
+  let report = "";
 
   report += aclAction("CLEAR");
   report += aclUpdateControlValue("TXTENTRYBAND", adifField(record, "BAND"));
   report += aclUpdateControlValue("TXTENTRYCALL", adifField(record, "CALL"));
   report += aclAction("CALLTAB");
-  report += aclUpdateControlValue(
-    "TXTENTRYFREQUENCY",
-    adifField(record, "FREQ")
-  );
+  report += aclUpdateControlValue("TXTENTRYFREQUENCY", adifField(record, "FREQ"));
   if (adifField(record, "SUBMODE").length > 0)
   {
-    report += aclUpdateControlValue(
-      "TXTENTRYMODE",
-      adifField(record, "SUBMODE")
-    );
+    report += aclUpdateControlValue("TXTENTRYMODE", adifField(record, "SUBMODE"));
   }
   else
-  { report += aclUpdateControlValue("TXTENTRYMODE", adifField(record, "MODE")); }
+  { 
+    report += aclUpdateControlValue("TXTENTRYMODE", adifField(record, "MODE"));
+  }
 
-  var date = adifField(record, "QSO_DATE");
-  var dataString =
-    date.substr(0, 4) + "/" + date.substr(4, 2) + "/" + date.substr(6);
+  let date = adifField(record, "QSO_DATE");
+  let dataString = date.substr(0, 4) + "/" + date.substr(4, 2) + "/" + date.substr(6);
 
   report += aclUpdateControlValue("TXTENTRYDATE", dataString);
 
-  var timeVal = adifField(record, "TIME_ON");
-  var whenString =
-    timeVal.substr(0, 2) +
-    ":" +
-    timeVal.substr(2, 2) +
-    ":" +
-    timeVal.substr(4, 2);
+  let timeVal = adifField(record, "TIME_ON");
+  let whenString = timeVal.substr(0, 2) + ":" + timeVal.substr(2, 2) + ":" + timeVal.substr(4, 2);
   report += aclUpdateControlValue("TXTENTRYTIMEON", whenString);
 
   timeVal = adifField(record, "TIME_OFF");
-  whenString =
-    timeVal.substr(0, 2) +
-    ":" +
-    timeVal.substr(2, 2) +
-    ":" +
-    timeVal.substr(4, 2);
+  whenString = timeVal.substr(0, 2) + ":" + timeVal.substr(2, 2) + ":" + timeVal.substr(4, 2);
   report += aclUpdateControlValue("TXTENTRYTIMEOFF", whenString);
 
-  report += aclUpdateControlValue(
-    "TXTENTRYRSTR",
-    adifField(record, "RST_RCVD")
-  );
-  report += aclUpdateControlValue(
-    "TXTENTRYRSTS",
-    adifField(record, "RST_SENT")
-  );
+  report += aclUpdateControlValue("TXTENTRYRSTR", adifField(record, "RST_RCVD"));
+  report += aclUpdateControlValue("TXTENTRYRSTS", adifField(record, "RST_SENT"));
   report += aclUpdateControlValue("TXTENTRYPOWER", adifField(record, "TX_PWR"));
-  report += aclUpdateControlValue(
-    "TXTENTRYGRID",
-    adifField(record, "GRIDSQUARE")
-  );
-  report += aclUpdateControlValue(
-    "TXTENTRYCOMMENTS",
-    adifField(record, "COMMENT")
-  );
+  report += aclUpdateControlValue("TXTENTRYGRID", adifField(record, "GRIDSQUARE"));
+  report += aclUpdateControlValue("TXTENTRYCOMMENTS", adifField(record, "COMMENT"));
   report += aclUpdateControlValue("TXTENTRYNAMER", adifField(record, "NAME"));
   report += aclUpdateControlValue("TXTENTRYIOTA", adifField(record, "IOTA"));
-  report += aclUpdateControlValue(
-    "TXTENTRYCONTINENT",
-    adifField(record, "CONT")
-  );
+  report += aclUpdateControlValue("TXTENTRYCONTINENT", adifField(record, "CONT"));
   report += aclUpdateControlValue("TXTENTRYITUZ", adifField(record, "ITUZ"));
   report += aclUpdateControlValue("TXTENTRYCQZONE", adifField(record, "CQZ"));
-  report += aclUpdateControlValue(
-    "TXTENTRYCOUNTYR",
-    replaceAll(adifField(record, "CNTY"), ", ", ",")
-  );
+  report += aclUpdateControlValue("TXTENTRYCOUNTYR", replaceAll(adifField(record, "CNTY"), ", ", ","));
 
-  var sentSpcNum = false;
+  let sentSpcNum = false;
   if (adifField(record, "SRX").length > 0)
   {
-    report += aclUpdateControlValue(
-      "TXTENTRYSERIALNOR",
-      adifField(record, "SRX")
-    );
+    report += aclUpdateControlValue("TXTENTRYSERIALNOR", adifField(record, "SRX"));
   }
   else if (adifField(record, "CONTEST_ID").length > 0)
   {
-    report += aclUpdateControlValue(
-      "TXTENTRYSPCNUM",
-      adifField(record, "SRX_STRING")
-    );
+    report += aclUpdateControlValue("TXTENTRYSPCNUM", adifField(record, "SRX_STRING"));
     sentSpcNum = true;
-    report += aclUpdateControlValue(
-      "TXTENTRYCLASS",
-      adifField(record, "CLASS")
-    );
-    report += aclUpdateControlValue(
-      "TXTENTRYSECTION",
-      adifField(record, "ARRL_SECT")
-    );
+    report += aclUpdateControlValue("TXTENTRYCLASS", adifField(record, "CLASS"));
+    report += aclUpdateControlValue("TXTENTRYSECTION", adifField(record, "ARRL_SECT"));
   }
 
   if (adifField(record, "STATE").length > 0)
   {
-    report += aclUpdateControlValue(
-      "TXTENTRYSTATE",
-      adifField(record, "STATE")
-    );
+    report += aclUpdateControlValue("TXTENTRYSTATE", adifField(record, "STATE"));
     if (sentSpcNum == false)
     {
-      report += aclUpdateControlValue(
-        "TXTENTRYSPCNUM",
-        adifField(record, "STATE")
-      );
+      report += aclUpdateControlValue("TXTENTRYSPCNUM", adifField(record, "STATE"));
     }
   }
 
@@ -2871,7 +2800,7 @@ function sendACLogMessage(record, port, address)
 
 function sendDXKeeperLogMessage(newMessage, port, address)
 {
-  var report = "";
+  let report = "";
 
   report += valueToAdiField("command", "log");
   report += valueToAdiField("parameters", newMessage);
@@ -2885,10 +2814,10 @@ const myTextDecoder = new TextDecoder();
 
 function parseADIFRecord(adif)
 {
-  var regex = new RegExp("<EOR>", "i");
-  var newLine = adif.split(regex);
-  var line = newLine[0].trim(); // Catch the naughty case of someone sending two records at the same time
-  var record = {};
+  let regex = new RegExp("<EOR>", "i");
+  let newLine = adif.split(regex);
+  let line = newLine[0].trim(); // Catch the naughty case of someone sending two records at the same time
+  let record = {};
 
   while (line.length > 0)
   {
@@ -2899,13 +2828,13 @@ function parseADIFRecord(adif)
     if (line.length > 0)
     {
       line = line.substr(1);
-      var where = line.indexOf(":");
+      let where = line.indexOf(":");
       if (where != -1)
       {
-        var fieldName = line.substr(0, where).toUpperCase();
+        let fieldName = line.substr(0, where).toUpperCase();
         line = line.substr(fieldName.length + 1);
-        var fieldLength = parseInt(line);
-        var end = line.indexOf(">");
+        let fieldLength = parseInt(line);
+        let end = line.indexOf(">");
         if (end > 0)
         {
           line = line.substr(end + 1);
@@ -2922,12 +2851,12 @@ function parseADIFRecord(adif)
 
 function sendHRDLogbookEntry(report, port, address)
 {
-  var command = "ver\rdb add {";
-  var items = Object.assign({}, report);
+  let command = "ver\rdb add {";
+  let items = Object.assign({}, report);
 
   items.FREQ = items.FREQ.split(".").join("");
 
-  for (var item in items)
+  for (let item in items)
   {
     command += item + "=\"" + items[item] + "\" ";
   }
@@ -2950,7 +2879,7 @@ function grabPsk24()
 
   if (GT.settings.app.myCall.length > 0 && GT.settings.app.myCall != "NOCALL")
   {
-    var days = 1;
+    let days = 1;
     if (pskImg.src == 1) days = 7;
     getABuffer(
       "https://pskreporter.info/cgi-bin/pskdata.pl?adif=1&days=" +
@@ -2969,16 +2898,16 @@ function grabPsk24()
 
 function findAdiField(row, field)
 {
-  var value = "";
-  var regex = new RegExp("<" + field + ":", "i");
-  var firstSplitArray = row.split(regex);
+  let value = "";
+  let regex = new RegExp("<" + field + ":", "i");
+  let firstSplitArray = row.split(regex);
   if (firstSplitArray && firstSplitArray.length == 2)
   {
-    var secondSplitArray = firstSplitArray[1].split(">");
+    let secondSplitArray = firstSplitArray[1].split(">");
     if (secondSplitArray.length > 1)
     {
-      var newLenSearch = secondSplitArray[0].split(":");
-      var newLen = newLenSearch[0];
+      let newLenSearch = secondSplitArray[0].split(":");
+      let newLen = newLenSearch[0];
       value = secondSplitArray[1].slice(0, newLen);
     }
   }
@@ -2987,47 +2916,41 @@ function findAdiField(row, field)
 
 function parsePSKadif(adiBuffer)
 {
-  var rawAdiBuffer = "";
+  let rawAdiBuffer = "";
   if (typeof adiBuffer == "object") rawAdiBuffer = String(adiBuffer);
   else rawAdiBuffer = adiBuffer;
 
-  var activeAdifArray = Array();
+  let activeAdifArray = Array();
 
   if (rawAdiBuffer.indexOf("PSKReporter") == -1) return;
 
   if (rawAdiBuffer.length > 1)
   {
-    var regex = new RegExp("<EOH>", "ig");
+    let regex = new RegExp("<EOH>", "ig");
     rawAdiBuffer = replaceAll(rawAdiBuffer, regex, "");
   }
 
   if (rawAdiBuffer.length > 1)
   {
-    var regex = new RegExp("<EOR>", "i");
+    let regex = new RegExp("<EOR>", "i");
     activeAdifArray = rawAdiBuffer.split(regex);
   }
 
-  for (var x = 0; x < activeAdifArray.length; x++)
+  for (let x = 0; x < activeAdifArray.length; x++)
   {
     if (activeAdifArray[x].length > 0)
     {
-      var finalMyGrid = findAdiField(
-        activeAdifArray[x],
-        "MY_GRIDSQUARE"
-      ).toUpperCase();
-      var finalGrid = findAdiField(
-        activeAdifArray[x],
-        "GRIDSQUARE"
-      ).toUpperCase();
-      var finalDXcall = findAdiField(activeAdifArray[x], "CALL");
-      var finalDEcall = findAdiField(activeAdifArray[x], "OPERATOR");
-      var finalRSTsent = findAdiField(activeAdifArray[x], "APP_PSKREP_SNR");
-      var dateVal = findAdiField(activeAdifArray[x], "QSO_DATE");
-      var timeVal = findAdiField(activeAdifArray[x], "TIME_ON");
-      var finalMode = findAdiField(activeAdifArray[x], "MODE");
-      var finalBand = formatBand(Number(findAdiField(activeAdifArray[x], "FREQ")));
-      var finalMsg = "-";
-      var finalDxcc = Number(findAdiField(activeAdifArray[x], "DXCC"));
+      let finalMyGrid = findAdiField(activeAdifArray[x], "MY_GRIDSQUARE").toUpperCase();
+      let finalGrid = findAdiField(activeAdifArray[x], "GRIDSQUARE").toUpperCase();
+      let finalDXcall = findAdiField(activeAdifArray[x], "CALL");
+      let finalDEcall = findAdiField(activeAdifArray[x], "OPERATOR");
+      let finalRSTsent = findAdiField(activeAdifArray[x], "APP_PSKREP_SNR");
+      let dateVal = findAdiField(activeAdifArray[x], "QSO_DATE");
+      let timeVal = findAdiField(activeAdifArray[x], "TIME_ON");
+      let finalMode = findAdiField(activeAdifArray[x], "MODE");
+      let finalBand = formatBand(Number(findAdiField(activeAdifArray[x], "FREQ")));
+      let finalMsg = "-";
+      let finalDxcc = Number(findAdiField(activeAdifArray[x], "DXCC"));
       if (finalDxcc == 0)
       {
         if (finalDXcall == GT.settings.app.myCall) finalDxcc = callsignToDxcc(finalDEcall);
@@ -3036,7 +2959,7 @@ function parsePSKadif(adiBuffer)
 
       finalGrid = finalGrid.substr(0, 6);
 
-      var dateTime = new Date(
+      let dateTime = new Date(
         Date.UTC(
           dateVal.substr(0, 4),
           parseInt(dateVal.substr(4, 2)) - 1,
@@ -3046,7 +2969,7 @@ function parsePSKadif(adiBuffer)
           timeVal.substr(4, 2)
         )
       );
-      var finalTime = parseInt(dateTime.getTime() / 1000);
+      let finalTime = parseInt(dateTime.getTime() / 1000);
       if (finalGrid != "" && finalDXcall != "" && validateGridFromString(finalGrid))
       {
         if (finalDXcall == GT.settings.app.myCall)
@@ -3110,11 +3033,11 @@ function parsePSKadif(adiBuffer)
 function sendTcpMessageGetResponse(msg, port, address, callback = null)
 {
   const net = require("net");
-  var client = new net.Socket();
+  let client = new net.Socket();
   let fileBuffer = null;
   client.setTimeout(30000);
   client.on("error", function () {
-    addLastTraffic("<font style='color:orange'>N3FJP Download Failed</font><br/><font style='color:white'>Is it running and<br/>TCP server enabled?</font>");
+    addLastTraffic("<font style='color:orange'>N3FJP Download Failed</font><br><font style='color:white'>Is it running and<br>TCP server enabled?</font>");
     if (callback) callback(null);
   });
 
@@ -3160,7 +3083,7 @@ function acLogCallback(buffer)
     clearOrLoadButton.style.display = "none";
     busyDiv.style.display = "block";
 
-    var task = {};
+    let task = {};
     task.type = "parseAcLog";
     task.appSettings = GT.settings.app;
     task.aclSettings = GT.settings.acLog;
@@ -3197,7 +3120,6 @@ function updateAdifBroadcast(port)
       }
       catch (e)
       {
-        console.error(e);
       }
     }
 
