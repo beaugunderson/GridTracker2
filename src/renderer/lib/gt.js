@@ -11631,17 +11631,7 @@ function getBuffer(file_url, callback, flag, mode, port, cache = null)
   });
 }
 
-function getPostBuffer(
-  file_url,
-  callback,
-  flag,
-  mode,
-  port,
-  theData,
-  timeoutMs,
-  timeoutCallback,
-  who
-)
+function getPostBuffer(file_url, callback, flag, mode, port, theData, timeoutMs, timeoutCallback, who)
 {
   let querystring = require("querystring");
   let postData = querystring.stringify(theData);
@@ -11675,7 +11665,7 @@ function getPostBuffer(
         if (typeof callback == "function")
         {
           // Call it, since we have confirmed it is callable
-          callback(fileBuffer, flag);
+          callback(fileBuffer, flag, postData);
         }
       })
       .on("error", function ()

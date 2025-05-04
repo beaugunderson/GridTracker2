@@ -2224,7 +2224,7 @@ function CloudlogFillProfiles(buffer, flag)
   }
 }
 
-function qrzSendLogResult(buffer, flag)
+function qrzSendLogResult(buffer, flag, postData)
 {
   let error = null;
 
@@ -2284,6 +2284,8 @@ function qrzSendLogResult(buffer, flag)
     {
       error = "Missing Response";
     }
+    logError("QRZ.com post data:");
+    logError(postData);
     logError("QRZ.com response:");
     logError(data);
   }
@@ -2299,29 +2301,9 @@ function qrzSendLogResult(buffer, flag)
   addLastTraffic("<font style='color:red'>Failed log to QRZ.com</font>");
 }
 
-function postRetryErrorCallaback(
-  file_url,
-  callback,
-  flag,
-  mode,
-  port,
-  theData,
-  timeoutMs,
-  timeoutCallback,
-  who
-)
+function postRetryErrorCallaback(file_url, callback, flag, mode, port, theData, timeoutMs, timeoutCallback, who)
 {
-  getPostBuffer(
-    file_url,
-    callback,
-    flag,
-    mode,
-    port,
-    theData,
-    timeoutMs,
-    null,
-    who
-  );
+  getPostBuffer(file_url, callback, flag, mode, port, theData, timeoutMs, null, who);
 }
 
 function sendQrzLogEntry(report)

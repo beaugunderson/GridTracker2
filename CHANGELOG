@@ -114,7 +114,8 @@ Settings -> Grids: New 'All Grid Overlay' Opacity setting
 
 App: Updated Electron engine to v35.2.2 (except for Windows 7)
 App: Linux pacman auto-updater support
-Logging -> Cloudlog/Wavelog: Comprehensive fixes supplied by DJ7NT and DF2ET, many thanks!
+Cloudlog/Wavelog: Comprehensive fixes supplied by DJ7NT and DF2ET, many thanks!
+
 
 ### Fixed
 
