@@ -114,7 +114,12 @@ Settings -> Grids: New 'All Grid Overlay' Opacity setting
 
 App: Updated Electron engine to v35.2.2 (except for Windows 7)
 App: Linux pacman auto-updater support
-Cloudlog/Wavelog: Comprehensive fixes supplied by DJ7NT and DF2ET, many thanks!
+Logging:
+    Cloudlog/Wavelog: Comprehensive fixes supplied by DJ7NT and DF2ET, many thanks!
+    QRZ.com: Added extra error info to main.log on upload failure
+    
+App: Fixed 7 year old bug in ADIF parsing, big thanks to VE3MSC for this find!
+     If "PSKReporter" appears anywhere in the ADIF being loaded it would be rejected entirely
 
 
 ### Fixed

@@ -88,18 +88,16 @@ function onAdiLoadComplete(task)
   let rows = 0;
   let rowsFiltered = 0;
   let lastHash = null;
-  let validAdifFile = true;
   let clublogFile = false;
   let lotwTimestampUpdated = false;
   let returnTask = {};
 
   try {
-    if (task.rawAdiBuffer.indexOf("PSKReporter") > -1) validAdifFile = false;
     if (task.rawAdiBuffer.indexOf("clublog.adif") > -1 || task.rawAdiBuffer.indexOf("ADIF export from Club Log") > -1) clublogFile = true;
 
     let eorRegEx = new RegExp("<EOR>", "i");
 
-    if (validAdifFile == true && task.rawAdiBuffer.length > 1)
+    if (task.rawAdiBuffer.length > 1)
     {
       let startPos = 0;
       let endPos = task.rawAdiBuffer.length;
