@@ -2,6 +2,7 @@
 // All rights reserved.
 // See LICENSE for more information.
 
+GT.lastConnectAttempt = 0;
 GT.gtEngineInterval = null;
 GT.chatRecvFunctions = {
   uuid: gtChatSetUUID,
@@ -17,19 +18,19 @@ GT.chatRecvFunctions = {
 
 GT.oamsDenied = false;
 
-var ChatState = Object();
-ChatState.none = -1;
+const ChatState = Object();
+ChatState.none = 100;
 ChatState.idle = 0;
 ChatState.connect = 1;
 ChatState.connecting = 2;
 ChatState.connected = 3;
-ChatState.waitUUID = 7;
 ChatState.status = 4;
 ChatState.closed = 5;
 ChatState.error = 6;
+ChatState.waitUUID = 7;
 
 GT.gtStateToFunction = {
-  "-1": gtSetIdle,
+  100: gtSetIdle,
   0: gtCanConnect,
   1: gtConnectChat,
   2: gtConnecting,
@@ -57,9 +58,7 @@ GT.gtUuidValid = false;
 GT.gtLiveStatusUpdate = false;
 GT.oamsBandActivityData = null;
 
-var myChatId = 0;
-
-var myRoom = 0;
+GT.myChatId = 0;
 
 GT.gtCurrentMessageCount = 0;
 
@@ -72,7 +71,7 @@ function gtConnectChat()
     return;
   }
 
-  var rnd = parseInt(Math.random() * 10) + 18360;
+  let rnd = parseInt(Math.random() * 10) + 18360;
   try
   {
     GT.gtState = ChatState.connecting;
@@ -160,9 +159,10 @@ function closeGtSocket()
 
     GT.gtChatSocket.close();
     GT.gtChatSocket = null;
-    GT.gtState = ChatState.none;
+
   }
-  else GT.gtState = ChatState.none;
+  
+  GT.gtState = ChatState.none;
 }
 
 function gtClosedSocket()
@@ -174,9 +174,6 @@ function gtClosedSocket()
   }
   GT.gtState = ChatState.none;
 }
-
-// Connect 30 seconds after startup
-GT.lastConnectAttempt = parseInt(Date.now() / 1000) - 30;
 
 function gtCanConnect()
 {
@@ -202,7 +199,7 @@ function gtStatusCheck()
   {
     GT.gtStatusCount--;
   }
-  if (GT.gtStatusCount == 0 || GT.gtLiveStatusUpdate == true)
+  if (GT.gtStatusCount < 1 || GT.gtLiveStatusUpdate == true)
   {
     if (GT.gtLiveStatusUpdate == true)
     {
@@ -244,7 +241,7 @@ GT.lastGtStatus = "";
 
 function gtChatSendStatus()
 {
-  var msg = Object();
+  let msg = Object();
   msg.type = "status";
   msg.uuid = GT.settings.app.chatUUID;
 
@@ -331,8 +328,8 @@ function oamsDisable(jsmesg)
 
 function gtChatRemoveCall(jsmesg)
 {
-  var id = jsmesg.id;
-  var cid = jsmesg.cid;
+  let id = jsmesg.id;
+  let cid = jsmesg.cid;
 
   if (cid in GT.gtFlagPins)
   {
@@ -371,8 +368,8 @@ function gtChatRemoveCall(jsmesg)
 
 function gtChatUpdateCall(jsmesg)
 {
-  var id = jsmesg.id;
-  var cid = jsmesg.cid;
+  let id = jsmesg.id;
+  let cid = jsmesg.cid;
 
   if (cid in GT.gtFlagPins)
   {
@@ -488,7 +485,7 @@ function makeGtPin(obj)
       return;
     }
 
-    var LL = squareToCenter(obj.grid);
+    let LL = squareToCenter(obj.grid);
     obj.pin = iconFeature(ol.proj.fromLonLat([LL.o, LL.a]), GT.gtFlagIcon, 100, "gtFlag");
     obj.pin.key = obj.cid;
     obj.pin.isGtFlag = true;
@@ -508,11 +505,11 @@ function gtChatNewList(jsmesg)
   GT.gtCallsigns = Object();
 
 
-  for (var key in jsmesg.data.calls)
+  for (let key in jsmesg.data.calls)
   {
-    var cid = jsmesg.data.cid[key];
-    var id = jsmesg.data.id[key];
-    if (id != myChatId)
+    let cid = jsmesg.data.cid[key];
+    let id = jsmesg.data.id[key];
+    if (id != GT.myChatId)
     {
       if (cid in GT.gtFlagPins)
       {
@@ -628,9 +625,9 @@ function PushoverReply(data, isTest)
 {
   if (isTest)
   {
-    var result = "Unknown Error";
-    var color = "#F00";
-    var responseJson = JSON.parse(data);
+    let result = "Unknown Error";
+    let color = "#F00";
+    let responseJson = JSON.parse(data);
 
     if (typeof responseJson != "undefined" && typeof responseJson.status != "undefined")
     {
@@ -673,7 +670,7 @@ function gtChatMessage(jsmesg)
 {
   if (GT.settings.app.oamsMsgEnable == true)
   {
-    var cid = jsmesg.cid;
+    let cid = jsmesg.cid;
     jsmesg.when = Date.now();
     try
     {
@@ -712,7 +709,7 @@ function gtChatMessage(jsmesg)
 
 function gtSendMessage(message, who)
 {
-  msg = Object();
+  let msg = Object();
   msg.type = "mesg";
   msg.uuid = GT.settings.app.chatUUID;
   msg.cid = who;
@@ -726,7 +723,7 @@ function gtSendMessage(message, who)
 
 function gtChatSendUUID()
 {
-  var msg = Object();
+  let msg = Object();
   msg.type = "uuid";
   if (GT.settings.app.chatUUID != "")
   {
@@ -752,7 +749,7 @@ function gtWaitUUID()
 function gtChatSetUUID(jsmesg)
 {
   GT.settings.app.chatUUID = jsmesg.uuid;
-  myChatId = jsmesg.id;
+  GT.myChatId = jsmesg.id;
 
   GT.gtUuidValid = true;
   gtChatSendStatus();
@@ -767,10 +764,10 @@ function gtChatStateMachine()
 {
   if (GT.settings.app.offAirServicesEnable == true && GT.settings.map.offlineMode == false && GT.settings.app.myCall.length > 2 && GT.settings.app.myCall != "NOCALL" && GT.oamsDenied == false)
   {
-    var now = timeNowSec();
+    let now = timeNowSec();
     GT.gtStateToFunction[GT.gtState]();
 
-    if (Object.keys(GT.gtUnread).length > 0 && now % 2 == 0)
+    if (Object.keys(GT.gtUnread).length > 0 && msgImg.style.webkitFilter == "")
     {
       msgImg.style.webkitFilter = "invert(1)";
     }
@@ -815,7 +812,8 @@ function gtSpotMessage(jsmesg)
 
 function gtChatSystemInit()
 {
-  GT.gtEngineInterval = nodeTimers.setInterval(gtChatStateMachine, 1000);
+  GT.lastConnectAttempt = timeNowSec() - 25;
+  GT.gtEngineInterval = nodeTimers.setInterval(gtChatStateMachine, 1333);
 }
 
 function showGtFlags()
@@ -890,7 +888,7 @@ function updateChatWindow(id = null)
 
 function newChatMessage(id, jsmesg)
 {
-  var hasFocus = false;
+  let hasFocus = false;
 
   if (GT.chatWindowInitialized)
   {

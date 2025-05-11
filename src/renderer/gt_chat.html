@@ -24,10 +24,14 @@
     <script src="lib/third-party.js" type="text/javascript"></script>
     <script src="./lib/i18n.js" type="text/javascript"></script>
     <script type="text/javascript">
-   
-      var g_knownSources = {};
-      g_knownSources.GT = "GridTracker";
-      g_knownSources.L4 = "Log4OM";
+      
+      const CH = {};
+      CH.knownSources = {};
+      CH.knownSources.GT = "GridTracker";
+      CH.knownSources.L4 = "Log4OM";
+      CH.viewBand = 0;
+      CH.viewMode = 0;
+      CH.currentId = 0;
 
       document.addEventListener("dragover", function (event)
       {
@@ -78,14 +82,14 @@
         if (event.key == "Enter")
         {
           // Do work
-          var msg = messageInput.value.trim();
-          if (msg.length > 0 && g_currentId != 0 && g_currentId in GT.gtFlagPins && GT.gtFlagPins[g_currentId].canmsg == true) 
+          let msg = messageInput.value.trim();
+          if (msg.length > 0 && CH.currentId != 0 && CH.currentId in GT.gtFlagPins && GT.gtFlagPins[CH.currentId].canmsg == true) 
           {
-            var worker = "";
+            let worker = "";
             // No message history, so lets clear the div
-            if (!(g_currentId in GT.gtMessages)) messageTextDiv.innerHTML = "";
+            if (!(CH.currentId in GT.gtMessages)) messageTextDiv.innerHTML = "";
 
-            window.opener.gtSendMessage(msg, g_currentId);
+            window.opener.gtSendMessage(msg, CH.currentId);
             worker = makeViewMessage("self", GT.settings.app.myCall, htmlEntities(msg));
             messageTextDiv.innerHTML += worker;
             scrollDown(messageTextDiv);
@@ -110,19 +114,17 @@
         });
       }
 
-      var g_viewBand = 0;
+ 
 
       function toggleBand()
       {
-        g_viewBand ^= 1;
+        CH.viewBand ^= 1;
         showAllCallsigns();
       }
 
-      var g_viewMode = 0;
-
       function toggleMode()
       {
-        g_viewMode ^= 1;
+        CH.viewMode ^= 1;
         showAllCallsigns();
       }
 
@@ -134,7 +136,7 @@
         }
         else 
         {
-          var node = document.getElementById(from.currentTarget.id);
+          let node = document.getElementById(from.currentTarget.id);
           if (node)
           {
             allCallDiv.removeChild(node);
@@ -152,7 +154,7 @@
         }
         else 
         {
-          var node = document.getElementById(from.currentTarget.id);
+          let node = document.getElementById(from.currentTarget.id);
           if (node)
           {
             allCallDiv.removeChild(node);
@@ -162,14 +164,14 @@
 
       function onHoverCid(from) 
       {
-        var cid = from.currentTarget.id;
+        let cid = from.currentTarget.id;
         if (cid in GT.gtFlagPins)
         {
           from.currentTarget.title = GT.gtFlagPins[cid].band + " , " + GT.gtFlagPins[cid].mode + " , " + GT.dxccToAltName[GT.gtFlagPins[cid].dxcc];
         }
         else
         {
-          var node = document.getElementById(cid);
+          let node = document.getElementById(cid);
           if (node)
           {
             allCallDiv.removeChild(node);
@@ -184,8 +186,8 @@
 
       function makeCallsignRow(callObj, show)
       {
-        var isNewObj = false;
-        var obj = document.getElementById(callObj.cid);
+        let isNewObj = false;
+        let obj = document.getElementById(callObj.cid);
         if (obj && obj.fCall != callObj.fCall)
         {
           // callsign changed
@@ -195,12 +197,12 @@
         if (!obj) 
         {
           isNewObj = true; 
-          var low = 0;
-          var mid = 0;
-          var target = null;
-          var high = allCallDiv.childElementCount;
+          let low = 0;
+          let mid = 0;
+          let target = null;
+          let high = allCallDiv.childElementCount;
 
-          var newDiv = document.createElement("div");
+          let newDiv = document.createElement("div");
           newDiv.id =  callObj.cid;
           newDiv.fCall = callObj.fCall;
           newDiv.onmouseenter = onHoverCid;
@@ -209,7 +211,7 @@
           newDiv.onclick = openIdCid;
           newDiv.oncontextmenu = openLookupCid;
          
-          var worker = "<div id='"+callObj.cid +"CALL' style='clear:both;' class='"+ (callObj.live == false ? "rosterOff" : "rosterOn") + "'>" + callObj.fCall;
+          let worker = "<div id='"+callObj.cid +"CALL' style='clear:both;' class='"+ (callObj.live == false ? "rosterOff" : "rosterOn") + "'>" + callObj.fCall;
           if (callObj.dxcc > 0 && callObj.dxcc in GT.dxccInfo)
           {
             worker += "<img src='img/flags/16/" + GT.dxccInfo[callObj.dxcc].flag +"' style='float:right;'>";
@@ -235,7 +237,7 @@
         } 
         else 
         {
-          var callDiv = document.getElementById(callObj.cid + "CALL");
+          let callDiv = document.getElementById(callObj.cid + "CALL");
           if (callDiv)
           {
             callDiv.className = (callObj.live == false ? "rosterOff" : "rosterOn");
@@ -249,10 +251,10 @@
       {
         if (id in GT.gtFlagPins)
         {
-          var obj = GT.gtFlagPins[id];
+          let obj = GT.gtFlagPins[id];
           if (obj.call != "" && obj.call != "NOCALL") 
           {
-            var show = true;
+            let show = true;
             try {
               if (searchBox.value.length > 0 && !obj.call.match(searchBox.value))
               {
@@ -261,15 +263,15 @@
             }
             catch (e) {}
 
-            if (g_viewBand > 0 && GT.settings.app.myBand != obj.band) show = false;
+            if (CH.viewBand > 0 && GT.settings.app.myBand != obj.band) show = false;
 
-            if (g_viewMode > 0 && GT.settings.app.myMode != obj.mode) show = false;
+            if (CH.viewMode > 0 && GT.settings.app.myMode != obj.mode) show = false;
 
             if (obj.canmsg == false) show = false;
 
             makeCallsignRow(obj, show);
 
-            if (obj.cid == g_currentId && messageInput.disabled == true && obj.live == true)
+            if (obj.cid == CH.currentId && messageInput.disabled == true && obj.live == true)
             {
               messageTextDiv.innerHTML += makeViewMessage("system", "GT", "Session resumed", null);
               messageInput.value = "";
@@ -277,15 +279,15 @@
               messageInput.disabled = false;
             }
           }
-          if (id == g_currentId)
+          if (id == CH.currentId)
           {
-            updateBar(g_currentId);
+            updateBar(CH.currentId);
           }
 
         }
         else
         {
-          var node = document.getElementById(id);
+          let node = document.getElementById(id);
           if (node)
           {
             allCallDiv.removeChild(node);
@@ -296,10 +298,10 @@
 
       function updateCount()
       {
-        var count = 0;
+        let count = 0;
         if(allCallDiv.childElementCount > 0)
         {
-          for (var x = allCallDiv.childNodes.length-1; x > -1;  x--)
+          for (let x = allCallDiv.childNodes.length-1; x > -1;  x--)
           {
             if (allCallDiv.childNodes[x].style.display != "none")
             {
@@ -328,10 +330,10 @@
 
         for (const x in GT.gtFlagPins)
         {
-          var obj = GT.gtFlagPins[x];
+          const obj = GT.gtFlagPins[x];
           if (obj.call != "" && obj.call != "NOCALL") 
           {
-            var show = true;
+            let show = true;
             try {
               if (searchBox.value.length > 0 && !obj.call.match(searchBox.value))
               {
@@ -340,15 +342,15 @@
             }
             catch (e) {}
 
-            if (g_viewBand > 0 && GT.settings.app.myBand != obj.band) show = false;
+            if (CH.viewBand > 0 && GT.settings.app.myBand != obj.band) show = false;
 
-            if (g_viewMode > 0 && GT.settings.app.myMode != obj.mode) show = false;
+            if (CH.viewMode > 0 && GT.settings.app.myMode != obj.mode) show = false;
 
             if (obj.canmsg == false) show = false;
 
             makeCallsignRow(obj, show);
 
-            if (obj.cid == g_currentId && messageInput.disabled == true && obj.live == true)
+            if (obj.cid == CH.currentId && messageInput.disabled == true && obj.live == true)
             {
               messageTextDiv.innerHTML += makeViewMessage("system", "GT", "Session resumed", null);
               messageInput.value = "";
@@ -358,10 +360,10 @@
           }
         }
         
-        updateBar(g_currentId);
+        updateBar(CH.currentId);
         updateCount();
 
-        if (g_viewBand)
+        if (CH.viewBand)
         {
           viewBand.innerHTML = GT.settings.app.myBand;
         }
@@ -370,7 +372,7 @@
           viewBand.innerHTML = "All";
         }
 
-        if (g_viewMode)
+        if (CH.viewMode)
         {
           viewMode.innerHTML = GT.settings.app.myMode;
         }
@@ -395,7 +397,7 @@
         activeCallsignsDiv.innerHTML = "<font color='gray'>no message history</font>";
         if (Object.keys(GT.gtMessages).length > 0)
         {
-          var worker = "";
+          let worker = "";
           for (const key in GT.gtMessages)
           {
             if (key in GT.gtFlagPins)
@@ -430,9 +432,9 @@
         } 
         catch (e) {}
 
-        if (what == g_currentId)
+        if (what == CH.currentId)
         {
-          g_currentId = "";
+          CH.currentId = "";
           openId(what);
         }
         messagesRedraw();
@@ -443,30 +445,29 @@
         showAllCallsigns();
       }
 
-      var g_currentId = 0;
+      let unicodeRegex = /[^\u0000-\u00ff]/; // Small performance gain from pre-compiling the regex
 
-      var regex = /[^\u0000-\u00ff]/; // Small performance gain from pre-compiling the regex
       function containsDoubleByte(str)
       {
         if (!str.length) return false;
         if (str.charCodeAt(0) > 255) return true;
-        return regex.test(str);
+        return unicodeRegex.test(str);
       }
 
-      function makeViewMessage(className, who, msg, when)
+      function makeViewMessage(className, from, msg, when)
       {
-        var who = "<text class='" + className + "' style='cursor:pointer' onclick='doLookup(\"" + who + "\")'>" + formatCallsign(who) + "</text>";
-        var time = "<text class='when'>" + window.opener.userTimeString(when) + "</text>";
-        var worker = who + " " + time + "<br>";
-        var msgTextClass = containsDoubleByte(msg) ? "msgTextUnicode" : "msgText";
+        let who = "<text class='" + className + "' style='cursor:pointer' onclick='doLookup(\"" + from + "\")'>" + formatCallsign(from) + "</text>";
+        let time = "<text class='when'>" + window.opener.userTimeString(when) + "</text>";
+        let worker = who + " " + time + "<br>";
+        let msgTextClass = containsDoubleByte(msg) ? "msgTextUnicode" : "msgText";
         worker += "<text class='" + msgTextClass + "' >" + msg.linkify() + "</text><br>";
         return worker;
       }
 
       function newChatMessage(id, jsmesg)
       {
-        if (id == g_currentId) {
-          var worker = makeViewMessage("them", GT.gtFlagPins[id].call, jsmesg.msg, jsmesg.when);
+        if (id == CH.currentId) {
+          let worker = makeViewMessage("them", GT.gtFlagPins[id].call, jsmesg.msg, jsmesg.when);
           if (id in GT.gtUnread) delete GT.gtUnread[id];
           messageTextDiv.innerHTML += worker;
           scrollDown(messageTextDiv);
@@ -478,12 +479,12 @@
       function closeMessageArea()
       {
         messageAreaDiv.style.display = "none";
-        g_currentId = 0;
+        CH.currentId = 0;
       }
 
       function notifyNoChat(id)
       {
-        if (id == g_currentId)
+        if (id == CH.currentId)
         {
           messageTextDiv.innerHTML += makeViewMessage("system", "GT", "Session ended", null);
           messageInput.value = "...this session is no longer available...";
@@ -506,7 +507,7 @@
           grid.innerHTML = GT.gtFlagPins[id].grid;
           band.innerHTML = GT.gtFlagPins[id].band;
           mode.innerHTML = GT.gtFlagPins[id].mode;
-          appSource.innerHTML = GT.gtFlagPins[id].src in g_knownSources ? g_knownSources[GT.gtFlagPins[id].src] : GT.gtFlagPins[id].src;
+          appSource.innerHTML = GT.gtFlagPins[id].src in CH.knownSources ? CH.knownSources[GT.gtFlagPins[id].src] : GT.gtFlagPins[id].src;
         }
       }
 
@@ -514,11 +515,11 @@
       {
         updateBar(id);
         // already displayed?
-        if (id == g_currentId && messageAreaDiv.style.display == "inline-block") return;
+        if (id == CH.currentId && messageAreaDiv.style.display == "inline-block") return;
 
         if (!(id in GT.gtFlagPins)) return;
 
-        var worker = "";
+        let worker = "";
         if (id in GT.gtMessages && GT.gtMessages[id].history.length > 0)
         {
           for (msg in GT.gtMessages[id].history)
@@ -546,13 +547,15 @@
           }
         }
         messageTextDiv.innerHTML = worker;
-        g_currentId = id;
+        CH.currentId = id;
         messageAreaDiv.style.display = "inline-block";
 
         if (GT.gtFlagPins[id].live == false)
         {
           notifyNoChat(id);
-        } else {
+        }
+        else
+        {
           messageInput.disabled = false;
           messageInput.value = "";
         }
@@ -565,13 +568,13 @@
         String.prototype.linkify = function ()
         {
           // http://, https://, ftp://
-          var urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gim;
+          let urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gim;
 
           // www. sans http:// or https://
-          var pseudoUrlPattern = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+          let pseudoUrlPattern = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
 
           // Email addresses
-          var emailAddressPattern = /[\w.]+@[a-zA-Z_-]+?(?:\.[a-zA-Z]{2,6})+/gim;
+          let emailAddressPattern = /[\w.]+@[a-zA-Z_-]+?(?:\.[a-zA-Z]{2,6})+/gim;
 
           return this.replace(urlPattern, '<a style="color:cyan" target="_blank" href="$&">$&</a>')
             .replace(pseudoUrlPattern, '$1<a style="color:cyan" target="_blank" href="http://$2">$2</a>')
@@ -583,8 +586,8 @@
       {
         if (GT.chatWindowInitialized == false) return;
         
-        var height = window.innerHeight;
-        var width = window.innerWidth;
+        let height = window.innerHeight;
+        let width = window.innerWidth;
 
         width -= allCallsignsDiv.offsetWidth;
         width -= 6;
