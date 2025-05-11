@@ -12865,7 +12865,7 @@ function init()
 
   startupDiv.style.display = "block";
   startupStatusDiv.innerHTML = "Starting...";
-  nodeTimers.setTimeout(startupEngine, 32);
+  nodeTimers.setTimeout(startupEngine, 100);
 }
 
 function startupEngine()
@@ -12875,7 +12875,7 @@ function startupEngine()
     var funcInfo = GT.startupTable.shift();
     funcInfo[0] && funcInfo[0]();
     startupStatusDiv.innerHTML = funcInfo[1];
-    nodeTimers.setTimeout(startupEngine, 64);
+    nodeTimers.setTimeout(startupEngine, 100);
   }
   else
   {
