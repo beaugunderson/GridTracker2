@@ -893,7 +893,7 @@ function findTrustedQSLPaths()
           let lines = stdout.split("\n");
           for (let line in lines)
           {
-            let path = lines[line] + base;
+            let path = lines[line].trim() + base;
             if (fs.existsSync(path))
             {
               GT.settings.trustedQsl.binaryFile = path;
