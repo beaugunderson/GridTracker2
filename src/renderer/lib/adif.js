@@ -879,63 +879,33 @@ function findTrustedQSLPaths()
     }
     else if (GT.platform == "mac")
     {
-      base = "/Applications/TrustedQSL/tqsl.app/Contents/MacOS/tqsl";
-      if (fs.existsSync(base))
+      const child_process = require("child_process");
+      let args = Array();
+      args.push("-name");
+      args.push("'tqsl");
+      base = "/Contents/MacOS/tqsl";
+
+      try 
       {
-        GT.settings.trustedQsl.binaryFile = base;
-        GT.settings.trustedQsl.binaryFileValid = true;
-      }
-      else
-      {
-        base =
-          process.env.HOME +
-          "/Applications/TrustedQSL/tqsl.app/Contents/MacOS/tqsl";
-        if (fs.existsSync(base))
+        let stdout = child_process.execFileSync("mdfind", args);
+        if (stdout)
         {
-          GT.settings.trustedQsl.binaryFile = base;
-          GT.settings.trustedQsl.binaryFileValid = true;
-        }
-        else
-        {
-          base =
-            process.env.HOME + "/Applications/tqsl.app/Contents/MacOS/tqsl";
-          if (fs.existsSync(base))
+          let lines = stdout.split("\n");
+          for (let line in lines)
           {
-            GT.settings.trustedQsl.binaryFile = base;
-            GT.settings.trustedQsl.binaryFileValid = true;
-          }
-          else
-          {
-            base = "/Applications/tqsl.app/Contents/MacOS/tqsl";
-            if (fs.existsSync(base))
+            let path = lines[line] + base;
+            if (fs.existsSync(path))
             {
               GT.settings.trustedQsl.binaryFile = base;
               GT.settings.trustedQsl.binaryFileValid = true;
-            }
-            else
-            {
-              base =
-                process.env.HOME +
-                "/Desktop/TrustedQSL/tqsl.app/Contents/MacOS/tqsl";
-              if (fs.existsSync(base))
-              {
-                GT.settings.trustedQsl.binaryFile = base;
-                GT.settings.trustedQsl.binaryFileValid = true;
-              }
-              else
-              {
-                base =
-                  process.env.HOME +
-                  "/Applications/Ham Radio/tqsl.app/Contents/MacOS/tqsl";
-                if (fs.existsSync(base))
-                {
-                  GT.settings.trustedQsl.binaryFile = base;
-                  GT.settings.trustedQsl.binaryFileValid = true;
-                }
-              }
+              break;
             }
           }
         }
+      }
+      catch (e)
+      {
+        console.log(e);
       }
     }
     else if (GT.platform == "linux")
