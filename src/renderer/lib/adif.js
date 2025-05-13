@@ -896,7 +896,7 @@ function findTrustedQSLPaths()
             let path = lines[line] + base;
             if (fs.existsSync(path))
             {
-              GT.settings.trustedQsl.binaryFile = base;
+              GT.settings.trustedQsl.binaryFile = path;
               GT.settings.trustedQsl.binaryFileValid = true;
               break;
             }
