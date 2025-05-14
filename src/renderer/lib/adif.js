@@ -866,7 +866,7 @@ function findTrustedQSLPaths()
       GT.settings.trustedQsl.binaryFileValid = false;
     }
   }
-  if (GT.settings.trustedQsl.binaryFileValid == false || GT.platform == "mac")
+  if (GT.settings.trustedQsl.binaryFileValid == false)
   {
     if (GT.platform == "windows")
     {
@@ -1918,12 +1918,7 @@ function testTrustedQSL(test)
     return;
   }
 
-  if (
-    logLOTWqsoCheckBox.checked == true &&
-    GT.settings.trustedQsl.binaryFileValid == true &&
-    GT.settings.trustedQsl.stationFileValid == true &&
-    lotwStation.value.length > 0
-  )
+  if (logLOTWqsoCheckBox.checked == true && GT.settings.trustedQsl.binaryFileValid == true && GT.settings.trustedQsl.stationFileValid == true && lotwStation.value.length > 0)
   {
     lotwTestResult.innerHTML = "Testing Upload";
 
@@ -1951,7 +1946,7 @@ function testTrustedQSL(test)
     if (GT.settings.trustedQsl.binaryFileValid == false)
     { worker += "Invalid tqsl executable<br>"; }
     if (GT.settings.trustedQsl.stationFileValid == false)
-    { worker += "TrustQSL not installed<br>"; }
+    { worker += "Stations not found<br>"; }
     if (!ValidateText(lotwTrusted)) worker += "TQSL Password missing<br>";
     if (!ValidateText(lotwStation)) worker += "Select Station<br>";
     lotwTestResult.innerHTML = worker;
