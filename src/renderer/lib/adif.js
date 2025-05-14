@@ -882,7 +882,7 @@ function findTrustedQSLPaths()
       const child_process = require("child_process");
       let args = Array();
       args.push("-name");
-      args.push("'tqsl");
+      args.push("'tqsl'");
       base = "/Contents/MacOS/tqsl";
 
       try 
