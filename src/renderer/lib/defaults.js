@@ -569,6 +569,8 @@ const def_settings = {
     compact: false,
     sortColumn: "Age",
     sortReverse: true,
+    watcherSortColumn: "name",
+    watcherSortReverse: false,
     clearRosterOnBandChange: true,
     rosterAlwaysOnTop: false,
     rosterDelayOnFocus: false,

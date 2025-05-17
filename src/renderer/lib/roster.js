@@ -137,6 +137,7 @@ function loadSettings()
     if (test.length != key.length)
     {
       delete CR.rosterSettings.watchers[key];
+      continue;
     }
 
     // Fix beacues we could have stored a regex object in settings in older versions
@@ -144,6 +145,16 @@ function loadSettings()
     {
       delete CR.rosterSettings.watchers[key].test;
     }
+
+    // Fix to add the name to the entry, makes sorting easier since we can sort on members vs key
+    if (!("name" in CR.rosterSettings.watchers[key]))
+    {
+      CR.rosterSettings.watchers[key].name = key;
+    }
+
+    if (CR.rosterSettings.watchers[key].start == false) CR.rosterSettings.watchers[key].startTime = 0;
+    if (CR.rosterSettings.watchers[key].end == false) CR.rosterSettings.watchers[key].endTime = 0;
+
   }
 
   // Code reducer
@@ -3105,13 +3116,11 @@ function newWatcherEntry()
   entry.type = "Callsign";
   entry.regex = false;
   entry.text = "";
-
+  entry.name = "";
   entry.start = false;
   entry.end = false;
-  entry.startTime = Date.now();
-  entry.startTime -= (entry.startTime % 86400000);
-  entry.endTime = Date.now();
-  entry.endTime -= (entry.endTime % 86400000);
+  entry.startTime = 0;
+  entry.endTime = 0;
   entry.autoDelete = false;
   entry.error = false;
 
@@ -3132,6 +3141,7 @@ function saveWatcher()
 
   let entry = newWatcherEntry();
   entry.watch = true;
+  entry.name = watcherName.value;
   entry.type = watcherType.value;
   entry.regex = watcherRegexCheckbox.checked;
   entry.text = watcherText.value;
@@ -3150,6 +3160,7 @@ function saveWatcher()
       entry.startTime = Date.parse(watcherStartDate.value + "Z");
     }
   }
+  else entry.startTime = 0;
 
   if (entry.end)
   {
@@ -3167,8 +3178,10 @@ function saveWatcher()
       entry.endTime = entry.startTime + 60000;
     }
   }
-  CR.watchers[watcherName.value] = entry;
-  CR.watchersTest[watcherName.value] = null;
+  else entry.endTime = 0;
+
+  CR.watchers[entry.name] = entry;
+  CR.watchersTest[entry.name] = null;
   openWatchersTab();
   window.opener.goProcessRoster();
 }
@@ -3183,6 +3196,7 @@ function addWatcher(value, type)
     entry.regex = false;
     entry.text = value;
     entry.autoDelete = false;
+    entry.name = value;
     CR.watchers[value] = entry;
     CR.watchersTest[value] = null;
     GT.activeRoster.wanted.huntWatcher = huntWatcher.checked = true;
@@ -3230,14 +3244,16 @@ function editWatcher(key)
 function loadWatcherValues(key, entry)
 {
   watcherName.value = key;
-  watcherType.vale = entry.type;
+  watcherType.value = entry.type;
   watcherRegexCheckbox.checked = entry.regex;
   watcherText.value = entry.text;
   watcherStartDateCheckbox.checked = entry.start;
   watcherEndDateCheckbox.checked = entry.end;
-  let date = new Date(entry.startTime);
+  let today = Date.now();
+  today -= today % 86400000;
+  let date = entry.startTime > 0 ? new Date(entry.startTime) : new Date(today);
   watcherStartDate.value = date.toISOString().slice(0, 16);
-  date = new Date(entry.endTime);
+  date = entry.endTime > 0 ? new Date(entry.endTime) : new Date(today);
   watcherEndDate.value = date.toISOString().slice(0, 16);
   watcherAutoDeleteCheckbox.checked = entry.autoDelete;
   watcherTypeChanged(entry.type);
@@ -3266,17 +3282,66 @@ function wantRenderWatchersTab()
   }
 }
 
+function boolCompare(a, b)
+{
+  return (a == false && b == true) ? -1 : (a == b) ? 0 : 1;
+}
+
+function stringCompare(a, b)
+{
+  return a.toLowerCase() < b.toLowerCase() ? -1 : (a == b) ? 0 : 1;
+}
+
+function numberCompare(a ,b)
+{
+  return (a < b) ? -1 : (a == b) ? 0 : 1;
+}
+
+CR.watcherColumns = {
+  watch: { text: "👁️", sort: true, cmp: boolCompare },
+  name: { text: "Name", sort: true, cmp: stringCompare  },
+  type: { text: "Type", sort: true, cmp: stringCompare },
+  regex: { text: "Regex", sort: true, cmp: boolCompare },
+  text: { text: "Text", sort: true, cmp: stringCompare },
+  startTime: { text: "Start Date", sort: true, cmp: numberCompare },
+  endTime: { text: "End Date", sort: true, cmp: numberCompare },
+  edit: { text: "Edit", sort: false },
+  delete: { text: "Delete", sort: false },
+};
+
+function watcherSortFunc(a, b)
+{
+  return CR.watcherColumns[CR.rosterSettings.watcherSortColumn].cmp(CR.watchers[a][CR.rosterSettings.watcherSortColumn], CR.watchers[b][CR.rosterSettings.watcherSortColumn]);
+}
+
 function renderWatchersTab()
 {
   if (Object.keys(CR.watchers).length > 0)
   {
-    let worker = "<div id='watcherTable'><table class='darkTable' align=center><tr><td>👁️</td><th>Name</th><th>Type</th><th>Regex</th><th>Text</th><th>Start Date</th><th>End Date</th><th>Edit</th><th>Delete</th></tr>";
-    Object.keys(CR.watchers)
-      .sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1)
-      .forEach(function (key)
+    let worker = "<div id='watcherTable'><table class='darkTable' align=center><tr>";
+    
+    for (column in CR.watcherColumns)
+    {
+      worker += "<th ";
+      worker += (CR.watcherColumns[column].sort ? "style='cursor: pointer;' onClick='setWatcherSorting(\"" + column + "\");'": "" );
+      worker += ">" + CR.watcherColumns[column].text;
+      if (CR.rosterSettings.watcherSortColumn == column)
+      {
+        worker += "<div style='display:inline-block;margin:0px;padding:0px;'>&nbsp;" + (CR.rosterSettings.watcherSortReverse == false ? "▲" : "▼") + "</div>";
+      }
+      worker += "</th>";
+    }
+
+    worker += "</tr>";
+
+    let sorted = Object.keys(CR.watchers).sort( watcherSortFunc );
+  
+    if (CR.rosterSettings.watcherSortReverse) sorted.reverse();
+
+    sorted.forEach(function (key)
       {
         worker += "<tr><td style='cursor:pointer;font-size:larger;' onclick='toggleWatcher(\"" + key + "\")'>" + (CR.watchers[key].watch ? "👀" : "🙈") + "</td>";
-        worker += "<td align=left style='color:yellow;' >" + key + "</td><td>" + CR.watchers[key].type + "</td><td>" + (CR.watchers[key].regex ? "☑️" : "") + "</td>";
+        worker += "<td align=left style='color:yellow;' >" + CR.watchers[key].name + "</td><td>" + CR.watchers[key].type + "</td><td>" + (CR.watchers[key].regex ? "☑️" : "") + "</td>";
         let text = htmlEntities(CR.watchers[key].text);
         worker += "<td style='overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:250px;color:cyan;'>" + (CR.watchers[key].regex ? text : formatCallsign(text)) + "</td>";
         worker += "<td>" + (CR.watchers[key].start ? window.opener.userTimeString(CR.watchers[key].startTime) : "") + "</td>";
@@ -3304,6 +3369,21 @@ function renderWatchersTab()
     watcherBoxDiv.style.height = "";
     watcherEditView.innerHTML = "";
   }
+}
+
+function setWatcherSorting(column)
+{
+  if (CR.rosterSettings.watcherSortColumn == column)
+  {
+    CR.rosterSettings.watcherSortReverse = !CR.rosterSettings.watcherSortReverse;
+  }
+  else
+  {
+    CR.rosterSettings.watcherSortColumn = column;
+    CR.rosterSettings.watcherSortReverse = false;
+  }
+
+  renderWatchersTab();
 }
 
 function createMenuHide()
