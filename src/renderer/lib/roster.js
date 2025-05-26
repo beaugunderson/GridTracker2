@@ -3268,6 +3268,13 @@ function htmlEntities(str)
     .replace(/"/g, "&quot;");
 }
 
+function bracesToHTML(str)
+{
+  return String(str)
+  .replace(/{/g, "<")
+  .replace(/}/g, ">");
+}
+
 function openWatchersTab()
 {
   clearWatcher();

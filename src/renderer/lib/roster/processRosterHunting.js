@@ -981,8 +981,7 @@ function processWatchers(callObj)
           {
             callObj.hunting.watcher = "hunted";
             callObj.watcherKey = key;
-            let htmlPrevent = htmlEntities(callObj[watcher.source]);
-            callObj[watcher.html] = htmlPrevent.replace(CR.watchersTest[key], (x, y) => `<span class='regexMatch'>${x}</span>`);
+            callObj[watcher.html] = bracesToHTML(htmlEntities(callObj[watcher.source].replace(CR.watchersTest[key], (x, y) => `{span class='regexMatch'}${x}{/span}`)));
             return true;
           }
         }
