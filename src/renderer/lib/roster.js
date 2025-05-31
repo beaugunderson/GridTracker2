@@ -3136,7 +3136,7 @@ function saveWatcher()
   if (CR.watcherEditKey.length > 0 && CR.watcherEditKey in CR.watchers)
   {
     delete CR.watchers[CR.watcherEditKey];
-    delete CR.watchersTest[CR.watcherEditKey];
+    if (CR.watcherEditKey in CR.watchersTest) delete CR.watchersTest[CR.watcherEditKey];
   }
 
   let entry = newWatcherEntry();
@@ -3227,7 +3227,7 @@ function toggleWatcher(key)
 function deleteWatcher(key)
 {
   delete CR.watchers[key];
-  delete CR.watchersTest[key];
+  if (key in CR.watchersTest) delete CR.watchersTest[key];
   wantRenderWatchersTab();
   window.opener.goProcessRoster();
 }
@@ -3333,7 +3333,7 @@ function renderWatchersTab()
     if (watcher.end && now > watcher.endTime && watcher.autoDelete)
     {
         delete CR.watchers[key];
-        delete CR.watchersTest[key];
+        if (key in CR.watchersTest) delete CR.watchersTest[key];
     }
   }
 
