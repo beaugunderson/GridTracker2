@@ -3323,6 +3323,20 @@ function watcherSortFunc(a, b)
 
 function renderWatchersTab()
 {
+  // If there's no decodes the watcher rules are not checked, so we'll check before each render.
+  // Functionally not nessecary as any expired watcher will not be tested *ever*, but makes some people happy
+  let now = Date.now();
+  for (let key in CR.watchers)
+  {
+    let watcher = CR.watchers[key];
+
+    if (watcher.end && now > watcher.endTime && watcher.autoDelete)
+    {
+        delete CR.watchers[key];
+        delete CR.watchersTest[key];
+    }
+  }
+
   if (Object.keys(CR.watchers).length > 0)
   {
     let worker = "<div id='watcherTable'><table class='darkTable' align=center><tr>";
