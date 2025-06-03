@@ -1,6 +1,6 @@
 {
   "name": "GridTracker2",
-  "version": "2.250603.0",
+  "version": "2.250603.1",
   "description": "GridTracker2",
   "main": "./src/main/index.js",
   "author": "The GridTracker Team",
@@ -31,7 +31,7 @@
     "@electron-toolkit/eslint-config": "1.0.2",
     "@electron-toolkit/eslint-config-prettier": "2.0.0",
     "electron": "35.2.2",
-    "electron-builder": "26.0.16",
+    "electron-builder": "26.0.12",
     "eslint": "8.57.0",
     "eslint_d": "14.0.4",
     "prettier": "3.3.2"
