@@ -754,10 +754,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                   </tr>
                   <tr>
                     <td>
-                      <label data-i18n="settings.general.Fwd.IP.label" for="udpForwardIpInput">IP</label>
-                      <input id="udpForwardIpInput" type="text" class="inputTextValue" maxlength="15" size="11"
-                        onkeypress="return validIpKeys(event.charCode);"
-                        oninput=" if ( ValidateIPaddress(this, udpForwardEnable) ) setForwardIp();   " />
+                      <label data-i18n="settings.general.Fwd.IP.label" for="udpForwardIpInput">IPs</label>
+                      <input id="udpForwardIpInput" type="text" class="inputTextValue" size="15"
+                        onkeypress="return validIpsKeys(event.charCode);"
+                        oninput=" if ( ValidateIPaddresses(this, udpForwardEnable) ) setForwardIp();   " />
                     </td>
                   </tr>
                   <tr>

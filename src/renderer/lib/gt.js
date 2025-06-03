@@ -195,6 +195,7 @@ GT.liveGrids = {};
 GT.qsoGrids = {};
 GT.liveCallsigns = {};
 GT.hotKeys = {};
+GT.forwardIPs = [];
 
 GT.activeRoster = null;
 GT.activeAudioAlerts = null;
@@ -277,6 +278,8 @@ GT.us_bands = [
   "6m",
   "2m"
 ];
+
+GT.ipformat = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
 GT.pathIgnore = {};
 GT.pathIgnore.RU = true;
@@ -10067,14 +10070,7 @@ function setUdpForwardEnable(checkbox)
 {
   if (checkbox.checked)
   {
-    if (
-      ValidatePort(
-        udpForwardPortInput,
-        null,
-        CheckForwardPortIsNotReceivePort
-      ) &&
-      ValidateIPaddress(udpForwardIpInput, null)
-    )
+    if (ValidatePort(udpForwardPortInput, null, CheckForwardPortIsNotReceivePort) && ValidateIPaddresses(udpForwardIpInput, null))
     {
       GT.settings.app.wsjtForwardUdpEnable = checkbox.checked;
       return;
@@ -10543,7 +10539,7 @@ function updateBasedOnIni()
 
 function CheckReceivePortIsNotForwardPort(value)
 {
-  if (udpForwardIpInput.value == "127.0.0.1" && udpForwardPortInput.value == value && GT.settings.app.wsjtIP == "" && udpForwardEnable.checked)
+  if (udpForwardIpInput.value.indexOf("127.0.0.1") > -1 && udpForwardPortInput.value == value && GT.settings.app.wsjtIP == "" && udpForwardEnable.checked)
   {
     return false;
   }
@@ -10553,7 +10549,7 @@ function CheckReceivePortIsNotForwardPort(value)
 
 function CheckForwardPortIsNotReceivePort(value)
 {
-  if (udpForwardIpInput.value == "127.0.0.1" && udpPortInput.value == value && GT.settings.app.wsjtIP == "")
+  if (udpForwardIpInput.value.indexOf("127.0.0.1") > -1 && udpPortInput.value == value && GT.settings.app.wsjtIP == "")
   {
     return false;
   }
@@ -10576,7 +10572,9 @@ function CheckAdifBroadcastPortIsNotReceivePort(value)
 
 function setForwardIp()
 {
-  GT.settings.app.wsjtForwardUdpIp = udpForwardIpInput.value;
+  let ips = udpForwardIpInput.value.split(",");
+  GT.forwardIPs = [...new Set(ips)];
+  GT.settings.app.wsjtForwardUdpIp = udpForwardIpInput.value = GT.forwardIPs.join(",");
   if (ValidatePort(udpPortInput, null, CheckReceivePortIsNotForwardPort))
   {
     setUdpPort();
@@ -10587,7 +10585,7 @@ function setForwardIp()
 function setForwardPort()
 {
   GT.settings.app.wsjtForwardUdpPort = udpForwardPortInput.value;
-  ValidateIPaddress(udpForwardIpInput, null);
+  ValidateIPaddresses(udpForwardIpInput, null);
   if (ValidatePort(udpPortInput, null, CheckReceivePortIsNotForwardPort))
   {
     setUdpPort();
@@ -10596,6 +10594,13 @@ function setForwardPort()
 
 function validIpKeys(value)
 {
+  if (value == 46) return true;
+  return value >= 48 && value <= 57;
+}
+
+function validIpsKeys(value)
+{
+  if (value == 44) return true;
   if (value == 46) return true;
   return value >= 48 && value <= 57;
 }
@@ -10842,8 +10847,7 @@ function ipToInt(ip)
 
 function ValidateMulticast(inputText)
 {
-  var ipformat = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-  if (inputText.value.match(ipformat))
+  if (inputText.value.match(GT.ipformat))
   {
     if (inputText.value != "0.0.0.0" && inputText.value != "255.255.255.255")
     {
@@ -10886,8 +10890,7 @@ function ValidateMulticast(inputText)
 
 function ValidateIPaddress(inputText, checkBox)
 {
-  var ipformat = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-  if (inputText.value.match(ipformat))
+  if (inputText.value.match(GT.ipformat))
   {
     if (inputText.value != "0.0.0.0" && inputText.value != "255.255.255.255")
     {
@@ -10910,6 +10913,51 @@ function ValidateIPaddress(inputText, checkBox)
     if (checkBox) checkBox.checked = false;
     return false;
   }
+}
+
+
+function ValidateIPaddresses(inputText, checkBox)
+{
+  let ips = inputText.value.split(",");
+  let valid = true;
+  for (let x = 0; x < ips.length; x++)
+  {
+    if (ips[x].match(GT.ipformat))
+    {
+      if (ips[x] != "0.0.0.0" && ips[x] != "255.255.255.255")
+      {
+        inputText.style.color = "#FF0";
+        inputText.style.backgroundColor = "darkblue";
+      }
+      else
+      {
+        inputText.style.color = "#FFF";
+        inputText.style.backgroundColor = "rgb(199, 113, 0)";
+        if (checkBox) checkBox.checked = false;
+        valid = false;
+        break;
+      }
+    }
+    else
+    {
+      valid = false;
+      break;
+    }
+  }
+
+  if (valid == false)
+  {
+    if (checkBox) checkBox.checked = false;
+    inputText.style.color = "#FFF";
+    inputText.style.backgroundColor = "rgb(199, 113, 0)";
+  }
+  else
+  {
+    inputText.style.color = "#FF0";
+    inputText.style.backgroundColor = "darkblue";
+  }
+
+  return valid;
 }
 
 function ValidatePort(inputText, checkBox, callBackCheck)
@@ -12608,7 +12656,7 @@ function postInit()
     loadReceptionReports();
     redrawSpots();
     section = "UDPListenerForward";
-    updateForwardListener();
+    startForwardListener();
     section = "LastTraffic";
     addLastTraffic("GridTracker2<br>" + gtShortVersion);
     section = "displayRadar";
@@ -12916,7 +12964,8 @@ function loadPortSettings()
   udpForwardPortInput.value = GT.settings.app.wsjtForwardUdpPort;
   ValidatePort(udpForwardPortInput, null, CheckForwardPortIsNotReceivePort);
   udpForwardIpInput.value = GT.settings.app.wsjtForwardUdpIp;
-  ValidateIPaddress(udpForwardIpInput, null);
+  ValidateIPaddresses(udpForwardIpInput, null);
+  setForwardIp();
   udpForwardEnable.checked = GT.settings.app.wsjtForwardUdpEnable;
   setUdpForwardEnable(udpForwardEnable);
 
@@ -13014,7 +13063,7 @@ function encodeQDOUBLE(byteArray, offset, value)
   return byteArray.writeDoubleBE(value, offset);
 }
 
-function updateForwardListener()
+function startForwardListener()
 {
   if (GT.forwardUdpServer != null)
   {
@@ -13048,27 +13097,24 @@ function updateForwardListener()
       newMessage.type = decodeQUINT32(message);
       message = message.slice(GT.qtToSplice);
       newMessage.Id = decodeQUTF8(message);
-      message = message.slice(GT.qtToSplice);
 
       if (newMessage.Id in GT.instances)
       {
-        wsjtUdpMessage(
-          originalMessage,
-          originalMessage.length,
-          GT.instances[newMessage.Id].remote.port,
-          GT.instances[newMessage.Id].remote.address
-        );
+        wsjtUdpMessage(originalMessage, originalMessage.length, GT.instances[newMessage.Id].remote.port, GT.instances[newMessage.Id].remote.address);
       }
     }
   });
   GT.forwardUdpServer.bind(0);
 }
 
-function sendForwardUdpMessage(msg, length, port, address)
+function sendForwardUdpMessage(msg, length)
 {
   if (GT.forwardUdpServer)
   {
-    GT.forwardUdpServer.send(msg, 0, length, port, address);
+    for (const key in GT.forwardIPs)
+    {
+      GT.forwardUdpServer.send(msg, 0, length, GT.settings.app.wsjtForwardUdpPort, GT.forwardIPs[key]);
+    }
   }
 }
 
@@ -13190,12 +13236,7 @@ function updateWsjtxListener(port)
 
     if (typeof udpForwardEnable != "undefined" && udpForwardEnable.checked == true)
     {
-      sendForwardUdpMessage(
-        message,
-        message.length,
-        udpForwardPortInput.value,
-        udpForwardIpInput.value
-      );
+      sendForwardUdpMessage(message, message.length);
     }
 
     var newMessage = {};

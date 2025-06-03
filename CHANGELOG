@@ -122,8 +122,8 @@ App: Fixed 7 year old bug in ADIF parsing, big thanks to VE3MSC for this find!
      If "PSKReporter" appears anywhere in the ADIF being loaded it would be rejected entirely
 
 
-
-Call Roster -> Watcher -> Fixed display of compound callsign matches in Msg column
+Call Roster -> Watcher: Fixed display of compound callsign matches in Msg column
+App: Settings -> General: Multiple IPs supported in 'Forwared UDP Messages' (comma separated)
 
 ### Fixed
 
