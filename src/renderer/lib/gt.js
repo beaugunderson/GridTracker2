@@ -10574,7 +10574,7 @@ function setForwardIp()
 {
   let ips = udpForwardIpInput.value.split(",");
   GT.forwardIPs = [...new Set(ips)];
-  GT.settings.app.wsjtForwardUdpIp = udpForwardIpInput.value = GT.forwardIPs.join(",");
+  GT.settings.app.wsjtForwardUdpIp = GT.forwardIPs.join(",");
   if (ValidatePort(udpPortInput, null, CheckReceivePortIsNotForwardPort))
   {
     setUdpPort();
