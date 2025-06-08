@@ -484,13 +484,24 @@ GT.viewInfo[6] = ["countyData", "US Counties", 0, 0, 3220];
 GT.viewInfo[7] = ["us48Data", "US Continental Grids", 0, 0, 488];
 GT.viewInfo[8] = ["wacpZones", "CA Provinces", 0, 0, 13];
 
+  GT.awardLayers = {
+    1 : {o: "cqZones",  p: "cqzone",  bx: "#FF000015", br: "#005500FF", bw: 1,   ww: 1,   dc: "#00FF0066", dw: "#FFFF0066", s: true},
+    2 : {o: "ituZones", p: "ituzone", bx: "#FF000015", br: "#800080FF", bw: 1,   ww: 1,   dc: "#00FF0066", dw: "#FFFF0066", s: true},
+    3 : {o: "wacZones", p: "wac",     bx: "#FF000015", br: "#006666FF", bw: 1,   ww: 1,   dc: "#00FF0066", dw: "#FFFF0066", s: true},
+    4 : {o: "wasZones", p: "was",     bx: "#FF000020", br: "#0000FFFF", bw: 1,   ww: 1,   dc: "#00FF0066", dw: "#FFFF0066", s: true},
+    5 : {o: "dxccInfo", p: "dxcc",    bx: "#FF000015", br: "#0000FFFF", bw: 1,   ww: 1,   dc: "#00FF0066", dw: "#FFFF0066", s: true},
+    6 : {o: "countyData", p: "usc",   bx: "#00000000", br: "#0000FFFF", bw: 0.1, ww: 1,   dc: "#00FF0066", dw: "#FFFF0066", s: true},
+    7 : {o: "us48Data", p: "us48",    bx: "#FF000015", br: "#0000FFFF", bw: 0.1, ww: 0.2, dc: "#00FF0066", dw: "#FFFF0066", s: false},
+    8 : {o: "wacpZones", p: "wacp",   bx: "#FF000020", br: "#0000FFFF", bw: 1,   ww: 1 ,  dc: "#00FF0066", dw: "#FFFF0066", s: true}
+};
+
 GT.dazzleGrid = null;
 GT.dazzleTimeout = null;
 GT.gridAlpha = "88";
 GT.mediaFiles = null;
 GT.qslAuthorityTimer = null;
-GT.tempGridBox = null;
-GT.currentShapes = {};
+
+
 GT.helpShow = false;
 GT.MyCurrentGrid = "";
 GT.MyGridIsUp = false;
@@ -1985,21 +1996,19 @@ function getMouseY()
   return GT.mouseY;
 }
 
-function tempGridToBox(iQTH, oldGrid, borderColor, boxColor, layer)
+function tempGridToBox(iQTH, borderColor, boxColor, layer)
 {
   var borderWeight = 2;
   var newGridBox = null;
   var LL = squareToLatLong(iQTH.substr(0, 4));
-  if (oldGrid)
-  {
-    if (GT.layerSources.temp.hasFeature(oldGrid)) { GT.layerSources.temp.removeFeature(oldGrid); }
-  }
+
   var bounds = [
     [LL.lo1, LL.la1],
     [LL.lo2, LL.la2]
   ];
   newGridBox = rectangle(bounds);
   newGridBox.setId(iQTH);
+  newGridBox.set("prop", null);
   const featureStyle = new ol.style.Style({
     fill: new ol.style.Fill({
       color: boxColor
@@ -2083,10 +2092,9 @@ function clearTempGrids()
   GT.layerSources.temp.clear();
 }
 
-function clearCurrentShapes()
+function clearAwardLayer()
 {
   GT.layerSources.award.clear();
-  GT.currentShapes = {};
 }
 
 function mapMemory(x, save, internal = false)
@@ -2360,13 +2368,11 @@ function setTrophyOverlay(which)
   gtTrophyLayer.value = GT.currentOverlay = GT.settings.map.trophyOverlay = which;
   window.document.title = makeTitleInfo(true);
   myTrophyTooltip.style.zIndex = -1;
-  clearCurrentShapes();
-  // set the scope of key
-  var key = 0;
+  clearAwardLayer();
 
   if (which == 0)
   {
-    for (key in GT.layerVectors)
+    for (const key in GT.layerVectors)
     {
       GT.layerVectors[key].setVisible(true);
     }
@@ -2380,14 +2386,14 @@ function setTrophyOverlay(which)
   {
     if (GT.settings.map.mergeOverlay == false)
     {
-      for (key in GT.layerVectors)
+      for (const key in GT.layerVectors)
       {
         GT.layerVectors[key].setVisible(false);
       }
     }
     else
     {
-      for (key in GT.layerVectors)
+      for (const key in GT.layerVectors)
       {
         GT.layerVectors[key].setVisible(true);
       }
@@ -2409,236 +2415,54 @@ function setTrophyOverlay(which)
     GT.layerVectors.gtflags.setVisible(false);
   }
 
-  if (which == 1)
+  if (which in GT.awardLayers)
   {
-    for (key in GT.cqZones)
+    const layer = GT.awardLayers[which];
+    const data = GT[layer.o];
+    for (const key in data)
     {
-      var boxColor = "#FF000015";
-      var borderColor = "#005500FF";
-      var borderWeight = 1;
-      if (didConfirm(GT.cqZones[key]))
+      let boxColor = layer.bx;
+      let borderColor = layer.br;
+      let borderWeight = layer.bw;
+      if (didConfirm(data[key]))
       {
-        boxColor = "#00FF0066";
+        boxColor = layer.dc;
+        borderWeight = layer.ww;
       }
-      else if (didWork(GT.cqZones[key]))
+      else if (didWork(data[key]))
       {
-        boxColor = "#FFFF0066";
+        boxColor = layer.dw;
+        borderWeight = layer.ww;
       }
+      if (layer.s)
+      {
+        // Old DXCCs may be deleted
+        if (data[key].geo != "deleted")
+        {
+          GT.layerSources.award.addFeature(shapeFeature(
+            key,
+            data[key].geo,
+            layer.p,
+            boxColor,
+            borderColor,
+            borderWeight
+          ));
+        }
+      }
+      else
+      {
+        let LL = squareToLatLong(key);
+        let bounds = [[LL.lo1, LL.la1], [LL.lo2, LL.la2]];
 
-      GT.currentShapes[key] = shapeFeature(
-        key,
-        GT.cqZones[key].geo,
-        "cqzone",
-        boxColor,
-        borderColor,
-        borderWeight
-      );
-      GT.layerSources.award.addFeature(GT.currentShapes[key]);
-    }
-  }
-  if (which == 2)
-  {
-    for (key in GT.ituZones)
-    {
-      var boxColor = "#FF000015";
-      var borderColor = "#800080FF";
-      var borderWeight = 1;
-      if (didConfirm(GT.ituZones[key]))
-      {
-        boxColor = "#00FF0066";
-        borderWeight = 1;
-      }
-      else if (didWork(GT.ituZones[key]))
-      {
-        boxColor = "#FFFF0066";
-        borderWeight = 1;
-      }
-
-      GT.currentShapes[key] = shapeFeature(
-        key,
-        GT.ituZones[key].geo,
-        "ituzone",
-        boxColor,
-        borderColor,
-        borderWeight
-      );
-      GT.layerSources.award.addFeature(GT.currentShapes[key]);
-    }
-  }
-  if (which == 3)
-  {
-    for (key in GT.wacZones)
-    {
-      var boxColor = "#FF000015";
-      var borderColor = "#006666FF";
-      var borderWeight = 1;
-      var originalKey = key;
-      if (didConfirm(GT.wacZones[key]))
-      {
-        boxColor = "#00FF0066";
-      }
-      else if (didWork(GT.wacZones[key]))
-      {
-        boxColor = "#FFFF0066";
-      }
-
-      GT.currentShapes[originalKey] = shapeFeature(
-        originalKey,
-        GT.wacZones[originalKey].geo,
-        "wac",
-        boxColor,
-        borderColor,
-        borderWeight
-      );
-      GT.layerSources.award.addFeature(GT.currentShapes[originalKey]);
-    }
-  }
-  if (which == 4)
-  {
-    for (key in GT.wasZones)
-    {
-      var boxColor = "#FF000020";
-      var borderColor = "#0000FFFF";
-      var borderWeight = 1;
-      if (didConfirm(GT.wasZones[key]))
-      {
-        boxColor = "#00FF0066";
-      }
-      else if (didWork(GT.wasZones[key]))
-      {
-        boxColor = "#FFFF0066";
-      }
-
-      GT.currentShapes[key] = shapeFeature(
-        key,
-        GT.wasZones[key].geo,
-        "was",
-        boxColor,
-        borderColor,
-        borderWeight
-      );
-      GT.layerSources.award.addFeature(GT.currentShapes[key]);
-    }
-  }
-  if (which == 5)
-  {
-    for (key in GT.dxccInfo)
-    {
-      var boxColor = "#FF000015";
-      var borderColor = "#0000FFFF";
-      var borderWeight = 1;
-      if (didConfirm(GT.dxccInfo[key]))
-      {
-        boxColor = "#00FF0066";
-      }
-      else if (didWork(GT.dxccInfo[key]))
-      {
-        boxColor = "#FFFF0066";
-      }
-
-      if (GT.dxccInfo[key].geo != "deleted")
-      {
-        GT.currentShapes[key] = shapeFeature(
+        GT.layerSources.award.addFeature(gridFeature(
           key,
-          GT.dxccInfo[key].geo,
-          "dxcc",
+          rectangle(bounds),
+          layer.p,
           boxColor,
           borderColor,
           borderWeight
-        );
-        GT.layerSources.award.addFeature(GT.currentShapes[key]);
+        ));
       }
-    }
-  }
-  if (which == 6)
-  {
-    for (key in GT.countyData)
-    {
-      var boxColor = "#00000000";
-      var borderColor = "#0000FFFF";
-      var borderWeight = 0.1;
-      if (didConfirm(GT.countyData[key]))
-      {
-        boxColor = "#00FF0066";
-        borderWeight = 1;
-      }
-      else if (didWork(GT.countyData[key]))
-      {
-        boxColor = "#FFFF0066";
-        borderWeight = 1;
-      }
-
-      GT.currentShapes[key] = shapeFeature(
-        key,
-        GT.countyData[key].geo,
-        "usc",
-        boxColor,
-        borderColor,
-        borderWeight
-      );
-      GT.layerSources.award.addFeature(GT.currentShapes[key]);
-    }
-  }
-  if (which == 7)
-  {
-    for (key in GT.us48Data)
-    {
-      var LL = squareToLatLong(key);
-      var bounds = [
-        [LL.lo1, LL.la1],
-        [LL.lo2, LL.la2]
-      ];
-
-      var boxColor = "#FF000015";
-      var borderColor = "#0000FFFF";
-      var borderWeight = 0.1;
-      if (GT.us48Data[key].confirmed)
-      {
-        boxColor = "#00FF0066";
-        borderWeight = 0.2;
-      }
-      else if (GT.us48Data[key].worked)
-      {
-        boxColor = "#FFFF0066";
-        borderWeight = 0.2;
-      }
-
-      GT.currentShapes[key] = gridFeature(
-        key,
-        rectangle(bounds),
-        "us48",
-        boxColor,
-        borderColor,
-        borderWeight
-      );
-      GT.layerSources.award.addFeature(GT.currentShapes[key]);
-    }
-  }
-  if (which == 8)
-  {
-    for (key in GT.wacpZones)
-    {
-      var boxColor = "#FF000020";
-      var borderColor = "#0000FFFF";
-      var borderWeight = 1;
-      if (didConfirm(GT.wacpZones[key]))
-      {
-        boxColor = "#00FF0066";
-      }
-      else if (didWork(GT.wacpZones[key]))
-      {
-        boxColor = "#FFFF0066";
-      }
-
-      GT.currentShapes[key] = shapeFeature(
-        key,
-        GT.wacpZones[key].geo,
-        "wacp",
-        boxColor,
-        borderColor,
-        borderWeight
-      );
-      GT.layerSources.award.addFeature(GT.currentShapes[key]);
     }
   }
 
@@ -2878,11 +2702,11 @@ function mouseDownGrid(longlat)
     return null;
   }
 
-  var grid = latLonToGridSquare(longlat[1], longlat[0]);
+  let grid = latLonToGridSquare(longlat[1], longlat[0]);
   GT.MyCurrentGrid = grid.substr(0, 4);
-  var worker = "";
+  let worker = "";
   worker += "<table align='center' class='darkTable'><tr style='color:white;'>";
-  var bearing = parseInt(MyCircle.bearing(GT.myLat, GT.myLon, longlat[1], longlat[0]));
+  let bearing = parseInt(MyCircle.bearing(GT.myLat, GT.myLon, longlat[1], longlat[0]));
   worker += "<tr><td>Dist</td><td style='color:lightgreen'>" +
     parseInt(
       MyCircle.distance(
@@ -2901,7 +2725,7 @@ function mouseDownGrid(longlat)
   {
     worker += "<table align='center' class='darkTable' style='border-top:none'><tr style='color:white;'>";
     worker += "<tr style='color:orange;'>";
-    for (var x = 0; x < GT.gridToDXCC[grid].length; x++)
+    for (let x = 0; x < GT.gridToDXCC[grid].length; x++)
     {
       worker +=
         "<td>" +
@@ -2913,12 +2737,12 @@ function mouseDownGrid(longlat)
     if (grid in GT.gridToState)
     {
       worker += "</tr><tr style='color:yellow;'>";
-      for (var x = 0; x < GT.gridToDXCC[grid].length; x++)
+      for (let x = 0; x < GT.gridToDXCC[grid].length; x++)
       {
         worker += "<td>";
         if (grid in GT.gridToState)
         {
-          for (var y = 0; y < GT.gridToState[grid].length; y++)
+          for (let y = 0; y < GT.gridToState[grid].length; y++)
           {
             if (GT.gridToDXCC[grid][x] == GT.StateData[GT.gridToState[grid][y]].dxcc)
             {
@@ -2930,9 +2754,11 @@ function mouseDownGrid(longlat)
       }
     }
     worker += "</tr></table>";
+
+    showDxccGrids(grid);
   }
 
-  GT.tempGridBox = tempGridToBox(grid, GT.tempGridBox, "#000000FF", "#00000000");
+  tempGridToBox(grid, "#000000FF", "#00000000");
 
   myGridTooltip.innerHTML = "<div style='font-size:14px;font-weight:bold;color:cyan;margin:0 auto' class='roundBorder'>" + grid + "</div>" + worker;
   GT.MyGridIsUp = true;
@@ -2956,12 +2782,7 @@ function mouseUpGrid()
 {
   GT.MyGridIsUp = false;
   myGridTooltip.style.zIndex = -1;
-
-  if (GT.tempGridBox)
-  {
-    if (GT.layerSources.temp.hasFeature(GT.tempGridBox)) { GT.layerSources.temp.removeFeature(GT.tempGridBox); }
-    GT.tempGridBox = null;
-  }
+  clearTempGrids();
 }
 
 function createFlagTipTable(feature)
@@ -4679,6 +4500,71 @@ function initMap()
   requestAnimationFrame(animatePaths);
 }
 
+function mouseDownEvent(event)
+{
+  if (event.activePointers[0].buttons == 1 && event.activePointers[0].ctrlKey == true)
+  {
+    let LL = ol.proj.toLonLat(event.coordinate, GT.settings.map.projection);
+    let info = {};
+    info.callObj = {};
+    info.callObj.distance = 1; // We just need the heading, but distance makes it valid
+    info.callObj.heading = parseInt(MyCircle.bearing(GT.myLat, GT.myLon, LL[1], LL[0]));
+    aimRotator(info);
+  }
+
+  let shouldReturn = false;
+  let features = GT.map.getFeaturesAtPixel(event.pixel);
+  if (features != null && features.length > 0)
+  {
+    features = features.reverse();
+    let finalGridFeature = null;
+    for (let index in features)
+    {
+      if (!(features[index].values_.prop in GT.hoverFunctors)) continue;
+      if (features[index].size == 6)
+      {
+        finalGridFeature = features[index];
+      }
+      if (features[index].size == 4 && finalGridFeature == null)
+      {
+        finalGridFeature = features[index];
+      }
+      if (features[index].size == 1)
+      {
+        leftClickGtFlag(features[index]);
+        shouldReturn = true;
+      }
+      if (features[index].size == 22)
+      {
+        leftClickPota(features[index].key);
+        shouldReturn = true;
+      }
+    }
+    if (finalGridFeature)
+    {
+      onRightClickGridSquare(finalGridFeature);
+      shouldReturn = true;
+    }
+  }
+
+  if (shouldReturn) return true;
+
+  if (event.activePointers[0].buttons == 2 && GT.currentOverlay == 0)
+  {
+    mouseDownGrid(ol.proj.toLonLat(event.coordinate, GT.settings.map.projection));
+    return true;
+  }
+}
+
+function mouseUpEvent(event)
+{
+    mouseUpGrid();
+    if (GT.settings.map.mouseOver == false)
+    {
+      mouseOutOfDataItem();
+    }
+}
+
 function renderMap()
 {
   if (isNaN(GT.myLat) || Math.abs(GT.myLat) >= 90)
@@ -4788,72 +4674,8 @@ function renderMap()
     view: GT.mapView
   });
 
-  GT.map.on("pointerdown", function (event)
-  {
-    var shouldReturn = false;
-    var features = GT.map.getFeaturesAtPixel(event.pixel);
-    if (features != null && features.length > 0)
-    {
-      features = features.reverse();
-      var finalGridFeature = null;
-      for (var index in features)
-      {
-        if (!(features[index].values_.prop in GT.hoverFunctors)) continue;
-        if (features[index].size == 6)
-        {
-          noFeature = false;
-          finalGridFeature = features[index];
-        }
-        if (features[index].size == 4 && finalGridFeature == null)
-        {
-          noFeature = false;
-          finalGridFeature = features[index];
-        }
-        if (features[index].size == 1)
-        {
-          leftClickGtFlag(features[index]);
-          shouldReturn = true;
-        }
-        if (features[index].size == 22)
-        {
-          leftClickPota(features[index].key);
-          shouldReturn = true;
-        }
-      }
-      if (finalGridFeature)
-      {
-        onRightClickGridSquare(finalGridFeature);
-        shouldReturn = true;
-      }
-    }
-
-    if (event.activePointers[0].buttons == 1 && event.activePointers[0].ctrlKey == true)
-    {
-      var LL = ol.proj.toLonLat(event.coordinate, GT.settings.map.projection);
-      var info = {};
-      info.callObj = {};
-      info.callObj.distance = 1; // We just need the heading, but distance makes it valid
-      info.callObj.heading = parseInt(MyCircle.bearing(GT.myLat, GT.myLon, LL[1], LL[0]));
-      aimRotator(info);
-    }
-
-    if (shouldReturn) return true;
-
-    if (event.activePointers[0].buttons == 2 && GT.currentOverlay == 0)
-    {
-      mouseDownGrid(ol.proj.toLonLat(event.coordinate, GT.settings.map.projection));
-      return true;
-    }
-  });
-
-  GT.map.on("pointerup", function (event)
-  {
-    mouseUpGrid();
-    if (GT.settings.map.mouseOver == false)
-    {
-      mouseOutOfDataItem();
-    }
-  });
+  GT.map.on("pointerdown", mouseDownEvent);
+  GT.map.on("pointerup", mouseUpEvent);
 
   document.getElementById("menuDiv").style.display = "block";
 
@@ -6779,6 +6601,36 @@ function dazzleGrid(LL)
   GT.layerSources.temp.addFeature(GT.dazzleGrid);
 
   GT.dazzleTimeout = nodeTimers.setTimeout(removeDazzleGrid, 3000);
+}
+
+function showDxccGrids(grid)
+{
+  for (let x = 0; x < GT.gridToDXCC[grid].length; x++)
+  {
+    let dxcc = GT.dxccInfo[GT.gridToDXCC[grid][x]];
+    let color = parseInt(GT.gridToDXCC[grid][x]);
+    let boxColor = "hsl(" + (color*3.3) % 360 + " 100% 50% / 20%)";
+    let borderColor = "#0000FFFF";
+    let borderWeight = 0.1;
+
+    for (let y = 0; y < dxcc.mh.length; y++ )
+    {
+      let LL = squareToLatLong(dxcc.mh[y]);
+      let bounds = [
+        [LL.lo1, LL.la1],
+        [LL.lo2, LL.la2]
+      ];
+
+      GT.layerSources.temp.addFeature(gridFeature(
+        dxcc.mh[y],
+        rectangle(bounds),
+        null,
+        boxColor,
+        borderColor,
+        borderWeight
+      ));
+    }
+  }
 }
 
 function centerOn(grid, dazzle = true)
@@ -11179,8 +11031,6 @@ function loadMaidenHeadData()
       if (!(GT.dxccInfo[key].mh[x] in GT.gridToDXCC)) { GT.gridToDXCC[GT.dxccInfo[key].mh[x]] = Array(); }
       GT.gridToDXCC[GT.dxccInfo[key].mh[x]].push(GT.dxccInfo[key].dxcc);
     }
-
-    if (GT.dxccInfo[key].dxcc != 291) { delete GT.dxccInfo[key].mh; }
   }
 
   let dxccGeo = requireJson("data/dxcc.json");
