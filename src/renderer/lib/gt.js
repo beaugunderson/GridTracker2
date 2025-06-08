@@ -4,7 +4,7 @@
 const gtVersionStr = electron.ipcRenderer.sendSync("appVersion");
 const gtVersion = parseInt(gtVersionStr.replace(/\./g, ""));
 
-// var GT is in screen.js
+// let GT is in screen.js
 GT.startingUp = true;
 GT.firstRun = false;
 
@@ -35,14 +35,14 @@ function loadAllSettings()
 
   try
   {
-    var tryDirectory = "";
-    var userdirs = [
+    let tryDirectory = "";
+    let userdirs = [
       GT.appData,
       GT.scriptPath,
       GT.qsoBackupDir,
       GT.extraMediaDir
     ];
-    for (var dir of userdirs)
+    for (let dir of userdirs)
     {
       if (!fs.existsSync(dir))
       {
@@ -944,7 +944,7 @@ function setGridView()
 
 function cycleGridView()
 {
-  var mode = GT.settings.app.gridViewMode;
+  let mode = GT.settings.app.gridViewMode;
   mode++;
   if (mode > 3) mode = 1;
   if (mode < 1) mode = 1;
@@ -994,10 +994,10 @@ function changeOffline()
     offlineMapSelect.style.display = "none";
     offlineMapNightSelect.style.display = "none";
 
-    for (var key in GT.settings.adifLog.menu)
+    for (let key in GT.settings.adifLog.menu)
     {
-      var value = GT.settings.adifLog.menu[key];
-      var where = key + "Div";
+      let value = GT.settings.adifLog.menu[key];
+      let where = key + "Div";
       document.getElementById(key).checked = value;
       if (value == true)
       {
@@ -1079,12 +1079,12 @@ function dateToString(dateTime)
 
 function userDayString(Msec)
 {
-  var dateTime;
+  let dateTime;
   if (Msec != null) dateTime = new Date(Msec);
   else dateTime = new Date();
 
-  var ds = dateTime.toUTCString().replace(/GMT/g, "UTC").replace(/,/g, "");
-  var dra = ds.split(" ");
+  let ds = dateTime.toUTCString().replace(/GMT/g, "UTC").replace(/,/g, "");
+  let dra = ds.split(" ");
   dra.shift();
   dra.pop();
   dra.pop();
@@ -1093,7 +1093,7 @@ function userDayString(Msec)
 
 function userTimeString(Msec)
 {
-  var dateTime;
+  let dateTime;
   if (Msec != null) dateTime = new Date(Msec);
   else dateTime = new Date();
   return dateToString(dateTime);
@@ -1107,7 +1107,7 @@ function refreshQSOs()
   clearOrLoadButton.style.display = "none";
   busyDiv.style.display = "block";
 
-  var task = {};
+  let task = {};
   task.type = "process";
   task.QSOhash = GT.QSOhash;
   GT.trackerWorker.postMessage(task);
@@ -1146,11 +1146,11 @@ function addLiveCallsign(
   finalDxcc
 )
 {
-  var callsign = null;
-  var wspr = mode == "WSPR" ? band : null;
-  var hash = "";
+  let callsign = null;
+  let wspr = mode == "WSPR" ? band : null;
+  let hash = "";
 
-  var finalMsg = ifinalMsg.trim();
+  let finalMsg = ifinalMsg.trim();
   if (finalMsg.length > 40) finalMsg = finalMsg.substring(0, 40) + "...";
 
   if (finalDxcc < 1) finalDxcc = callsignToDxcc(finalDXcall);
@@ -1169,10 +1169,10 @@ function addLiveCallsign(
 
   if (callsign == null)
   {
-    var newCallsign = {};
+    let newCallsign = {};
     newCallsign.DEcall = finalDXcall;
     newCallsign.grid = finalGrid;
-    newCallsign.field = finalGrid.substring(0, 2);
+    // newCallsign.field = finalGrid.substring(0, 2);
     newCallsign.mode = mode;
     newCallsign.band = band;
     newCallsign.msg = finalMsg;
@@ -1235,7 +1235,7 @@ function addLiveCallsign(
 
     if (newCallsign.state == null && isKnownCallsignDXCC(newCallsign.dxcc))
     {
-      var fourGrid = finalGrid.substr(0, 4);
+      let fourGrid = finalGrid.substr(0, 4);
       if (fourGrid in GT.gridToState && GT.gridToState[fourGrid].length == 1)
       {
         newCallsign.state = GT.gridToState[fourGrid][0];
@@ -1270,7 +1270,7 @@ function addLiveCallsign(
       callsign.wspr = wspr;
       if (finalGrid.length > callsign.grid.length) callsign.grid = finalGrid;
       if (finalGrid.length == callsign.grid.length && finalGrid != callsign.grid) callsign.grid = finalGrid;
-      callsign.field = callsign.grid.substring(0, 2);
+      // callsign.field = callsign.grid.substring(0, 2);
       if (finalRSTsent != null) callsign.RSTsent = finalRSTsent;
       if (finalRSTrecv != null) callsign.RSTrecv = finalRSTrecv;
       callsign.vucc_grids = [];
@@ -1378,13 +1378,13 @@ function changePathValues()
 
 function styleAllFlightPaths()
 {
-  for (var i = GT.flightPaths.length - 1; i >= 0; i--)
+  for (let i = GT.flightPaths.length - 1; i >= 0; i--)
   {
-    var featureStyle = GT.flightPaths[i].getStyle();
-    var featureStroke = featureStyle.getStroke();
+    let featureStyle = GT.flightPaths[i].getStyle();
+    let featureStroke = featureStyle.getStroke();
 
-    var color = GT.flightPaths[i].isQRZ ? getQrzPathColor() : getPathColor();
-    var width = GT.flightPaths[i].isQRZ ? qrzPathWidthValue.value : pathWidthValue.value;
+    let color = GT.flightPaths[i].isQRZ ? getQrzPathColor() : getPathColor();
+    let width = GT.flightPaths[i].isQRZ ? qrzPathWidthValue.value : pathWidthValue.value;
 
     if (width == 0)
     {
@@ -1406,11 +1406,11 @@ function styleAllFlightPaths()
 
     if ("Arrow" in GT.flightPaths[i])
     {
-      var stroke = new ol.style.Stroke({
+      let stroke = new ol.style.Stroke({
         color: color,
         width: width
       });
-      var thisStle = new ol.style.Style({
+      let thisStle = new ol.style.Style({
         image: new ol.style.Circle({
           stroke: stroke,
           radius: 3
@@ -1421,8 +1421,8 @@ function styleAllFlightPaths()
   }
   if (GT.transmitFlightPath != null)
   {
-    var featureStyle = GT.transmitFlightPath.getStyle();
-    var featureStroke = featureStyle.getStroke();
+    let featureStyle = GT.transmitFlightPath.getStyle();
+    let featureStroke = featureStyle.getStroke();
 
     if (qrzPathWidthValue.value == 0)
     {
@@ -1438,11 +1438,11 @@ function styleAllFlightPaths()
 
       if ("Arrow" in GT.transmitFlightPath)
       {
-        var stroke = new ol.style.Stroke({
+        let stroke = new ol.style.Stroke({
           color: getQrzPathColor(),
           width: qrzPathWidthValue.value
         });
-        var thisStle = new ol.style.Style({
+        let thisStle = new ol.style.Style({
           image: new ol.style.Circle({
             stroke: stroke,
             radius: 3
@@ -1465,15 +1465,15 @@ function createSpotTipTable(toolElement)
 {
   try
   {
-    var now = timeNowSec();
-    var worker = "";
+    let now = timeNowSec();
+    let worker = "";
     if (toolElement.spot in GT.receptionReports.spots)
     {
       GT.layerSources.pskHop.clear();
-      var report = GT.receptionReports.spots[toolElement.spot];
+      let report = GT.receptionReports.spots[toolElement.spot];
 
-      var LL = squareToCenter(GT.settings.app.myRawGrid);
-      var fromPoint = ol.proj.fromLonLat([LL.o, LL.a]);
+      let LL = squareToCenter(GT.settings.app.myRawGrid);
+      let fromPoint = ol.proj.fromLonLat([LL.o, LL.a]);
 
       worker = "<table id='tooltipTable' class='darkTable' ><tr><th colspan=2 style='color:cyan'>Rx Spot</th></tr>";
       worker += "<tr><td>Call</td><td style='color:#ff0' >" + formatCallsign(report.call) + "</td></tr>";
@@ -1503,8 +1503,8 @@ function createSpotTipTable(toolElement)
       }
       worker += "</table>";
 
-      var strokeWeight = pathWidthValue.value;
-      var toPoint = ol.proj.fromLonLat([LL.o, LL.a]);
+      let strokeWeight = pathWidthValue.value;
+      let toPoint = ol.proj.fromLonLat([LL.o, LL.a]);
 
       flightFeature(
         [fromPoint, toPoint],
@@ -1532,26 +1532,26 @@ function createTooltTipTable(toolElement)
   {
     return createSpotTipTable(toolElement);
   }
-  var colspan = 10;
+  let colspan = 10;
   if (GT.settings.callsignLookups.lotwUseEnable == true) colspan++;
   if (GT.settings.callsignLookups.eqslUseEnable == true) colspan++;
   if (GT.settings.callsignLookups.oqrsUseEnable == true) colspan++;
   if (toolElement.qso == true) colspan += 2;
 
-  var worker = "<table id='tooltipTable' class='darkTable' ><tr><th colspan=" +
+  let worker = "<table id='tooltipTable' class='darkTable' ><tr><th colspan=" +
     colspan + " style='color:cyan'>" +
     toolElement.qth + " (<font color='white'>" + I18N((toolElement.qso ? "gt.gridView.logbook" : "gt.gridView.live")) + "</font>)</th></tr>";
   if (toolElement.qth in GT.gridToDXCC)
   {
     worker += "<tr><th colspan=" + colspan + " style='color:yellow'><small>";
-    for (var x = 0; x < GT.gridToDXCC[toolElement.qth].length; x++)
+    for (let x = 0; x < GT.gridToDXCC[toolElement.qth].length; x++)
     {
       worker += GT.dxccToAltName[GT.gridToDXCC[toolElement.qth][x]];
       if (toolElement.qth in GT.gridToState)
       {
         worker += " (<font color='orange'>";
-        var added = false;
-        for (var y = 0; y < GT.gridToState[toolElement.qth].length; y++)
+        let added = false;
+        for (let y = 0; y < GT.gridToState[toolElement.qth].length; y++)
         {
           if (GT.gridToDXCC[toolElement.qth][x] == GT.StateData[GT.gridToState[toolElement.qth][y]].dxcc)
           {
@@ -1566,7 +1566,7 @@ function createTooltTipTable(toolElement)
     }
     worker += "</small></th></tr>";
   }
-  var newCallList = Array();
+  let newCallList = Array();
   if (toolElement.qso == true)
   {
     if (Object.keys(toolElement.hashes).length > 0)
@@ -1589,7 +1589,7 @@ function createTooltTipTable(toolElement)
       if (GT.settings.callsignLookups.oqrsUseEnable == true) worker += "<td>" + I18N("gt.qsoPage.OQRS") + "</td>";
       worker += "</tr>";
     }
-    for (var KeyIsHash in toolElement.hashes)
+    for (let KeyIsHash in toolElement.hashes)
     {
       if (KeyIsHash in GT.QSOhash)
       {
@@ -1598,7 +1598,7 @@ function createTooltTipTable(toolElement)
     }
     if (toolElement.qth in GT.liveGrids && GT.liveGrids[toolElement.qth].rectangle != null && GT.liveGrids[toolElement.qth].isTriangle == false)
     {
-      for (var KeyIsCall in GT.liveGrids[toolElement.qth].rectangle.liveHash)
+      for (let KeyIsCall in GT.liveGrids[toolElement.qth].rectangle.liveHash)
       {
         if (KeyIsCall in GT.liveCallsigns && GT.settings.app.gridViewMode == 3) { newCallList.push(GT.liveCallsigns[KeyIsCall]); }
       }
@@ -1626,21 +1626,21 @@ function createTooltTipTable(toolElement)
       if (GT.settings.callsignLookups.oqrsUseEnable == true) worker += "<td>" + I18N("gt.newCallList.OQRS") + "</td>";
       worker += "</tr>";
     }
-    for (var KeyIsCall in toolElement.liveHash)
+    for (let KeyIsCall in toolElement.liveHash)
     {
       if (KeyIsCall in GT.liveCallsigns) { newCallList.push(GT.liveCallsigns[KeyIsCall]); }
     }
   }
   newCallList.sort(compareCallsignTime).reverse();
-  for (var x = 0; x < newCallList.length; x++)
+  for (let x = 0; x < newCallList.length; x++)
   {
-    var callsign = newCallList[x];
-    var bgDX = " style='font-weight:bold;color:cyan;' ";
-    var bgDE = " style='font-weight:bold;color:yellow;' ";
+    let callsign = newCallList[x];
+    let bgDX = " style='font-weight:bold;color:cyan;' ";
+    let bgDE = " style='font-weight:bold;color:yellow;' ";
     if (callsign.DXcall == GT.settings.app.myCall) { bgDX = " style='background-color:cyan;color:#000;font-weight:bold' "; }
     if (callsign.DEcall == GT.settings.app.myCall) { bgDE = " style='background-color:#FFFF00;color:#000;font-weight:bold' "; }
     if (typeof callsign.msg == "undefined" || callsign.msg == "") { callsign.msg = "-"; }
-    var ageString = "";
+    let ageString = "";
     if (timeNowSec() - callsign.time < 3601) { ageString = toDHMS(timeNowSec() - callsign.time); }
     else
     {
@@ -1727,7 +1727,7 @@ function createTooltTipTable(toolElement)
 
 function leftClickGtFlag(feature)
 {
-  var e = window.event;
+  let e = window.event;
   if ((e.which && e.which == 1) || (e.button && e.button == 1))
   {
     startLookup(GT.gtFlagPins[feature.key].call, GT.gtFlagPins[feature.key].grid);
@@ -1764,7 +1764,7 @@ function insertMessageInRoster(newMessage, msgDEcallsign, msgDXcallsign, callObj
     GT.rosterUpdateTimer = null;
   }
 
-  var now = timeNowSec();
+  let now = timeNowSec();
   if (!(hash in GT.callRoster))
   {
     GT.callRoster[hash] = {};
@@ -1942,7 +1942,7 @@ function renderTooltipWindow(feature)
 {
   if (GT.popupWindowInitialized)
   {
-    var positionInfo = myTooltip.getBoundingClientRect();
+    let positionInfo = myTooltip.getBoundingClientRect();
     GT.popupWindowHandle.window.resizeTo(parseInt(positionInfo.width + 20), parseInt(positionInfo.height + 40));
     GT.popupWindowHandle.window.adifTable.innerHTML = myTooltip.innerHTML;
     electron.ipcRenderer.send("showWin", "gt_popup");
@@ -1951,7 +1951,7 @@ function renderTooltipWindow(feature)
 
 function onRightClickGridSquare(feature)
 {
-  var e = window.event;
+  let e = window.event;
   if ((e.which && e.button == 2 && event.shiftKey) || (e.button && e.button == 2 && event.shiftKey))
   {
     createTooltTipTable(feature);
@@ -1998,11 +1998,11 @@ function getMouseY()
 
 function tempGridToBox(iQTH, borderColor, boxColor, layer)
 {
-  var borderWeight = 2;
-  var newGridBox = null;
-  var LL = squareToLatLong(iQTH.substr(0, 4));
+  let borderWeight = 2;
+  let newGridBox = null;
+  let LL = squareToLatLong(iQTH.substr(0, 4));
 
-  var bounds = [
+  let bounds = [
     [LL.lo1, LL.la1],
     [LL.lo2, LL.la2]
   ];
@@ -2048,7 +2048,7 @@ function onMyKeyDown(event)
       }
       if (GT.hotKeys[event.code].param1 != null)
       {
-        var param2 = null;
+        let param2 = null;
         if (GT.hotKeys[event.code].param2 != null)
         {
           if (GT.hotKeys[event.code].param2 in event) { param2 = event[GT.hotKeys[event.code].param2]; }
@@ -2070,7 +2070,7 @@ function onMyKeyDown(event)
       }
       if (GT.hotKeys[event.key].param1 != null)
       {
-        var param2 = null;
+        let param2 = null;
         if (GT.hotKeys[event.key].param2 != null)
         {
           if (GT.hotKeys[event.key].param2 in event) { param2 = event[GT.hotKeys[event.key].param2]; }
@@ -2324,23 +2324,13 @@ function cycleTrophyOverlay()
   setTrophyOverlay(GT.currentOverlay);
 }
 
-function didWork(testObj)
-{
-  return testObj.worked;
-}
-
-function didConfirm(testObj)
-{
-  return testObj.confirmed;
-}
-
 function makeTitleInfo(mapWindow)
 {
-  var band = GT.settings.app.gtBandFilter.length == 0 ? "Mixed" : GT.settings.app.gtBandFilter == "auto" ? GT.settings.app.myBand : GT.settings.app.gtBandFilter;
-  var mode = GT.settings.app.gtModeFilter.length == 0 ? "Mixed" : GT.settings.app.gtModeFilter == "auto" ? GT.settings.app.myMode : GT.settings.app.gtModeFilter;
+  let band = GT.settings.app.gtBandFilter.length == 0 ? "Mixed" : GT.settings.app.gtBandFilter == "auto" ? GT.settings.app.myBand : GT.settings.app.gtBandFilter;
+  let mode = GT.settings.app.gtModeFilter.length == 0 ? "Mixed" : GT.settings.app.gtModeFilter == "auto" ? GT.settings.app.myMode : GT.settings.app.gtModeFilter;
 
-  var news = `GridTracker2 [Band: ${band} Mode: ${mode}`;
-  var end = "]";
+  let news = `GridTracker2 [Band: ${band} Mode: ${mode}`;
+  let end = "]";
 
   if (mapWindow)
   {
@@ -2349,7 +2339,7 @@ function makeTitleInfo(mapWindow)
 
   if (GT.currentOverlay == 0 && GT.settings.app.gridViewMode == 1) { return news + end; }
 
-  var workline = ` - Worked ${GT.viewInfo[GT.currentOverlay][2]} Confirmed ${GT.viewInfo[GT.currentOverlay][3]}`;
+  let workline = ` - Worked ${GT.viewInfo[GT.currentOverlay][2]} Confirmed ${GT.viewInfo[GT.currentOverlay][3]}`;
   if (GT.viewInfo[GT.currentOverlay][2] <= GT.viewInfo[GT.currentOverlay][4] && GT.viewInfo[GT.currentOverlay][4] > 0)
   {
     end = ` Needed ${(GT.viewInfo[GT.currentOverlay][4] - GT.viewInfo[GT.currentOverlay][2])}]`;
@@ -2360,7 +2350,6 @@ function makeTitleInfo(mapWindow)
 function gtTrophyLayerChanged(element)
 {
   setTrophyOverlay(element.value);
-  
 }
 
 function setTrophyOverlay(which)
@@ -2368,41 +2357,32 @@ function setTrophyOverlay(which)
   gtTrophyLayer.value = GT.currentOverlay = GT.settings.map.trophyOverlay = which;
   window.document.title = makeTitleInfo(true);
   myTrophyTooltip.style.zIndex = -1;
+
   clearAwardLayer();
 
   if (which == 0)
   {
-    for (const key in GT.layerVectors)
-    {
-      GT.layerVectors[key].setVisible(true);
-    }
+    for (const key in GT.layerVectors) GT.layerVectors[key].setVisible(true);
+
     GT.layerVectors.award.setVisible(false);
-    if (GT.timezoneLayer)
-    {
-      GT.timezoneLayer.setVisible(true);
-    }
+
+    if (GT.timezoneLayer) GT.timezoneLayer.setVisible(true);
   }
   else
   {
     if (GT.settings.map.mergeOverlay == false)
     {
-      for (const key in GT.layerVectors)
-      {
-        GT.layerVectors[key].setVisible(false);
-      }
+      for (const key in GT.layerVectors) GT.layerVectors[key].setVisible(false);
     }
     else
     {
-      for (const key in GT.layerVectors)
-      {
-        GT.layerVectors[key].setVisible(true);
-      }
+      for (const key in GT.layerVectors) GT.layerVectors[key].setVisible(true);
     }
+
     GT.layerVectors.award.setVisible(true);
-    if (GT.timezoneLayer)
-    {
-      GT.timezoneLayer.setVisible(false);
-    }
+
+    if (GT.timezoneLayer) GT.timezoneLayer.setVisible(false);
+
     mapLoseFocus();
   }
 
@@ -2424,12 +2404,12 @@ function setTrophyOverlay(which)
       let boxColor = layer.bx;
       let borderColor = layer.br;
       let borderWeight = layer.bw;
-      if (didConfirm(data[key]))
+      if (data[key].confirmed)
       {
         boxColor = layer.dc;
         borderWeight = layer.ww;
       }
-      else if (didWork(data[key]))
+      else if (data[key].worked)
       {
         boxColor = layer.dw;
         borderWeight = layer.ww;
@@ -2471,7 +2451,7 @@ function setTrophyOverlay(which)
 
 function gridFeature(key, objectData, propname, fillColor, borderColor, borderWidth)
 {
-  var style = new ol.style.Style({
+  let style = new ol.style.Style({
     stroke: new ol.style.Stroke({
       color: borderColor,
       width: borderWidth
@@ -2492,13 +2472,13 @@ function moonOver(feature)
 {
   if (GT.currentOverlay != 0) return false;
 
-  var data = subLunar(timeNowSec());
-  var object = doRAconvert(GT.myLon, GT.myLat, data.RA, data.Dec);
-  var elevation = object.elevation.toFixed(1);
-  var elColor = "yellow";
+  let data = subLunar(timeNowSec());
+  let object = doRAconvert(GT.myLon, GT.myLat, data.RA, data.Dec);
+  let elevation = object.elevation.toFixed(1);
+  let elColor = "yellow";
   if (elevation <= 0) elColor = "red";
   if (elevation > 10.0) elColor = "lightgreen";
-  var worker = "<table class='darkTable'>";
+  let worker = "<table class='darkTable'>";
   worker += "<tr><th colspan=2 style='font-size:15px;color:cyan;'>Moon</th></tr>";
   worker += "<tr><th >Azimuth</th><td  style='color:lightgreen'>" + object.azimuth.toFixed(1) + "&deg;</td></tr>";
   worker += "<tr><th >Elevation</th><td  style='color:" + elColor + "'>" + elevation + "</td></tr>";
@@ -2515,7 +2495,7 @@ function moonOver(feature)
 
 function moonMove(feature)
 {
-  var positionInfo = myMoonTooltip.getBoundingClientRect();
+  let positionInfo = myMoonTooltip.getBoundingClientRect();
   myMoonTooltip.style.left = getMouseX() - positionInfo.width / 2 + "px";
   myMoonTooltip.style.top = getMouseY() - positionInfo.height - 22 + "px";
 }
@@ -2527,12 +2507,12 @@ function moonOut(feature)
 
 function trophyOver(feature)
 {
-  var name = feature.getGeometryName();
-  var infoObject = {};
-  var trophy = "";
-  var zone = null;
+  let name = feature.getGeometryName();
+  let infoObject = {};
+  let trophy = "";
+  let zone = null;
 
-  var key = feature.get("prop");
+  let key = feature.get("prop");
   if (key == "cqzone")
   {
     trophy = "CQ Zone";
@@ -2565,7 +2545,7 @@ function trophyOver(feature)
   else if (key == "dxcc" && name in GT.dxccInfo)
   {
     trophy = "DXCC";
-    var ref = name;
+    let ref = name;
     infoObject = GT.dxccInfo[ref];
     name = GT.dxccInfo[ref].name + " <font color='orange'>(" + GT.dxccInfo[ref].pp + ")</font>";
   }
@@ -2584,11 +2564,11 @@ function trophyOver(feature)
     if (name in GT.gridToState)
     {
       zone = "";
-      for (var x = 0; x < GT.gridToDXCC[name].length; x++)
+      for (let x = 0; x < GT.gridToDXCC[name].length; x++)
       {
         if (name in GT.gridToState)
         {
-          for (var y = 0; y < GT.gridToState[name].length; y++)
+          for (let y = 0; y < GT.gridToState[name].length; y++)
           {
             if (GT.gridToDXCC[name][x] == GT.StateData[GT.gridToState[name][y]].dxcc && GT.gridToDXCC[name][x] == 291)
             {
@@ -2601,7 +2581,7 @@ function trophyOver(feature)
     }
   }
 
-  var worker = "<table>";
+  let worker = "<table>";
   worker += "<tr><th colspan=2 >" + trophy + "</th></tr>";
   worker += "<tr><td colspan=2><font color='white'><b>" + name + "</b></font></td></tr>";
 
@@ -2610,14 +2590,14 @@ function trophyOver(feature)
     worker += " <tr><td colspan=2><font color='lightgreen'>" + zone + "</font></td></tr>";
   }
 
-  var wc1Table = "<td></td>";
+  let wc1Table = "<td></td>";
   if (infoObject.worked)
   {
     wc1Table = "<td align=center><table class='darkTable'>";
     wc1Table += "<tr><td colspan=2 ><font  color='yellow'>" + I18N("gt.wcTable.Worked") + "</font></td></tr>";
     wc1Table += "<tr><td align=right><font color='green'>Band</font></td>";
     wc1Table += "<td align=left><table class='subtable'>";
-    var keys = Object.keys(infoObject.worked_bands).sort();
+    let keys = Object.keys(infoObject.worked_bands).sort();
     for (key in keys)
     {
       wc1Table += "<tr><td align=right>" + keys[key] + "</td><td align=left> <font color='white'>(" + infoObject.worked_bands[keys[key]] + ") </font></td></tr>";
@@ -2637,14 +2617,14 @@ function trophyOver(feature)
     wc1Table += "</tr>";
     wc1Table += "</table></td>";
   }
-  var wcTable = "<td></td>";
+  let wcTable = "<td></td>";
   if (infoObject.confirmed)
   {
     wcTable = "<td align=center><table class='darkTable'>";
     wcTable += "<tr><td colspan=2 ><font  color='lightgreen'>" + I18N("gt.wcTable.Confirmed") + "</font></td></tr>";
     wcTable += "<tr><td align=right><font color='green'>" + I18N("gt.wcTable.Band") + "</font></td>";
     wcTable += "<td align=left><table class='subtable'>";
-    var keys = Object.keys(infoObject.confirmed_bands).sort();
+    let keys = Object.keys(infoObject.confirmed_bands).sort();
     for (key in keys)
     {
       wcTable += "<tr><td align=right>" + keys[key] + "</td><td align=left> <font color='white'>(" + infoObject.confirmed_bands[keys[key]] + ") </font></td></tr>";
@@ -2685,7 +2665,7 @@ function trophyOver(feature)
 
 function trophyMove(feature)
 {
-  var positionInfo = myTrophyTooltip.getBoundingClientRect();
+  let positionInfo = myTrophyTooltip.getBoundingClientRect();
   myTrophyTooltip.style.left = getMouseX() - positionInfo.width / 2 + "px";
   myTrophyTooltip.style.top = getMouseY() - positionInfo.height - 22 + "px";
 }
@@ -2772,7 +2752,7 @@ function mouseMoveGrid()
 {
   if (GT.MyGridIsUp == true)
   {
-    var positionInfo = myGridTooltip.getBoundingClientRect();
+    let positionInfo = myGridTooltip.getBoundingClientRect();
     myGridTooltip.style.left = getMouseX() - positionInfo.width / 2 + "px";
     myGridTooltip.style.top = getMouseY() - positionInfo.height - 22 + "px";
   }
@@ -2787,11 +2767,11 @@ function mouseUpGrid()
 
 function createFlagTipTable(feature)
 {
-  var worker = "";
-  var key = feature.key;
-  var dxcc = callsignToDxcc(GT.gtFlagPins[key].call);
-  var dxccName = GT.dxccToAltName[dxcc];
-  var workColor = "cyan";
+  let worker = "";
+  let key = feature.key;
+  let dxcc = callsignToDxcc(GT.gtFlagPins[key].call);
+  let dxccName = GT.dxccToAltName[dxcc];
+  let workColor = "cyan";
 
   if (GT.gtFlagPins[key].call + GT.settings.app.myBand + GT.settings.app.myMode in GT.tracker.worked.call)
   {
@@ -2809,8 +2789,8 @@ function createFlagTipTable(feature)
   worker += "<tr><td>Freq</td><td style='color:lightgreen' >" + formatMhz(Number(GT.gtFlagPins[key].freq / 1000), 3, 3) + " <font color='yellow'>(" + formatBand(Number(GT.gtFlagPins[key].freq / 1000000)) + ")</font></td></tr>";
   worker += "<tr><td>Mode</td><td style='color:orange' >" + GT.gtFlagPins[key].mode + "</td></tr>";
 
-  var LL = squareToCenter(GT.gtFlagPins[key].grid);
-  var bearing = parseInt(MyCircle.bearing(GT.myLat, GT.myLon, LL.a, LL.o));
+  let LL = squareToCenter(GT.gtFlagPins[key].grid);
+  let bearing = parseInt(MyCircle.bearing(GT.myLat, GT.myLon, LL.a, LL.o));
 
   worker += "<tr><td>Dist</td><td style='color:cyan'>" + parseInt(MyCircle.distance(GT.myLat, GT.myLon, LL.a, LL.o) * MyCircle.validateRadius(distanceUnit.value)) + distanceUnit.value.toLowerCase() + "</td></tr>";
   worker += "<tr><td>Azim</td><td style='color:yellow'>" + bearing + "&deg;</td></tr>";
@@ -2831,7 +2811,7 @@ function mouseOverGtFlag(feature)
 
 function mouseGtFlagMove(feature)
 {
-  var positionInfo = myFlagtip.getBoundingClientRect();
+  let positionInfo = myFlagtip.getBoundingClientRect();
   myFlagtip.style.left = getMouseX() - positionInfo.width / 2 + "px";
   myFlagtip.style.top = getMouseY() - positionInfo.height - 22 + "px";
 }
@@ -2843,7 +2823,7 @@ function mouseOutGtFlag(feature)
 
 function mouseOverTimezone(feature)
 {
-  var style = new ol.style.Style({
+  let style = new ol.style.Style({
     fill: new ol.style.Fill({
       color: "#FFFF0088"
     })
@@ -2862,12 +2842,12 @@ function mouseOverTimezone(feature)
 
 function createTimezoneTipTable(feature)
 {
-  var props = feature.getProperties();
+  let props = feature.getProperties();
 
   moment.locale(navigator.languages[0]);
-  var m = moment().tz(props.tzid);
-  var abbr = m.format("zz");
-  var zone = m.format("Z");
+  let m = moment().tz(props.tzid);
+  let abbr = m.format("zz");
+  let zone = m.format("Z");
   if (zone.indexOf(abbr) > -1) abbr = "";
   else abbr = " <font color='orange'>(" + abbr + ")</font>";
 
@@ -2882,7 +2862,7 @@ function createTimezoneTipTable(feature)
 
 function TimezoneMove()
 {
-  var positionInfo = myTimezoneTip.getBoundingClientRect();
+  let positionInfo = myTimezoneTip.getBoundingClientRect();
   myTimezoneTip.style.left = getMouseX() - positionInfo.width / 2 + "px";
   myTimezoneTip.style.top = getMouseY() - positionInfo.height - 22 + "px";
 }
@@ -2926,13 +2906,13 @@ function mouseOverDataItem(feature, fromHover)
 
 function mouseMoveDataItem(feature)
 {
-  var positionInfo = myTooltip.getBoundingClientRect();
-  var windowWidth = window.innerWidth;
-  var windowHeight = window.innerHeight;
-  var top = 0;
-  var left = 0;
-  var noRoomLeft = false;
-  var noRoomRight = false;
+  let positionInfo = myTooltip.getBoundingClientRect();
+  let windowWidth = window.innerWidth;
+  let windowHeight = window.innerHeight;
+  let top = 0;
+  let left = 0;
+  let noRoomLeft = false;
+  let noRoomRight = false;
 
   top = getMouseY() - (positionInfo.height / 2);
   // Favor the left side over the right side (avoid covering the work panel if possible)
@@ -3002,14 +2982,14 @@ function reloadInfo()
 function twoWideToLatLong(qth)
 {
   qth = qth.toUpperCase();
-  var a = qth.charCodeAt(0) - 65;
-  var b = qth.charCodeAt(1) - 65;
+  let a = qth.charCodeAt(0) - 65;
+  let b = qth.charCodeAt(1) - 65;
 
-  var la1 = b * 10;
-  var lo1 = a * 20;
-  var la2 = la1 + 10;
-  var lo2 = lo1 + 20;
-  var LatLong = [];
+  let la1 = b * 10;
+  let lo1 = a * 20;
+  let la2 = la1 + 10;
+  let lo2 = lo1 + 20;
+  let LatLong = [];
 
   la1 -= 90;
   lo1 -= 180;
@@ -3024,8 +3004,8 @@ function twoWideToLatLong(qth)
 
 function squareToCenter(qth)
 {
-  var LL = squareToLatLongAll(qth);
-  var obj = {};
+  let LL = squareToLatLongAll(qth);
+  let obj = {};
   obj.a = LL.la2 - (LL.la2 - LL.la1) / 2;
   obj.o = LL.lo2 - (LL.lo2 - LL.lo1) / 2;
   return obj;
@@ -3034,15 +3014,15 @@ function squareToCenter(qth)
 function squareToLatLongAll(qth)
 {
   qth = qth.toUpperCase();
-  var a = qth.charCodeAt(0) - 65;
-  var b = qth.charCodeAt(1) - 65;
-  var c = qth.charCodeAt(2) - 48;
-  var d = qth.charCodeAt(3) - 48;
-  var la1 = b * 10 + d;
-  var lo1 = a * 20 + c * 2;
-  var la2;
-  var lo2;
-  var LatLong = [];
+  let a = qth.charCodeAt(0) - 65;
+  let b = qth.charCodeAt(1) - 65;
+  let c = qth.charCodeAt(2) - 48;
+  let d = qth.charCodeAt(3) - 48;
+  let la1 = b * 10 + d;
+  let lo1 = a * 20 + c * 2;
+  let la2;
+  let lo2;
+  let LatLong = [];
   if (qth.length == 4)
   {
     la2 = la1 + 1;
@@ -3051,12 +3031,12 @@ function squareToLatLongAll(qth)
   }
   else
   {
-    var lo3;
-    var la3;
-    var e = qth.charCodeAt(4) - 65;
-    var f = qth.charCodeAt(5) - 65;
-    var R = 5 / 60;
-    var T = 2.5 / 60;
+    let lo3;
+    let la3;
+    let e = qth.charCodeAt(4) - 65;
+    let f = qth.charCodeAt(5) - 65;
+    let R = 5 / 60;
+    let T = 2.5 / 60;
     lo3 = (e * 5) / 60;
     la3 = (f * 2.5) / 60;
     la1 += la3;
@@ -3080,15 +3060,15 @@ function squareToLatLongAll(qth)
 function squareToLatLong(qth)
 {
   qth = qth.toUpperCase();
-  var a = qth.charCodeAt(0) - 65;
-  var b = qth.charCodeAt(1) - 65;
-  var c = qth.charCodeAt(2) - 48;
-  var d = qth.charCodeAt(3) - 48;
-  var la1 = b * 10 + d;
-  var lo1 = a * 20 + c * 2;
-  var la2;
-  var lo2;
-  var LatLong = [];
+  let a = qth.charCodeAt(0) - 65;
+  let b = qth.charCodeAt(1) - 65;
+  let c = qth.charCodeAt(2) - 48;
+  let d = qth.charCodeAt(3) - 48;
+  let la1 = b * 10 + d;
+  let lo1 = a * 20 + c * 2;
+  let la2;
+  let lo2;
+  let LatLong = [];
   if (qth.length == 4 || GT.pushPinMode == false || GT.settings.app.sixWideMode == 0)
   {
     la2 = la1 + 1;
@@ -3097,12 +3077,12 @@ function squareToLatLong(qth)
   }
   else
   {
-    var lo3;
-    var la3;
-    var e = qth.charCodeAt(4) - 65;
-    var f = qth.charCodeAt(5) - 65;
-    var R = 5 / 60;
-    var T = 2.5 / 60;
+    let lo3;
+    let la3;
+    let e = qth.charCodeAt(4) - 65;
+    let f = qth.charCodeAt(5) - 65;
+    let R = 5 / 60;
+    let T = 2.5 / 60;
     lo3 = (e * 5) / 60;
     la3 = (f * 2.5) / 60;
     la1 += la3;
@@ -3124,7 +3104,7 @@ function squareToLatLong(qth)
 
 function iconFeature(center, iconObj, zIndex, propName)
 {
-  var feature = new ol.Feature({
+  let feature = new ol.Feature({
     geometry: new ol.geom.Point(center),
     prop: propName
   });
@@ -3134,7 +3114,7 @@ function iconFeature(center, iconObj, zIndex, propName)
     feature.getGeometry().transform("EPSG:3857", GT.settings.map.projection);
   }
 
-  var iconStyle = new ol.style.Style({
+  let iconStyle = new ol.style.Style({
     zIndex: zIndex,
     image: iconObj
   });
@@ -3156,10 +3136,10 @@ function qthToQsoBox(iQTH, iHash, locked, DE, worked, confirmed, band)
     }
   }
 
-  var borderColor = GT.mainBorderColor;
-  var boxColor = GT.settings.legendColors.QSX + GT.gridAlpha;
-  var borderWeight = 0.5;
-  var myDEbox = false;
+  let borderColor = GT.mainBorderColor;
+  let boxColor = GT.settings.legendColors.QSX + GT.gridAlpha;
+  let borderWeight = 0.5;
+  let myDEbox = false;
   if (worked)
   {
     boxColor = GT.settings.legendColors.QSO + GT.gridAlpha;
@@ -3169,11 +3149,11 @@ function qthToQsoBox(iQTH, iHash, locked, DE, worked, confirmed, band)
     boxColor = GT.settings.legendColors.QSL + GT.gridAlpha;
   }
 
-  var zIndex = 2;
-  var entityVisibility = GT.settings.app.gridViewMode > 1;
+  let zIndex = 2;
+  let entityVisibility = GT.settings.app.gridViewMode > 1;
   if (GT.pushPinMode == false || GT.settings.app.sixWideMode == 0) iQTH = iQTH.substr(0, 4);
   else iQTH = iQTH.substr(0, 6);
-  var rect = null;
+  let rect = null;
 
   if (iQTH in GT.qsoGrids)
   {
@@ -3182,7 +3162,7 @@ function qthToQsoBox(iQTH, iHash, locked, DE, worked, confirmed, band)
 
   if (rect == null)
   {
-    var triangleView = false;
+    let triangleView = false;
     if (GT.settings.app.gridViewMode == 3 && iQTH in GT.liveGrids && entityVisibility == true && GT.pushPinMode == false)
     {
       if (confirmed)
@@ -3204,7 +3184,7 @@ function qthToQsoBox(iQTH, iHash, locked, DE, worked, confirmed, band)
     newRect = {};
     newRect.qth = iQTH;
 
-    var bounds = [
+    let bounds = [
       [LL.lo1, LL.la1],
       [LL.lo2, LL.la2]
     ];
@@ -3230,7 +3210,7 @@ function qthToQsoBox(iQTH, iHash, locked, DE, worked, confirmed, band)
 
     if (GT.pushPinMode == false && entityVisibility == true) { GT.layerSources.qso.addFeature(newRect.rectangle); }
 
-    var newPin = GT.colorLeafletQPins.worked[band];
+    let newPin = GT.colorLeafletQPins.worked[band];
     if (confirmed) newPin = GT.colorLeafletQPins.confirmed[band];
 
     let lat = LL.la2 - (LL.la2 - LL.la1) / 2;
@@ -3309,10 +3289,10 @@ function qthToBox(iQTH, iDEcallsign, iCQ, locked, DE, band, wspr, hash, fromLive
       return null;
     }
   }
-  var borderColor = GT.mainBorderColor;
-  var boxColor = GT.settings.legendColors.QSX + GT.gridAlpha;
-  var borderWeight = 0.5;
-  var myDEbox = false;
+  let borderColor = GT.mainBorderColor;
+  let boxColor = GT.settings.legendColors.QSX + GT.gridAlpha;
+  let borderWeight = 0.5;
+  let myDEbox = false;
   if (DE == "CQ" || iCQ)
   {
     boxColor = GT.settings.legendColors.CQ + GT.gridAlpha;
@@ -3346,13 +3326,13 @@ function qthToBox(iQTH, iDEcallsign, iCQ, locked, DE, band, wspr, hash, fromLive
       boxColor = "#" + GT.pskColors.OOB + GT.gridAlpha;
     }
   }
-  var zIndex = 2;
+  let zIndex = 2;
   if (GT.pushPinMode == false || GT.settings.app.sixWideMode == 0) iQTH = iQTH.substr(0, 4);
   else iQTH = iQTH.substr(0, 6);
-  var rect = null;
+  let rect = null;
   if (iQTH == "")
   {
-    for (var key in GT.liveGrids)
+    for (let key in GT.liveGrids)
     {
       if (hash in GT.liveGrids[key].rectangle.liveHash)
       {
@@ -3373,8 +3353,8 @@ function qthToBox(iQTH, iDEcallsign, iCQ, locked, DE, band, wspr, hash, fromLive
     if (iQTH != "")
     {
       // Valid QTH
-      var entityVisibility = true;
-      var triangleView = false;
+      let entityVisibility = true;
+      let triangleView = false;
       if (Number(GT.settings.app.gridViewMode) == 3 && iQTH in GT.qsoGrids && GT.pushPinMode == false)
       {
         if (GT.settings.map.splitQSL || GT.qsoGrids[iQTH].rectangle.confirmed == false)
@@ -3396,7 +3376,7 @@ function qthToBox(iQTH, iDEcallsign, iCQ, locked, DE, band, wspr, hash, fromLive
       newRect.age = GT.timeNow;
       newRect.qth = iQTH;
 
-      var bounds = [
+      let bounds = [
         [LL.lo1, LL.la1],
         [LL.lo2, LL.la2]
       ];
@@ -3497,8 +3477,8 @@ function qthToBox(iQTH, iDEcallsign, iCQ, locked, DE, band, wspr, hash, fromLive
 
 function alphaTo(rgba, alphaFloat)
 {
-  var alphaInt = parseInt(alphaFloat * 255);
-  var alphaHex = alphaInt.toString(16);
+  let alphaInt = parseInt(alphaFloat * 255);
+  let alphaHex = alphaInt.toString(16);
   if (alphaHex.length == 1)
   {
     alphaHex = "0" + alphaHex;
@@ -3508,7 +3488,7 @@ function alphaTo(rgba, alphaFloat)
 
 function intAlphaToRGB(rgb, alphaInt)
 {
-  var alphaHex = alphaInt.toString(16);
+  let alphaHex = alphaInt.toString(16);
   if (alphaHex.length == 1)
   {
     alphaHex = "0" + alphaHex;
@@ -3520,13 +3500,13 @@ function dimFunction(qthObj)
 {
   if (qthObj.rectangle.locked == false)
   {
-    var featureStyle = qthObj.rectangle.getStyle();
-    var featureFill = featureStyle.getFill();
-    var fillColor = featureFill.getColor();
-    var featureStroke = featureStyle.getStroke();
-    var strokeColor = featureStroke.getColor();
-    var percent = 1.0 - (GT.timeNow - qthObj.age) / gridDecay.value;
-    var alpha = Math.max(0.06, (GT.settings.map.gridAlpha / 255) * percent);
+    let featureStyle = qthObj.rectangle.getStyle();
+    let featureFill = featureStyle.getFill();
+    let fillColor = featureFill.getColor();
+    let featureStroke = featureStyle.getStroke();
+    let strokeColor = featureStroke.getColor();
+    let percent = 1.0 - (GT.timeNow - qthObj.age) / gridDecay.value;
+    let alpha = Math.max(0.06, (GT.settings.map.gridAlpha / 255) * percent);
 
     fillColor = alphaTo(fillColor, alpha);
     featureFill.setColor(fillColor);
@@ -3625,20 +3605,20 @@ function changeAnimate()
 {
   GT.settings.map.animate = animateValue.checked;
   
-  var dash = [];
-  var dashOff = 0;
+  let dash = [];
+  let dashOff = 0;
   if (GT.settings.map.animate == true)
   {
     dash = GT.flightPathLineDash;
     dashOff = GT.flightPathTotal - GT.flightPathOffset;
   }
 
-  for (var i = GT.flightPaths.length - 1; i >= 0; i--)
+  for (let i = GT.flightPaths.length - 1; i >= 0; i--)
   {
     if (GT.flightPaths[i].isShapeFlight == 0)
     {
-      var featureStyle = GT.flightPaths[i].getStyle();
-      var featureStroke = featureStyle.getStroke();
+      let featureStyle = GT.flightPaths[i].getStyle();
+      let featureStroke = featureStyle.getStroke();
 
       featureStroke.setLineDash(dash);
       featureStroke.setLineDashOffset(dashOff);
@@ -3649,8 +3629,8 @@ function changeAnimate()
   }
   if (GT.transmitFlightPath != null)
   {
-    var featureStyle = GT.transmitFlightPath.getStyle();
-    var featureStroke = featureStyle.getStroke();
+    let featureStyle = GT.transmitFlightPath.getStyle();
+    let featureStroke = featureStyle.getStroke();
 
     featureStroke.setLineDash(dash);
     featureStroke.setLineDashOffset(dashOff);
@@ -3661,8 +3641,8 @@ function changeAnimate()
 
   if (GT.dazzleGrid != null)
   {
-    var featureStyle = GT.dazzleGrid.getStyle();
-    var featureStroke = featureStyle.getStroke();
+    let featureStyle = GT.dazzleGrid.getStyle();
+    let featureStroke = featureStyle.getStroke();
 
     featureStroke.setLineDash(dash);
     featureStroke.setLineDashOffset(dashOff);
@@ -3682,7 +3662,7 @@ function changeAnimateSpeedValue()
 
 function removeFlightPathsAndDimSquares()
 {
-  for (var i = GT.flightPaths.length - 1; i >= 0; i--)
+  for (let i = GT.flightPaths.length - 1; i >= 0; i--)
   {
     if (GT.flightPaths[i].age < GT.timeNow)
     {
@@ -3719,10 +3699,10 @@ function animatePaths()
   GT.flightPathOffset += 1;
   GT.flightPathOffset %= GT.flightPathTotal;
 
-  var targetOffset = GT.flightPathTotal - GT.flightPathOffset;
-  var featureStyle = null;
-  var featureStroke = null;
-  for (var i = 0; i < GT.flightPaths.length; i++)
+  let targetOffset = GT.flightPathTotal - GT.flightPathOffset;
+  let featureStyle = null;
+  let featureStroke = null;
+  for (let i = 0; i < GT.flightPaths.length; i++)
   {
     if (GT.flightPaths[i].isShapeFlight == 0)
     {
@@ -3735,8 +3715,8 @@ function animatePaths()
 
   if (GT.transmitFlightPath != null)
   {
-    var featureStyle = GT.transmitFlightPath.getStyle();
-    var featureStroke = featureStyle.getStroke();
+    let featureStyle = GT.transmitFlightPath.getStyle();
+    let featureStroke = featureStyle.getStroke();
 
     featureStroke.setLineDashOffset(targetOffset);
 
@@ -3746,8 +3726,8 @@ function animatePaths()
 
   if (GT.dazzleGrid != null)
   {
-    var featureStyle = GT.dazzleGrid.getStyle();
-    var featureStroke = featureStyle.getStroke();
+    let featureStyle = GT.dazzleGrid.getStyle();
+    let featureStroke = featureStyle.getStroke();
 
     featureStroke.setLineDashOffset(targetOffset);
 
@@ -3773,14 +3753,14 @@ function fadePaths()
 function dimGridsquare()
 {
   if (gridDecay.value == 0) return;
-  for (var i in GT.liveGrids)
+  for (let i in GT.liveGrids)
   {
     dimFunction(GT.liveGrids[i]);
 
     if (GT.timeNow - GT.liveGrids[i].age >= gridDecay.value && GT.liveGrids[i].rectangle.locked == false)
     {
       // Walk the rectangles DEcall's and remove them from GT.liveCallsigns
-      for (var CallIsKey in GT.liveGrids[i].rectangle.liveHash)
+      for (let CallIsKey in GT.liveGrids[i].rectangle.liveHash)
       {
         if (CallIsKey in GT.liveCallsigns)
         {
@@ -3822,7 +3802,7 @@ function dimGridsquare()
 
 function updateCountStats()
 {
-  var count = Object.keys(GT.liveCallsigns).length;
+  let count = Object.keys(GT.liveCallsigns).length;
 
   if (GT.settings.app.myCall in GT.liveCallsigns) count--;
 
@@ -3868,7 +3848,7 @@ function clearQsoGrids()
 
   GT.qsoGrids = {};
 
-  for (var key in GT.dxccInfo)
+  for (let key in GT.dxccInfo)
   {
     GT.dxccInfo[key].worked = false;
     GT.dxccInfo[key].confirmed = false;
@@ -3877,7 +3857,7 @@ function clearQsoGrids()
     GT.dxccInfo[key].worked_modes = {};
     GT.dxccInfo[key].confirmed_modes = {};
   }
-  for (var key in GT.cqZones)
+  for (let key in GT.cqZones)
   {
     GT.cqZones[key].worked = false;
     GT.cqZones[key].confirmed = false;
@@ -3887,7 +3867,7 @@ function clearQsoGrids()
     GT.cqZones[key].worked_modes = {};
     GT.cqZones[key].confirmed_modes = {};
   }
-  for (var key in GT.ituZones)
+  for (let key in GT.ituZones)
   {
     GT.ituZones[key].worked = false;
     GT.ituZones[key].confirmed = false;
@@ -3897,7 +3877,7 @@ function clearQsoGrids()
     GT.ituZones[key].worked_modes = {};
     GT.ituZones[key].confirmed_modes = {};
   }
-  for (var key in GT.wasZones)
+  for (let key in GT.wasZones)
   {
     GT.wasZones[key].worked = false;
     GT.wasZones[key].confirmed = false;
@@ -3907,7 +3887,7 @@ function clearQsoGrids()
     GT.wasZones[key].worked_modes = {};
     GT.wasZones[key].confirmed_modes = {};
   }
-  for (var key in GT.wacpZones)
+  for (let key in GT.wacpZones)
   {
     GT.wacpZones[key].worked = false;
     GT.wacpZones[key].confirmed = false;
@@ -3917,7 +3897,7 @@ function clearQsoGrids()
     GT.wacpZones[key].worked_modes = {};
     GT.wacpZones[key].confirmed_modes = {};
   }
-  for (var key in GT.wacZones)
+  for (let key in GT.wacZones)
   {
     GT.wacZones[key].worked = false;
     GT.wacZones[key].confirmed = false;
@@ -3926,7 +3906,7 @@ function clearQsoGrids()
     GT.wacZones[key].worked_modes = {};
     GT.wacZones[key].confirmed_modes = {};
   }
-  for (var key in GT.countyData)
+  for (let key in GT.countyData)
   {
     GT.countyData[key].worked = false;
     GT.countyData[key].confirmed = false;
@@ -3935,7 +3915,7 @@ function clearQsoGrids()
     GT.countyData[key].worked_modes = {};
     GT.countyData[key].confirmed_modes = {};
   }
-  for (var key in GT.us48Data)
+  for (let key in GT.us48Data)
   {
     GT.us48Data[key].worked = false;
     GT.us48Data[key].confirmed = false;
@@ -4036,8 +4016,8 @@ function clearLogFilesAndCounts()
 
 function getCurrentBandModeHTML()
 {
-  var band = GT.settings.app.gtBandFilter == "auto" ? GT.settings.app.myBand + " (Auto)" : GT.settings.app.gtBandFilter.length == 0 ? "Mixed Bands" : GT.settings.app.gtBandFilter;
-  var mode = GT.settings.app.gtModeFilter == "auto" ? GT.settings.app.myMode + " (Auto)" : GT.settings.app.gtModeFilter.length == 0 ? "Mixed Modes" : GT.settings.app.gtModeFilter;
+  let band = GT.settings.app.gtBandFilter == "auto" ? GT.settings.app.myBand + " (Auto)" : GT.settings.app.gtBandFilter.length == 0 ? "Mixed Bands" : GT.settings.app.gtBandFilter;
+  let mode = GT.settings.app.gtModeFilter == "auto" ? GT.settings.app.myMode + " (Auto)" : GT.settings.app.gtModeFilter.length == 0 ? "Mixed Modes" : GT.settings.app.gtModeFilter;
   return (
     "<div style='vertical-align:top;display:inline-block;margin-bottom:3px;color:lightgreen;font-weight:bold;font-size:larger'>" + I18N("stats.viewing") + ": <text style='color:yellow'>" +
     band +
@@ -4064,7 +4044,7 @@ function displayTime()
   currentTime.innerHTML = "<font color='lightblue'>" + userTimeString(null) + "</font>";
   if (GT.lastTimeSinceMessageInSeconds > 0)
   {
-    var since = GT.timeNow - GT.lastTimeSinceMessageInSeconds;
+    let since = GT.timeNow - GT.lastTimeSinceMessageInSeconds;
     secondsAgoMsg.innerHTML = toDHMS(since);
     if (since > 17 && since < 122)
     {
@@ -4151,7 +4131,7 @@ function createGlobalMapLayer(name, maxResolution, minResolution)
 
 function createGeoJsonLayer(name, url, color, stroke)
 {
-  var style = new ol.style.Style({
+  let style = new ol.style.Style({
     stroke: new ol.style.Stroke({
       color: color,
       width: stroke
@@ -4161,13 +4141,13 @@ function createGeoJsonLayer(name, url, color, stroke)
     })
   });
 
-  var layerSource = new ol.source.Vector({
+  let layerSource = new ol.source.Vector({
     url: url,
     format: new ol.format.GeoJSON({ geometryName: name }),
     overlaps: true
   });
 
-  var layerVector = new ol.layer.Vector({
+  let layerVector = new ol.layer.Vector({
     source: layerSource,
     style: style,
     visible: true,
@@ -4190,7 +4170,6 @@ function displayMouseTrack()
 
 function initHoverFunctors()
 {
-  //  { hover: , move: , out: };
   GT.hoverFunctors.tz = { hover: mouseOverTimezone, move: TimezoneMove, out: mouseOutZimezone };
   GT.hoverFunctors.grid = { hover: mouseOverDataItem, move: mouseMoveDataItem, out: mouseOutOfDataItem };
   GT.hoverFunctors.pin = { hover: mouseOverDataItem, move: mouseMoveDataItem, out: mouseOutOfDataItem };
@@ -4435,7 +4414,7 @@ function initMap()
         GT.mapsLayer[key] = new GT.mapSourceTypes[GT.maps[key].sourceType](GT.maps[key]);
       }
 
-      var option = document.createElement("option");
+      let option = document.createElement("option");
       option.value = key;
       option.text = key;
       mapSelect.appendChild(option);
@@ -4710,22 +4689,22 @@ function mapMoveEvent(event)
 {
   onMouseUpdate(event);
 
-  var mousePosition = GT.map.getEventPixel(event);
+  let mousePosition = GT.map.getEventPixel(event);
   if (GT.settings.app.mouseTracking)
   {
-    var mouseLngLat = GT.map.getEventCoordinate(event);
+    let mouseLngLat = GT.map.getEventCoordinate(event);
     if (mouseLngLat)
     {
-      var LL = ol.proj.toLonLat(mouseLngLat, GT.settings.map.projection);
+      let LL = ol.proj.toLonLat(mouseLngLat, GT.settings.map.projection);
       if (isNaN(LL[0]))
       {
         mouseTrackDiv.innerHTML = "";
       }
       else
       {
-        var dist = parseInt(MyCircle.distance(GT.myLat, GT.myLon, LL[1], LL[0]) * MyCircle.validateRadius(distanceUnit.value)) + distanceUnit.value.toLowerCase();
-        var azim = parseInt(MyCircle.bearing(GT.myLat, GT.myLon, LL[1], LL[0])) + "&deg;";
-        var gg = latLonToGridSquare(LL[1], LL[0], 6);
+        let dist = parseInt(MyCircle.distance(GT.myLat, GT.myLon, LL[1], LL[0]) * MyCircle.validateRadius(distanceUnit.value)) + distanceUnit.value.toLowerCase();
+        let azim = parseInt(MyCircle.bearing(GT.myLat, GT.myLon, LL[1], LL[0])) + "&deg;";
+        let gg = latLonToGridSquare(LL[1], LL[0], 6);
         mouseTrackDiv.innerHTML = LL[1].toFixed(3) + ", " + LL[0].toFixed(3) + " " + dist + " " + azim + " " + gg;
       }
     }
@@ -4794,14 +4773,14 @@ function changeNightMapEnable(check)
 
 function createRadar()
 {
-  var layerSource = new ol.source.TileWMS({
+  let layerSource = new ol.source.TileWMS({
     projection: "EPSG:3857",
     url: "https://mapservices.weather.noaa.gov/eventdriven/services/radar/radar_base_reflectivity_time/ImageServer/WMSServer",
     attributions: `<a href="https://radar.weather.gov/" target="_blank">NWS</a>`,
     params: { LAYERS: "0" }
   });
 
-  var layerVector = new ol.layer.Tile({
+  let layerVector = new ol.layer.Tile({
     source: layerSource,
     visible: true,
     opacity: 0.6,
@@ -4888,21 +4867,21 @@ function mapLoseFocus()
 
 function lineString(points, count)
 {
-  var thing;
+  let thing;
   if (GT.useTransform)
   {
-    var line = lineGeometry(points, count);
-    var thing = new ol.geom.LineString(line);
+    let line = lineGeometry(points, count);
+    let thing = new ol.geom.LineString(line);
   }
   else
   {
-    var fromPoint = ol.proj.fromLonLat(points[0]);
-    var toPoint = ol.proj.fromLonLat(points[1]);
+    let fromPoint = ol.proj.fromLonLat(points[0]);
+    let toPoint = ol.proj.fromLonLat(points[1]);
     let pointsA = [ fromPoint, toPoint ];
     thing = new ol.geom.LineString(pointsA);
   }
 
-  var rect = new ol.Feature({
+  let rect = new ol.Feature({
     geometry: thing,
     prop: "lineString"
   });
@@ -4915,7 +4894,7 @@ function lineString(points, count)
 
 function rectangle(bounds, property = "grid")
 {
-  var thing = new ol.geom.Polygon([
+  let thing = new ol.geom.Polygon([
     [
       ol.proj.fromLonLat([bounds[0][0], bounds[0][1]]),
       ol.proj.fromLonLat([bounds[0][0], bounds[1][1]]),
@@ -4923,7 +4902,7 @@ function rectangle(bounds, property = "grid")
       ol.proj.fromLonLat([bounds[1][0], bounds[0][1]])
     ]
   ]);
-  var rect = new ol.Feature({
+  let rect = new ol.Feature({
     prop: property,
     geometry: thing
   });
@@ -4936,7 +4915,7 @@ function rectangle(bounds, property = "grid")
 
 function triangle(bounds, topLeft)
 {
-  var thing = null;
+  let thing = null;
 
   if (topLeft)
   {
@@ -4961,7 +4940,7 @@ function triangle(bounds, topLeft)
     ]);
   }
 
-  var rect = new ol.Feature({
+  let rect = new ol.Feature({
     prop: "grid",
     geometry: thing
   });
@@ -4974,13 +4953,13 @@ function triangle(bounds, topLeft)
 
 function triangleToGrid(iQTH, feature)
 {
-  var LL = squareToLatLong(iQTH);
-  var bounds = [
+  let LL = squareToLatLong(iQTH);
+  let bounds = [
     [LL.lo1, LL.la1],
     [LL.lo2, LL.la2]
   ];
 
-  var thing = new ol.geom.Polygon([
+  let thing = new ol.geom.Polygon([
     [
       ol.proj.fromLonLat([bounds[0][0], bounds[0][1]]),
       ol.proj.fromLonLat([bounds[0][0], bounds[1][1]]),
@@ -4999,12 +4978,12 @@ function triangleToGrid(iQTH, feature)
 
 function gridToTriangle(iQTH, feature, topLeft)
 {
-  var LL = squareToLatLong(iQTH);
-  var bounds = [
+  let LL = squareToLatLong(iQTH);
+  let bounds = [
     [LL.lo1, LL.la1],
     [LL.lo2, LL.la2]
   ];
-  var thing = null;
+  let thing = null;
 
   if (topLeft)
   {
@@ -5061,7 +5040,7 @@ function setHomeGridsquare()
 
   newCallsign.DEcall = GT.settings.app.myCall;
   newCallsign.grid = GT.settings.app.myGrid;
-  newCallsign.field = newCallsign.grid.substring(0, 2);
+  // newCallsign.field = newCallsign.grid.substring(0, 2);
   newCallsign.wspr = null;
   newCallsign.msg = GT.settings.app.myGrid;
   newCallsign.RSTsent = "-";
@@ -5126,12 +5105,12 @@ function initiateQso(thisCall)
       haltAllTx();
     }
 
-    var newMessage = GT.callRoster[thisCall].message;
-    var responseArray = Buffer.alloc(1024);
-    var length = 0;
-    var instance = GT.callRoster[thisCall].message.instance;
-    var port = GT.instances[instance].remote.port;
-    var address = GT.instances[instance].remote.address;
+    let newMessage = GT.callRoster[thisCall].message;
+    let responseArray = Buffer.alloc(1024);
+    let length = 0;
+    let instance = GT.callRoster[thisCall].message.instance;
+    let port = GT.instances[instance].remote.port;
+    let address = GT.instances[instance].remote.address;
     length = encodeQUINT32(responseArray, length, newMessage.magic_key);
     length = encodeQUINT32(responseArray, length, newMessage.schema_number);
     length = encodeQUINT32(responseArray, length, 4);
@@ -5152,11 +5131,11 @@ function initiateQso(thisCall)
 
 function spotLookupAndSetCall(spot)
 {
-  var call = GT.receptionReports.spots[spot].call;
-  var grid = GT.receptionReports.spots[spot].grid;
-  var band = GT.receptionReports.spots[spot].band;
-  var mode = GT.receptionReports.spots[spot].mode;
-  for (var instance in GT.instances)
+  let call = GT.receptionReports.spots[spot].call;
+  let grid = GT.receptionReports.spots[spot].grid;
+  let band = GT.receptionReports.spots[spot].band;
+  let mode = GT.receptionReports.spots[spot].mode;
+  for (let instance in GT.instances)
   {
     if (GT.instances[instance].valid && GT.instances[instance].status.Band == band && GT.instances[instance].status.MO == mode)
     {
@@ -5169,9 +5148,9 @@ function spotLookupAndSetCall(spot)
 
 function setCallAndGrid(callsign, grid, instance = null, genMessages = true)
 {
-  var thisInstance = null;
-  var port = null;
-  var address = null;
+  let thisInstance = null;
+  let port = null;
+  let address = null;
   if (instance != null)
   {
     if (instance in GT.instances && GT.instances[instance].remote)
@@ -5193,8 +5172,8 @@ function setCallAndGrid(callsign, grid, instance = null, genMessages = true)
 
   if (thisInstance && (thisInstance.TxEnabled == 0 || genMessages == false))
   {
-    var responseArray = Buffer.alloc(1024);
-    var length = 0;
+    let responseArray = Buffer.alloc(1024);
+    let length = 0;
     length = encodeQUINT32(responseArray, length, thisInstance.magic_key);
     length = encodeQUINT32(responseArray, length, thisInstance.schema_number);
     length = encodeQUINT32(responseArray, length, 15);
@@ -5210,7 +5189,7 @@ function setCallAndGrid(callsign, grid, instance = null, genMessages = true)
     {
       length = encodeQUTF8(responseArray, length, callsign);
 
-      var hash = liveHash(callsign, thisInstance.Band, thisInstance.MO);
+      let hash = liveHash(callsign, thisInstance.Band, thisInstance.MO);
       if (hash in GT.liveCallsigns && GT.liveCallsigns[hash].grid.length > 1) { grid = GT.liveCallsigns[hash].grid; }
 
       if (grid.length == 0) grid = " ";
@@ -5371,7 +5350,7 @@ function handleInstanceStatus(newMessage)
     rigWrap.style.display = "none";
   }
 
-  var DXcall = newMessage.DXcall.trim();
+  let DXcall = newMessage.DXcall.trim();
 
   if (DXcall.length > 1)
   {
@@ -5414,11 +5393,11 @@ function handleInstanceStatus(newMessage)
 
   if (GT.activeInstance == newMessage.instance)
   {
-    var sp = newMessage.Id.split(" - ");
+    let sp = newMessage.Id.split(" - ");
     rigDiv.innerHTML = sp[sp.length - 1].substring(0, 18);
 
-    var bandChange = false;
-    var modeChange = false;
+    let bandChange = false;
+    let modeChange = false;
 
     wsjtxMode.innerHTML = "<font color='orange'>" + newMessage.MO + "</font>";
     GT.settings.app.myMode = newMessage.MO;
@@ -5454,7 +5433,7 @@ function handleInstanceStatus(newMessage)
       redrawParks();
       redrawPins();
 
-      var msg = "<font color='yellow'>" + GT.settings.app.myBand + "</font> / <font color='orange'>" + GT.settings.app.myMode + "</font>";
+      let msg = "<font color='yellow'>" + GT.settings.app.myBand + "</font> / <font color='orange'>" + GT.settings.app.myMode + "</font>";
       addLastTraffic(msg);
       ackAlerts();
       updateChatWindow();
@@ -5483,7 +5462,7 @@ function handleInstanceStatus(newMessage)
 
     dxCallBoxDiv.className = "DXCallBox";
 
-    var hash = DXcall + GT.settings.app.myBand + GT.settings.app.myMode;
+    let hash = DXcall + GT.settings.app.myBand + GT.settings.app.myMode;
 
     if (hash in GT.tracker.worked.call)
     {
@@ -5532,7 +5511,7 @@ function handleInstanceStatus(newMessage)
     else
     {
       localDXGrid.innerHTML = GT.myDXGrid;
-      var LL = squareToCenter(GT.myDXGrid);
+      let LL = squareToCenter(GT.myDXGrid);
       localDXDistance.innerHTML = parseInt(MyCircle.distance(GT.myLat, GT.myLon, LL.a, LL.o) * MyCircle.validateRadius(distanceUnit.value)) + distanceUnit.value.toLowerCase();
       localDXAzimuth.innerHTML = parseInt(MyCircle.bearing(GT.myLat, GT.myLon, LL.a, LL.o)) + "&deg;";
     }
@@ -5577,7 +5556,7 @@ function handleInstanceStatus(newMessage)
         updateCountStats();
 
         if (bandChange || modeChange) reloadInfo();
-        var worker = "";
+        let worker = "";
 
         worker += "<div  style='vertical-align:top;display:inline-block;margin-right:8px;'>";
         worker += "<table class='darkTable' align=center>";
@@ -5621,9 +5600,9 @@ function handleInstanceStatus(newMessage)
         }
         else if (GT.settings.map.qrzDxccFallback && DXcall.length > 0 && callsignToDxcc(DXcall) > 0)
         {
-          var dxcc = callsignToDxcc(DXcall);
-          var Lat = GT.dxccInfo[dxcc].lat;
-          var Lon = GT.dxccInfo[dxcc].lon;
+          let dxcc = callsignToDxcc(DXcall);
+          let Lat = GT.dxccInfo[dxcc].lat;
+          let Lon = GT.dxccInfo[dxcc].lon;
           fitViewBetweenPoints([getPoint(GT.settings.app.myRawGrid), ol.proj.fromLonLat([Lon, Lat])], 15);
         }
       }
@@ -5655,11 +5634,11 @@ function handleInstanceStatus(newMessage)
 
       if (qrzPathWidthValue.value != 0 && GT.settings.app.gridViewMode != 2 && validateGridFromString(GT.settings.app.myRawGrid))
       {
-        var strokeColor = getQrzPathColor();
-        var strokeWeight = qrzPathWidthValue.value;
-        var LL = squareToCenter(GT.settings.app.myRawGrid);
-        var fromPoint = ol.proj.fromLonLat([LL.o, LL.a]);
-        var toPoint = null;
+        let strokeColor = getQrzPathColor();
+        let strokeWeight = qrzPathWidthValue.value;
+        let LL = squareToCenter(GT.settings.app.myRawGrid);
+        let fromPoint = ol.proj.fromLonLat([LL.o, LL.a]);
+        let toPoint = null;
 
         if (validateGridFromString(GT.myDXGrid))
         {
@@ -5668,15 +5647,15 @@ function handleInstanceStatus(newMessage)
         }
         else if (GT.settings.map.qrzDxccFallback && DXcall.length > 0 && callsignToDxcc(DXcall) > 0)
         {
-          var dxcc = callsignToDxcc(DXcall);
+          let dxcc = callsignToDxcc(DXcall);
           toPoint = ol.proj.fromLonLat([GT.dxccInfo[dxcc].lon, GT.dxccInfo[dxcc].lat]);
 
-          var locality = GT.dxccInfo[dxcc].geo;
+          let locality = GT.dxccInfo[dxcc].geo;
           if (locality == "deleted") locality = null;
 
           if (locality != null)
           {
-            var feature = shapeFeature("qrz", locality, "qrz", "#FFFF0010", "#FF0000FF", 1.0);
+            let feature = shapeFeature("qrz", locality, "qrz", "#FFFF0010", "#FF0000FF", 1.0);
             GT.layerSources.transmit.addFeature(feature);
           }
         }
@@ -5726,7 +5705,7 @@ function drawTraffic()
 {
   while (GT.lastTraffic.length > 60) GT.lastTraffic.pop();
 
-  var worker = GT.lastTraffic.join("<br>");
+  let worker = GT.lastTraffic.join("<br>");
   worker = worker.split("80%'><br>").join("80%'>");
   if (GT.localDXcall.length > 1)
   {
@@ -5816,15 +5795,15 @@ const kIsEven = {
 
 function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
 {
-  var didCustomAlert = false;
-  var validQTH = false;
-  var CQ = false;
-  var RR73 = false;
-  var msgDEcallsign = "";
-  var msgDXcallsign = "";
-  var theirQTH = "";
-  var countryName = "";
-  var newF;
+  let didCustomAlert = false;
+  let validQTH = false;
+  let CQ = false;
+  let RR73 = false;
+  let msgDEcallsign = "";
+  let msgDXcallsign = "";
+  let theirQTH = "";
+  let countryName = "";
+  let newF;
   if (newMessage.OF > 0)
   {
     newF = formatMhz(Number((newMessage.OF + newMessage.DF) / 1000), 3, 3);
@@ -5833,12 +5812,12 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
   {
     newF = newMessage.DF;
   }
-  var theTimeStamp = timeNowSec() - (timeNowSec() % 86400) + parseInt(newMessage.TM / 1000);
+  let theTimeStamp = timeNowSec() - (timeNowSec() % 86400) + parseInt(newMessage.TM / 1000);
 
-  var theMessage = (isFox == true ? foxMessage : newMessage.Msg);
+  let theMessage = (isFox == true ? foxMessage : newMessage.Msg);
 
   // Break up the decoded message
-  var decodeWords = theMessage.split(" ").slice(0, 5);
+  let decodeWords = theMessage.split(" ").slice(0, 5);
   while (decodeWords[decodeWords.length - 1] == "") decodeWords.pop();
 
   if (decodeWords.length > 1)
@@ -5864,11 +5843,11 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
     }
 
     // Grab the last word in the decoded message
-    var qth = decodeWords[decodeWords.length - 1].trim();
+    let qth = decodeWords[decodeWords.length - 1].trim();
     if (qth.length == 4)
     {
-      var LETTERS = qth.substr(0, 2);
-      var NUMBERS = qth.substr(2, 2);
+      let LETTERS = qth.substr(0, 2);
+      let NUMBERS = qth.substr(2, 2);
       if (/^[A-R]+$/.test(LETTERS) && /^[0-9]+$/.test(NUMBERS))
       {
         theirQTH = LETTERS + NUMBERS;
@@ -5922,12 +5901,12 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
       RR73 = true;
     }
 
-    var callsign = null;
+    let callsign = null;
 
-    var hash = msgDEcallsign + newMessage.OB + newMessage.OM;
+    let hash = msgDEcallsign + newMessage.OB + newMessage.OM;
     if (hash in GT.liveCallsigns) callsign = GT.liveCallsigns[hash];
 
-    var canPath = false;
+    let canPath = false;
     if (
       (GT.settings.app.gtBandFilter.length == 0 ||
         (GT.settings.app.gtBandFilter == "auto" && newMessage.OB == GT.settings.app.myBand) ||
@@ -5952,7 +5931,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
       let newCallsign = {};
       newCallsign.DEcall = msgDEcallsign;
       newCallsign.grid = theirQTH;
-      newCallsign.field = theirQTH.substring(0, 2);
+      // newCallsign.field = theirQTH.substring(0, 2);
       newCallsign.wspr = null;
       newCallsign.msg = newMessage.Msg;
       newCallsign.RSTsent = newMessage.SR;
@@ -6036,7 +6015,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
     callsign.band = newMessage.OB;
     callsign.instance = newMessage.instance;
     callsign.grid = callsign.grid.substr(0, 4);
-    callsign.field = callsign.grid.substring(0, 2);
+    // callsign.field = callsign.grid.substring(0, 2);
     callsign.CQ = CQ;
     callsign.RR73 = RR73;
     callsign.UTC = toColonHMS(parseInt(newMessage.TM / 1000));
@@ -6071,7 +6050,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
 
     if (callsign.distance == 0 && callsign.grid.length > 0)
     {
-      var LL = squareToCenter(callsign.grid);
+      let LL = squareToCenter(callsign.grid);
       callsign.distance = MyCircle.distance(GT.myLat, GT.myLon, LL.a, LL.o);
       callsign.heading = MyCircle.bearing(GT.myLat, GT.myLon, LL.a, LL.o);
     }
@@ -6081,7 +6060,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
       callsign.pota = null;
       if (callsign.DEcall in GT.pota.callSpots || callsign.DEcall in GT.pota.callSchedule)
       {
-        var now = Date.now();
+        let now = Date.now();
         if (callsign.DEcall in GT.pota.callSpots)
         {
           if (GT.pota.callSpots[callsign.DEcall] in GT.pota.parkSpots && GT.pota.parkSpots[GT.pota.callSpots[callsign.DEcall]][callsign.DEcall].expire > now)
@@ -6091,7 +6070,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
         }
         else if (callsign.DEcall in GT.pota.callSchedule)
         {
-          for (var i in GT.pota.callSchedule[callsign.DEcall])
+          for (const i in GT.pota.callSchedule[callsign.DEcall])
           {
             if (now < GT.pota.callSchedule[callsign.DEcall][i].end && now >= GT.pota.callSchedule[callsign.DEcall][i].start)
             {
@@ -6123,7 +6102,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
 
       if (GT.settings.map.trafficDecode && didCustomAlert == true)
       {
-        var traffic = htmlEntities(theMessage);
+        let traffic = htmlEntities(theMessage);
 
         traffic = traffic + " 🚩";
 
@@ -6164,7 +6143,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
         {
           // Our msgDEcallsign is not sending a CQ.
           // Let's see if we can locate who he's talking to in our known list
-          var DEcallsign = null;
+          let DEcallsign = null;
           if (callsign.DXcall + newMessage.OB + newMessage.OM in GT.liveCallsigns)
           {
             DEcallsign = GT.liveCallsigns[callsign.DXcall + newMessage.OB + newMessage.OM];
@@ -6176,10 +6155,10 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
 
           if (DEcallsign != null && DEcallsign.grid != "")
           {
-            var strokeColor = getPathColor();
-            var strokeWeight = pathWidthValue.value;
-            var flightPath = null;
-            var isQRZ = false;
+            let strokeColor = getPathColor();
+            let strokeWeight = pathWidthValue.value;
+            let flightPath = null;
+            let isQRZ = false;
             if (msgDXcallsign == GT.settings.app.myCall)
             {
               strokeColor = getQrzPathColor();
@@ -6189,8 +6168,8 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
 
             if (strokeWeight != 0)
             {
-              var fromPoint = getPoint(callsign.grid);
-              var toPoint = getPoint(DEcallsign.grid);
+              let fromPoint = getPoint(callsign.grid);
+              let toPoint = getPoint(DEcallsign.grid);
 
               try
               {
@@ -6222,18 +6201,18 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
         else if (GT.settings.map.qrzDxccFallback && msgDXcallsign == GT.settings.app.myCall && callsign.dxcc > 0)
         {
           // the caller is calling us, but they don't have a grid, so lookup the DXCC and show it
-          var strokeColor = getQrzPathColor();
-          var strokeWeight = qrzPathWidthValue.value;
-          var flightPath = null;
-          var isQRZ = true;
+          let strokeColor = getQrzPathColor();
+          let strokeWeight = qrzPathWidthValue.value;
+          let flightPath = null;
+          let isQRZ = true;
  
           if (strokeWeight != 0 && GT.settings.app.myGrid.length > 0)
           {
-            var toPoint = getPoint(GT.settings.app.myGrid);
+            let toPoint = getPoint(GT.settings.app.myGrid);
 
-            var Lat = GT.dxccInfo[callsign.dxcc].lat;
-            var Lon = GT.dxccInfo[callsign.dxcc].lon;
-            var fromPoint = ol.proj.fromLonLat([Lon, Lat]);
+            let Lat = GT.dxccInfo[callsign.dxcc].lat;
+            let Lon = GT.dxccInfo[callsign.dxcc].lon;
+            let fromPoint = ol.proj.fromLonLat([Lon, Lat]);
 
             try
             {
@@ -6260,7 +6239,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
               console.error("Unexpected error inside handleWsjtxDecode 2", err)
             }
 
-            var feature = shapeFeature(
+            let feature = shapeFeature(
               "qrz",
               GT.dxccInfo[callsign.dxcc].geo,
               "qrz",
@@ -6278,10 +6257,10 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
       }
       else if (GT.settings.map.CQhilite && msgDXcallsign.indexOf("CQ ") == 0 && callsign.grid != "" && GT.settings.app.gridViewMode != 2 && pathWidthValue.value != 0)
       {
-        var CCd = msgDXcallsign.replace("CQ ", "").split(" ")[0];
+        let CCd = msgDXcallsign.replace("CQ ", "").split(" ")[0];
         if (CCd.length < 5 && !(CCd in GT.pathIgnore))
         {
-          var locality = null;
+          let locality = null;
           // Direct lookup US states, Continents, possibly
           if (CCd in GT.replaceCQ) CCd = GT.replaceCQ[CCd];
 
@@ -6310,11 +6289,11 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
 
           if (locality != null)
           {
-            var strokeColor = getPathColor();
-            var strokeWeight = pathWidthValue.value;
-            var flightPath = null;
+            let strokeColor = getPathColor();
+            let strokeWeight = pathWidthValue.value;
+            let flightPath = null;
 
-            var feature = shapeFeature(
+            let feature = shapeFeature(
               CCd,
               locality,
               CCd,
@@ -6329,8 +6308,8 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
             GT.layerSources.flight.addFeature(feature);
             GT.flightPaths.push(feature);
 
-            var fromPoint = getPoint(callsign.grid);
-            var toPoint = ol.proj.fromLonLat(locality.properties.center);
+            let fromPoint = getPoint(callsign.grid);
+            let toPoint = ol.proj.fromLonLat(locality.properties.center);
 
             try
             {
@@ -6361,7 +6340,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
     }
   }
 
-  var bgColor = "black";
+  let bgColor = "black";
   if (newMessage.LC > 0) bgColor = "#880000";
 
   GT.lastMessages.unshift(
@@ -6416,13 +6395,13 @@ function shapeFeature(
   borderWidth
 )
 {
-  var feature = new ol.format.GeoJSON({
+  let feature = new ol.format.GeoJSON({
     geometryName: key
   }).readFeature(geoJsonData, {
     featureProjection: GT.settings.map.projection
   });
 
-  var style = new ol.style.Style({
+  let style = new ol.style.Style({
     stroke: new ol.style.Stroke({
       color: borderColor,
       width: borderWidth
@@ -6440,7 +6419,7 @@ function shapeFeature(
 
 function handleWsjtxClear(newMessage)
 {
-  for (var hash in GT.liveCallsigns)
+  for (let hash in GT.liveCallsigns)
   {
     if (GT.liveCallsigns[hash].instance == newMessage.instance || GT.liveCallsigns[hash].mode == GT.instances[newMessage.instance].status.MO)
     {
@@ -6453,7 +6432,7 @@ function handleWsjtxClear(newMessage)
       delete GT.liveCallsigns[hash];
     }
   }
-  for (var call in GT.callRoster)
+  for (let call in GT.callRoster)
   {
     if (GT.callRoster[call].callObj.instance == newMessage.instance) { delete GT.callRoster[call]; }
   }
@@ -6467,7 +6446,7 @@ function handleWsjtxClear(newMessage)
 
 function goProcessRoster()
 {
-  var now = timeNowSec();
+  let now = timeNowSec();
   for (const call in GT.callRoster)
   {
     if (now - GT.callRoster[call].callObj.age > 300)
@@ -6499,9 +6478,8 @@ function handleClosed(newMessage)
   {
     txrxdec.style.backgroundColor = "Purple";
     txrxdec.style.borderColor = "Purple";
-    var name = newMessage.Id.toUpperCase().split(" - ");
-    var txt = name[name.length - 1];
-    txrxdec.innerHTML = txt + " Closed";
+    let name = newMessage.Id.toUpperCase().split(" - ");
+    txrxdec.innerHTML = name[name.length - 1] + " Closed";
   }
 
   if (GT.instances[newMessage.Id].open == false)
@@ -6657,7 +6635,7 @@ function setCenterQTH()
   if (GT.settings.app.myGrid.length >= 4)
   {
     // Grab home QTH Gridsquare from Center QTH
-    var LL = squareToLatLong(GT.settings.app.myGrid);
+    let LL = squareToLatLong(GT.settings.app.myGrid);
 
     GT.mapView
       .setCenter(
@@ -6737,7 +6715,7 @@ function importSettings(contents)
       else
       {
         GT.settings = { };
-        for (var key in data)
+        for (const key in data)
         {
           GT.settings[key] = data[key];
         }
@@ -7140,13 +7118,13 @@ function showWorkedBox(sortIndex, nextPage, redraw)
 {
   try
   {
-    var myObjects = null;
-    var mySort = sortIndex;
-    var bands = {};
-    var modes = {};
-    var dxccs = {};
-    var confSrcs = {};
-    var ObjectCount = 0;
+    let myObjects = null;
+    let mySort = sortIndex;
+    let bands = {};
+    let modes = {};
+    let dxccs = {};
+    let confSrcs = {};
+    let ObjectCount = 0;
 
     myObjects = GT.QSOhash;
 
@@ -7157,7 +7135,7 @@ function showWorkedBox(sortIndex, nextPage, redraw)
       GT.lastSortType = 2;
     }
 
-    var list = Object.values(myObjects);
+    let list = Object.values(myObjects);
 
     if (GT.Zday)
     {
@@ -7180,8 +7158,8 @@ function showWorkedBox(sortIndex, nextPage, redraw)
     {
       list = list.filter(function (value)
       {
-        var x = value.grid.indexOf(GT.gridSearch);
-        var y = value.vucc_grids.indexOf(GT.gridSearch);
+        let x = value.grid.indexOf(GT.gridSearch);
+        let y = value.vucc_grids.indexOf(GT.gridSearch);
         return x == 0 || y == 0;
       });
     }
@@ -7217,12 +7195,12 @@ function showWorkedBox(sortIndex, nextPage, redraw)
       });
     }
 
-    for (var key in list)
+    for (let key in list)
     {
       bands[list[key].band] = list[key].band;
       modes[list[key].mode] = list[key].mode;
 
-      var pp = list[key].dxcc in GT.dxccInfo ? GT.dxccInfo[list[key].dxcc].pp : "?";
+      let pp = list[key].dxcc in GT.dxccInfo ? GT.dxccInfo[list[key].dxcc].pp : "?";
 
       dxccs[GT.dxccToAltName[list[key].dxcc] + " (" + pp + ")"] = list[key].dxcc;
       if (list[key].confirmed)
@@ -7339,11 +7317,11 @@ function showWorkedBox(sortIndex, nextPage, redraw)
     GT.qsoPage %= GT.qsoPages;
     if (GT.qsoPage < 0) GT.qsoPage = GT.qsoPages - 1;
 
-    var startIndex = GT.qsoPage * GT.settings.app.qsoItemsPerPage;
-    var endIndex = startIndex + GT.settings.app.qsoItemsPerPage;
+    let startIndex = GT.qsoPage * GT.settings.app.qsoItemsPerPage;
+    let endIndex = startIndex + GT.settings.app.qsoItemsPerPage;
     if (endIndex > ObjectCount) endIndex = ObjectCount;
 
-    var workHead = "<b> Entries (" + ObjectCount + ")</b>";
+    let workHead = "<b> Entries (" + ObjectCount + ")</b>";
 
     if (GT.qsoPages > 1)
     {
@@ -7355,7 +7333,7 @@ function showWorkedBox(sortIndex, nextPage, redraw)
 
     if (myObjects != null)
     {
-      var worker = "";
+      let worker = "";
       worker += "<table  id='logTable' style='white-space:nowrap;overflow:auto;overflow-x;hidden;' class='darkTable' align=center>";
       worker += "<tr><th><input type='text' id='searchWB' style='margin:0px'  oncontextmenu='contextMenu()' class='inputTextValue' value='" + GT.searchWB + "' size='8' oninput='window.opener.showWorkedSearchChanged(this);' / >";
       if (GT.searchWB.length > 0)
@@ -7430,7 +7408,7 @@ function showWorkedBox(sortIndex, nextPage, redraw)
       if (GT.settings.callsignLookups.oqrsUseEnable == true) worker += "<th>" + I18N("gt.qsoPage.OQRS") + "</th>";
       worker += "</tr>";
 
-      for (var i = startIndex; i < endIndex; i++)
+      for (let i = startIndex; i < endIndex; i++)
       {
         let confTitle = "";
         let confTd = "";
@@ -7517,10 +7495,10 @@ function showWorkedBox(sortIndex, nextPage, redraw)
 
       if (GT.settings.app.potaFeatureEnabled) statsValidateCallByElement("searchPOTA");
 
-      var newSelect = document.createElement("select");
+      let newSelect = document.createElement("select");
       newSelect.id = "bandFilter";
       newSelect.title = "Band Filter";
-      var option = document.createElement("option");
+      let option = document.createElement("option");
       option.value = "Mixed";
       option.text = "Mixed";
       newSelect.appendChild(option);
@@ -7531,7 +7509,7 @@ function showWorkedBox(sortIndex, nextPage, redraw)
         })
         .forEach(function (key)
         {
-          var option = document.createElement("option");
+          let option = document.createElement("option");
           option.value = key;
           option.text = key;
           newSelect.appendChild(option);
@@ -7566,7 +7544,7 @@ function showWorkedBox(sortIndex, nextPage, redraw)
         .sort()
         .forEach(function (key)
         {
-          var option = document.createElement("option");
+          let option = document.createElement("option");
           option.value = key;
           option.text = key;
           newSelect.appendChild(option);
@@ -7592,7 +7570,7 @@ function showWorkedBox(sortIndex, nextPage, redraw)
         .sort()
         .forEach(function (key)
         {
-          var option = document.createElement("option");
+          let option = document.createElement("option");
           option.value = dxccs[key];
           option.text = key;
           newSelect.appendChild(option);
@@ -7627,7 +7605,7 @@ function showWorkedBox(sortIndex, nextPage, redraw)
       Object.keys(confSrcs)
         .forEach(function (key)
         {
-          var option = document.createElement("option");
+          let option = document.createElement("option");
           option.value = key
           option.text = GT.confSrcNames[key];
           newSelect.appendChild(option);
@@ -7768,12 +7746,12 @@ function getBandSlots()
   return worker;
 }
 
+function keysThatContain(obj, text) {
+  return Object.keys(obj).filter(key => key.includes(text)).length;
+};
+
 function getDXMarathon()
 {
-  const keysThatContain  = (obj, text) => {
-    return Object.keys(obj).filter(key => key.includes(text)).length;
-  };
-
   let worker = "<h1>" +I18N("rosterColumns.Wanted.dxm") + " " + GT.currentYear + "</h1>";
 
   worker += "<table class='darkTable' align=center>";
@@ -7791,23 +7769,23 @@ function getDXMarathon()
 
 function showDXCCsBox()
 {
-  var worker = getBandSlots();
-  var band = GT.settings.app.gtBandFilter == "auto" ? GT.settings.app.myBand : GT.settings.app.gtBandFilter.length == 0 ? "" : GT.settings.app.gtBandFilter;
-  var mode = GT.settings.app.gtModeFilter == "auto" ? GT.settings.app.myMode : GT.settings.app.gtModeFilter.length == 0 ? "" : GT.settings.app.gtModeFilter;
+  let worker = getBandSlots();
+  let band = GT.settings.app.gtBandFilter == "auto" ? GT.settings.app.myBand : GT.settings.app.gtBandFilter.length == 0 ? "" : GT.settings.app.gtBandFilter;
+  let mode = GT.settings.app.gtModeFilter == "auto" ? GT.settings.app.myMode : GT.settings.app.gtModeFilter.length == 0 ? "" : GT.settings.app.gtModeFilter;
   worker += getCurrentBandModeHTML();
-  var confirmed = 0;
-  var worked = 0;
-  var needed = 0;
-  var List = {};
-  var ListConfirmed = {};
-  var ListNotWorked = {};
+  let confirmed = 0;
+  let worked = 0;
+  let needed = 0;
+  let List = {};
+  let ListConfirmed = {};
+  let ListNotWorked = {};
   for (const key in GT.dxccInfo)
   {
     if (key != -1 && Number(GT.dxccInfo[key].dxcc) > 0)
     {
       if (GT.dxccInfo[key].worked == true)
       {
-        var item = {};
+        let item = {};
         item.dxcc = GT.dxccInfo[key].dxcc;
         item.flag = GT.dxccInfo[key].flag;
         item.confirmed = GT.dxccInfo[key].confirmed;
@@ -7816,7 +7794,7 @@ function showDXCCsBox()
       }
       if (GT.dxccInfo[key].confirmed == true)
       {
-        var item = {};
+        let item = {};
         item.dxcc = GT.dxccInfo[key].dxcc;
         item.flag = GT.dxccInfo[key].flag;
         item.confirmed = GT.dxccInfo[key].confirmed;
@@ -7825,7 +7803,7 @@ function showDXCCsBox()
       }
       if (GT.dxccInfo[key].worked == false && GT.dxccInfo[key].confirmed == false && GT.dxccInfo[key].pp != "" && GT.dxccInfo[key].geo != "deleted")
       {
-        var item = {};
+        let item = {};
         item.dxcc = GT.dxccInfo[key].dxcc;
         item.flag = GT.dxccInfo[key].flag;
         item.confirmed = GT.dxccInfo[key].confirmed;
@@ -7850,8 +7828,8 @@ function showDXCCsBox()
       .sort()
       .forEach(function (key, i)
       {
-        var rowStyle = List[key].confirmed ? "" : "background-clip:content-box;box-shadow: 0 0 8px 3px inset; cursor:pointer ";
-        var rowAttributes = List[key].confirmed ? "" : "onclick='searchWorked(" + List[key].dxcc + ", \"" + band + "\", \"" + mode + "\");'";
+        let rowStyle = List[key].confirmed ? "" : "background-clip:content-box;box-shadow: 0 0 8px 3px inset; cursor:pointer ";
+        let rowAttributes = List[key].confirmed ? "" : "onclick='searchWorked(" + List[key].dxcc + ", \"" + band + "\", \"" + mode + "\");'";
 
         worker += "<tr><td align=left style='color:#ff0;" + rowStyle + "' " + rowAttributes + ">" + key + "</td>";
         worker += "<td align='center' style='margin:0;padding:0'><img style='padding-top:3px' src='img/flags/16/" + List[key].flag + "'></td>";
@@ -7907,7 +7885,7 @@ function showDXCCsBox()
 
 function showZonesBox()
 {
-  var worker = getCurrentBandModeHTML();
+  let worker = getCurrentBandModeHTML();
 
   worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.CQZoneBox.Worked") + "</b><br>";
   worker += displayItemList(GT.cqZones, "#FFA500");
@@ -7926,7 +7904,7 @@ function showZonesBox()
 
 function showWASPlusBox()
 {
-  var worker = getCurrentBandModeHTML();
+  let worker = getCurrentBandModeHTML();
 
   worker += "<div style='vertical-align:top;display:inline-block;margin-right:8px;overflow:auto;overflow-x:hidden;color:cyan;'><b>" + I18N("gt.WASWACBox.WAS") + "</b><br>";
   worker += displayItemList(GT.wasZones, "#00DDDD");
@@ -8210,7 +8188,7 @@ function openInfoTab(evt, tabName, callFunc, callObj)
   if (GT.statsWindowInitialized)
   {
     // Declare all variables
-    var i, infoTabcontent, infoTablinks;
+    let i, infoTabcontent, infoTablinks;
     // Get all elements with class="infoTabcontent" and hide them
     infoTabcontent = GT.statsWindowHandle.window.document.getElementsByClassName(
       "infoTabcontent"
@@ -8278,7 +8256,7 @@ function openAudioAlertSettings()
 function openSettingsTab(evt, tabName)
 {
   // Declare all variables
-  var i, settingsTabcontent, settingsTablinks;
+  let i, settingsTabcontent, settingsTablinks;
   // Get all elements with class="settingsTabcontent" and hide them
   settingsTabcontent = document.getElementsByClassName("settingsTabcontent");
   for (i = 0; i < settingsTabcontent.length; i++)
@@ -8311,7 +8289,7 @@ function toggleGridMode()
 
 function newStatObject()
 {
-  var statObject = {};
+  let statObject = {};
   statObject.worked = 0;
   statObject.confirmed = 0;
   statObject.worked_bands = {};
@@ -8325,7 +8303,7 @@ function newStatObject()
 
 function newStatCountObject()
 {
-  var statCountObject = {};
+  let statCountObject = {};
 
   statCountObject.worked = 0;
   statCountObject.confirmed = 0;
@@ -8346,7 +8324,7 @@ function newStatCountObject()
 
 function newDistanceObject(start = 0)
 {
-  var distance = {};
+  let distance = {};
   distance.worked_unit = start;
   distance.worked_hash = "";
   distance.confirmed_unit = start;
@@ -8356,7 +8334,7 @@ function newDistanceObject(start = 0)
 
 function showStatBox(resize)
 {
-  var count = Object.keys(GT.QSOhash).length;
+  let count = Object.keys(GT.QSOhash).length;
 
   if (typeof resize != "undefined" && resize)
   {
@@ -8426,23 +8404,23 @@ function workObject(obj, count, band, mode, type, didConfirm)
 
 function renderStatsBox()
 {
-  var worker = "";
-  var scoreSection = "Initial";
+  let worker = "";
+  let scoreSection = "Initial";
   try
   {
-    var dxccInfo = {};
-    var cqZones = {};
-    var ituZones = {};
-    var wasZones = {};
-    var wacpZones = {};
-    var wacZones = {};
-    var countyData = {};
-    var gridData = {};
-    var wpxData = {};
-    var callData = {};
+    let dxccInfo = {};
+    let cqZones = {};
+    let ituZones = {};
+    let wasZones = {};
+    let wacpZones = {};
+    let wacZones = {};
+    let countyData = {};
+    let gridData = {};
+    let wpxData = {};
+    let callData = {};
 
-    var long_distance = newDistanceObject();
-    var short_distance = newDistanceObject(100000);
+    let long_distance = newDistanceObject();
+    let short_distance = newDistanceObject(100000);
     long_distance.band = {};
     long_distance.mode = {};
     long_distance.type = {};
@@ -8450,14 +8428,14 @@ function renderStatsBox()
     short_distance.mode = {};
     short_distance.type = {};
 
-    var modet = {};
+    let modet = {};
     modet.Mixed = newStatCountObject();
     modet.Digital = newStatCountObject();
     modet.Phone = newStatCountObject();
     modet.CW = newStatCountObject();
     modet.Other = newStatCountObject();
 
-    var details = {};
+    let details = {};
     details.callsigns = {};
 
     details.oldest = timeNowSec() + 86400;
@@ -8465,22 +8443,22 @@ function renderStatsBox()
 
     scoreSection = "QSO";
 
-    for (var i in GT.QSOhash)
+    for (let i in GT.QSOhash)
     {
-      var finalGrid = GT.QSOhash[i].grid;
-      var didConfirm = GT.QSOhash[i].confirmed;
-      var band = GT.QSOhash[i].band;
-      var mode = GT.QSOhash[i].mode;
-      var state = GT.QSOhash[i].state;
-      var cont = GT.QSOhash[i].cont;
-      var finalDxcc = GT.QSOhash[i].dxcc;
-      var cnty = GT.QSOhash[i].cnty;
-      var ituz = GT.QSOhash[i].ituz;
-      var cqz = GT.QSOhash[i].cqz;
-      var wpx = GT.QSOhash[i].px;
-      var call = GT.QSOhash[i].DXcall;
-      var who = GT.QSOhash[i].DEcall;
-      var type = getTypeFromMode(mode);
+      let finalGrid = GT.QSOhash[i].grid;
+      let didConfirm = GT.QSOhash[i].confirmed;
+      let band = GT.QSOhash[i].band;
+      let mode = GT.QSOhash[i].mode;
+      let state = GT.QSOhash[i].state;
+      let cont = GT.QSOhash[i].cont;
+      let finalDxcc = GT.QSOhash[i].dxcc;
+      let cnty = GT.QSOhash[i].cnty;
+      let ituz = GT.QSOhash[i].ituz;
+      let cqz = GT.QSOhash[i].cqz;
+      let wpx = GT.QSOhash[i].px;
+      let call = GT.QSOhash[i].DXcall;
+      let who = GT.QSOhash[i].DEcall;
+      let type = getTypeFromMode(mode);
 
       if (!(who in callData)) callData[who] = newStatObject();
 
@@ -8552,7 +8530,7 @@ function renderStatsBox()
       {
         if (cont in GT.shapeData)
         {
-          var name = GT.shapeData[cont].properties.name;
+          let name = GT.shapeData[cont].properties.name;
           if (name in GT.wacZones)
           {
             if (!(name in wacZones)) wacZones[name] = newStatObject();
@@ -8688,7 +8666,7 @@ function renderStatsBox()
 
       if (cqz && cqz.length > 0)
       {
-        var name = GT.cqZones[cqz].name;
+        let name = GT.cqZones[cqz].name;
         if (!(name in cqZones)) cqZones[name] = newStatObject();
 
         workObject(cqZones[name], false, band, mode, type, didConfirm);
@@ -8703,7 +8681,7 @@ function renderStatsBox()
 
       if (finalGrid.length > 0)
       {
-        var gridCheck = finalGrid.substr(0, 4);
+        let gridCheck = finalGrid.substr(0, 4);
 
         if (!(gridCheck in gridData)) gridData[gridCheck] = newStatObject();
 
@@ -8713,8 +8691,8 @@ function renderStatsBox()
 
     scoreSection = "Stats";
 
-    var stats = {};
-    var output = {};
+    let stats = {};
+    let output = {};
 
     dxccInfo.order = 1;
     stats.DXCC = dxccInfo;
@@ -8732,7 +8710,7 @@ function renderStatsBox()
     {
       output[i] = newStatCountObject();
 
-      for (var key in stats[i])
+      for (let key in stats[i])
       {
         if (stats[i][key].worked)
         {
@@ -8753,32 +8731,32 @@ function renderStatsBox()
           }
         }
 
-        for (var band in stats[i][key].worked_bands)
+        for (let band in stats[i][key].worked_bands)
         {
           output[i].worked_bands[band] = ~~output[i].worked_bands[band] + 1;
         }
 
-        for (var band in stats[i][key].confirmed_bands)
+        for (let band in stats[i][key].confirmed_bands)
         {
           output[i].confirmed_bands[band] = ~~output[i].confirmed_bands[band] + 1;
         }
 
-        for (var mode in stats[i][key].worked_modes)
+        for (let mode in stats[i][key].worked_modes)
         {
           output[i].worked_modes[mode] = ~~output[i].worked_modes[mode] + 1;
         }
 
-        for (var mode in stats[i][key].confirmed_modes)
+        for (let mode in stats[i][key].confirmed_modes)
         {
           output[i].confirmed_modes[mode] = ~~output[i].confirmed_modes[mode] + 1;
         }
 
-        for (var type in stats[i][key].worked_types)
+        for (let type in stats[i][key].worked_types)
         {
           output[i].worked_types[type] = ~~output[i].worked_types[type] + 1;
         }
 
-        for (var type in stats[i][key].confirmed_types)
+        for (let type in stats[i][key].confirmed_types)
         {
           output[i].confirmed_types[type] = ~~output[i].confirmed_types[type] + 1;
         }
@@ -8795,7 +8773,7 @@ function renderStatsBox()
     output.CW = modet.CW;
     output.Other = modet.Other;
 
-    for (var i in output)
+    for (let i in output)
     {
       output[i].worked_band_count = Object.keys(output[i].worked_bands).length;
       output[i].confirmed_band_count = Object.keys(
@@ -8811,7 +8789,7 @@ function renderStatsBox()
       ).length;
     }
 
-    var TypeNames = {
+    let TypeNames = {
       0: ["MIXED", I18N("gt.typeNames.Mixed"), ""],
       1: ["DIGITAL", I18N("gt.typeNames.Digital"), ""],
       2: ["PHONE", I18N("gt.typeNames.Phone"), ""],
@@ -8819,7 +8797,7 @@ function renderStatsBox()
       4: ["Other", I18N("gt.typeNames.Other"), ""]
     };
 
-    var AwardNames = {
+    let AwardNames = {
       0: ["WRFA", I18N("gt.awardNames.WRFA"), "WRFA", "yellow"],
       1: ["GRID", I18N("gt.awardNames.Grid"), "GSA", "cyan"],
       2: ["DXCC", I18N("gt.awardNames.DXCC"), "DXWA", "orange"],
@@ -8838,7 +8816,7 @@ function renderStatsBox()
 
     worker += "<table style='display:inline-table;margin:5px;' class='darkTable'>";
 
-    var ws = "";
+    let ws = "";
     if (Object.keys(details.callsigns).length > 1) ws = "s";
     worker +=
       "<tr><td>Callsign" +
@@ -8860,10 +8838,10 @@ function renderStatsBox()
     worker += "<table style='display:inline-table;margin:5px;' class='darkTable'>";
     worker += "<tr><th>" + I18N("gt.logbook.topScore") + "</th>" + "<th style='color:yellow'>" + I18N("gt.logbook.worked") + "</th>" + "<th style='color:lightgreen'>" + I18N("gt.logbook.confirmed") + "</th></tr>";
 
-    for (var key in AwardNames)
+    for (let key in AwardNames)
     {
       scoreSection = "Award " + AwardNames[key][1];
-      var infoObject = output[AwardNames[key][0]];
+      let infoObject = output[AwardNames[key][0]];
       worker += "<tr><td style='color:white'>" + AwardNames[key][1] + "</td>";
       worker +=
         "<td style='color:" +
@@ -8971,7 +8949,7 @@ function renderStatsBox()
     worker += "<h1>" + I18N("gt.AwardTypes") + "</h1>";
 
     scoreSection = "Award Types";
-    for (var key in AwardNames)
+    for (let key in AwardNames)
     {
       worker += createStatTable(
         AwardNames[key][1],
@@ -8985,7 +8963,7 @@ function renderStatsBox()
     scoreSection = "Mode Types";
 
     worker += "<h1>" + I18N("gt.ModeTypes") + "</h1>";
-    for (var key in TypeNames)
+    for (let key in TypeNames)
     {
       worker += createStatTable(
         TypeNames[key][1],
@@ -9016,7 +8994,7 @@ function renderStatsBox()
 
 function createDistanceTable(obj, name)
 {
-  var worker =
+  let worker =
     "<table style='display:inline-table;margin:5px;' class='darkTable'>";
   worker +=
     "<tr><th colspan = 3 align=left style='font-size:15px;color:cyan;'>" +
@@ -9027,11 +9005,11 @@ function createDistanceTable(obj, name)
       "</font></td><td colspan=2 ><font color='lightgreen'>" + I18N("gt.distanceTable.Confirmed") + "</font></td></tr>";
   worker += "<tr><td align=center><font color='lightgreen'>" + I18N("gt.distanceTable.Bands") + "</font></td>";
   worker += "<td align=left><table class='subtable'>";
-  var keys = Object.keys(obj.band).sort(numberSort);
-  for (var key in keys)
+  let keys = Object.keys(obj.band).sort(numberSort);
+  for (let key in keys)
   {
-    var grid = GT.QSOhash[obj.band[keys[key]].worked_hash].grid;
-    var call = GT.QSOhash[obj.band[keys[key]].worked_hash].DEcall;
+    let grid = GT.QSOhash[obj.band[keys[key]].worked_hash].grid;
+    let call = GT.QSOhash[obj.band[keys[key]].worked_hash].DEcall;
     worker +=
       "<tr><td align=right>" +
       keys[key] +
@@ -9053,12 +9031,12 @@ function createDistanceTable(obj, name)
   }
   worker += "</table></td>";
   worker += "<td align=left><table class='subtable'>";
-  for (var key in keys)
+  for (let key in keys)
   {
     if (keys[key] in obj.band && obj.band[keys[key]].confirmed_hash)
     {
-      var grid = GT.QSOhash[obj.band[keys[key]].confirmed_hash].grid;
-      var call = GT.QSOhash[obj.band[keys[key]].confirmed_hash].DEcall;
+      let grid = GT.QSOhash[obj.band[keys[key]].confirmed_hash].grid;
+      let call = GT.QSOhash[obj.band[keys[key]].confirmed_hash].DEcall;
       worker +=
         "<tr><td align=right>" +
         keys[key] +
@@ -9086,10 +9064,10 @@ function createDistanceTable(obj, name)
   worker += "<tr><td align=center><font color='orange'>" + I18N("gt.distanceTable.Modes") + "</font></td>";
   worker += "<td align=left><table class='subtable'>";
   keys = Object.keys(obj.mode).sort();
-  for (var key in keys)
+  for (let key in keys)
   {
-    var grid = GT.QSOhash[obj.mode[keys[key]].worked_hash].grid;
-    var call = GT.QSOhash[obj.mode[keys[key]].worked_hash].DEcall;
+    let grid = GT.QSOhash[obj.mode[keys[key]].worked_hash].grid;
+    let call = GT.QSOhash[obj.mode[keys[key]].worked_hash].DEcall;
     worker +=
       "<tr><td align=right>" +
       keys[key] +
@@ -9111,12 +9089,12 @@ function createDistanceTable(obj, name)
   }
   worker += "</table></td>";
   worker += "<td align=left><table class='subtable'>";
-  for (var key in keys)
+  for (let key in keys)
   {
     if (keys[key] in obj.mode && obj.mode[keys[key]].confirmed_hash)
     {
-      var grid = GT.QSOhash[obj.mode[keys[key]].confirmed_hash].grid;
-      var call = GT.QSOhash[obj.mode[keys[key]].confirmed_hash].DEcall;
+      let grid = GT.QSOhash[obj.mode[keys[key]].confirmed_hash].grid;
+      let call = GT.QSOhash[obj.mode[keys[key]].confirmed_hash].DEcall;
       worker +=
         "<tr><td align=right>" +
         keys[key] +
@@ -9143,10 +9121,10 @@ function createDistanceTable(obj, name)
   worker += "<tr><td align=center><font color='#DD44DD'>" + I18N("gt.distanceTable.Types") + "</font></td>";
   worker += "<td align=left><table class='subtable'>";
   keys = Object.keys(obj.type).sort();
-  for (var key in keys)
+  for (let key in keys)
   {
-    var grid = GT.QSOhash[obj.type[keys[key]].worked_hash].grid;
-    var call = GT.QSOhash[obj.type[keys[key]].worked_hash].DEcall;
+    let grid = GT.QSOhash[obj.type[keys[key]].worked_hash].grid;
+    let call = GT.QSOhash[obj.type[keys[key]].worked_hash].DEcall;
     worker +=
       "<tr><td align=right>" +
       keys[key] +
@@ -9168,12 +9146,12 @@ function createDistanceTable(obj, name)
   }
   worker += "</table></td>";
   worker += "<td align=left><table class='subtable'>";
-  for (var key in keys)
+  for (let key in keys)
   {
     if (keys[key] in obj.type && obj.type[keys[key]].confirmed_hash)
     {
-      var grid = GT.QSOhash[obj.type[keys[key]].confirmed_hash].grid;
-      var call = GT.QSOhash[obj.type[keys[key]].confirmed_hash].DEcall;
+      let grid = GT.QSOhash[obj.type[keys[key]].confirmed_hash].grid;
+      let call = GT.QSOhash[obj.type[keys[key]].confirmed_hash].DEcall;
       worker +=
         "<tr><td align=right>" +
         keys[key] +
@@ -9204,8 +9182,8 @@ function createDistanceTable(obj, name)
 function numberSort(a, b)
 {
   // cut off 'm' from 80m or 70cm
-  var metersA = a.slice(0, -1);
-  var metersB = b.slice(0, -1);
+  let metersA = a.slice(0, -1);
+  let metersB = b.slice(0, -1);
 
   // if last letter is c we have a centimeter band, multiply value with 0.01
   if (metersA.slice(-1) == "c")
@@ -9231,7 +9209,7 @@ function numberSort(a, b)
 
 function createStatTable(title, infoObject, awardName)
 {
-  var wc1Table = "";
+  let wc1Table = "";
 
   if (infoObject.worked)
   {
@@ -9241,7 +9219,7 @@ function createStatTable(title, infoObject, awardName)
       "<tr><th colspan = 3 align=left style='font-size:15px;color:cyan;'>" +
       title +
       "</th></tr>";
-    var award = "<th></th>";
+    let award = "<th></th>";
 
     wc1Table +=
       "<tr>" +
@@ -9256,8 +9234,8 @@ function createStatTable(title, infoObject, awardName)
       "<tr><td align=center><font color='lightgreen'>" + I18N("gt.statTable.Bands") + "</font></td>";
 
     wc1Table += "<td align=left><table class='subtable'>";
-    var keys = Object.keys(infoObject.worked_bands).sort(numberSort);
-    for (var key in keys)
+    let keys = Object.keys(infoObject.worked_bands).sort(numberSort);
+    for (let key in keys)
     {
       wc1Table +=
         "<tr><td align=right>" +
@@ -9270,7 +9248,7 @@ function createStatTable(title, infoObject, awardName)
     wc1Table += "</table></td>";
     wc1Table += "<td align=left><table class='subtable'>";
 
-    for (var key in keys)
+    for (let key in keys)
     {
       if (keys[key] in infoObject.confirmed_bands)
       {
@@ -9290,7 +9268,7 @@ function createStatTable(title, infoObject, awardName)
     wc1Table += "<td align=center><font color='orange'>" + I18N("gt.statTable.Modes") + "</font></td>";
     wc1Table += "<td align=left><table class='subtable'>";
     keys = Object.keys(infoObject.worked_modes).sort();
-    for (var key in keys)
+    for (let key in keys)
     {
       wc1Table +=
         "<tr><td align=right>" +
@@ -9304,7 +9282,7 @@ function createStatTable(title, infoObject, awardName)
 
     wc1Table += "<td align=left><table class='subtable'>";
 
-    for (var key in keys)
+    for (let key in keys)
     {
       if (keys[key] in infoObject.confirmed_modes)
       {
@@ -9326,8 +9304,8 @@ function createStatTable(title, infoObject, awardName)
       wc1Table += "<tr>";
       wc1Table += "<td align=center><font color='#DD44DD'>" + I18N("gt.statTable.Types") + "</font></td>";
       wc1Table += "<td align=left><table class='subtable'>";
-      var keys = Object.keys(infoObject.worked_types).sort();
-      for (var key in keys)
+      let keys = Object.keys(infoObject.worked_types).sort();
+      for (let key in keys)
       {
         wc1Table +=
           "<tr><td align=right>" +
@@ -9342,7 +9320,7 @@ function createStatTable(title, infoObject, awardName)
 
       wc1Table += "<td align=left><table class='subtable'>";
 
-      for (var key in keys)
+      for (let key in keys)
       {
         if (keys[key] in infoObject.confirmed_types)
         {
@@ -9405,7 +9383,7 @@ function validateMapBandAndMode(band, mode)
 
 function redrawLiveGrids(honorAge = true)
 {
-  for (var i in GT.liveCallsigns)
+  for (let i in GT.liveCallsigns)
   {
     if (GT.settings.app.gridViewMode != 2 && validateMapBandAndMode(GT.liveCallsigns[i].band, GT.liveCallsigns[i].mode) && (honorAge == false || (honorAge == true && GT.timeNow - GT.liveCallsigns[i].age <= gridDecay.value)))
     {
@@ -9414,7 +9392,7 @@ function redrawLiveGrids(honorAge = true)
   }
   if (honorAge == false)
   {
-    for (var i in GT.liveGrids)
+    for (let i in GT.liveGrids)
     {
       GT.liveGrids[i].age = GT.timeNow;
     }
@@ -9434,13 +9412,13 @@ function redrawGrids()
   GT.QSLcount = 0;
   GT.QSOcount = 0;
 
-  for (var i in GT.QSOhash)
+  for (let i in GT.QSOhash)
   {
-    var finalGrid = GT.QSOhash[i].grid;
-    var worked = GT.QSOhash[i].worked;
-    var didConfirm = GT.QSOhash[i].confirmed;
-    var band = GT.QSOhash[i].band;
-    var mode = GT.QSOhash[i].mode;
+    let finalGrid = GT.QSOhash[i].grid;
+    let worked = GT.QSOhash[i].worked;
+    let didConfirm = GT.QSOhash[i].confirmed;
+    let band = GT.QSOhash[i].band;
+    let mode = GT.QSOhash[i].mode;
     GT.QSOcount++;
     if (didConfirm) GT.QSLcount++;
 
@@ -9460,7 +9438,7 @@ function redrawGrids()
             GT.QSOhash[i].band
           );
         }
-        for (var vucc in GT.QSOhash[i].vucc_grids)
+        for (let vucc in GT.QSOhash[i].vucc_grids)
         {
           qthToQsoBox(
             GT.QSOhash[i].vucc_grids[vucc],
@@ -9474,12 +9452,12 @@ function redrawGrids()
         }
       }
 
-      var state = GT.QSOhash[i].state;
-      var cont = GT.QSOhash[i].cont;
-      var finalDxcc = GT.QSOhash[i].dxcc;
-      var cnty = GT.QSOhash[i].cnty;
-      var ituz = GT.QSOhash[i].ituz;
-      var cqz = GT.QSOhash[i].cqz;
+      let state = GT.QSOhash[i].state;
+      let cont = GT.QSOhash[i].cont;
+      let finalDxcc = GT.QSOhash[i].dxcc;
+      let cnty = GT.QSOhash[i].cnty;
+      let ituz = GT.QSOhash[i].ituz;
+      let cqz = GT.QSOhash[i].cqz;
 
       if (state != null && isKnownCallsignDXCC(finalDxcc))
       {
@@ -9544,7 +9522,7 @@ function redrawGrids()
       {
         if (cont in GT.shapeData)
         {
-          var name = GT.shapeData[cont].properties.name;
+          let name = GT.shapeData[cont].properties.name;
 
           if (name in GT.wacZones)
           {
@@ -9615,7 +9593,7 @@ function redrawGrids()
 
       if (finalGrid.length > 0)
       {
-        var gridCheck = finalGrid.substr(0, 4);
+        let gridCheck = finalGrid.substr(0, 4);
 
         if (gridCheck in GT.us48Data)
         {
@@ -9637,9 +9615,9 @@ function redrawGrids()
         }
       }
 
-      for (var key in GT.QSOhash[i].vucc_grids)
+      for (let key in GT.QSOhash[i].vucc_grids)
       {
-        var grid = GT.QSOhash[i].vucc_grids[key].substr(0, 4);
+        let grid = GT.QSOhash[i].vucc_grids[key].substr(0, 4);
         if (grid in GT.us48Data)
         {
           GT.us48Data[grid].worked ||= worked;
@@ -9660,14 +9638,14 @@ function redrawGrids()
     }
   }
 
-  for (var layer in GT.viewInfo)
+  for (let layer in GT.viewInfo)
   {
-    var search = GT[GT.viewInfo[layer][0]];
-    var worked = (confirmed = 0);
+    let search = GT[GT.viewInfo[layer][0]];
+    let worked = (confirmed = 0);
 
     if (layer == 0)
     {
-      for (var key in search)
+      for (let key in search)
       {
         if (search[key].rectangle.worked) worked++;
         if (search[key].rectangle.confirmed) confirmed++;
@@ -9677,7 +9655,7 @@ function redrawGrids()
     }
     else if (layer == 5)
     {
-      for (var key in search)
+      for (let key in search)
       {
         if (search[key].geo != "deleted")
         {
@@ -9690,7 +9668,7 @@ function redrawGrids()
     }
     else
     {
-      for (var key in search)
+      for (let key in search)
       {
         if (search[key].worked) worked++;
         if (search[key].confirmed) confirmed++;
@@ -10061,31 +10039,31 @@ function renderBandActivity()
 {
   if (GT.settings.app.oamsBandActivity == false) return;
 
-  var buffer = "";
+  let buffer = "";
   if (typeof GT.settings.bandActivity.lines[GT.settings.app.myMode] != "undefined" || GT.oamsBandActivityData != null)
   {
-    var lines = (GT.settings.app.myMode in GT.settings.bandActivity.lines) ? GT.settings.bandActivity.lines[GT.settings.app.myMode] : [];
-    var bands = (GT.myDXCC in GT.callsignDatabaseUSplus) ? GT.us_bands : GT.non_us_bands;
-    var bandData = {};
-    var maxValue = 0;
+    let lines = (GT.settings.app.myMode in GT.settings.bandActivity.lines) ? GT.settings.bandActivity.lines[GT.settings.app.myMode] : [];
+    let bands = (GT.myDXCC in GT.callsignDatabaseUSplus) ? GT.us_bands : GT.non_us_bands;
+    let bandData = {};
+    let maxValue = 0;
 
-    for (var i = 0; i < bands.length; i++)
+    for (let i = 0; i < bands.length; i++)
     {
       bandData[bands[i]] = { pskScore: 0, pskSpots: 0, pskTx: 0, pskRx: 0, oamsRxSpots: 0, oamsTxSpots: 0, oamsTx: 0, oamsRx: 0, oamsDecodes: 0, oamsScore: 0 };
     }
 
-    for (var x = 0; x < lines.length; x++)
+    for (let x = 0; x < lines.length; x++)
     {
-      var firstChar = lines[x].charCodeAt(0);
+      let firstChar = lines[x].charCodeAt(0);
       if (firstChar != 35 && lines[x].length > 1)
       {
         // doesn't begins with # and has something
-        var values = lines[x].trim().split(" ");
-        var band = formatBand(Number(Number(values[0]) / 1000000));
+        let values = lines[x].trim().split(" ");
+        let band = formatBand(Number(Number(values[0]) / 1000000));
 
         if (band in bandData)
         {
-          var place = bandData[band];
+          let place = bandData[band];
 
           place.pskScore += Number(values[1]);
           place.pskSpots += Number(values[2]);
@@ -10105,8 +10083,8 @@ function renderBandActivity()
         {
           if (band in bandData)
           {
-            var place = bandData[band];
-            var data = GT.oamsBandActivityData[grid][band];
+            let place = bandData[band];
+            let data = GT.oamsBandActivityData[grid][band];
 
             place.oamsScore ??= 0;
             place.oamsDecodes += data.d;
@@ -10174,7 +10152,7 @@ function renderBandActivity()
 
 function pskBandActivityCallback(buffer, flag)
 {
-  var result = String(buffer);
+  let result = String(buffer);
   if (result.indexOf("frequency score") > -1)
   {
     // looks good so far
@@ -10226,7 +10204,7 @@ function pskGetBandActivity()
 
 function getIniFromApp(appName)
 {
-  var result = {};
+  let result = {};
   result.port = -1;
   result.ip = "";
   result.MyCall = "NOCALL";
@@ -10333,7 +10311,7 @@ function getIniFromApp(appName)
 
 function updateBasedOnIni()
 {
-  var which =  getIniFromApp("WSJT-X");
+  let which =  getIniFromApp("WSJT-X");
   if (which.port == -1) which = getIniFromApp("JTDX");
 
   // UdpPortNotSet
@@ -10487,9 +10465,9 @@ function validGridKeys(value)
 function ValidateCallsigns(inputText)
 {
   inputText.value = inputText.value.toUpperCase();
-  var callsigns = inputText.value.split(",");
-  var passed = false;
-  for (var call in callsigns)
+  let callsigns = inputText.value.split(",");
+  let passed = false;
+  for (let call in callsigns)
   {
     if (callsigns[call].length > 0)
     {
@@ -10526,9 +10504,9 @@ function ValidateCallsigns(inputText)
 function ValidateGrids(inputText)
 {
   inputText.value = inputText.value.toUpperCase();
-  var grids = inputText.value.split(",");
-  var passed = false;
-  for (var grid in grids)
+  let grids = inputText.value.split(",");
+  let passed = false;
+  for (let grid in grids)
   {
     if (grids[grid].length == 4)
     {
@@ -10567,7 +10545,7 @@ function ValidateCallsign(inputText, validDiv)
   addError.innerHTML = "";
   if (inputText.value.length > 0)
   {
-    var passed = false;
+    let passed = false;
     inputText.value = inputText.value.toUpperCase();
     if (/\d/.test(inputText.value) || /[A-Z]/.test(inputText.value))
     {
@@ -10602,9 +10580,9 @@ function ValidateGridsquareOnly4(inputText, validDiv)
   addError.innerHTML = "";
   if (inputText.value.length == 4)
   {
-    var gridSquare = "";
-    var LETTERS = inputText.value.substr(0, 2).toUpperCase();
-    var NUMBERS = inputText.value.substr(2, 2).toUpperCase();
+    let gridSquare = "";
+    let LETTERS = inputText.value.substr(0, 2).toUpperCase();
+    let NUMBERS = inputText.value.substr(2, 2).toUpperCase();
     if (/^[A-R]+$/.test(LETTERS) && /^[0-9]+$/.test(NUMBERS))
     {
       gridSquare = LETTERS + NUMBERS;
@@ -10638,16 +10616,16 @@ function ValidateGridsquare(inputText, validDiv)
 {
   if (inputText.value.length == 4 || inputText.value.length == 6)
   {
-    var gridSquare = "";
-    var LETTERS = inputText.value.substr(0, 2).toUpperCase();
-    var NUMBERS = inputText.value.substr(2, 2).toUpperCase();
+    let gridSquare = "";
+    let LETTERS = inputText.value.substr(0, 2).toUpperCase();
+    let NUMBERS = inputText.value.substr(2, 2).toUpperCase();
     if (/^[A-R]+$/.test(LETTERS) && /^[0-9]+$/.test(NUMBERS))
     {
       gridSquare = LETTERS + NUMBERS;
     }
     if (inputText.value.length > 4)
     {
-      var LETTERS_SUB = inputText.value.substr(4, 2);
+      let LETTERS_SUB = inputText.value.substr(4, 2);
       gridSquare = "";
       if (
         /^[A-R]+$/.test(LETTERS) &&
@@ -10703,7 +10681,7 @@ function ValidateMulticast(inputText)
   {
     if (inputText.value != "0.0.0.0" && inputText.value != "255.255.255.255")
     {
-      var ipInt = ipToInt(inputText.value);
+      let ipInt = ipToInt(inputText.value);
       if (ipInt >= ipToInt("224.0.0.0") && ipInt < ipToInt("240.0.0.0"))
       {
         if (ipInt > ipToInt("224.0.0.255"))
@@ -10814,7 +10792,7 @@ function ValidateIPaddresses(inputText, checkBox)
 
 function ValidatePort(inputText, checkBox, callBackCheck)
 {
-  var value = Number(inputText.value);
+  let value = Number(inputText.value);
   if (value > 1023 && value < 65536)
   {
     if (callBackCheck && !callBackCheck(value))
@@ -10886,7 +10864,7 @@ function workingDateChanged()
 
 function displayWorkingDate()
 {
-  var date = new Date(GT.settings.app.workingDate * 1000);
+  let date = new Date(GT.settings.app.workingDate * 1000);
   workingDateValue.value = date.toISOString().slice(0, 16);
   workingDateString.innerHTML = dateToString(date);
 }
@@ -10955,12 +10933,12 @@ function selectElementContents(el)
 {
   if (document.createRange && window.getSelection)
   {
-    var range = document.createRange();
-    var sel = window.getSelection();
+    let range = document.createRange();
+    let sel = window.getSelection();
     sel.removeAllRanges();
     range.selectNodeContents(el);
     sel.addRange(range);
-    var text = sel.toString();
+    let text = sel.toString();
     text = text.replace(/\t/g, ",");
     sel.removeAllRanges();
     selectNodeDiv.innerText = text;
@@ -11246,7 +11224,7 @@ function displayTimezones()
 }
 
 function kilometerToUnit(value, unit) {
-  var r = { 'KM': 1, 'MI': 0.621371, 'NM': 0.539957, 'DG':0.008 };
+  let r = { 'KM': 1, 'MI': 0.621371, 'NM': 0.539957, 'DG':0.008 };
   if ( unit in r ) return r[unit] * value;
   else return unit;
 }
@@ -11549,7 +11527,7 @@ function getPostBuffer(file_url, callback, flag, mode, port, theData, timeoutMs,
   };
   let req = http.request(options, function (res)
   {
-    // var fsize = res.headers["content-length"];
+    // let fsize = res.headers["content-length"];
     let cookies = null;
     if (typeof res.headers["set-cookie"] != "undefined") { cookies = res.headers["set-cookie"]; }
     res
@@ -11708,7 +11686,7 @@ function changeMapNightValues()
 
 function setMapColors()
 {
-  var pathColor = pathColorValue.value == 0 ? "#000" : pathColorValue.value == 361 ? "#FFF" : "hsl(" + pathColorValue.value + ", 100%, 50%)";
+  let pathColor = pathColorValue.value == 0 ? "#000" : pathColorValue.value == 361 ? "#FFF" : "hsl(" + pathColorValue.value + ", 100%, 50%)";
   if (pathColorValue.value != 0)
   {
     pathColorDiv.style.color = "#000";
@@ -11735,7 +11713,7 @@ function setMapColors()
 
 function setNightMapColors()
 {
-  var pathColor = GT.settings.map.nightPathColor == 0 ? "#000" : GT.settings.map.nightPathColor == 361 ? "#FFF" : "hsl(" + GT.settings.map.nightPathColor + ", 100%, 50%)";
+  let pathColor = GT.settings.map.nightPathColor == 0 ? "#000" : GT.settings.map.nightPathColor == 361 ? "#FFF" : "hsl(" + GT.settings.map.nightPathColor + ", 100%, 50%)";
   if (GT.settings.map.nightPathColor != 0)
   {
     pathNightColorDiv.style.color = "#000";
@@ -11797,7 +11775,7 @@ function setLegendGrid(name, newColor)
 
 function setLegendGridSettings()
 {
-  for (var key in GT.settings.legendColors)
+  for (let key in GT.settings.legendColors)
   {
     setLegendGrid(key, GT.settings.legendColors[key]);
   }
@@ -11805,7 +11783,7 @@ function setLegendGridSettings()
 
 function resetLegendColors()
 {
-  for (var key in def_legendColors)
+  for (let key in def_legendColors)
   {
     GT.settings.legendColors[key] = def_legendColors[key];
   }
@@ -11817,9 +11795,9 @@ function resetLegendColors()
 
 function changeLegendColor(source)
 {
-  var newColor = source.value;
+  let newColor = source.value;
 
-  var name = source.id.replace("gridValue", "");
+  let name = source.id.replace("gridValue", "");
 
   GT.settings.legendColors[name] = newColor;
 
@@ -11937,9 +11915,9 @@ function timedGetVoices()
     if (GT.voices.length > 0 &&  GT.speechAvailable == false)
     {
       alertVoiceInput.title = "Select Voice";
-      for (var i = 0; i < GT.voices.length; i++)
+      for (let i = 0; i < GT.voices.length; i++)
       {
-        var option = document.createElement("option");
+        let option = document.createElement("option");
         option.value = i;
         option.text = GT.voices[i].name;
         if (GT.voices[i].default)
@@ -11975,7 +11953,7 @@ function initSpeech()
 {
   nodeTimers.setTimeout(timedGetVoices, 5000);
   
-  var msg = new SpeechSynthesisUtterance("\n");
+  let msg = new SpeechSynthesisUtterance("\n");
   msg.lang = GT.localeString;
   window.speechSynthesis.speak(msg);
 }
@@ -12111,9 +12089,9 @@ function setPins()
   GT.colorLeafletQPins = {};
   GT.colorLeafletQPins.worked = {};
   GT.colorLeafletQPins.confirmed = {};
-  for (var i = 0; i < GT.colorBands.length; i++)
+  for (let i = 0; i < GT.colorBands.length; i++)
   {
-    var pin = new ol.style.Icon({
+    let pin = new ol.style.Icon({
       src: "img/pin/" + GT.colorBands[i] + ".png",
       anchorYUnits: "pixels",
       anchorXUnits: "pixels",
@@ -12315,10 +12293,10 @@ function loadAdifSettings()
     selectTQSLButton.style.display = "none";
   }
 
-  for (var key in GT.settings.adifLog.menu)
+  for (let key in GT.settings.adifLog.menu)
   {
-    var value = GT.settings.adifLog.menu[key];
-    var where = key + "Div";
+    let value = GT.settings.adifLog.menu[key];
+    let where = key + "Div";
     if (document.getElementById(key) != null)
     {
       document.getElementById(key).checked = value;
@@ -12336,11 +12314,11 @@ function loadAdifSettings()
       delete GT.settings.adifLog.menu[key];
     }
   }
-  for (var key in GT.settings.adifLog.startup)
+  for (let key in GT.settings.adifLog.startup)
   {
     if (document.getElementById(key) != null) { document.getElementById(key).checked = GT.settings.adifLog.startup[key]; }
   }
-  for (var key in GT.settings.adifLog.nickname)
+  for (let key in GT.settings.adifLog.nickname)
   {
     if (document.getElementById(key) != null)
     {
@@ -12358,7 +12336,7 @@ function loadAdifSettings()
       }
     }
   }
-  for (var key in GT.settings.adifLog.text)
+  for (let key in GT.settings.adifLog.text)
   {
     if (document.getElementById(key) != null)
     {
@@ -12366,7 +12344,7 @@ function loadAdifSettings()
       ValidateText(document.getElementById(key));
     }
   }
-  for (var key in GT.settings.adifLog.qsolog)
+  for (let key in GT.settings.adifLog.qsolog)
   {
     if (document.getElementById(key) != null)
     {
@@ -12519,8 +12497,8 @@ function postInit()
     displayTimezones();
 
     section = "inputRanges";
-    var x = document.querySelectorAll("input[type='range']");
-    for (var i = 0; i < x.length; i++)
+    let x = document.querySelectorAll("input[type='range']");
+    for (let i = 0; i < x.length; i++)
     {
       if (x[i].title.length > 0) x[i].title += "\n";
       x[i].title += "(Use Arrow Keys For Smaller Increments)";
@@ -12638,7 +12616,7 @@ function buttonPanelInit()
   if (GT.settings.app.buttonPanelOrder.length > 0)
   {
     // First make sure that all the saved buttons exist.
-    var i = GT.settings.app.buttonPanelOrder.length;
+    let i = GT.settings.app.buttonPanelOrder.length;
     while (i--)
     {
       if (document.getElementById(GT.settings.app.buttonPanelOrder[i]) == null)
@@ -12770,7 +12748,7 @@ function startupEngine()
 {
   if (GT.startupTable.length > 0)
   {
-    var funcInfo = GT.startupTable.shift();
+    let funcInfo = GT.startupTable.shift();
     funcInfo[0] && funcInfo[0]();
     startupStatusDiv.innerHTML = funcInfo[1];
     nodeTimers.setTimeout(startupEngine, 100);
@@ -12860,8 +12838,8 @@ function encodeQINT32(byteArray, offset, value)
 
 function decodeQUINT64(byteArray)
 {
-  var value = 0;
-  for (var i = 0; i < 8; i++)
+  let value = 0;
+  for (let i = 0; i < 8; i++)
   {
     value = value * 256 + byteArray[i];
   }
@@ -12871,13 +12849,13 @@ function decodeQUINT64(byteArray)
 
 function encodeQUINT64(byteArray, offset, value)
 {
-  var breakOut = Array();
-  for (var i = 0; i < 8; i++)
+  let breakOut = Array();
+  for (let i = 0; i < 8; i++)
   {
     breakOut[i] = value & 0xff;
     value >>= 8;
   }
-  for (var i = 0; i < 8; i++)
+  for (let i = 0; i < 8; i++)
   {
     offset = encodeQBOOL(byteArray, offset, breakOut[7 - i]);
   }
@@ -12886,8 +12864,8 @@ function encodeQUINT64(byteArray, offset, value)
 
 function decodeQUTF8(byteArray)
 {
-  var utf8_len = decodeQUINT32(byteArray);
-  var result = "";
+  let utf8_len = decodeQUINT32(byteArray);
+  let result = "";
   byteArray = byteArray.slice(GT.qtToSplice);
   if (utf8_len == 0xffffffff) utf8_len = 0;
   else result = byteArray.slice(0, utf8_len);
@@ -12898,7 +12876,7 @@ function decodeQUTF8(byteArray)
 function encodeQUTF8(byteArray, offset, value)
 {
   offset = encodeQUINT32(byteArray, offset, value.length);
-  var wrote = byteArray.write(value, offset, value.length);
+  let wrote = byteArray.write(value, offset, value.length);
   return wrote + offset;
 }
 
@@ -13089,7 +13067,7 @@ function updateWsjtxListener(port)
       sendForwardUdpMessage(message, message.length);
     }
 
-    var newMessage = {};
+    let newMessage = {};
     newMessage.magic_key = decodeQUINT32(message);
     message = message.slice(GT.qtToSplice);
     if (newMessage.magic_key == 0xadbccbda)
@@ -13101,13 +13079,13 @@ function updateWsjtxListener(port)
       newMessage.Id = decodeQUTF8(message);
       message = message.slice(GT.qtToSplice);
 
-      var instanceId = newMessage.Id;
+      let instanceId = newMessage.Id;
       if (!(instanceId in GT.instances))
       {
         addNewInstance(instanceId);
         GT.instanceCount++;
       }
-      var notify = false;
+      let notify = false;
       if (GT.instances[instanceId].open == false) notify = true;
       GT.instances[instanceId].open = true;
       GT.instances[instanceId].remote = remote;
@@ -13498,9 +13476,9 @@ function continueWithLookup(callsign, gridPass)
   }
   else
   {
-    var dxcc = callsignToDxcc(callsign);
-    var where;
-    var ccode = 0;
+    let dxcc = callsignToDxcc(callsign);
+    let where;
+    let ccode = 0;
     if (dxcc in GT.dxccToAltName)
     {
       where = GT.dxccToAltName[dxcc];
@@ -13520,7 +13498,7 @@ function continueWithLookup(callsign, gridPass)
     }
     else
     {
-      var worker =
+      let worker =
         "<center>" + I18N("gt.callookDX1") +
           "<br>" + I18N("gt.callookDX2") +
           "<br>" + I18N("gt.callookDX3") + "<br>";
@@ -13647,12 +13625,12 @@ function GetSessionID(resultTd, useCache)
 
 function hamQthGetSessionCallback(buffer, resultTd)
 {
-  var oParser = new DOMParser();
-  var oDOM = oParser.parseFromString(buffer, "text/xml");
-  var result = "";
+  let oParser = new DOMParser();
+  let oDOM = oParser.parseFromString(buffer, "text/xml");
+  let result = "";
   if (oDOM != null)
   {
-    var json = XML2jsobj(oDOM.documentElement);
+    let json = XML2jsobj(oDOM.documentElement);
     if (json.hasOwnProperty("session"))
     {
       if (json.session.hasOwnProperty("session_id"))
@@ -13691,12 +13669,12 @@ function hamQthGetSessionCallback(buffer, resultTd)
 
 function qrzGetSessionCallback(buffer, resultTd, useCache)
 {
-  var oParser = new DOMParser();
-  var oDOM = oParser.parseFromString(buffer, "text/xml");
-  var result = "";
+  let oParser = new DOMParser();
+  let oDOM = oParser.parseFromString(buffer, "text/xml");
+  let result = "";
   if (oDOM != null)
   {
-    var json = XML2jsobj(oDOM.documentElement);
+    let json = XML2jsobj(oDOM.documentElement);
     if (json.hasOwnProperty("Session"))
     {
       if (json.Session.hasOwnProperty("Key"))
@@ -13792,12 +13770,12 @@ function GetLookup(useCache)
 
 function qthHamLookupResults(buffer, gridPass, useCache)
 {
-  var oParser = new DOMParser();
-  var oDOM = oParser.parseFromString(buffer, "text/xml");
-  var result = "";
+  let oParser = new DOMParser();
+  let oDOM = oParser.parseFromString(buffer, "text/xml");
+  let result = "";
   if (oDOM != null)
   {
-    var json = XML2jsobj(oDOM.documentElement);
+    let json = XML2jsobj(oDOM.documentElement);
     if (json.hasOwnProperty("search"))
     {
       if (gridPass) json.search.gtGrid = gridPass;
@@ -13826,15 +13804,15 @@ function qthHamLookupResults(buffer, gridPass, useCache)
 
 function qrzLookupResults(buffer, gridPass, useCache)
 {
-  var oParser = new DOMParser();
-  var oDOM = oParser.parseFromString(buffer, "text/xml");
-  var result = "";
+  let oParser = new DOMParser();
+  let oDOM = oParser.parseFromString(buffer, "text/xml");
+  let result = "";
   if (oDOM != null)
   {
-    var json = XML2jsobj(oDOM.documentElement);
+    let json = XML2jsobj(oDOM.documentElement);
     if (json.hasOwnProperty("Callsign"))
     {
-      var call = "";
+      let call = "";
       if (json.Callsign.hasOwnProperty("callsign"))
       {
         json.Callsign.call = lookup.callsign;
@@ -14667,7 +14645,7 @@ function createSpot(report, key, fromPoint, addToLayer = true)
 {
   try
   {
-    var LL = squareToCenter(report.grid);
+    let LL = squareToCenter(report.grid);
 
     if (isNaN(LL.a))
     {
@@ -14675,17 +14653,17 @@ function createSpot(report, key, fromPoint, addToLayer = true)
       return;
     }
 
-    var spot = spotFeature([LL.o, LL.a]);
+    let spot = spotFeature([LL.o, LL.a]);
 
-    var colorNoAlpha = "#" + GT.bandToColor[report.band];
-    var colorAlpha = intAlphaToRGB(colorNoAlpha, report.color);
-    var spotColor = colorAlpha;
+    let colorNoAlpha = "#" + GT.bandToColor[report.band];
+    let colorAlpha = intAlphaToRGB(colorNoAlpha, report.color);
+    let spotColor = colorAlpha;
 
-    var workingColor = GT.settings.map.nightMapEnable && GT.nightTime ? GT.settings.reception.pathNightColor : GT.settings.reception.pathColor;
+    let workingColor = GT.settings.map.nightMapEnable && GT.nightTime ? GT.settings.reception.pathNightColor : GT.settings.reception.pathColor;
 
     if (workingColor != -1)
     {
-      var testColor = workingColor < 1 ? "#0000000" : workingColor == 361 ? "#FFFFFF" : "hsla(" + workingColor + ", 100%, 50%," + report.color / 255 + ")";
+      let testColor = workingColor < 1 ? "#0000000" : workingColor == 361 ? "#FFFFFF" : "hsla(" + workingColor + ", 100%, 50%," + report.color / 255 + ")";
       if (workingColor < 1 || workingColor == 361)
       {
         spotColor = intAlphaToRGB(testColor.substr(0, 7), report.color);
@@ -14711,11 +14689,11 @@ function createSpot(report, key, fromPoint, addToLayer = true)
     spot.size = 6; // Mouseover detection
     GT.layerSources.pskSpots.addFeature(spot);
 
-    var toPoint = ol.proj.fromLonLat([LL.o, LL.a]);
+    let toPoint = ol.proj.fromLonLat([LL.o, LL.a]);
 
-    var lonLat = new ol.geom.Point(toPoint);
+    let lonLat = new ol.geom.Point(toPoint);
 
-    var pointFeature = new ol.Feature({
+    let pointFeature = new ol.Feature({
       geometry: lonLat,
       weight: report.color / 255 // e.g. temperature
     });
@@ -14729,9 +14707,9 @@ function createSpot(report, key, fromPoint, addToLayer = true)
 
     if (GT.settings.reception.spotWidth > 0)
     {
-      var strokeWeight = GT.settings.reception.spotWidth;
+      let strokeWeight = GT.settings.reception.spotWidth;
 
-      var flightColor =
+      let flightColor =
         workingColor == -1
           ? colorNoAlpha + "BB"
           : GT.settings.map.nightMapEnable && GT.nightTime
@@ -14758,23 +14736,23 @@ function createSpot(report, key, fromPoint, addToLayer = true)
 
 function redrawSpots()
 {
-  var shouldSave = false;
-  var now = timeNowSec();
+  let shouldSave = false;
+  let now = timeNowSec();
   GT.spotTotalCount = 0;
   GT.layerSources.pskSpots.clear();
   GT.layerSources.pskFlights.clear();
   GT.layerSources.pskHop.clear();
   GT.layerSources.pskHeat.clear();
 
-  var fromPoint = getPoint(GT.settings.app.myRawGrid);
+  let fromPoint = getPoint(GT.settings.app.myRawGrid);
 
   if (GT.settings.reception.mergeSpots == false)
   {
-    var spot = iconFeature(fromPoint, GT.gtFlagIcon, 100, "homeFlag");
+    let spot = iconFeature(fromPoint, GT.gtFlagIcon, 100, "homeFlag");
     GT.layerSources.pskSpots.addFeature(spot);
   }
 
-  for (var key in GT.receptionReports.spots)
+  for (let key in GT.receptionReports.spots)
   {
     report = GT.receptionReports.spots[key];
 
@@ -14826,7 +14804,7 @@ function mapTransChange()
 function spotPathChange()
 {
   GT.settings.reception.pathColor = spotPathColorValue.value;
-  var pathColor = GT.settings.reception.pathColor < 1
+  let pathColor = GT.settings.reception.pathColor < 1
     ? "#000"
     : GT.settings.reception.pathColor == 361
       ? "#FFF"
@@ -14853,7 +14831,7 @@ function spotPathChange()
         : "hsla(" + GT.settings.reception.pathColor + ", 100%, 50%,0.73)";
 
   GT.settings.reception.pathNightColor = spotNightPathColorValue.value;
-  var pathNightColor =
+  let pathNightColor =
     GT.settings.reception.pathNightColor < 1
       ? "#000"
       : GT.settings.reception.pathNightColor == 361
@@ -14965,7 +14943,7 @@ function updateSpottingViews()
   {
     if (GT.settings.reception.mergeSpots == false)
     {
-      for (var key in GT.layerVectors)
+      for (let key in GT.layerVectors)
       {
         GT.layerVectors[key].setVisible(false);
       }
@@ -15110,7 +15088,7 @@ function createPredSource()
 
 function createPredLayer()
 {
-  var layerVector = new ol.layer.Tile({
+  let layerVector = new ol.layer.Tile({
     source: createPredSource(),
     opacity: Number(GT.settings.map.predOpacity),
     visible: true,
@@ -15144,9 +15122,9 @@ function displayPredLayer()
   if (GT.settings.map.predMode > 0 && GT.settings.map.offlineMode == false)
   {
     predDiv.style.display = (GT.settings.map.predLegend) ? "" : "none";
-    for (var viewIndex in GT.predViews)
+    for (let viewIndex in GT.predViews)
     {
-      for (var html in GT.predViews[viewIndex])
+      for (let html in GT.predViews[viewIndex])
       {
         GT.predViews[viewIndex][html].style.display = viewIndex == GT.settings.map.predMode ? "" : "none";
       }

@@ -214,7 +214,7 @@ function onAdiLoadComplete(task)
           if (finalGrid)
           {
             qso.grid = finalGrid;
-            qso.field = finalGrid.substring(0, 2);
+            // qso.field = finalGrid.substring(0, 2);
           }
   
           let finalRSTsent = (object.RST_SENT || null);
@@ -684,7 +684,7 @@ function parseAcLog(task)
           if (finalGrid)
           {
             qso.grid = finalGrid;
-            qso.field = finalGrid.substring(0, 2);
+            // qso.field = finalGrid.substring(0, 2);
           }
   
           let finalRSTsent = (object.RSTS || null);

@@ -212,7 +212,7 @@ function initQSOdata()
 
   GT.tracker.worked.call = {};
   GT.tracker.worked.grid = {};
-  GT.tracker.worked.field = {};
+  // GT.tracker.worked.field = {};
   GT.tracker.worked.dxcc = {};
   GT.tracker.worked.cqz = {};
   GT.tracker.worked.dxm = {};
@@ -225,7 +225,7 @@ function initQSOdata()
 
   GT.tracker.confirmed.call = {};
   GT.tracker.confirmed.grid = {};
-  GT.tracker.confirmed.field = {};
+  // GT.tracker.confirmed.field = {};
   GT.tracker.confirmed.dxcc = {};
   GT.tracker.confirmed.cqz = {};
   GT.tracker.confirmed.dxm = {};
@@ -264,20 +264,20 @@ function trackQSO(details, currentYear, currentDay)
     GT.tracker.worked.grid[fourGrid + details.band] = true;
     GT.tracker.worked.grid[fourGrid + details.band + details.mode] = true;
 
-    let field = fourGrid.substring(0, 2);
+    /* let field = fourGrid.substring(0, 2);
 
     GT.tracker.worked.field[field] = true;
     GT.tracker.worked.field[field + details.mode] = true;
     GT.tracker.worked.field[field + details.band] = true;
-    GT.tracker.worked.field[field + details.band + details.mode] = true;
+    GT.tracker.worked.field[field + details.band + details.mode] = true; */
 
     if (isDigi == true)
     {
       GT.tracker.worked.grid[fourGrid + "dg"] = true;
       GT.tracker.worked.grid[fourGrid + details.band + "dg"] = true;
 
-      GT.tracker.worked.field[field + "dg"] = true;
-      GT.tracker.worked.field[field + details.band + "dg"] = true;
+      /* GT.tracker.worked.field[field + "dg"] = true;
+      GT.tracker.worked.field[field + details.band + "dg"] = true; */
     }
   }
 
