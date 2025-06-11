@@ -693,11 +693,14 @@ function parseAcLog(task)
           let finalRSTrecv = (object.RSTR || null);
           if (finalRSTrecv) qso.RSTrecv = finalRSTrecv;
 
-          let finalBand = (object.BAND || "").toLowerCase() + "m";
-          if (finalBand == "m" || finalBand == "oob")
+          let finalBand = (object.BAND || "").toLowerCase();
+          // Check mapping
+          if (finalBand in GT.acLogBandMap)
           {
-            finalBand = formatBand(Number(object.FREQUENCY || 0));
+            finalBand = GT.acLogBandMap[finalBand];
           }
+          if (finalBand == "") finalBand = formatBand(Number(object.FREQUENCY || 0));
+
           qso.band = finalBand;
 
           let finalPropMode = (object.PROPMODE || null);

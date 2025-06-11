@@ -140,8 +140,25 @@ function loadZoomCallback(zoom)
 
 function onZoomControlDown(event)
 {
+  if (event.metaKey && event.code == "KeyQ")
+  {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    if (isGT == true)
+    {
+      saveAndCloseApp(false);
+      window.close();
+      return;
+    }
+
+    window.opener.saveAndCloseApp(false);
+    window.opener.window.close();
+    return;
+  }
   if (event.ctrlKey || event.altKey)
   {
+
     if (event.code in g_zoomKeys)
     {
       g_zoomKeys[event.code](event);
