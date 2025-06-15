@@ -161,6 +161,8 @@ GT.myDXGrid = "";
 GT.speechAvailable = false;
 GT.receptionReports = { spots: {} };
 GT.acknowledgedCalls = {};
+GT.worldVhfActivity = {};
+GT.worldVhfActivityTimestamp = 0;
 GT.flightDuration = 30;
 GT.crScript = GT.settings.app.crScript;
 GT.spotView = GT.settings.app.spotView;
@@ -2280,35 +2282,18 @@ function openPrint()
 function toggleMoon()
 {
   GT.settings.app.moonTrack ^= 1;
-
-  if (GT.settings.app.moonTrack == 1)
-  {
-    moonLayer.show();
-  }
-  else
-  {
-    moonLayer.hide();
-  }
+  (GT.settings.app.moonTrack == 1) ? moonLayer.show() : moonLayer.hide();
 }
 
 function toggleFullscreen()
 {
-  if (document.fullscreenElement == null)
-  {
-    mainBody.requestFullscreen();
-  }
-  else
-  {
-    document.exitFullscreen();
-  }
+  (document.fullscreenElement == null) ?  mainBody.requestFullscreen() : document.exitFullscreen();
 }
 
 function toggleMenu()
 {
-  if (GT.menuShowing == false) collapseMenu(false);
-  else collapseMenu(true);
+  (GT.menuShowing == false) ? collapseMenu(false) : collapseMenu(true);
 }
-
 
 function toggleHelp()
 {
@@ -3848,81 +3833,37 @@ function clearQsoGrids()
 
   GT.qsoGrids = {};
 
-  for (let key in GT.dxccInfo)
+  for (const key in GT.dxccInfo)
   {
-    GT.dxccInfo[key].worked = false;
-    GT.dxccInfo[key].confirmed = false;
-    GT.dxccInfo[key].worked_bands = {};
-    GT.dxccInfo[key].confirmed_bands = {};
-    GT.dxccInfo[key].worked_modes = {};
-    GT.dxccInfo[key].confirmed_modes = {};
+    clearWorkingObject(GT.dxccInfo[key]);
   }
-  for (let key in GT.cqZones)
+  for (const key in GT.cqZones)
   {
-    GT.cqZones[key].worked = false;
-    GT.cqZones[key].confirmed = false;
-
-    GT.cqZones[key].worked_bands = {};
-    GT.cqZones[key].confirmed_bands = {};
-    GT.cqZones[key].worked_modes = {};
-    GT.cqZones[key].confirmed_modes = {};
+    clearWorkingObject(GT.cqZones[key]);
   }
-  for (let key in GT.ituZones)
+  for (const key in GT.ituZones)
   {
-    GT.ituZones[key].worked = false;
-    GT.ituZones[key].confirmed = false;
-
-    GT.ituZones[key].worked_bands = {};
-    GT.ituZones[key].confirmed_bands = {};
-    GT.ituZones[key].worked_modes = {};
-    GT.ituZones[key].confirmed_modes = {};
+    clearWorkingObject(GT.ituZones[key]);
   }
-  for (let key in GT.wasZones)
+  for (const key in GT.wasZones)
   {
-    GT.wasZones[key].worked = false;
-    GT.wasZones[key].confirmed = false;
-
-    GT.wasZones[key].worked_bands = {};
-    GT.wasZones[key].confirmed_bands = {};
-    GT.wasZones[key].worked_modes = {};
-    GT.wasZones[key].confirmed_modes = {};
+    clearWorkingObject(GT.wasZones[key]);
   }
-  for (let key in GT.wacpZones)
+  for (const key in GT.wacpZones)
   {
-    GT.wacpZones[key].worked = false;
-    GT.wacpZones[key].confirmed = false;
-
-    GT.wacpZones[key].worked_bands = {};
-    GT.wacpZones[key].confirmed_bands = {};
-    GT.wacpZones[key].worked_modes = {};
-    GT.wacpZones[key].confirmed_modes = {};
+    clearWorkingObject(GT.wacpZones[key]);
   }
-  for (let key in GT.wacZones)
+  for (const key in GT.wacZones)
   {
-    GT.wacZones[key].worked = false;
-    GT.wacZones[key].confirmed = false;
-    GT.wacZones[key].worked_bands = {};
-    GT.wacZones[key].confirmed_bands = {};
-    GT.wacZones[key].worked_modes = {};
-    GT.wacZones[key].confirmed_modes = {};
+    clearWorkingObject(GT.wacZones[key])
   }
-  for (let key in GT.countyData)
+  for (const key in GT.countyData)
   {
-    GT.countyData[key].worked = false;
-    GT.countyData[key].confirmed = false;
-    GT.countyData[key].worked_bands = {};
-    GT.countyData[key].confirmed_bands = {};
-    GT.countyData[key].worked_modes = {};
-    GT.countyData[key].confirmed_modes = {};
+    clearWorkingObject(GT.countyData[key]);
   }
-  for (let key in GT.us48Data)
+  for (const key in GT.us48Data)
   {
-    GT.us48Data[key].worked = false;
-    GT.us48Data[key].confirmed = false;
-    GT.us48Data[key].worked_bands = {};
-    GT.us48Data[key].confirmed_bands = {};
-    GT.us48Data[key].worked_modes = {};
-    GT.us48Data[key].confirmed_modes = {};
+    clearWorkingObject(GT.us48Data[key]);
   }
 }
 
@@ -4087,13 +4028,14 @@ function timeNowSec()
   return parseInt(Date.now() / 1000);
 }
 
-function createGlobalHeatmapLayer(name, blur, radius)
+function createGlobalHeatmapLayer(name, blur, radius, gradient = ['#00f', '#0ff', '#0f0', '#ff0', '#f00'])
 {
   GT.layerSources[name] = new ol.source.Vector({});
   GT.layerVectors[name] = new ol.layer.Heatmap({
     source: GT.layerSources[name],
     blur: blur,
     radius: radius,
+    gradient: gradient,
     zIndex: Object.keys(GT.layerVectors).length + 1
   });
   GT.layerVectors[name].set("name", name);
@@ -4582,6 +4524,7 @@ function renderMap()
 
   createGlobalMapLayer("rangeRings");
   createGlobalMapLayer("award");
+  createGlobalHeatmapLayer("baHeat", 20, 18, ['#f00', '#ff0' ,'#0f0',  '#0ff',  '#00f']);
   createGlobalHeatmapLayer("pskHeat", 20, 15);
   createGlobalMapLayer("qso");
   createGlobalMapLayer("qsoPins");
@@ -4590,6 +4533,7 @@ function renderMap()
   createGlobalMapLayer("lineGrids");
   createGlobalMapLayer("longGrids", 4500);
   createGlobalMapLayer("bigGrids", 50000, 4501);
+  createGlobalMapLayer("baFlight");
   createGlobalMapLayer("pskFlights");
   createGlobalMapLayer("pskSpots");
   createGlobalMapLayer("pskHop");
@@ -4624,6 +4568,7 @@ function renderMap()
       GT.shadowVector,
       GT.layerVectors.rangeRings,
       GT.layerVectors.award,
+      GT.layerVectors.baHeat,
       GT.layerVectors.pskHeat,
       GT.layerVectors.qso,
       GT.layerVectors.qsoPins,
@@ -4632,6 +4577,7 @@ function renderMap()
       GT.layerVectors.lineGrids,
       GT.layerVectors.longGrids,
       GT.layerVectors.bigGrids,
+      GT.layerVectors.baFlight,
       GT.layerVectors.pskFlights,
       GT.layerVectors.pskSpots,
       GT.layerVectors.pskHop,
@@ -4871,7 +4817,7 @@ function lineString(points, count)
   if (GT.useTransform)
   {
     let line = lineGeometry(points, count);
-    let thing = new ol.geom.LineString(line);
+    thing = new ol.geom.LineString(line);
   }
   else
   {
@@ -5411,6 +5357,7 @@ function handleInstanceStatus(newMessage)
         nodeTimers.clearInterval(GT.pskBandActivityTimerHandle);
         GT.pskBandActivityTimerHandle = null;
       }
+      //nodeTimers.setTimeout(renderWorldBandActivity, 1000);
     }
     if (GT.lastMode != GT.settings.app.myMode)
     {
@@ -6168,13 +6115,10 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
 
             if (strokeWeight != 0)
             {
-              let fromPoint = getPoint(callsign.grid);
-              let toPoint = getPoint(DEcallsign.grid);
-
               try
               {
                 flightPath = flightFeature(
-                  [fromPoint, toPoint],
+                  [getPoint(callsign.grid), getPoint(DEcallsign.grid)],
                   {
                     weight: strokeWeight,
                     color: strokeColor,
@@ -6193,7 +6137,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
               }
               catch (err)
               {
-                console.error("Unexpected error inside handleWsjtxDecode 1", err)
+               // console.error("Unexpected error inside handleWsjtxDecode 1", err)
               }
             }
           }
@@ -6208,16 +6152,10 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
  
           if (strokeWeight != 0 && GT.settings.app.myGrid.length > 0)
           {
-            let toPoint = getPoint(GT.settings.app.myGrid);
-
-            let Lat = GT.dxccInfo[callsign.dxcc].lat;
-            let Lon = GT.dxccInfo[callsign.dxcc].lon;
-            let fromPoint = ol.proj.fromLonLat([Lon, Lat]);
-
             try
             {
               flightPath = flightFeature(
-                [fromPoint, toPoint],
+                [ol.proj.fromLonLat([ GT.dxccInfo[callsign.dxcc].lon, GT.dxccInfo[callsign.dxcc].lat]), getPoint(GT.settings.app.myGrid)],
                 {
                   weight: strokeWeight,
                   color: strokeColor,
@@ -10162,16 +10100,7 @@ function pskBandActivityCallback(buffer, flag)
 
   renderBandActivity();
 }
-/* FIXME ******************************************************************************
-   Should we somewhere in settings, have a checkbox to enable / disable PSK spots
-   specifically? We can disable the overall spots, both PSK and OAMS, and OAMS has a
-   checkbox in the OAMS tab. I'm thinking for the situation where I only want to
-   pull in OAMS spots and not PSK reporter's spots.
 
-   Answer: this the Band Activity, not PSK Spots, different API. But we can revisit as
-   we now have OAMS Band Activity - Tag
-   ************************************************************************************
-*/
 function pskGetBandActivity()
 {
   if (GT.settings.map.offlineMode == true || GT.settings.map.offAirServicesEnable == false || GT.settings.map.oamsBandActivity == false) return;
@@ -10950,6 +10879,24 @@ function selectElementContents(el)
   }
 }
 
+function createWorkingObject(name)
+{
+  let workingObject = {};
+  workingObject.name = name;
+  clearWorkingObject(workingObject);
+  return workingObject;
+}
+
+function clearWorkingObject(workingObject)
+{
+  workingObject.worked = false;
+  workingObject.confirmed = false;
+  workingObject.worked_bands = {};
+  workingObject.confirmed_bands = {};
+  workingObject.worked_modes = {};
+  workingObject.confirmed_modes = {};
+}
+
 function loadMaidenHeadData()
 {
   GT.dxccInfo = require(GT.dxccInfoPath);
@@ -11029,15 +10976,8 @@ function loadMaidenHeadData()
 
     if (!(cnty in GT.cntyToCounty)) { GT.cntyToCounty[cnty] = toProperCase(countyData[id].properties.n); }
 
-    GT.countyData[cnty] = {};
+    GT.countyData[cnty] = createWorkingObject(cnty);
     GT.countyData[cnty].geo = countyData[id];
-    GT.countyData[cnty].worked = false;
-    GT.countyData[cnty].confirmed = false;
-
-    GT.countyData[cnty].worked_bands = {};
-    GT.countyData[cnty].confirmed_bands = {};
-    GT.countyData[cnty].worked_modes = {};
-    GT.countyData[cnty].confirmed_modes = {};
 
     for (let x in countyData[id].properties.z)
     {
@@ -11077,15 +11017,7 @@ function loadMaidenHeadData()
       for (let mh in GT.dxccInfo[key].mh)
       {
         let sqr = GT.dxccInfo[key].mh[mh];
-
-        GT.us48Data[sqr] = {};
-        GT.us48Data[sqr].name = sqr;
-        GT.us48Data[sqr].worked = false;
-        GT.us48Data[sqr].confirmed = false;
-        GT.us48Data[sqr].worked_bands = {};
-        GT.us48Data[sqr].confirmed_bands = {};
-        GT.us48Data[sqr].worked_modes = {};
-        GT.us48Data[sqr].confirmed_modes = {};
+        GT.us48Data[sqr] = createWorkingObject(sqr);
       }
     }
   }
@@ -11102,16 +11034,8 @@ function loadMaidenHeadData()
 
       if (shapeKey in GT.shapeData)
       {
-        GT.wasZones[name] = {};
-        GT.wasZones[name].name = GT.StateData[key].name;
+        GT.wasZones[name] = createWorkingObject(GT.StateData[key].name);
         GT.wasZones[name].geo = GT.shapeData[shapeKey];
-        GT.wasZones[name].worked = false;
-        GT.wasZones[name].confirmed = false;
-
-        GT.wasZones[name].worked_bands = {};
-        GT.wasZones[name].confirmed_bands = {};
-        GT.wasZones[name].worked_modes = {};
-        GT.wasZones[name].confirmed_modes = {};
       }
     }
     else if (key.substr(0, 3) == "CA-")
@@ -11121,16 +11045,8 @@ function loadMaidenHeadData()
 
       if (shapeKey in GT.shapeData)
       {
-        GT.wacpZones[name] = {};
-        GT.wacpZones[name].name = GT.StateData[key].name;
+        GT.wacpZones[name] = createWorkingObject(GT.StateData[key].name)
         GT.wacpZones[name].geo = GT.shapeData[shapeKey];
-        GT.wacpZones[name].worked = false;
-        GT.wacpZones[name].confirmed = false;
-
-        GT.wacpZones[name].worked_bands = {};
-        GT.wacpZones[name].confirmed_bands = {};
-        GT.wacpZones[name].worked_modes = {};
-        GT.wacpZones[name].confirmed_modes = {};
       }
     }
   }
@@ -11140,16 +11056,8 @@ function loadMaidenHeadData()
     if (GT.shapeData[key].properties.type == "Continent")
     {
       let name = GT.shapeData[key].properties.name;
-      GT.wacZones[name] = {};
+      GT.wacZones[name] = createWorkingObject(name);
       GT.wacZones[name].geo = GT.shapeData[key];
-
-      GT.wacZones[name].worked = false;
-      GT.wacZones[name].confirmed = false;
-
-      GT.wacZones[name].worked_bands = {};
-      GT.wacZones[name].confirmed_bands = {};
-      GT.wacZones[name].worked_modes = {};
-      GT.wacZones[name].confirmed_modes = {};
     }
   }
 
@@ -12538,6 +12446,8 @@ function postInit()
     nodeTimers.setInterval(refreshSpotsNoTx, 300000); // Redraw spots every 5 minutes, this clears old ones
     nodeTimers.setTimeout(downloadCtyDat, 120000);    // In 2 minutes, when the dust settles
     nodeTimers.setTimeout(checkForNewVersion, 30000); // Informative check
+
+    //nodeTimers.setTimeout(downloadWorldVhfActivity, 2000);
   }
   catch (e)
   {
@@ -15326,4 +15236,119 @@ function updateByBandMode()
   }
 
   setVisualHunting();
+}
+
+function downloadWorldVhfActivity()
+{
+  if (GT.settings.map.offlineMode == false)
+  {
+    getBuffer(
+      "https://tagloomis.com/oams_muf/vhf.json",
+      processWorldVhfActivity,
+      null,
+      "https",
+      443
+    );
+  }
+
+  nodeTimers.setTimeout(downloadWorldVhfActivity, 60000);
+}
+
+function processWorldVhfActivity(buffer, flag)
+{
+  let valid = false;
+  try
+  {
+    GT.worldVhfActivity = JSON.parse(buffer);
+
+    if (GT.worldVhfActivityTimestamp != GT.worldVhfActivity.t)
+    {
+      GT.worldVhfActivityTimestamp = GT.worldVhfActivity.t;
+      valid = true;
+    }
+  }
+  catch (e)
+  {
+
+  }
+
+  if (valid)
+  {
+    nodeTimers.setTimeout(renderWorldBandActivity, 1000);
+  }
+}
+
+function renderWorldBandActivity()
+{
+  let paths = {};
+  let points = {};
+  GT.layerSources.baHeat.clear();
+  GT.layerSources.baFlight.clear();
+
+  for (const band in GT.worldVhfActivity.p)
+  {
+    for (const pipe in GT.worldVhfActivity.p[band])
+    {
+      const grids = GT.worldVhfActivity.p[band][pipe].split("-");
+      // occasionally, we see invalid grids, so rather than test each and every one
+      // we'll try/catch
+      try
+      {
+        (grids.length == 1) ? circleFeatureFromPoint(getPoint(grids[0]),
+              {
+                weight: 1,
+                color: "green",
+                zIndex: 90
+              },
+              "baFlight",
+              false
+            )
+            :  flightFeaturePointToPoint([getPoint(grids[0]), getPoint(grids[1])],
+              {
+                weight: 0.5,
+                color: "purple",
+                steps: 22,
+                zIndex: 90
+              },
+              "baFlight",
+              true
+            );
+      }
+      catch (e)
+      {
+
+      }
+    }
+  }
+
+  for (const band in GT.worldVhfActivity.h)
+  {
+    for (const grid in GT.worldVhfActivity.h[band])
+    {
+      // occasionally, we see invalid grids, so rather than test each and every one
+      // we'll try/catch
+      try
+      {
+        let toPoint = getPoint(grid);
+
+        let lonLat = new ol.geom.Point(toPoint);
+
+        let pointFeature = new ol.Feature({
+          geometry: lonLat,
+          weight: GT.worldVhfActivity.h[band][grid] * 0.01
+        });
+
+        if (GT.useTransform)
+        {
+          pointFeature.getGeometry().transform("EPSG:3857", GT.settings.map.projection);
+        }
+
+        GT.layerSources.baHeat.addFeature(pointFeature);
+      }
+      catch (e)
+      {
+
+      }
+    }
+  }
 }
