@@ -11843,6 +11843,12 @@ function timedGetVoices()
       }
 
       GT.speechAvailable = true;
+
+      console.log(GT.localeString);
+      
+      let msg = new SpeechSynthesisUtterance("\n");
+      msg.lang = GT.localeString;
+      window.speechSynthesis.speak(msg);
     }
     else
     {
@@ -11859,11 +11865,7 @@ function timedGetVoices()
 
 function initSpeech()
 {
-  nodeTimers.setTimeout(timedGetVoices, 5000);
-  
-  let msg = new SpeechSynthesisUtterance("\n");
-  msg.lang = GT.localeString;
-  window.speechSynthesis.speak(msg);
+  nodeTimers.setTimeout(timedGetVoices, 1000);
 }
 
 function initSoundCards()
@@ -12382,40 +12384,29 @@ function postInit()
   let section = "mapViewFilters";
   try
   {
-    console.log(section);
     displayMapViewFilters();
     section = "InitSettingsTabs";
-    console.log(section);
     initSettingsTabs();
     section = "DrawMapLines";
-    console.log(section);
     drawAllGrids();
     drawRangeRings();
     section = "Spots";
-    console.log(section);
     loadReceptionReports();
     redrawSpots();
     section = "UDPListenerForward";
-    console.log(section);
     startForwardListener();
     section = "LastTraffic";
-    console.log(section);
     addLastTraffic("GridTracker2<br>" + gtShortVersion);
     section = "displayRadar";
-    console.log(section);
     displayRadar();
     section = "PredictionInit";
-    console.log(section);
     predInit();
     section = "PredictionLayer";
-    console.log(section);
     displayPredLayer();
     section = "TimezonesLayer";
-    console.log(section);
     displayTimezones();
 
     section = "inputRanges";
-    console.log(section);
     let x = document.querySelectorAll("input[type='range']");
     for (let i = 0; i < x.length; i++)
     {
@@ -12424,48 +12415,34 @@ function postInit()
     }
 
     section = "DataBreakout";
-    console.log(section);
     initPopupWindow();
     section = "StatsWindow";
-    console.log(section);
     openStatsWindow(false);
-    console.log(section);
     section = "LookupWindow";
-    console.log(section);
     openLookupWindow(false);
     section = "BaWindow";
-    console.log(section);
     openBaWindow(false);
     section = "AlertWindow";
-    console.log(section);
     openAlertWindow(false);
     section = "ConditionsWindow";
-    console.log(section);
     openConditionsWindow(false);
     section = "ChatWindow";
-    console.log(section);
     showMessaging(false);
     section = "RosterWindow";
-    console.log(section);
     openCallRosterWindow(false);
     section = "ButtonPanelInit";
-    console.log(section);
     buttonPanelInit();
     projectionImg.style.filter = GT.settings.map.projection == "AEQD" ? "" : "grayscale(1)";
     section = "MouseTrack";
-    console.log(section);
     displayMouseTrack();
     section = "FileSelectorHandles";
-    console.log(section);
     createFileSelectorHandlers();
     section = "registerCutAndPasteContextMenu";
-    console.log(section);
     registerCutAndPasteContextMenu();
     section = "registerLegendContextMenus";
-    console.log(section);
     registerLegendContextMenus();
     section = "SettingTimers";
-    console.log(section);
+
     nodeTimers.setInterval(removeFlightPathsAndDimSquares, 2000); // Every 2 seconds
     nodeTimers.setInterval(downloadCtyDat, 86400000);  // Every 24 hours
     nodeTimers.setInterval(refreshSpotsNoTx, 300000); // Redraw spots every 5 minutes, this clears old ones
@@ -12476,7 +12453,6 @@ function postInit()
   }
   catch (e)
   {
-    console.log("Error in post init: " + section);
     alert("!Init Failed Section!: " + section + "\nPlease report failed section");
   }
 }
