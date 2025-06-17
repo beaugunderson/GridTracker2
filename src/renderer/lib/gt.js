@@ -11844,8 +11844,6 @@ function timedGetVoices()
 
       GT.speechAvailable = true;
 
-      console.log(GT.localeString);
-      
       let msg = new SpeechSynthesisUtterance("\n");
       msg.lang = GT.localeString;
       window.speechSynthesis.speak(msg);
