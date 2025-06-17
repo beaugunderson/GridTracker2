@@ -125,6 +125,7 @@ App: Fixed 7 year old bug in ADIF parsing, big thanks to VE3MSC for this find!
 Call Roster -> Watcher: Fixed display of compound callsign matches in Msg column
 App: Settings -> General: Multiple IPs supported in 'Forwared UDP Messages' (comma separated)
 
+App: Fixed crash on startup on Windows system when no text-2-speech available (Thanks PU8REG)
 Map: Right-Click empty grid info now shows all DXCC grids associated
 Logging: ACLog: Fixed issue with incorrect band info from 70cm and above
 Mac: Cmd-Q now exits the application
