@@ -9628,11 +9628,10 @@ function toggleAlertMute()
 {
   GT.settings.audio.alertMute ^= 1;
   alertMuteImg.src = GT.alertImageArray[GT.settings.audio.alertMute];
-  if (GT.settings.audio.alertMute == 1)
+  if (GT.settings.audio.alertMute == 1 && GT.speechAvailable)
   {
     window.speechSynthesis.cancel();
   }
-  
 }
 
 function togglePushPinMode()
@@ -11842,11 +11841,11 @@ function timedGetVoices()
         alertVoiceInput.value = GT.settings.audio.speechVoice - 1;
       }
 
-      GT.speechAvailable = true;
-
       let msg = new SpeechSynthesisUtterance("\n");
       msg.lang = GT.localeString;
       window.speechSynthesis.speak(msg);
+
+      GT.speechAvailable = true;
     }
     else
     {

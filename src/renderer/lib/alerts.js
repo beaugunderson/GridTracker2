@@ -51,7 +51,7 @@ function playTestFile()
 
 function changeSpeechValues()
 {
-  window.speechSynthesis.cancel();
+  if (GT.speechAvailable) window.speechSynthesis.cancel();
 
   GT.settings.audio.speechVolume = speechVolume.value;
   GT.settings.audio.speechPitch = speechPitch.value;
@@ -658,7 +658,7 @@ function wantedChanged(what)
 {
   if (what.id in GT.activeAudioAlerts.wanted)
   {
-    window.speechSynthesis.cancel();
+    if (GT.speechAvailable) window.speechSynthesis.cancel();
     GT.activeAudioAlerts.wanted[what.id] = what.checked;
     if (GT.activeAudioAlerts.wanted[what.id] == false)
     {
@@ -773,7 +773,7 @@ function huntingValueChanged(element)
 {
   if (GT.callRosterWindowInitialized)
   {
-    window.speechSynthesis.cancel();
+    if (GT.speechAvailable) window.speechSynthesis.cancel();
     let value = (element.type == "checkbox") ? element.checked : element.value;
     GT.callRosterWindowHandle.window.huntingValueChangedFromAudioAlerts(element.id, value);
     setVisualAudioAlerts();
@@ -786,7 +786,7 @@ function huntingValueChanged(element)
 
 function alertRulesValueChanged(element)
 {
-    window.speechSynthesis.cancel();
+    if (GT.speechAvailable) window.speechSynthesis.cancel();
     let value = (element.type == "checkbox") ? element.checked : element.value;
     GT.settings.audioAlerts.rules[element.id] = value;
     GT.callRosterWindowHandle.window.huntingValueChangedFromAudioAlerts(element.id, value);
