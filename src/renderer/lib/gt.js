@@ -14159,7 +14159,7 @@ function displayLookupObject(lookup, gridPass, fromCache = false)
   worker += makeRow("Grid", lookup, "grid", true);
   if (getLookProp(lookup, "gtGrid").length > 0 && getLookProp(lookup, "gtGrid").toUpperCase() != getLookProp(lookup, "grid").toUpperCase())
   {
-    worker += makeRow("GT Grid", lookup, "gtGrid");
+    worker += makeRow("GT Grid", lookup, "gtGrid", true);
   }
 
   worker += makeRow("Born", lookup, "born");
@@ -14232,14 +14232,18 @@ function makeYesNoRow(first, object, key)
   return "";
 }
 
-function makeRow(first, object, key, clip = false)
+function makeRow(first, object, key, grid = false)
 {
   let value = getLookProp(object, key);
   if (value.length > 0)
   {
-    if (clip)
+    if (grid)
     {
-      return ("<tr><td>" + first + "</td><td title='Copy to clipboard' style='cursor:pointer;color:cyan;font-weight: bold;' onClick='addTextToClipboard(\"" + object[key].substr(0, 45) + "\")'>" + object[key].substr(0, 45) + "</td></tr>");
+       // only applies to grid at this point. we want to invert
+       // the background color of the grid cell if new or
+       // unconfirmed and leave as is if confirmed.
+      let style = ((object[key].substr(0, 4) + GT.settings.app.myBand + GT.settings.app.myMode) in GT.tracker.confirmed.grid) ? "color:cyan;background-color:black;" : "color:black;background-color:cyan;";
+      return ("<tr><td>" + first + "</td><td title='Copy to clipboard' style='cursor:pointer;font-weight:bold;" + style + "' onClick='addTextToClipboard(\"" + object[key] + "\")'>" + object[key] + "</td></tr>");
     }
     else
     {
