@@ -823,10 +823,10 @@ table.subtable tr:hover td {
   animation: change-background-red 2s ease infinite;
 }
 
-.oneByOne {
+/* .oneByOne {
   background-clip: content-box;
   box-shadow: 0 0 8px 3px inset #fff;
-}
+} */
 
 .dxCaller {
   background-clip: content-box;

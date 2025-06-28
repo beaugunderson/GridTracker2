@@ -427,12 +427,12 @@ table.rosterTable thead th:first-child {
   box-shadow: inset 0px 11px 6px -8px #555, inset 0px -11px 6px -8px #555;
 }
 
-.oneByOne {
+/* .oneByOne {
   background-clip: content-box;
   box-shadow: 0 0 8px 3px inset #fff;
   background-color: #000;
   color: #ff0;
-}
+} */
 
 .regexMatch {
   background-color: #ffffff;

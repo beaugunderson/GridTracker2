@@ -8,8 +8,7 @@
 		"message-documentation": "qqq"
 	},
     "COMMENT_GridTracker.html": "",
-	"appname-title": "GridTracker2",
-	"appname-sub-title": "An Amateur Radio Companion",
+    "appname-sub-title": "An Amateur Radio Companion",
     "sidebarNoMessages": "waiting for message",
     "sidebarNoDataYet": "...no data yet...",
     "statupStatusDiv": "Initial Startup",

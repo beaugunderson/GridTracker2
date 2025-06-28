@@ -4,6 +4,7 @@ const validSettings = [
   "acLog",
   "adifLog",
   "app",
+  "appLogs",
   "audio",
   "awardTracker",
   "bandActivity",
@@ -29,7 +30,6 @@ const validSettings = [
   "trustedQsl",
   "legendColors",
   "pstrotator",
-
   "defaultsApplied"
 ];
 
@@ -117,7 +117,6 @@ const def_settings = {
     wsjtForwardUdpPort: 2238,
     wsjtIP: "",
     wsjtUdpPort: 0,
-    wsjtLogPath: "",
 
     adifBroadcastEnable: false,
     adifBroadcastPort: 2333,
@@ -136,6 +135,7 @@ const def_settings = {
     logEventMedia: "Ping-coin.mp3",
     buttonPanelOrder: []
   },
+  appLogs: [],
   map: {
     allGridOpacity: 1,
     animate: true,
@@ -220,7 +220,6 @@ const def_settings = {
       buttonPsk24CheckBox: false
     },
     startup: {
-      loadWSJTCheckBox: true,
       loadGTCheckBox: true,
       loadAdifCheckBox: false,
       loadPsk24CheckBox: false,

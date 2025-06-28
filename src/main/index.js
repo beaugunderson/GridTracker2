@@ -23,10 +23,21 @@ const { electronApp, optimizer } = require('@electron-toolkit/utils');
 const path = require('path');
 const { join } = require('path');
 const log = require('electron-log');
-
-const singleInstanceLock = app.requestSingleInstanceLock();
 const isMac = process.platform === 'darwin';
 const disableAutoUpdate = app.commandLine.hasSwitch("disable-auto-updates");
+
+let gtName = "";
+
+if (app.commandLine.hasSwitch("gt-name")) {
+  let appInstance = app.getPath('userData');
+  gtName = slugify(app.commandLine.getSwitchValue("gt-name"));
+  if (gtName.length > 0 ) {
+    app.setPath('userData', appInstance + " - " + gtName);
+  }
+  console.log("Running from: " + app.getPath('userData') + "\r\n");
+}
+
+const singleInstanceLock = app.requestSingleInstanceLock();
 
 if (!singleInstanceLock) {
   app.quit();
@@ -258,6 +269,10 @@ ipcMain.on('getResourcesPath', (event) => {
 
 ipcMain.on('getPath', (event, what) => {
   event.returnValue = app.getPath(what);
+});
+
+ipcMain.on('getAppName', (event) => {
+  event.returnValue = gtName;
 });
 
 ipcMain.on('appVersion', (event) => {
@@ -676,6 +691,14 @@ function padNumber(number, size) {
   }
   return s;
 };
+
+function slugify(string) {
+  return string
+    .trim()
+    .replace(/ +/g, '-')
+    .replace(/[^A-Za-z0-9\-_]/g, '');
+}
+
 
 process.on('uncaughtException', function (error) {
   log.error(error);

@@ -130,6 +130,25 @@ Map: Right-Click empty grid info now shows all DXCC grids associated
 Logging: ACLog: Fixed issue with incorrect band info from 70cm and above
 Mac: Cmd-Q now exits the application
 
+
+
+App: Updated Electron engine to 35.7.0
+
+App: Multiple GridTracker instance support using --gt-name=UniqueName
+
+Logging: WSJT-X source renamed to "App Log(s)" .. all WSJT-X/JTDX log file locations searched at startup
+      (Then disable the ones you don't want to load, this is for multiple GT instance support)
+
+Logging: LoTW: Will now queue failed uploads and retry on next QSO
+
+Logging: Any 1x1 QSO in the US over 15 days not considered worked for hunting purposes
+
+Call Roster: Due to complaints 1x1 US Special Callsign highlighting removed
+      (Use the watcher -> Callsign Regex  ^[KNW][0-9][A-W|Y|Z]$ to replicate)
+
+
+
+
 ### Fixed
 
 

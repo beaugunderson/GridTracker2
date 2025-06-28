@@ -219,11 +219,12 @@ function processRosterHunting(callRoster, rosterSettings)
           }
 
         }
-        // Special Calls
-        if (callObj.DEcall.match("^[A-Z][0-9][A-Z](/w+)?$"))
+
+        // Special Calls, folks complained, so it's out
+        /* if (callObj.DEcall.match("^[A-Z][0-9][A-Z](/w+)?$"))
         {
           callObj.style.call = "class='oneByOne'";
-        }
+        } */
 
         // Entries currently calling or being called by us
         if (callObj.DEcall == GT.instances[callObj.instance].status.DXcall)

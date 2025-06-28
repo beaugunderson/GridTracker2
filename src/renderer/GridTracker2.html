@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </div>
     <div>
       <h1>
-        <div data-i18n="settings.about.AppName">GridTracker2</div>
+        <div id="loadTitle">GridTracker2</div>
       </h1>
     </div>
     <div>
@@ -173,16 +173,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <table align="center">
           <tr>
             <td colspan="2">
-              <div data-i18n="appname-title" class="button" title="Click to hide menu" style="
+              <div id="appTitle" class="button" title="Click to hide menu" style="
                     color: #fff;
                     margin: 0;
                     padding: 0;
                     font-weight: bold;
-                    width: 150px;
+                    width: 160px;
                     padding-top: 2px;
                     border-width: 2px;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
                   " onclick="collapseMenu(true);">
-                GridTracker
+                GridTracker2
               </div>
             </td>
           </tr>
@@ -582,7 +585,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         "
         class="roundBorder"></div>
       <div
-        id="myTooltip"
+       id="myTooltip"
         style="
           -webkit-user-select: text;
           user-select: text;
@@ -951,7 +954,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                   <tr>
                     <td>
                       <div data-i18n="settings.general.ImportSettings.label" 
-                        id="importSettingsButton" class="button" id="importSettingsButton">
+                       id="importSettingsButton" class="button" id="importSettingsButton">
                         Import Settings
                       </div>
                     </td>
@@ -1031,7 +1034,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               <tr>
                 <td data-i18n="settings.logging.pstrotator.label">CatRotator / PstRotator</td>
                 <td>
-                  <input type="checkbox" checked="false" class="inputTextValue" id="pstrotatorCheckBox" onclick="
+                  <input type="checkbox"   class="inputTextValue" id="pstrotatorCheckBox" onclick="
                     ValidateIPaddress(pstrotatorIpInput, this); ValidatePort(pstrotatorPortInput, this, null ); pstrotatorServiceChanged(); " />
                 </td>
               </tr>
@@ -1379,7 +1382,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               <input type="range" min="0" max="2" value="1" step="0.1" class="slider" id="speechPitch"
                 oninput="changeSpeechValues()" />
             </td>
-            <td  id="speechPitchTd">1</td>
+            <td id="speechPitchTd">1</td>
           </tr>
           <tr>
             <td data-i18n="settings.audio.Speech.Volume.label" >Speech Volume</td>
@@ -1387,7 +1390,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               <input type="range" min="0.1" max="1" value="1" step="0.05" class="slider" id="speechVolume"
                 oninput="changeSpeechValues()" />
             </td>
-            <td  id="speechVolumeTd">1</td>
+            <td id="speechVolumeTd">1</td>
           </tr>
           <tr>
             <td data-i18n="settings.audio.Speech.Phonetics.label"
@@ -1502,7 +1505,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <tr>
               <td>
                 <div class="roundBorderValue" style="margin-bottom:5px; width: auto; font-size: larger; font-weight: bold"
-                  id="workingDateString">
+                 id="workingDateString">
                   No Date
                 </div>
               </td>
@@ -1518,7 +1521,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <br />
         <div data-i18n="settings.logbook.apply.label"
           style="padding: 5px; display: none; font-size: larger; font-weight: bold; color: cyan"
-          id="applyCallsignsAndDateDiv" class="button" onclick="applyCallsignsAndDates();"
+         id="applyCallsignsAndDateDiv" class="button" onclick="applyCallsignsAndDates();"
           title="Apply Changes and Re-Import Logbook(s)">
           Apply Changes
         </div>
@@ -1773,7 +1776,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <div class="flexItem">
           <label data-i18n="settings.map.QSXPath.width.label" >QSX Path Width</label>
           <input type="range" min="0.0" max="8" value="1.5" step="0.1" class="slider" id="pathWidthValue" oninput="changePathValues()" />
-          <label  id="pathWidthTd">1.5</label>
+          <label id="pathWidthTd">1.5</label>
         </div>
         <div class="flexItem" id="pathColorDiv">
           <label data-i18n="settings.map.QSXPath.color.label">QSX Path Color</label>
@@ -1850,15 +1853,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <th data-i18n="settings.logging.tableheader.result">Result</th>
           </tr>
           <tr>
-            <td>WSJT-X Log</td>
+            <td>App Log(s)</td>
             <td></td>
             <td></td>
             <td>
-              <input type="checkbox" checked="false" id="loadWSJTCheckBox" onclick="adifStartupCheckBoxChanged(this);" />
+               <div data-i18n="settings.logging.LocalFiles.details.add" class="button" onclick="GT.appLogsFileSelector.click()">Add File</div>
             </td>
             <td>
             </td>
-            <td><div id="wsjtFilePathDiv" class="button" onclick="GT.wsjtLogFileSelector.click()">not set</div></td>
+            <td>
+                <table align="center" class="subtable">
+                  <tr>
+                    <td>
+                      <div id="appLogsFilesDiv"></div>
+                    </td>
+                  </tr>
+                </table>
+            </td>
             <td></td>
             <td></td>
           </tr>
@@ -1867,10 +1878,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td></td>
             <td></td>
             <td>
-              <input type="checkbox" checked="false" id="loadGTCheckBox" onclick="adifStartupCheckBoxChanged(this);" />
+              <input type="checkbox" id="loadGTCheckBox" onclick="adifStartupCheckBoxChanged(this);" />
             </td>
             <td>
-              <input type="checkbox" checked="false" id="logGTqsoCheckBox" onclick="adifLogQsoCheckBoxChanged(this);" />
+              <input type="checkbox" id="logGTqsoCheckBox" onclick="adifLogQsoCheckBoxChanged(this);" />
             </td>
             <td><div onClick="openBackupLogsFolder()" data-i18n="settings.logging.gridtracker.details" class="button">Backup Logs</div></td>
             <td></td>
@@ -1880,10 +1891,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td data-i18n="settings.logging.LocalFiles.source">Local File(s)</td>
             <td></td>
             <td>
-              <input type="checkbox" checked="false" id="buttonAdifCheckBox" onclick="adifMenuCheckBoxChanged(this);" />
+              <input type="checkbox" id="buttonAdifCheckBox" onclick="adifMenuCheckBoxChanged(this);" />
             </td>
             <td>
-              <input type="checkbox" checked="false" id="loadAdifCheckBox"
+              <input type="checkbox" id="loadAdifCheckBox"
                 onclick="adifStartupCheckBoxChanged(this);" />
             </td>
             <td></td>
@@ -1892,7 +1903,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 <table align="center" class="subtable">
                   <tr>
                     <td>
-                      <div data-i18n="settings.logging.LocalFiles.details.add" class="button" id="selectAdifButton">Add File</div>
+                      <div data-i18n="settings.logging.LocalFiles.details.add" class="button" onClick="adifLoadDialog()">Add File</div>
                     </td>
                     <td>
                       <div id="startupLogFileDiv"></div>
@@ -1908,11 +1919,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td data-i18n="settings.logging.PSKReporter.source">PSK-Reporter</td>
             <td></td>
             <td>
-              <input type="checkbox" checked="false" id="buttonPsk24CheckBox"
+              <input type="checkbox" id="buttonPsk24CheckBox"
                 onclick="adifMenuCheckBoxChanged(this);" />
             </td>
             <td>
-              <input type="checkbox" checked="false" id="loadPsk24CheckBox"
+              <input type="checkbox" id="loadPsk24CheckBox"
                 onclick="adifStartupCheckBoxChanged(this);" />
             </td>
             <td></td>
@@ -1926,13 +1937,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td data-i18n="settings.logging.QRZcom.source">QRZ.com</td>
             <td></td>
             <td>
-              <input type="checkbox" checked="false" id="buttonQRZCheckBox" onclick="adifMenuCheckBoxChanged(this);" />
+              <input type="checkbox" id="buttonQRZCheckBox" onclick="adifMenuCheckBoxChanged(this);" />
             </td>
             <td>
-              <input type="checkbox" checked="false" id="loadQRZCheckBox" onclick="adifStartupCheckBoxChanged(this);" />
+              <input type="checkbox" id="loadQRZCheckBox" onclick="adifStartupCheckBoxChanged(this);" />
             </td>
             <td>
-              <input type="checkbox" checked="false" id="logQRZqsoCheckBox"
+              <input type="checkbox" id="logQRZqsoCheckBox"
                 onclick="adifLogQsoCheckBoxChanged(this);" />
             </td>
             <td>
@@ -1950,14 +1961,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td data-i18n="settings.logging.ClubLog.source">ClubLog</td>
             <td></td>
             <td>
-              <input type="checkbox" checked="false" id="buttonClubCheckBox" onclick="adifMenuCheckBoxChanged(this);" />
+              <input type="checkbox" id="buttonClubCheckBox" onclick="adifMenuCheckBoxChanged(this);" />
             </td>
             <td>
-              <input type="checkbox" checked="false" id="loadClubCheckBox"
+              <input type="checkbox" id="loadClubCheckBox"
                 onclick="adifStartupCheckBoxChanged(this);" />
             </td>
             <td>
-              <input type="checkbox" checked="false" id="logClubqsoCheckBox"
+              <input type="checkbox" id="logClubqsoCheckBox"
                 onclick="adifLogQsoCheckBoxChanged(this);" />
             </td>
             <td>
@@ -1986,7 +1997,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td></td>
             <td></td>
             <td>
-              <input type="checkbox" checked="false" id="logHRDLOGqsoCheckBox"
+              <input type="checkbox" id="logHRDLOGqsoCheckBox"
                 onclick="adifLogQsoCheckBoxChanged(this);" />
             </td>
             <td>
@@ -2015,7 +2026,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td></td>
             <td></td>
             <td>
-              <input type="checkbox" checked="false" id="logCloudlogQSOCheckBox" onclick="adifLogQsoCheckBoxChanged(this);" />
+              <input type="checkbox" id="logCloudlogQSOCheckBox" onclick="adifLogQsoCheckBoxChanged(this);" />
             </td>
             <td>
               <label data-i18n="settings.logging.CloudLog.details.URL" for="CloudlogURL">URL</label>
@@ -2042,7 +2053,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td></td>
             <td></td>
             <td>
-              <input type="checkbox" checked="false" id="logeQSLQSOCheckBox"
+              <input type="checkbox" id="logeQSLQSOCheckBox"
                 onclick="adifLogQsoCheckBoxChanged(this);" />
             </td>
             <td>
@@ -2053,7 +2064,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               <input id="eQSLPassword" type="password" class="inputTextValue" size="8"
                 oninput=" ValidateText(this); adifTextValueChange(this);" /><br />
               <label data-i18n="settings.logging.eQSLcc.details.QTHnick" for="nicknameeQSLCheckBox">QTH Nickname</label>
-              <input type="checkbox" checked="false" id="nicknameeQSLCheckBox"
+              <input type="checkbox" id="nicknameeQSLCheckBox"
                 onclick="adifNicknameCheckBoxChanged(this);" />
               <input id="eQSLNickname" style="display: none" type="text" class="inputTextValue" size="12"
                 oninput=" ValidateText(this); adifTextValueChange(this);" />
@@ -2070,14 +2081,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td data-i18n="settings.logging.LoTW.source">LotW</td>
             <td></td>
             <td>
-              <input type="checkbox" checked="false" id="buttonLOTWCheckBox" onclick="adifMenuCheckBoxChanged(this);" />
+              <input type="checkbox" id="buttonLOTWCheckBox" onclick="adifMenuCheckBoxChanged(this);" />
             </td>
             <td>
-              <input type="checkbox" checked="false" id="loadLOTWCheckBox"
+              <input type="checkbox" id="loadLOTWCheckBox"
                 onclick="adifStartupCheckBoxChanged(this);" />
             </td>
             <td>
-              <input type="checkbox" checked="false" id="logLOTWqsoCheckBox"
+              <input type="checkbox" id="logLOTWqsoCheckBox"
                 onclick="adifLogQsoCheckBoxChanged(this);" />
             </td>
             <td>
@@ -2120,7 +2131,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td></td>
             <td></td>
             <td>
-              <input type="checkbox" checked="false" id="logHamCQqsoCheckBox"
+              <input type="checkbox" id="logHamCQqsoCheckBox"
                 onclick="adifLogQsoCheckBoxChanged(this);" />
             </td>
             <td>
@@ -2143,7 +2154,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td></td>
             <td></td>
             <td>
-              <input type="checkbox" checked="false" class="inputTextValue" id="buttonN1MMCheckBox"
+              <input type="checkbox"   class="inputTextValue" id="buttonN1MMCheckBox"
                 onclick=" ValidateIPaddress(N1MMIpInput,this); ValidatePort(N1MMPortInput,this, null ); n1mmLoggerChanged(); " />
             </td>
             <td>
@@ -2165,7 +2176,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td></td>
             <td></td>
             <td>
-              <input type="checkbox" checked="false" class="inputTextValue" id="buttonLog4OMCheckBox"
+              <input type="checkbox"   class="inputTextValue" id="buttonLog4OMCheckBox"
                 onclick=" ValidateIPaddress(log4OMIpInput,this); ValidatePort(log4OMPortInput,this, null ); log4OMLoggerChanged(); " />
             </td>
             <td>
@@ -2224,7 +2235,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td></td>
             <td></td>
             <td>
-              <input type="checkbox" checked="false" class="inputTextValue" id="buttondxkLogCheckBox"
+              <input type="checkbox"   class="inputTextValue" id="buttondxkLogCheckBox"
                 onclick=" ValidateIPaddress(dxkLogIpInput,this); ValidatePort(dxkLogPortInput,this, null ); dxkLogLoggerChanged(); " />
             </td>
             <td>
@@ -2246,7 +2257,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <td></td>
             <td></td>
             <td>
-              <input type="checkbox" checked="false" class="inputTextValue" id="buttonHrdLogbookCheckBox"
+              <input type="checkbox"   class="inputTextValue" id="buttonHrdLogbookCheckBox"
                 onclick=" ValidateIPaddress(hrdLogbookIpInput,this); ValidatePort(hrdLogbookPortInput,this, null ); hrdLogbookLoggerChanged(); " />
             </td>
             <td>
@@ -2551,7 +2562,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <div id="aboutDiv" class="settingsTabcontent">
       <div class="mapItem" style="padding: 4px">
         <h2>
-          <div data-i18n="settings.about.AppName" >GridTracker2</div>
+          <div id="aboutTitle" >GridTracker2</div>
           <div style="font-size:small; font-weight: normal;" id="aboutVersionText"></div>
         </h2>
         <p>

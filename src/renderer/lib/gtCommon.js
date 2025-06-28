@@ -233,6 +233,11 @@ function callsignToDxcc(insign)
   return -1;
 }
 
+function timeNowSec()
+{
+  return parseInt(Date.now() / 1000);
+}
+
 function initQSOdata()
 {
   GT.tracker = {};
@@ -266,7 +271,9 @@ function initQSOdata()
   GT.tracker.confirmed.pota = {};
 }
 
-function trackQSO(details, currentYear, currentDay)
+const K_15_DAYS_IN_SECONDS = 1296000;
+
+function trackQSO(details, currentYear, currentDay, currentSecond)
 {
   let qsoDate = new Date(1970, 0, 1); qsoDate.setSeconds(details.time);
   let isCurrentYear = (qsoDate.getUTCFullYear() == currentYear);
@@ -274,6 +281,12 @@ function trackQSO(details, currentYear, currentDay)
   let fourGrid = details.grid.substring(0, 4);
   let isDigi = details.digital;
   let isPhone = details.phone;
+
+  if (details.DEcall.length == 3 && details.DEcall.charAt(0) != 'A' && details.DEcall.charAt(2) != 'X' && isKnownCallsignUS(details.dxcc) && currentSecond - details.time > K_15_DAYS_IN_SECONDS)
+  {
+    // Any 1x1 QSO in the US over 15 days is not considered worked for hunting purposes
+    return;
+  }
 
   GT.tracker.worked.call[details.DEcall + details.band + details.mode] = true;
   GT.tracker.worked.call[details.DEcall] = true;

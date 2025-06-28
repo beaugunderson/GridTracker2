@@ -1,7 +1,6 @@
 // GridTracker Copyright © 2025 GridTracker.org
 // All rights reserved.
 // See LICENSE for more information.
-GT.selectStartupLink = null;
 
 GT.confSrcNames = {
   C: "Clublog",
@@ -132,7 +131,7 @@ function adifParseLiveComplete(task)
   GT.adifLogCount--;
   GT.QSOhash[task.details.hash] = task.details;
 
-  trackQSO(GT.QSOhash[task.details.hash], GT.currentYear, GT.currentDay);
+  trackQSO(GT.QSOhash[task.details.hash], GT.currentYear, GT.currentDay, timeNowSec());
   applyQSOs(null);
 
   tryNextTask(task);
@@ -582,24 +581,6 @@ function adifTextValueChange(what)
   GT.settings.adifLog.text[what.id] = what.value;
 }
 
-GT.wsjtLogFileSelector = document.createElement("input");
-GT.wsjtLogFileSelector.setAttribute("type", "file");
-GT.wsjtLogFileSelector.setAttribute("accept", ".adi, .adif");
-GT.wsjtLogFileSelector.onchange = function ()
-{
-  if (this.files && this.files[0])
-  {
-    let fullPath = webUtils.getPathForFile(this.files[0]);
-
-    if (ValidatePotentialAdifLogFileAgainstInternal(fullPath))
-    {
-      GT.settings.app.wsjtLogPath = fullPath;
-      updateWsjtLogUI(true);
-    }
-  }
-};
-
-
 GT.fileSelector = document.createElement("input");
 GT.fileSelector.setAttribute("type", "file");
 GT.fileSelector.setAttribute("accept", ".adi, .adif");
@@ -613,13 +594,9 @@ GT.fileSelector.onchange = function ()
 
 function ValidatePotentialAdifLogFileAgainstInternal(fullPath)
 {
-  let extName =  path.extname(fullPath);
   // Is on disk
   if (!(fs.existsSync(fullPath))) return false;
-  // Not in Local File(s)
-  if (GT.settings.startupLogs.indexOf(fullPath) != -1 ) return false;
-  // Not starting wsjtx_log.adi 
-  if (fullPath == GT.settings.app.wsjtLogPath) return false;
+
   let dirname = path.dirname(fullPath);
   // Not in Ginternal
   if (dirname == GT.appData) return false;
@@ -633,24 +610,23 @@ function addLogToStartupList(name, path)
 {
   loadAdifCheckBox.checked = true;
   adifStartupCheckBoxChanged(loadAdifCheckBox);
-
-
-  let buffer = fs.readFileSync(path, "utf-8");
-  if (buffer) onAdiLoadComplete(buffer);
   
   for (const i in GT.settings.startupLogs)
   {
     if (path == GT.settings.startupLogs[i].file)
     {
-      addLastTraffic("<font color='white'>Dupe</font> <font color='orange'>" +name + "</font>");
+      addLastTraffic("<font color='white'>Dupe</font> <font color='orange'>" + name + "</font>");
       return;
     }
   }
   if (ValidatePotentialAdifLogFileAgainstInternal(path) == false)
   {
-    addLastTraffic("<font color='white'>Not Allowed</font> <font color='orange'>" + name + "</font>");
+    addLastTraffic("<font color='white'>Error Adding</font><br/><font color='orange'>" + name + "</font>");
     return;
   }
+
+  let buffer = fs.readFileSync(path, "utf-8");
+  if (buffer) onAdiLoadComplete(buffer);
 
   let newObject = Object();
   newObject.name = name;
@@ -668,17 +644,6 @@ function adifLoadDialog()
   return false;
 }
 
-GT.startupFileSelector = document.createElement("input");
-GT.startupFileSelector.setAttribute("type", "file");
-GT.startupFileSelector.setAttribute("accept", ".adi, .adif");
-GT.startupFileSelector.onchange = function ()
-{
-  if (this.files && this.files[0])
-  {
-    addLogToStartupList(this.files[0].name, webUtils.getPathForFile(this.files[0]));
-  }
-};
-
 function start_and_end(str)
 {
   if (str.length > 31)
@@ -692,13 +657,6 @@ function start_and_end(str)
 
 function setFileSelectors()
 {
-  GT.selectStartupLink = document.getElementById("selectAdifButton");
-  GT.selectStartupLink.onclick = function ()
-  {
-    GT.startupFileSelector.click();
-    return false;
-  };
-
   selectTqsl = document.getElementById("selectTQSLButton");
   selectTqsl.onclick = function ()
   {
@@ -777,14 +735,6 @@ function loadLoTWLogFile()
   }
 }
 
-function loadWsjtLogFile()
-{
-  if (GT.settings.app.wsjtLogPath.length > 0 && GT.settings.adifLog.startup.loadWSJTCheckBox == true &&  fs.existsSync(GT.settings.app.wsjtLogPath))
-  {
-    let buffer = fs.readFileSync(GT.settings.app.wsjtLogPath, "UTF-8");
-    if (buffer) onAdiLoadComplete(buffer);
-  }
-}
 
 function findTrustedQSLPaths()
 {
@@ -977,9 +927,10 @@ function setAdifStartup(checkbox)
       worker += "<table class='darkTable'>";
       for (const i in GT.settings.startupLogs)
       {
-        let style = ValidatePotentialAdifLogFileAgainstInternal(GT.settings.startupLogs[i].file) ? "" : "style='text-decoration: line-through red; text-decoration-thickness: 2px;'";
-        worker += "<tr title='" + GT.settings.startupLogs[i].file + "'>";
-        worker += "<td " + style + ">" +  GT.settings.startupLogs[i].name + "</td>";
+        const appFile = GT.settings.startupLogs[i];
+        let style = isInAppLog(appFile.file) ? "style='text-decoration: line-through red; text-decoration-thickness: 2px;'" : "";
+        worker += "<tr title='" + appFile.file + "'>";
+        worker += "<td " + style + ">" +  getParentFolderAndFilename(appFile.file) + "</td>";
         worker += "<td onclick='removeStartupLog(" + i + ")'><img src='img/trash_24x48.png' style='height:17px;margin:-1px;margin-bottom:-3px;padding:0px;cursor:pointer'></td></tr>";
       }
       worker += "</table>";
@@ -994,36 +945,188 @@ function setAdifStartup(checkbox)
   else
   {
     startupLogFileDiv.innerHTML = "No file(s) selected";
-    GT.startupFileSelector.setAttribute("type", "");
-    GT.startupFileSelector.setAttribute("type", "file");
-    GT.startupFileSelector.setAttribute("accept", ".adi, .adif");
-    GT.startupFileSelector.value = null;
     selectFileOnStartupDiv.style.display = "none";
   }
-
-  updateWsjtLogUI();
 }
 
-function updateWsjtLogUI(shouldLoad = false)
+
+GT.appLogsFileSelector = document.createElement("input");
+GT.appLogsFileSelector.setAttribute("type", "file");
+GT.appLogsFileSelector.setAttribute("accept", ".adi, .adif");
+GT.appLogsFileSelector.value = null;
+GT.appLogsFileSelector.onchange = function ()
 {
-  if (GT.settings.app.wsjtLogPath.length > 0)
+  if (this.files && this.files[0])
   {
-    if (fs.existsSync(GT.settings.app.wsjtLogPath))
+    let fullPath = webUtils.getPathForFile(this.files[0]);
+
+    if (ValidatePotentialAdifLogFileAgainstInternal(fullPath))
     {
-      wsjtFilePathDiv.innerHTML = path.basename(GT.settings.app.wsjtLogPath);
-      if (shouldLoad == true)
-      {
-        loadWsjtLogFile();
-      }
+      appendAppLog(fullPath, true);
+      updateAppLogsUI();
+
+      let buffer = fs.readFileSync(fullPath, "UTF-8");
+      if (buffer) onAdiLoadComplete(buffer);
     }
     else
     {
-      wsjtFilePathDiv.innerHTML = "not found";
+      addLastTraffic("<font color='white'>Error Adding</font><br/><font color='orange'>" + this.files[0].name + "</font>");
+      return;
     }
-  } 
+
+    GT.appLogsFileSelector.setAttribute("type", "file");
+    GT.appLogsFileSelector.setAttribute("accept", ".adi, .adif");
+    GT.appLogsFileSelector.value = null;
+  }
+};
+
+function isInAppLog(filepath)
+{
+  for (const appFile of GT.settings.appLogs)
+  {
+    if (appFile.file == filepath)
+    {
+      appFile.enabled = true;
+      updateAppLogsUI();
+      return true;
+    }
+  }
+  return false;
+}
+
+const CONST_APP_LOG_REGEX = /^WSJT|^JTDX/
+const CONST_ADIF_FILE_REGEX = /\.adi$|\.adif$/
+
+function scanForAppLogs()
+{
+  let appBase = "";
+  if (GT.platform == "windows")
+  {
+    let appData = electron.ipcRenderer.sendSync("getPath","appData");
+    let basepath = path.basename(appData);
+    if (basepath != "Local")
+    {
+      appData = appData.replace(basepath, "Local");
+    }
+    appBase = appData;
+  }
+  else if (GT.platform == "mac")
+  {
+    appBase = path.join(process.env.HOME, "Library/Application Support");
+  }
   else
   {
-    wsjtFilePathDiv.innerHTML = "not set";
+    appBase = path.join(process.env.HOME, ".local/share");
+  }
+      
+  try 
+  {
+    const directories = getDirectoriesSync(appBase).sort();
+    for (const dir of directories)
+    {
+      if (path.basename(dir).toUpperCase().match(CONST_APP_LOG_REGEX))
+      {
+        const foundFiles = fs.readdirSync(dir).filter(file => { return path.extname(file).toLowerCase().match(CONST_ADIF_FILE_REGEX); });
+        for (const file of foundFiles) appendAppLog(path.join(dir, file), false);
+      }
+    }
+  }
+  catch (err) 
+  {
+    console.error(err);
+  }
+}
+
+function getDirectoriesSync(srcpath)
+{
+  return fs.readdirSync(srcpath, { withFileTypes: true })
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => path.join(srcpath, dirent.name));
+}
+
+function appendAppLog(filepath, forceEnable = false)
+{
+  let newLog = true;
+  for (const appFile of GT.settings.appLogs)
+  {
+    if (appFile.file == filepath)
+    {
+      if (forceEnable) appFile.enabled = true;
+      newLog = false;
+      break;
+    }
+  }
+  if (newLog)
+  {
+    GT.settings.appLogs.push({ enabled: true, file: filepath });
+  }
+}
+
+
+function loadAppLogs()
+{
+  for (const appFile of GT.settings.appLogs)
+  {
+    if (appFile.enabled && fs.existsSync(appFile.file))
+    {
+      let buffer = fs.readFileSync(appFile.file, "UTF-8");
+      if (buffer) onAdiLoadComplete(buffer);
+    }
+  }
+}
+
+function getParentFolderAndFilename(filepath)
+{
+  let pathParts = [];
+  pathParts.push(path.basename(path.dirname(filepath)));
+  pathParts.push(path.basename(filepath));
+  return pathParts.join(' ' + path.sep + ' ');
+}
+
+function updateAppLogsUI()
+{
+  let worker = "";
+  if (GT.settings.appLogs.length > 0)
+  {
+    worker += "<table class='darkTable'><tr><th>" + I18N("settings.alerts.AudioAlert.Header.Enable") + "</th>";
+    worker += "<th>" + I18N("settings.alerts.AudioAlert.Header.Value") + "</th></tr>";
+    for (const i in GT.settings.appLogs)
+    {
+      const appFile = GT.settings.appLogs[i];
+      worker += "<tr title='" + appFile.file + "'>";
+      worker += "<td><input type='checkbox' " + (appFile.enabled ? "checked" : "") +  " onclick='toggleAppLog(" + i + ", this)' /></td>";
+      worker += "<td >" +  getParentFolderAndFilename(appFile.file) + "</td>";
+      worker += "<td onclick='removeAppLog(" + i + ")'><img src='img/trash_24x48.png' style='height:17px;margin:-1px;margin-bottom:-3px;padding:0px;cursor:pointer'></td></tr>";
+    }
+    worker += "</table>";
+  }
+  else
+  {
+    worker = "No file(s) selected";
+  }
+  appLogsFilesDiv.innerHTML = worker;
+}
+
+function removeAppLog(i)
+{
+  if (i in GT.settings.appLogs)
+  {
+    GT.settings.appLogs.splice(i, 1);
+
+    updateAppLogsUI();
+  }
+}
+
+function toggleAppLog(i, checkbox)
+{
+  if (i in GT.settings.appLogs)
+  {
+    GT.settings.appLogs[i].enabled = checkbox.checked;
+    if (GT.settings.appLogs[i].enabled)
+    {
+      let buffer = fs.readFileSync(GT.settings.appLogs[i].file, "UTF-8");
+      if (buffer) onAdiLoadComplete(buffer);
+    }
   }
 }
 
@@ -1041,7 +1144,7 @@ function startupAdifLoadCheck()
 {
   logEventMedia.value = GT.settings.app.logEventMedia;
  
-  loadWsjtLogFile();
+  loadAppLogs();
 
   if (loadGTCheckBox.checked == true) loadBackupLogFiles();
 
@@ -1284,14 +1387,7 @@ function valueToAdiField(field, value)
 
 function pad(value)
 {
-  if (value < 10)
-  {
-    return "0" + value;
-  }
-  else
-  {
-    return value;
-  }
+  return String(value).padStart(2, "0");
 }
 
 function HMSfromMilli(milli)
@@ -1304,36 +1400,7 @@ function HMSfromMilli(milli)
   let mnts = Math.floor(seconds / 60);
   seconds -= mnts * 60;
 
-  val = String(pad(hrs)) + String(pad(mnts)) + String(pad(seconds));
-  return String(val);
-}
-
-function colonHMSfromMilli(milli)
-{
-  let seconds = parseInt(milli / 1000);
-  let days = Math.floor(seconds / (3600 * 24));
-  seconds -= days * 3600 * 24;
-  let hrs = Math.floor(seconds / 3600);
-  seconds -= hrs * 3600;
-  let mnts = Math.floor(seconds / 60);
-  seconds -= mnts * 60;
-
-  val = String(pad(hrs)) + ":" + String(pad(mnts)) + ":" + String(pad(seconds));
-  return String(val);
-}
-
-function colonHMSfromSeconds(secondsIn)
-{
-  let seconds = secondsIn;
-  let days = Math.floor(seconds / (3600 * 24));
-  seconds -= days * 3600 * 24;
-  let hrs = Math.floor(seconds / 3600);
-  seconds -= hrs * 3600;
-  let mnts = Math.floor(seconds / 60);
-  seconds -= mnts * 60;
-
-  val = String(pad(hrs)) + ":" + String(pad(mnts)) + ":" + String(pad(seconds));
-  return String(val);
+  return (pad(hrs) + pad(mnts) + pad(seconds));
 }
 
 function convertToDate(julian)
@@ -1570,6 +1637,18 @@ function finishSendingReport(record)
   }
   reportNoPotaNoStateNoCnty += "<EOR>";
   
+  let callsignFile = "";
+  if ("STATION_CALLSIGN" in record)
+  {
+    callsignFile = record["STATION_CALLSIGN"].replaceAll("/","_");
+  }
+  
+  let gridFile = "";
+  if ("MY_GRIDSQUARE" in record)
+  {
+    gridFile = record["MY_GRIDSQUARE"].substring(0,4);
+  }
+
   // Full record dupe check
   if (report != GT.lastReport)
   {
@@ -1619,13 +1698,13 @@ function finishSendingReport(record)
       if (logGTqsoCheckBox.checked == true)
       {
         let logNameArray = ["GridTracker2"];
-        if ("STATION_CALLSIGN" in record)
+        if (callsignFile.length > 0)
         {
-          logNameArray.push(record["STATION_CALLSIGN"].replaceAll("/","_"));
+          logNameArray.push(callsignFile);
         }
-        if ("MY_GRIDSQUARE" in record)
+        if (gridFile.length > 0)
         {
-          logNameArray.push(record["MY_GRIDSQUARE"].substring(0,4));
+          logNameArray.push(gridFile);
         }
         let filename = logNameArray.join("_") + ".adif";
         let fullPath = path.join(GT.qsoBackupDir, filename);
@@ -1738,7 +1817,7 @@ function finishSendingReport(record)
 
     try
     {
-      sendLotwLogEntry(report);
+      sendLotwLogEntry(report, callsignFile, gridFile);
     }
     catch (e)
     {
@@ -1952,9 +2031,9 @@ function testTrustedQSL(test)
     lotwTestResult.innerHTML = worker;
   }
 }
-GT.trustTempPath = "";
 
-function sendLotwLogEntry(report)
+
+function sendLotwLogEntry(report, callsignFile, gridFile)
 {
   if (GT.settings.map.offlineMode == true) return;
 
@@ -1965,16 +2044,32 @@ function sendLotwLogEntry(report)
     lotwStation.value.length > 0
   )
   {
-    let header = "Generated " + userTimeString(null) + " for " + GT.settings.app.myCall + "\r\n\r\n";
-    let pid = "GridTracker";
-    let pver = String(gtVersion);
-    header += "<PROGRAMID:" + pid.length + ">" + pid + "\r\n";
-    header += "<PROGRAMVERSION:" + pver.length + ">" + pver + "\r\n";
-    header += "<EOH>\r\n";
-    let finalLog = header + report + "\r\n";
 
-    GT.trustTempPath = path.join(os.tmpdir(), unique(report) + ".adif");
-    fs.writeFileSync(GT.trustTempPath, finalLog, { flush: true });
+    let logNameArray = ["LoTW_queue"];
+    if (callsignFile.length > 0)
+    {
+      logNameArray.push(callsignFile);
+    }
+    if (gridFile.length > 0)
+    {
+      logNameArray.push(gridFile);
+    }
+
+    let filename = logNameArray.join("_") + ".adif";
+    let fullPath = path.join(GT.appData, filename);
+
+    if (!fs.existsSync(fullPath))
+    {
+      let header = "Generated " + userTimeString(null) + " for " + callsignFile.replaceAll('_','/') + "\r\n\r\n";
+      let pid = "GridTracker";
+      let pver = String(gtVersion);
+      header += "<PROGRAMID:" + pid.length + ">" + pid + "\r\n";
+      header += "<PROGRAMVERSION:" + pver.length + ">" + pver + "\r\n";
+      header += "<EOH>\r\n";
+      fs.writeFileSync(fullPath, header);
+    }
+
+    fs.appendFileSync(fullPath, report + "\r\n", { flush: true });
 
     const child_process = require("child_process");
     let options = Array();
@@ -1991,7 +2086,7 @@ function sendLotwLogEntry(report)
     options.push("-x");
     options.push("-d");
     options.push("-u");
-    options.push(GT.trustTempPath);
+    options.push(fullPath);
 
     child_process.execFile(
       GT.settings.trustedQsl.binaryFile,
@@ -2001,13 +2096,13 @@ function sendLotwLogEntry(report)
         if (stderr.indexOf("Final Status: Success") < 0)
         {
           logError("TQSL: " + stderr);
-          addLastTraffic("<font style='color:red'>Fail log to TQSL</font>");
+          addLastTraffic("<font style='color:orange'>Fail log to TQSL<br/>Queued for retry</font>");
         }
         else
         {
           addLastTraffic("<font style='color:white'>Logged to TQSL</font>");
+          fs.unlinkSync(fullPath);
         }
-        fs.unlinkSync(GT.trustTempPath);
       }
     );
   }
@@ -2796,12 +2891,27 @@ function parseADIFRecord(adif)
   return record;
 }
 
+let unicodeRegex = /[^\u0000-\u00ff]/; // Small performance gain from pre-compiling the regex
+
+function containsDoubleByte(str)
+{
+  if (!str.length) return false;
+  if (str.charCodeAt(0) > 255) return true;
+  return unicodeRegex.test(str);
+}
+
 function sendHRDLogbookEntry(report, port, address)
 {
   let command = "ver\rdb add {";
   let items = Object.assign({}, report);
 
   items.FREQ = items.FREQ.split(".").join("");
+
+  // HRD Log doesn't accept unicode
+  if (items.NAME && containsDoubleByte(items.NAME))
+  {
+    delete items.NAME;
+  }
 
   for (let item in items)
   {

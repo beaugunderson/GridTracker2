@@ -1,7 +1,7 @@
 const mqtt = require('mqtt');
 
 GT.pskMqttClient = null;
-GT.pskMqttUrl = "ws://mqtt.pskreporter.info:1885";
+GT.pskMqttUrl = "mqtt://mqtt.pskreporter.info:1883";
 GT.pskCloseTimer = null;
 
 function openPskMqtt()

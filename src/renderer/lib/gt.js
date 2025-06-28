@@ -95,6 +95,26 @@ function loadAllSettings()
 
   GT.settings.currentVersion = String(gtVersion);
 
+  // remap any settings as neeeded
+  if (GT.settings.roster.huntNeed)
+  {
+    GT.settings.roster.logbook.huntNeed = GT.settings.roster.huntNeed;
+    delete GT.settings.roster.huntNeed;
+  }
+
+  if (GT.settings.roster.referenceNeed)
+  {
+    GT.settings.roster.logbook.referenceNeed = GT.settings.roster.referenceNeed;
+    delete GT.settings.roster.referenceNeed;
+  }
+
+  // Deprecated single app log path
+  if (GT.settings.app.wsjtLogPath)
+  {
+    appendAppLog(GT.settings.app.wsjtLogPath, true);
+    delete GT.settings.app.wsjtLogPath;
+  }
+
   // Remove any unknown settings
   for (const key in GT.settings)
   {
@@ -103,19 +123,6 @@ function loadAllSettings()
       console.log("Removing unknown setting: " + key);
       delete GT.settings[key];
     }
-  }
-
-  // remap any settings as neeeded
-  if ("huntNeed" in GT.settings.roster)
-  {
-    GT.settings.roster.logbook.huntNeed = GT.settings.roster.huntNeed;
-    delete GT.settings.roster.huntNeed;
-  }
-
-  if ("referenceNeed" in GT.settings.roster)
-  {
-    GT.settings.roster.logbook.referenceNeed = GT.settings.roster.referenceNeed;
-    delete GT.settings.roster.referenceNeed;
   }
 
   setWindowTheme();
@@ -509,7 +516,6 @@ GT.MyCurrentGrid = "";
 GT.MyGridIsUp = false;
 GT.animateFrame = 0;
 GT.nextDimTime = 0;
-GT.lastFrame = 0;
 GT.nightTime = false;
 GT.currentNightState = false;
 GT.timeNow = timeNowSec();
@@ -3576,6 +3582,7 @@ function setAnimateView()
 function toggleAnimate()
 {
   animateValue.checked = !animateValue.checked;
+  setAnimateView()
   changeAnimate();
 }
 
@@ -3636,7 +3643,10 @@ function changeAnimate()
     GT.dazzleGrid.setStyle(featureStyle);
   }
 
-  setAnimateView();
+  if (GT.settings.map.animate)
+  {
+    setAnimate(true);
+  }
 }
 
 function changeAnimateSpeedValue()
@@ -3667,19 +3677,36 @@ function removeFlightPathsAndDimSquares()
   }
 }
 
+GT.isAnimating = false;
+
+function setAnimate(enabled)
+{
+  if (enabled && GT.isAnimating == false)
+  {
+    GT.isAnimating = true;
+    requestAnimationFrame(animatePaths);
+  }
+  if (enabled == false) GT.isAnimating = false;
+}
+
 function animatePaths()
 {
-  requestAnimationFrame(animatePaths);
-
-  GT.lastFrames
-  if (GT.lastFrame == 1) return;
+  if (GT.settings.map.animate == false) return;
 
   GT.animateFrame++;
   GT.animateFrame %= GT.settings.map.animateSpeed;
 
-  if (GT.animateFrame > 0) return;
+  let requestAnimation = false;
 
-  if (GT.settings.map.animate == false) return;
+  if (GT.animateFrame > 0) 
+  {
+    setAnimate(false);
+    if (GT.flightPaths.length > 0 || GT.transmitFlightPath || GT.dazzleGrid)
+    {
+      setAnimate(true);
+    }
+    return;
+  }
 
   GT.flightPathOffset += 1;
   GT.flightPathOffset %= GT.flightPathTotal;
@@ -3695,6 +3722,7 @@ function animatePaths()
       featureStroke = featureStyle.getStroke();
       featureStroke.setLineDashOffset(targetOffset);
       GT.flightPaths[i].setStyle(featureStyle);
+      requestAnimation = true;
     }
   }
 
@@ -3707,6 +3735,7 @@ function animatePaths()
 
     featureStyle.setStroke(featureStroke);
     GT.transmitFlightPath.setStyle(featureStyle);
+    requestAnimation = true;
   }
 
   if (GT.dazzleGrid != null)
@@ -3718,7 +3747,11 @@ function animatePaths()
 
     featureStyle.setStroke(featureStroke);
     GT.dazzleGrid.setStyle(featureStyle);
+    requestAnimation = true;
   }
+
+  setAnimate(false);
+  if (requestAnimation) setAnimate(requestAnimation);
 }
 
 function removePaths()
@@ -4021,11 +4054,6 @@ function displayTime()
     styleAllFlightPaths();
     GT.currentNightState = GT.nightTime;
   }
-}
-
-function timeNowSec()
-{
-  return parseInt(Date.now() / 1000);
 }
 
 function createGlobalHeatmapLayer(name, blur, radius, gradient = ['#00f', '#0ff', '#0f0', '#ff0', '#f00'])
@@ -4418,7 +4446,6 @@ function initMap()
   });
 
   renderMap();
-  requestAnimationFrame(animatePaths);
 }
 
 function mouseDownEvent(event)
@@ -5357,7 +5384,6 @@ function handleInstanceStatus(newMessage)
         nodeTimers.clearInterval(GT.pskBandActivityTimerHandle);
         GT.pskBandActivityTimerHandle = null;
       }
-      //nodeTimers.setTimeout(renderWorldBandActivity, 1000);
     }
     if (GT.lastMode != GT.settings.app.myMode)
     {
@@ -5622,6 +5648,7 @@ function handleInstanceStatus(newMessage)
               "transmit",
               true
             );
+            setAnimate(true);
           }
           catch (err)
           {
@@ -6134,6 +6161,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
                 flightPath.isQRZ = isQRZ;
 
                 GT.flightPaths.push(flightPath);
+                setAnimate(true);
               }
               catch (err)
               {
@@ -6171,6 +6199,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
               flightPath.isQRZ = isQRZ;
 
               GT.flightPaths.push(flightPath);
+              setAnimate(true);
             }
             catch (err)
             {
@@ -6190,6 +6219,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
             feature.isQRZ = isQRZ;
             GT.layerSources.flight.addFeature(feature);
             GT.flightPaths.push(feature);
+            setAnimate(true);
           }
         }
       }
@@ -6245,7 +6275,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
             feature.isQRZ = false;
             GT.layerSources.flight.addFeature(feature);
             GT.flightPaths.push(feature);
-
+            setAnimate(true);
             let fromPoint = getPoint(callsign.grid);
             let toPoint = ol.proj.fromLonLat(locality.properties.center);
 
@@ -6267,6 +6297,7 @@ function finalWsjtxDecode(newMessage, isFox = false, foxMessage)
               flightPath.isShapeFlight = 0;
               flightPath.isQRZ = false;
               GT.flightPaths.push(flightPath);
+              setAnimate(true);
             }
             catch (err)
             {
@@ -6515,6 +6546,7 @@ function dazzleGrid(LL)
   GT.dazzleGrid.setStyle(featureStyle);
 
   GT.layerSources.temp.addFeature(GT.dazzleGrid);
+  setAnimate(true);
 
   GT.dazzleTimeout = nodeTimers.setTimeout(removeDazzleGrid, 3000);
 }
@@ -10139,13 +10171,13 @@ function getIniFromApp(appName)
   result.MyGrid = "";
   result.MyBand = "";
   result.MyMode = "";
-  result.LogPath = "";
+
   result.N1MMServer = "";
   result.N1MMServerPort = 0;
   result.BroadcastToN1MM = false;
   result.appName = appName;
   let wsjtxCfgPath = "";
-  let logPath = "";
+
   let appData = electron.ipcRenderer.sendSync("getPath","appData");
 
   if (GT.platform == "windows")
@@ -10157,24 +10189,21 @@ function getIniFromApp(appName)
     }
 
     wsjtxCfgPath = path.join(appData, appName, appName + ".ini");
-    logPath = path.join(appData, appName, "wsjtx_log.adi" );
   }
   else if (GT.platform == "mac")
   {
     wsjtxCfgPath =  path.join(process.env.HOME, "Library/Preferences/WSJT-X.ini");
-    logPath = path.join(process.env.HOME, "Library/Application Support/WSJT-X/wsjtx_log.adi");
   }
   else
   {
     wsjtxCfgPath = path.join(process.env.HOME, ".config/" + appName + ".ini");
-    logPath = path.join(process.env.HOME, ".local/share/" + appName, "wsjtx_log.adi");
   }
   if (fs.existsSync(wsjtxCfgPath))
   {
     let fileBuf = fs.readFileSync(wsjtxCfgPath, "ascii");
     let fileArray = fileBuf.split("\n");
     for (const key in fileArray) fileArray[key] = fileArray[key].trim();
-    result.LogPath = logPath;
+
     for (let x = 0; x < fileArray.length; x++)
     {
       let indexOfSearch = fileArray[x].indexOf("UDPServerPort=");
@@ -10239,6 +10268,8 @@ function getIniFromApp(appName)
 
 function updateBasedOnIni()
 {
+  scanForAppLogs();
+  
   let which =  getIniFromApp("WSJT-X");
   if (which.port == -1) which = getIniFromApp("JTDX");
 
@@ -10257,12 +10288,6 @@ function updateBasedOnIni()
       GT.settings.app.multicast = false;
     }
 
-    GT.settings.app.wsjtLogPath = which.LogPath;
-  }
- 
-  if (which.LogPath.length > 0 && GT.settings.app.wsjtLogPath.length == 0)
-  {
-    GT.settings.app.wsjtLogPath = which.LogPath;
   }
 
   if (GT.settings.app.wsjtUdpPort == 0)
@@ -12293,6 +12318,8 @@ function loadAdifSettings()
   CloudlogStationProfileID.style.color = "#FF0";
   CloudlogStationProfileID.style.backgroundColor = "darkblue";
   CloudlogGetProfiles();
+
+  updateAppLogsUI();
 
   setAdifStartup(loadAdifCheckBox);
   ValidateQrzApi(qrzApiKey);
@@ -14419,6 +14446,14 @@ function mediaCheck()
   GT.QSLcount = 0;
   GT.QSOcount = 0;
   GT.rowsFiltered = 0;
+
+  let appName = I18N("settings.about.AppName");
+  let gtName = electron.ipcRenderer.sendSync("getAppName");
+  if (gtName.length > 0)
+  {
+    appName += " - " + gtName;
+  }
+  appTitle.innerHTML = aboutTitle.innerHTML = loadTitle.innerHTML = appName;
 }
 
 function newOption(value, text = null, selected = null)
