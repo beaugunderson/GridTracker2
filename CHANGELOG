@@ -133,6 +133,7 @@ Mac: Cmd-Q now exits the application
 
 
 App: Updated Electron engine to 35.7.0
+      (Windows users should double-check firewall settings after installation)
 
 App: Multiple GridTracker instance support using --gt-name=UniqueName
 
