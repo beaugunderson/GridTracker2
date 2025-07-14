@@ -111,7 +111,7 @@ function loadAllSettings()
   // Deprecated single app log path
   if (GT.settings.app.wsjtLogPath)
   {
-    appendAppLog(GT.settings.app.wsjtLogPath, true);
+    if (fs.existsSync(GT.settings.app.wsjtLogPath)) appendAppLog(GT.settings.app.wsjtLogPath, true);
     delete GT.settings.app.wsjtLogPath;
   }
 
