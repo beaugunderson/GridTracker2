@@ -829,34 +829,26 @@ function findTrustedQSLPaths()
     }
     else if (GT.platform == "mac")
     {
-      const child_process = require("child_process");
-      let args = Array();
-      args.push("-name");
-      args.push("'tqsl'");
-      base = "/Contents/MacOS/tqsl";
+      const testLocations = [
+        "/Applications/TrustedQSL/tqsl.app/Contents/MacOS/tqsl",
+        "/Applications/tqsl.app/Contents/MacOS/tqsl",
+        process.env.HOME + "/Applications/TrustedQSL/tqsl.app/Contents/MacOS/tqsl",
+        process.env.HOME + "/Applications/tqsl.app/Contents/MacOS/tqsl",
+        process.env.HOME + "/Desktop/TrustedQSL/tqsl.app/Contents/MacOS/tqsl",
+        process.env.HOME + "/Desktop/tqsl.app/Contents/MacOS/tqsl",
+        process.env.HOME + "/Applications/Ham Radio/TrustedQSL/tqsl.app/Contents/MacOS/tqsl",
+        process.env.HOME + "/Applications/Ham Radio/tqsl.app/Contents/MacOS/tqsl",
+      ];
 
-      try 
+      for (const path of testLocations)
       {
-        let stdout = child_process.execFileSync("mdfind", args);
-        if (stdout)
+        if (fs.existsSync(path))
         {
-          let lines = stdout.split("\n");
-          for (let line in lines)
-          {
-            let path = lines[line].trim() + base;
-            if (fs.existsSync(path))
-            {
-              GT.settings.trustedQsl.binaryFile = path;
-              GT.settings.trustedQsl.binaryFileValid = true;
-              break;
-            }
-          }
+          GT.settings.trustedQsl.binaryFile = path;
+          GT.settings.trustedQsl.binaryFileValid = true;
+          break;
         }
-      }
-      catch (e)
-      {
-        console.log(e);
-      }
+       }
     }
     else if (GT.platform == "linux")
     {

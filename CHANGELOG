@@ -144,6 +144,16 @@ Logging: LoTW: Will now queue failed uploads and retry on next QSO
 
 Logging: Any 1x1 QSO in the US over 15 days not considered worked for hunting purposes
 
+Logging: MacOS no longer allows third-party apps to find installed apps, will use known install locations
+        /Applications/TrustedQSL/tqsl.app
+        /Applications/tqsl.app
+        ~/Applications/TrustedQSL/tqsl.app
+        ~/Applications/tqsl.app
+        ~/Desktop/TrustedQSL/tqsl.app
+        ~/Desktop/tqsl.app
+        ~/Applications/Ham Radio/TrustedQSL/tqsl.app
+        ~/Applications/Ham Radio/tqsl.app
+
 Call Roster: Due to complaints 1x1 US Special Callsign highlighting removed
       (Use the watcher -> Callsign Regex  ^[KNW][0-9][A-W|Y|Z]$ to replicate)
 
