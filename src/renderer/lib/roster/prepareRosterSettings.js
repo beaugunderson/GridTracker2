@@ -4,7 +4,6 @@ function prepareRosterSettings()
     bands: {},
     modes: {},
     onlyHits: CR.rosterSettings.onlyHits,
-    canMsg: window.opener.oamsCanMsg(),
     isAwardTracker: false,
     now: timeNowSec()
   }

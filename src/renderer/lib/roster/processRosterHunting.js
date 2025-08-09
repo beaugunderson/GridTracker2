@@ -20,7 +20,6 @@ const AWT_MAP = {
 
 const AWARD_HUNT_EMPTY = {
   huntCallsign: false,
-  huntOAMS: false,
   huntGrid: false,
   huntDXCC: false,
   huntCQz: false,
@@ -36,7 +35,6 @@ const AWARD_HUNT_EMPTY = {
 
 const AUDIO_ALERT_HUNT_ZERO = {
   huntCallsign: 0,
-  huntOAMS: 0,
   huntGrid: 0,
   huntDXCC: 0,
   huntState: 0,
@@ -63,7 +61,6 @@ const kLayeredUnconfAlpha = "AA";
 
 function processRosterHunting(callRoster, rosterSettings)
 {
-  let hasGtPin = false;
   const currentYear = new Date().getUTCFullYear();
   const potaFeatureEnabled = (GT.settings.app.potaFeatureEnabled && GT.settings.map.offlineMode == false);
 
@@ -167,32 +164,6 @@ function processRosterHunting(callRoster, rosterSettings)
           callPointer = "text-decoration: line-through;";
           callConf = "";
         }
-      }
-
-      // Calls that have OAMS chat support
-      if (callsign in GT.gtCallsigns)
-      {
-        callObj.gt = 0;
-        hasGtPin = false;
-        for (const cid in GT.gtCallsigns[callsign])
-        {
-          if (cid in GT.gtFlagPins && GT.gtFlagPins[cid].canmsg == true)
-          {
-            callObj.callFlags.oams = true;
-            callObj.gt = cid;
-            hasGtPin = true;
-            if (GT.gtFlagPins[cid].src == "GT")
-            {
-              // a GT user, lets go with it
-              break;
-            }
-          }
-        }
-      }
-      else
-      {
-        callObj.gt = 0;
-        hasGtPin = false;
       }
 
     
@@ -318,18 +289,6 @@ function processRosterHunting(callRoster, rosterSettings)
           {
             if (AAW.huntWatcher) AH.huntWatcher++;
             if (RW.huntWatcher) shouldRosterAlert = true;
-          }
-        }
-
-        // Hunting for stations with OAMS
-        if ((RW.huntOAMS || AAW.huntOAMS) && hasGtPin)
-        {
-          if (AAW.huntOAMS) AH.huntOAMS++;
-          if (RW.huntOAMS)
-          {
-            callObj.hunting.oams = "hunted";
-            shouldRosterAlert = true;
-            callObj.shouldOAMS = true;
           }
         }
 

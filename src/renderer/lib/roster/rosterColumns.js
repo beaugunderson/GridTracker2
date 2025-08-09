@@ -4,7 +4,7 @@ const DEFAULT_COLUMN_ORDER = [
   "dB", "Freq", "DT", "Dist", "Azim", 
   "CQz", "ITUz", "PX",
   "LoTW", "eQSL", "OQRS",
-  "Life", "Spot", "OAMS", "Age", "UTC"
+  "Life", "Spot",  "Age", "UTC"
 ]
 
 const getterSimpleComparer = (getter) => (a, b) =>
@@ -319,41 +319,6 @@ const ROSTER_COLUMNS = {
     })
   },
 
-  OAMS: {
-    tableHeader: () => ({ description: "Off-Air Message User" }),
-    compare: getterSimpleComparer((elem) => elem.callObj.gt != 0 ? 1 : 0),
-    tableData: (callObj) =>
-    {
-      if (callObj.gt != 0)
-      {
-        if (callObj.shouldOAMS)
-        {
-          return {
-            align: "center",
-            style: "margin: 0; padding: 0; cursor: pointer; background-clip: content-box; box-shadow: 0 0 4px 4px inset #2222FFFF;",
-            onClick: `openChatToCid("${callObj.gt}")`,
-            html: "<img height='13px' style='margin-bottom:-2px;' src='img/gt_chat.png' />"
-          }
-        }
-        else
-        {
-          return {
-            align: "center",
-            style: "margin: 0; padding: 0; cursor: pointer;",
-            onClick: `openChatToCid("${callObj.gt}")`,
-            html: "<img height='13px' style='margin-bottom:-2px;' src='img/gt_chat.png' />"
-          }
-        }
-      }
-      else
-      {
-        return {
-          html: "&nbsp;"
-        }
-      }
-    }
-  },
-
   UTC: {
     compare: callObjSimpleComparer("age"),
     tableData: (callObj) => ({
@@ -442,7 +407,7 @@ function potaColumnHover(callObj)
   
   return value;
 }
-WANTED_ORDER = ["call", "qrz", "watcher", "cont", "dxcc", "cqz", "ituz", "dxm", "state", "pota", "grid", "cnty", "wpx", "oams"];
+WANTED_ORDER = ["call", "qrz", "watcher", "cont", "dxcc", "cqz", "ituz", "dxm", "state", "pota", "grid", "cnty", "wpx"];
 WANTED_LABELS = {};
 
 function wantedColumnParts(callObj, options)
@@ -464,7 +429,7 @@ function wantedColumnParts(callObj, options)
     if (wanted == "calling") { parts.push("Calling"); }
     // else if (wanted == "caller") { parts.push("Called"); }
     else if (wanted == "hunted" && field == "qrz") { parts.push("Caller"); }
-    else if (wanted == "hunted" && field == "oams") { parts.push("OAMS User"); }
+
     else if (wanted == "hunted" && field == "watcher") { parts.push(callObj.watcherKey); }
     else if (wanted == "hunted") { parts.push(`${options.html ? "<b>" : ""}New ${WANTED_LABELS[field]}${options.html ? "<b>" : ""}`); }
     else if (wanted == "worked") { parts.push(`Worked ${WANTED_LABELS[field]}`); }

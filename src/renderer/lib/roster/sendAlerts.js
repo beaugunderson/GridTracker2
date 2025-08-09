@@ -70,11 +70,11 @@ function sendAlerts()
   // NOTE: Ring alerts if needed
   if (shouldRosterAlert > 0)
   {
-    if (GT.settings.msg.msgPushover && GT.settings.msg.msgPushoverRoster)
+    if (GT.settings.msg.msgPushover)
     {
       sendPushOverAlert(parseCRJson(scriptReport));
     }
-    if (GT.settings.msg.msgSimplepush && GT.settings.msg.msgSimplepushRoster)
+    if (GT.settings.msg.msgSimplepush)
     {
       sendSimplePushMessage(parseCRJson(scriptReport));
     }

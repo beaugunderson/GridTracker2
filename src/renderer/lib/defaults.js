@@ -69,8 +69,7 @@ const def_settings = {
     gtFlagImgSrc: 0,
     gtModeFilter: "",
     gtPropFilter: "mixed",
-    oamsMsgEnable: true,
-    msgAlertMedia: "",
+
     offAirServicesEnable: true,
     spottingEnable: true,
     loadAdifAtStartup: false,
@@ -266,13 +265,10 @@ const def_settings = {
   msg: {
     msgSimplepush: false,
     msgSimplepushApiKey: "",
-    msgSimplepushChat: true,
-    msgSimplepushRoster: false,
     msgPushover: false,
     msgPushoverUserKey: "",
     msgPushoverToken: "",
-    msgPushoverChat: true,
-    msgPushoverRoster: false
+
   },
   reception: {
     viewHistoryTimeSec: 900,
@@ -376,7 +372,6 @@ const def_settings = {
       huntCont: false,
       huntPX: false,
       huntPOTA: false,
-      huntOAMS: false,
       huntWatcher: false,
       huntAward: false,
       huntMultiple: false,
@@ -393,7 +388,6 @@ const def_settings = {
       huntContType: "tts",
       huntPXType: "tts",
       huntPOTAType: "tts",
-      huntOAMSType: "tts",
       huntWatcherType: "tts",
       huntAwardType: "tts",
       huntMultipleType: "tts",
@@ -409,7 +403,7 @@ const def_settings = {
       huntContFileSingle: "none",
       huntPXFileSingle: "none",
       huntPOTAFileSingle: "none",
-      huntOAMSFileSingle: "none",
+
       huntWatcherFileSingle: "none",
       huntAwardFileSingle: "none",
       huntMultipleFileSingle: "none",
@@ -425,7 +419,7 @@ const def_settings = {
       huntContFileMulti: "none",
       huntPXFileMulti: "none",
       huntPOTAFileMulti: "none",
-      huntOAMSFileMulti: "none",
+
       huntWatcherFileMulti: "none",
       huntAwardFileMulti: "none",
       huntMultipleFileMulti: "none",
@@ -441,7 +435,7 @@ const def_settings = {
       huntContSpeechSingle: "Wanted Continent",
       huntPXSpeechSingle: "Wanted Prefix",
       huntPOTASpeechSingle: "Wanted Park",
-      huntOAMSSpeechSingle: "Wanted Ohms User",
+
       huntWatcherSpeechSingle: "Wanted Watcher",
       huntAwardSpeechSingle: "Wanted Award",
       huntMultipleSpeechSingle: "not visible",
@@ -457,7 +451,7 @@ const def_settings = {
       huntContSpeechMulti: "Many Continents",
       huntPXSpeechMulti: "Many Prefixes",
       huntPOTASpeechMulti: "Many Parks",
-      huntOAMSSpeechMulti: "Many Ohms Users",
+
       huntWatcherSpeechMulti: "Many Watchers",
       huntAwardSpeechMulti: "Many Awards",
       huntMultipleSpeechMulti: "Many Wanted Entities",
@@ -510,7 +504,7 @@ const def_settings = {
       huntCont: false,
       huntPX: false,
       huntPOTA: false,
-      huntOAMS: false,
+
       huntWatcher: false,
       huntDXM: false,
     },
@@ -543,7 +537,6 @@ const def_settings = {
       OQRS: false,
       Spot: false,
       Life: false,
-      OAMS: true,
       Age: true,
       UTC: false
     },
@@ -553,7 +546,7 @@ const def_settings = {
       "dB", "Freq", "DT", "Dist", "Azim", 
       "CQz", "ITUz", "PX",
       "LoTW", "eQSL", "OQRS",
-      "Life", "Spot", "OAMS", "Age", "UTC"
+      "Life", "Spot", "Age", "UTC"
     ],
     displayFilters: {
       brightness: 100,

@@ -9,7 +9,6 @@ GT.chatRecvFunctions = {
   list: gtChatNewList,
   info: gtChatUpdateCall,
   drop: gtChatRemoveCall,
-  mesg: gtChatMessage,
   o: gtSpotMessage,
   ba: bandActivityReply,
   Kp: kpIndexMessage,
@@ -43,15 +42,12 @@ GT.gtStateToFunction = {
 
 GT.gtChatSocket = null;
 GT.gtFlagPins = Object();
-GT.gtMessages = Object();
-GT.gtUnread = Object();
 GT.gtCallsigns = Object();
 
 
 GT.gtState = ChatState.none;
 GT.gtStatusCount = 0;
 GT.gtStatusTime = 500;
-GT.gtMaxChatMessages = 100;
 GT.gtNeedUsersList = true;
 GT.gtUuidValid = false;
 
@@ -159,7 +155,6 @@ function closeGtSocket()
 
     GT.gtChatSocket.close();
     GT.gtChatSocket = null;
-
   }
   
   GT.gtState = ChatState.none;
@@ -251,7 +246,7 @@ function gtChatSendStatus()
   msg.mode = GT.settings.app.myMode;
   msg.band = GT.settings.app.myBand;
   msg.src = "GT";
-  msg.canmsg = GT.settings.app.oamsMsgEnable;
+  msg.canmsg = false;
   msg.o = GT.settings.app.spottingEnable == true ? 1 : 0;
   msg = JSON.stringify(msg);
 
@@ -351,17 +346,12 @@ function gtChatRemoveCall(jsmesg)
         GT.gtFlagPins[cid].pin = null;
       }
       GT.gtFlagPins[cid].live = false;
-      notifyNoChat(cid);
-      if (!(cid in GT.gtMessages))
-      {
-        if (Object.keys(GT.gtCallsigns[GT.gtFlagPins[cid].call]).length == 0)
-        {
-          delete GT.gtCallsigns[GT.gtFlagPins[cid].call];
-        }
-        delete GT.gtFlagPins[cid];
-      }
 
-      updateChatWindow(cid);
+      if (Object.keys(GT.gtCallsigns[GT.gtFlagPins[cid].call]).length == 0)
+      {
+        delete GT.gtCallsigns[GT.gtFlagPins[cid].call];
+      }
+      delete GT.gtFlagPins[cid];    
     }
   }
 }
@@ -405,7 +395,7 @@ function gtChatUpdateCall(jsmesg)
   GT.gtFlagPins[cid].band = jsmesg.band;
   GT.gtFlagPins[cid].mode = jsmesg.mode;
   GT.gtFlagPins[cid].src = jsmesg.src;
-  GT.gtFlagPins[cid].canmsg = jsmesg.canmsg;
+
   GT.gtFlagPins[cid].o = jsmesg.o;
   GT.gtFlagPins[cid].dxcc = callsignToDxcc(jsmesg.call);
   GT.gtFlagPins[cid].live = true;
@@ -426,7 +416,6 @@ function gtChatUpdateCall(jsmesg)
   }
   GT.gtCallsigns[GT.gtFlagPins[cid].call][cid] = true;
 
-  updateChatWindow(cid);
 }
 
 function gtChatGetList()
@@ -500,8 +489,6 @@ function gtChatNewList(jsmesg)
 
   // starting clean if we're getting a new chat list
   GT.gtFlagPins = Object()
-  GT.gtMessages = Object();
-  GT.gtUnread = Object();
   GT.gtCallsigns = Object();
 
 
@@ -531,7 +518,7 @@ function gtChatNewList(jsmesg)
       GT.gtFlagPins[cid].mode = jsmesg.data.mode[key];
       GT.gtFlagPins[cid].src = jsmesg.data.src[key];
       GT.gtFlagPins[cid].cid = cid;
-      GT.gtFlagPins[cid].canmsg = jsmesg.data.canmsg[key];
+
       GT.gtFlagPins[cid].o = jsmesg.data.o[key];
       GT.gtFlagPins[cid].dxcc = callsignToDxcc(GT.gtFlagPins[cid].call);
       GT.gtFlagPins[cid].live = true;
@@ -552,25 +539,9 @@ function gtChatNewList(jsmesg)
     }
   }
 
-  updateChatWindow();
-
   oamsBandActivityCheck();
 }
 
-function appendToHistory(cid, jsmesg)
-{
-  if (!(cid in GT.gtMessages))
-  {
-    GT.gtMessages[cid] = Object();
-    GT.gtMessages[cid].history = Array();
-  }
-
-  GT.gtMessages[cid].history.push(jsmesg);
-  while (GT.gtMessages[cid].history.length > GT.gtMaxChatMessages)
-  {
-    GT.gtMessages[cid].history.shift();
-  }
-}
 
 function htmlEntities(str)
 {
@@ -586,7 +557,7 @@ function sendSimplePushMessage(jsmesg)
   const url = "https://api.simplepush.io/send";
   let data = {
     key: GT.settings.msg.msgSimplepushApiKey,
-    title: "GT Chat - " + formatCallsign(GT.settings.app.myCall),
+    title: "GT Test - " + formatCallsign(GT.settings.app.myCall),
     msg: formatCallsign(jsmesg.call) + ": " + jsmesg.msg
   };
   getPostBuffer(
@@ -607,7 +578,7 @@ function sendPushOverMessage(jsmesg, test = false)
     user: GT.settings.msg.msgPushoverUserKey,
     token: GT.settings.msg.msgPushoverToken,
     title:
-        "GT Chat - " + formatCallsign(GT.settings.app.myCall),
+        "GT Test - " + formatCallsign(GT.settings.app.myCall),
     message: formatCallsign(jsmesg.call) + ": " + jsmesg.msg
   };
   getPostBuffer(
@@ -666,61 +637,6 @@ function PushoverReply(data, isTest)
   }
 }
 
-function gtChatMessage(jsmesg)
-{
-  if (GT.settings.app.oamsMsgEnable == true)
-  {
-    let cid = jsmesg.cid;
-    jsmesg.when = Date.now();
-    try
-    {
-      jsmesg.msg = new Buffer.from(jsmesg.msg, "base64").toString("utf8"); // eslint-disable-line new-cap
-      jsmesg.msg = htmlEntities(jsmesg.msg);
-    }
-    catch (e)
-    {
-      jsmesg.msg = "Corrupt message received";
-    }
-
-    if (jsmesg.call != null && jsmesg.call != "" && jsmesg.call != "NOCALL")
-    {
-      appendToHistory(cid, jsmesg);
-      GT.gtUnread[cid] = true;
-      GT.gtCurrentMessageCount++;
-
-      if (newChatMessage(cid, jsmesg) == false)
-      {
-        // Only notify if you're not in active chat with them.
-        if (GT.settings.msg.msgSimplepush && GT.settings.msg.msgSimplepushChat && GT.settings.msg.msgSimplepushApiKey != null)
-        {
-          sendSimplePushMessage(jsmesg);
-        }
-        if (GT.settings.msg.msgPushover && GT.settings.msg.msgPushoverChat && GT.settings.msg.msgPushoverUserKey != null &&
-            GT.settings.msg.msgPushoverToken != null)
-        {
-          sendPushOverMessage(jsmesg);
-        }
-
-        alertChatMessage();
-      }
-    }
-  }
-}
-
-function gtSendMessage(message, who)
-{
-  let msg = Object();
-  msg.type = "mesg";
-  msg.uuid = GT.settings.app.chatUUID;
-  msg.cid = who;
-  msg.msg = new Buffer.from(message).toString("base64"); // eslint-disable-line new-cap
-  sendGtJson(JSON.stringify(msg));
-  msg.msg = htmlEntities(message);
-  msg.id = 0;
-  msg.when = Date.now();
-  appendToHistory(who, msg);
-}
-
 function gtChatSendUUID()
 {
   let msg = Object();
@@ -766,12 +682,6 @@ function gtChatStateMachine()
   {
     let now = timeNowSec();
     GT.gtStateToFunction[GT.gtState]();
-
-    if (Object.keys(GT.gtUnread).length > 0 && msgImg.style.webkitFilter == "")
-    {
-      msgImg.style.webkitFilter = "invert(1)";
-    }
-    else msgImg.style.webkitFilter = "";
 
     GT.getEngineWasRunning = true;
   }
@@ -853,56 +763,4 @@ function toggleGtMap()
   {
     GT.layerVectors.gtflags.setVisible(false);
   }
-}
-
-function notifyNoChat(id)
-{
-  if (GT.chatWindowInitialized)
-  {
-    try
-    {
-      GT.chatWindowHandle.window.notifyNoChat(id);
-    }
-    catch (e) {}
-  }
-}
-
-function updateChatWindow(id = null)
-{
-  if (GT.chatWindowInitialized)
-  {
-    try
-    {
-      if (id)
-      {
-        GT.chatWindowHandle.window.updateCallsign(id);
-      }
-      else
-      {
-        GT.chatWindowHandle.window.updateEverything();
-      }
-    }
-    catch (e) {}
-  }
-}
-
-function newChatMessage(id, jsmesg)
-{
-  let hasFocus = false;
-
-  if (GT.chatWindowInitialized)
-  {
-    try
-    {
-      hasFocus = GT.chatWindowHandle.window.newChatMessage(id, jsmesg);
-      GT.chatWindowHandle.window.messagesRedraw();
-    }
-    catch (e) {}
-  }
-  return hasFocus;
-}
-
-function oamsCanMsg()
-{
-  return (GT.settings.map.offlineMode == false && GT.settings.app.offAirServicesEnable == true && GT.settings.app.oamsMsgEnable == true);
 }

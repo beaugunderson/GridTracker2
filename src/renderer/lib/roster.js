@@ -271,9 +271,6 @@ function realtimeRoster()
   CR.day = parseInt(now / 86400);
   CR.dayAsString = String(CR.day);
 
-  if (Object.keys(GT.gtUnread).length > 0 && now % 2 == 0) rosterChatNotifyImg.style.webkitFilter = "invert(1)";
-  else rosterChatNotifyImg.style.webkitFilter = "";
-
   if (CR.rosterSettings.realtime == false) return;
 
   let timeCols = document.getElementsByClassName("timeCol");
@@ -321,11 +318,6 @@ function getSpotString(callObj)
   }
   if (result != "&nbsp;") result += " / " + callObj.spot.snr;
   return result;
-}
-
-function openChatToCid(cid)
-{
-  window.opener.showMessaging(true, cid);
 }
 
 function initiateQso(thisHash)
@@ -777,7 +769,6 @@ function setVisual()
   useseQSLDiv.style.display = (GT.settings.callsignLookups.eqslUseEnable) ? "" : "none";
   usesOQRSDiv.style.display = (GT.settings.callsignLookups.oqrsUseEnable) ? "" : "none";
   onlySpotDiv.style.display = (CR.rosterSettings.columns.Spot) ? "" : "none";
-  rosterChatNotifyImg.style.display = huntingMatrixOAMSDiv.style.display = (window.opener.oamsCanMsg()) ? "" : "none";
   huntingMatrixPotaDiv.style.display = (GT.settings.app.potaFeatureEnabled && GT.settings.map.offlineMode == false) ? "" : "none";
   rosterBody.style.display = "block";
   

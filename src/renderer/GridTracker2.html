@@ -550,9 +550,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <div id="gtFlagButton" onclick="toggleGtMap();" class="iconButton" title="Toggle View GridTracker Users">
           <img id="gtFlagImg" src="" class="buttonImg" />
         </div>
-        <div id="msgButton" onclick="toggleMessaging()" oncontextmenu="toggleMessaging(false)" class="iconButton" title="Messaging Window">
-          <img id="msgImg" src="img/gt_chat.png" class="buttonImg" />
-        </div>
       </div>
       <div id="trafficDiv" class="roundBorder" style="
             position: relative;
@@ -1116,19 +1113,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               <input  type="checkbox" id="oamsBandActivityNeighbors" onclick="setOamsBandActivityNeighbors(this);" />
             </td>
           </tr>
-          <tr id="oamsMsgEnableTr">
-            <td data-i18n="settings.OAMS.message.enable.label" for="oamsMsgEnable">Chat Messaging</td>
-            <td>
-              <input type="checkbox" id="oamsMsgEnable" onclick="setMsgEnable();" />
-            </td>
-          </tr>
-          <tr id="oamsMsgAlertTr">
-            <td data-i18n="settings.OAMS.message.newAlert.label" for="msgAlertMedia">New Message Alert</td>
-            <td>
-              <select id="msgAlertMedia" onchange="setMsgAlert(); alertChatMessage();">
-              </select>
-            </td>
-          </tr>
           </table>
         </div>
         <div class="mapItem" style="border:0">
@@ -1144,14 +1128,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     class="inputTextValue" maxlength="255" size="16"
                     oninput="ValidateText(this); newMessageSetting(this);" />
                 </td>
-              </tr>
-              <tr>
-                <td><input title="Enable / Disable Chat Message Forward" type="checkbox" id="msgSimplepushChat"
-                  onclick="setOamsSimplepushChat(this);" data-i18n="settings.OAMS.forward.chat" /> Forward Chat Messages</td>
-              </tr>
-              <tr>
-                <td><input title="Enable / Disable Roster Alert Forward" type="checkbox" id="msgSimplepushRoster"
-                  onclick="setOamsSimplepushRoster(this);" data-i18n="settings.OAMS.forward.roster" /> Forward Roster Alerts</td>
               </tr>
               <tr>
                 <td>
@@ -1182,14 +1158,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                          class="inputTextValue" maxlength="255" size="16"
                          oninput="ValidateText(this); newMessageSetting(this);" />
                 </td>
-              </tr>
-              <tr>
-                <td><input title="Enable / Disable Chat Message Forward" type="checkbox" id="msgPushoverChat"
-                  onclick="setOamsPushoverChat(this);" data-i18n="settings.OAMS.forward.chat" /> Forward Chat Messages</td>
-              </tr>
-              <tr>
-                <td><input title="Enable / Disable Roster Alert Forward" type="checkbox" id="msgPushoverRoster"
-                  onclick="setOamsPushoverRoster(this);" data-i18n="settings.OAMS.forward.roster" /> Forward Roster Alerts</td>
               </tr>
               <tr>
                 <td>
@@ -2355,14 +2323,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 <label data-i18n="roster.secondary.wanted.pota" for="huntPOTA" title="Parks On The Air">POTA</label>
              </td>
               </tr>
-              <tr id="huntingMatrixOAMSRow">
-              <td>
-                <input type="checkbox" id="huntOAMS" onchange="wantedChanged(this);" />
-              </td>
-              <td>
-                <label data-i18n="roster.secondary.wanted.OAMS" for="huntOAMS" title="Off-Air Message Service Users">OAMS</label>
-              </td>
-            </tr>
             <tr>
               <td>
                 <input type="checkbox" id="huntCQz" onchange="wantedChanged(this);" />

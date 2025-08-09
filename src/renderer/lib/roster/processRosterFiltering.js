@@ -32,7 +32,6 @@ function processRosterFiltering(callRoster, rosterSettings)
     entry.tx = true;
     callObj.shouldRosterAlert = false;
     callObj.shouldAudioAlert = false;
-    callObj.shouldOAMS = false;
     callObj.AH = {};
     callObj.audioAlertReason = {};
     callObj.dxm = null;

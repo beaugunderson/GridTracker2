@@ -108,6 +108,17 @@ function loadAllSettings()
     delete GT.settings.roster.referenceNeed;
   }
 
+  if (GT.settings.roster.columns.OAMS)
+  {
+    delete GT.settings.roster.columns.OAMS;
+  }
+
+  let indexOfOAMS = GT.settings.roster.columnOrder.indexOf("OAMS");
+  if (indexOfOAMS > -1)
+  {
+    GT.settings.roster.columnOrder.splice(indexOfOAMS, 1);
+  }
+
   // Deprecated single app log path
   if (GT.settings.app.wsjtLogPath)
   {
@@ -151,8 +162,7 @@ GT.callRosterWindowHandle = null;
 GT.callRosterWindowInitialized = false;
 GT.conditionsWindowHandle = null;
 GT.conditionsWindowInitialized = false;
-GT.chatWindowHandle = null;
-GT.chatWindowInitialized = false;
+
 GT.statsWindowHandle = null;
 GT.statsWindowInitialized = false;
 GT.lookupWindowHandle = null;
@@ -1898,43 +1908,6 @@ function openStatsWindow(show = true)
   else if (GT.statsWindowInitialized == true)
   {
     show ? electron.ipcRenderer.send("showWin", "gt_stats") : electron.ipcRenderer.send("hideWin", "gt_stats");
-  }
-}
-
-function showMessaging(show = true, cid)
-{
-  if (GT.chatWindowHandle == null)
-  {
-    GT.chatWindowHandle = window.open("gt_chat.html", "gt_chat");
-  }
-  else if (GT.chatWindowInitialized)
-  {
-    show ? electron.ipcRenderer.send("showWin", "gt_chat") : electron.ipcRenderer.send("hideWin", "gt_chat");
-    if (typeof cid != "undefined") GT.chatWindowHandle.window.openId(cid);
-  }
-}
-
-function toggleMessaging(toggle = true)
-{
-  if (GT.chatWindowInitialized)
-  {
-    if (toggle)
-    {
-      electron.ipcRenderer.send("toggleWin", "gt_chat");
-    }
-    else
-    {
-      electron.ipcRenderer.send("showWin", "gt_chat");
-    }
-  }
-}
-
-function openMessaging()
-{
-  if (GT.chatWindowInitialized)
-  {
-    electron.ipcRenderer.send("showWin", "gt_chat");
-    electron.ipcRenderer.send("focusWin", "gt_chat");
   }
 }
 
@@ -5409,7 +5382,7 @@ function handleInstanceStatus(newMessage)
       let msg = "<font color='yellow'>" + GT.settings.app.myBand + "</font> / <font color='orange'>" + GT.settings.app.myMode + "</font>";
       addLastTraffic(msg);
       ackAlerts();
-      updateChatWindow();
+
       oamsBandActivityCheck();
       GT.gtLiveStatusUpdate = true;
       GT.startingUp = false;
@@ -9689,35 +9662,10 @@ function updateOffAirServicesViews()
   offAirServicesTr.style.display = GT.settings.map.offlineMode == true ? "none" : "";
   updateGTFlagViews();
   setMsgSettingsView();
-  updateChatMessagingViews();
   updateBandActivityViews();
   updateSpottingViews();
   setVisualHunting();
   goProcessRoster();
-}
-
-function updateChatMessagingViews()
-{
-  if (GT.settings.map.offlineMode == true || GT.settings.app.offAirServicesEnable == false)
-  {
-    oamsMsgEnableTr.style.display = "none";
-  }
-  else
-  {
-    oamsMsgEnableTr.style.display = "";
-  }
-
-  if (GT.settings.map.offlineMode == true || GT.settings.app.offAirServicesEnable == false || GT.settings.app.oamsMsgEnable == false)
-  {
-    msgButton.style.display = "none";
-    oamsMsgAlertTr.style.display = "none";
-    showMessaging(false);
-  }
-  else
-  {
-    msgButton.style.display = "";
-    oamsMsgAlertTr.style.display = "";
-  }
 }
 
 function updateBandActivityViews()
@@ -9770,8 +9718,6 @@ function updateGTFlagViews()
     clearGtFlags();
     // Clear list
     GT.gtFlagPins = Object()
-    GT.gtMessages = Object();
-    GT.gtUnread = Object();
     GT.gtCallsigns = Object();
 
     conditionsButton.style.background = "";
@@ -9912,65 +9858,11 @@ function setOamsSimplepush(checkbox)
   simplePushDiv.style.display = GT.settings.msg.msgSimplepush == true ? "" : "none";
 }
 
-function setOamsSimplepushChat(checkbox)
-{
-  GT.settings.msg.msgSimplepushChat = checkbox.checked;
-  // One must be checked, otherwise why is the service enabled?
-  if (GT.settings.msg.msgSimplepushChat == false && GT.settings.msg.msgSimplepushRoster == false)
-  {
-    GT.settings.msg.msgSimplepushRoster = msgSimplepushRoster.checked = true;
-  }
-}
-
-function setOamsSimplepushRoster(checkbox)
-{
-  GT.settings.msg.msgSimplepushRoster = checkbox.checked;
-  // One must be checked, otherwise why is the service enabled?
-  if (GT.settings.msg.msgSimplepushRoster == false && GT.settings.msg.msgSimplepushChat == false)
-  {
-    GT.settings.msg.msgSimplepushChat = msgSimplepushChat.checked = true;
-  }
-}
 
 function setOamsPushover(checkbox)
 {
   GT.settings.msg.msgPushover = checkbox.checked;
   pushOverDiv.style.display = GT.settings.msg.msgPushover == true ? "" : "none";
-}
-
-function setOamsPushoverChat(checkbox)
-{
-  GT.settings.msg.msgPushoverChat = checkbox.checked;
-  // One must be checked, otherwise why is the service enabled?
-  if (GT.settings.msg.msgPushoverChat == false && GT.settings.msg.msgPushoverRoster == false)
-  {
-    GT.settings.msg.msgPushoverRoster = msgPushoverRoster.checked = true;
-  }
-}
-
-function setOamsPushoverRoster(checkbox)
-{
-  GT.settings.msg.msgPushoverRoster = checkbox.checked;
-  // One must be checked, otherwise why is the service enabled?
-  if (GT.settings.msg.msgPushoverRoster == false && GT.settings.msg.msgPushoverChat == false)
-  {
-    GT.settings.msg.msgPushoverChat = msgPushoverChat.checked = true;
-  }
-}
-
-function setMsgEnable()
-{
-  GT.settings.app.oamsMsgEnable = oamsMsgEnable.checked;
-  GT.gtLiveStatusUpdate = true;
-  updateChatMessagingViews();
-  setMsgSettingsView();
-  setVisualHunting();
-  goProcessRoster();
-}
-
-function setMsgAlert()
-{
-  GT.settings.app.msgAlertMedia = msgAlertMedia.value;
 }
 
 function newMessageSetting(whichSetting)
@@ -12135,8 +12027,7 @@ function loadViewSettings()
 
 function loadMsgSettings()
 {
-  oamsMsgEnable.checked = GT.settings.app.oamsMsgEnable;
-  msgAlertMedia.value = GT.settings.app.msgAlertMedia;
+
   spottingEnable.checked = GT.settings.app.spottingEnable;
 
   oamsBandActivity.checked = GT.settings.app.oamsBandActivity;
@@ -12158,12 +12049,7 @@ function loadMsgSettings()
   }
 
   msgSimplepush.checked = GT.settings.msg.msgSimplepush;
-  msgSimplepushChat.checked = GT.settings.msg.msgSimplepushChat;
-  msgSimplepushRoster.checked = GT.settings.msg.msgSimplepushRoster;
-
   msgPushover.checked = GT.settings.msg.msgPushover;
-  msgPushoverChat.checked = GT.settings.msg.msgPushoverChat;
-  msgPushoverRoster.checked = GT.settings.msg.msgPushoverRoster;
 
   setMsgSettingsView();
 }
@@ -12450,8 +12336,6 @@ function postInit()
     openAlertWindow(false);
     section = "ConditionsWindow";
     openConditionsWindow(false);
-    section = "ChatWindow";
-    showMessaging(false);
     section = "RosterWindow";
     openCallRosterWindow(false);
     section = "ButtonPanelInit";
@@ -14132,15 +14016,6 @@ function displayLookupObject(lookup, gridPass, fromCache = false)
     worker += "</tr>";
   }
 
-  for (const cid in GT.gtCallsigns[thisCall])
-  {
-    if (cid in GT.gtFlagPins && GT.gtFlagPins[cid].canmsg == true)
-    {
-      worker += "<tr style='cursor:pointer' onClick='window.opener.showMessaging(true, \"" + cid + "\")'><td>" + I18N("rosterColumns.OAMS.user") + "</td><td><img height='13px' style='margin-bottom:-2px;' src='img/gt_chat.png' /></td></tr>";
-      break;
-    }
-  }
-
   worker += makeRow("Type", lookup, "type");
   worker += makeRow("Class", lookup, "class");
   worker += makeRow("Codes", lookup, "codes");
@@ -14417,7 +14292,6 @@ function mediaCheck()
   GT.clublogLogFile = path.join(GT.appData, "clublog.adif");
 
   logEventMedia.appendChild(newOption("none", I18N("settings.OAMS.message.newAlert.none")));
-  msgAlertMedia.appendChild(newOption("", I18N("settings.OAMS.message.newAlert.none")));
 
   alertMediaSelect.appendChild(newOption("none", I18N("alerts.addNew.SelectFile")));
 
@@ -14427,7 +14301,6 @@ function mediaCheck()
   {
     let noExt = path.parse(filename).name;
     logEventMedia.appendChild(newOption(filename, noExt));
-    msgAlertMedia.appendChild(newOption(filename, noExt));
     alertMediaSelect.appendChild(newOption(filename, noExt));
 
   });

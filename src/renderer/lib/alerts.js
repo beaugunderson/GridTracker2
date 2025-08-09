@@ -848,7 +848,6 @@ function setVisualAudioAlerts()
   useseQSLDiv.style.display = (GT.settings.callsignLookups.eqslUseEnable) ? "" : "none";
   usesOQRSDiv.style.display = (GT.settings.callsignLookups.oqrsUseEnable) ? "" : "none";
   onlySpotDiv.style.display = (GT.settings.roster.columns.Spot) ? "" : "none";
-  huntingMatrixOAMSRow.style.display = (oamsCanMsg()) ? "" : "none";
   huntingMatrixPotaRow.style.display = (GT.settings.app.potaFeatureEnabled && GT.settings.map.offlineMode == false) ? "" : "none";
 }
 
@@ -1057,12 +1056,3 @@ function openWatcher()
     }
   }
 }
-
-function alertChatMessage()
-{
-  if (GT.settings.app.msgAlertMedia.length > 0)
-  {
-    playAlertMediaFile(GT.settings.app.msgAlertMedia);
-  }
-}
-
