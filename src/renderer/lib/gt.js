@@ -689,7 +689,6 @@ GT.startupTable = [
   [registerHotKeys, "Registered Hotkeys", "gt.startupTable.regHotkeys"],
   [gtChatSystemInit, "Chat System Initialized", "gt.startupTable.initOams"],
   [initPota, "POTA Initialized", "gt.startupTable.loadPOTA"],
-  [downloadAcknowledgements, "Contributor Acknowledgements Loaded", "gt.startupTable.getAcks"],
   [postInit, "Finalizing System", "gt.startupTable.postInit"],
   [undefined, "Completed", "gt.startupEngine.completed"]
 ];
@@ -9874,27 +9873,6 @@ function newMessageSetting(whichSetting)
   }
 }
 
-function downloadAcknowledgements()
-{
-  if (GT.settings.map.offlineMode == false)
-  {
-    getBuffer(
-      "https://app2.gridtracker.org/dbs/acknowledgements.json",
-      updateAcks,
-      null,
-      "https",
-      443
-    );
-
-    // check again tomorrow
-    nodeTimers.setTimeout(downloadAcknowledgements, 86400000);
-  }
-  else
-  {
-    // check in 5 minutes, maybe they went online
-    nodeTimers.setTimeout(downloadAcknowledgements, 300000);
-  }
-}
 
 function renderBandActivity()
 {
@@ -11004,6 +10982,8 @@ function loadMaidenHeadData()
     }
   }
 
+  GT.acknowledgedCalls = requireJson("data/acknowledgements.json");
+  
   // Pass running data set to workers as needed.
   initAdifWorker();
 }
@@ -11252,18 +11232,6 @@ function drawAllGrids()
       }
       GT.layerSources.bigGrids.addFeature(feature);
     }
-  }
-}
-
-function updateAcks(buffer)
-{
-  try
-  {
-    GT.acknowledgedCalls = JSON.parse(buffer);
-  }
-  catch (e)
-  {
-    // can't write, somethings broke
   }
 }
 

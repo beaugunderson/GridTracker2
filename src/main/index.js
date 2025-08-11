@@ -181,12 +181,6 @@ const allowedWindows = {
       icon: join(__dirname, '../renderer/img/conditions.png'),
     },
   },
-  gt_chat: {
-    window: null,
-    honorVisibility: true,
-    options: { x: 55, y: 55, width: 640, height: 300, show: false, zoom: 0 },
-    static: { minWidth: 450, minHeight: 140 },
-  },
   gt_roster: {
     window: null,
     honorVisibility: true,
@@ -248,10 +242,12 @@ if (fs.existsSync(windowSettingsPath)) {
   try {
     const settings = require(windowSettingsPath);
     for (let windowName in settings) {
-      allowedWindows[windowName].options = {
-        ...allowedWindows[windowName].options,
-        ...settings[windowName],
-      };
+      if (windowName in allowedWindows) {
+        allowedWindows[windowName].options = {
+          ...allowedWindows[windowName].options,
+          ...settings[windowName],
+        };
+      }
     }
   }
   catch (e)
