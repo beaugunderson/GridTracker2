@@ -5316,7 +5316,7 @@ function handleInstanceStatus(newMessage)
     }
   }
 
-  if (GT.callRosterWindowInitialized && GT.callRosterWindowHandle.window.CR.rosterSettings.clearRosterOnBandChange && GT.instances[newMessage.instance].oldStatus)
+  if (GT.callRosterWindowInitialized && GT.settings.roster.clearRosterOnBandChange && GT.instances[newMessage.instance].oldStatus)
   {
     if (GT.instances[newMessage.instance].oldStatus.Band != newMessage.Band || GT.instances[newMessage.instance].oldStatus.MO != newMessage.MO)
     {
