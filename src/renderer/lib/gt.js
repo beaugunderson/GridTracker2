@@ -4218,9 +4218,9 @@ function initAEQDprojection()
     // This is a hack because OpenLayers sucks
     // I patched ol.js to insert the function below
     // Tb.proj.addProjections=Ji,
-    // +++ Tb.proj.deleteProjection=function(i){delete ii[i],delete oi[i]},
+    // +++ cP.proj.deleteProjection=function(i){delete ii[i],delete oi[i]},
     // Tb.proj.clearAllProjections=function(){ni(),ai()}
-    delete ol.proj.deleteProjection("AEQD");
+    ol.proj.deleteProjection("AEQD");
     proj4.defs("AEQD", '+');
   }
  
