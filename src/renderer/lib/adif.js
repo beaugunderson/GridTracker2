@@ -2048,8 +2048,19 @@ function sendLotwLogEntry(report, callsignFile, gridFile)
     }
 
     let filename = logNameArray.join("_") + ".adif";
-    let fullPath = path.join(GT.appData, filename);
+    let fullPath = path.join(GT.tempPath, filename);
 
+    try {
+      if (fs.existsSync(path.join(GT.appData, filename))) 
+      {
+        fs.renameSync(path.join(GT.appData, filename), fullPath);
+      }
+    }
+    catch (e)
+    {
+      console.log("Error moving old lotw queue to temp directory");
+    }
+    
     if (!fs.existsSync(fullPath))
     {
       let header = "Generated " + userTimeString(null) + " for " + callsignFile.replaceAll('_','/') + "\r\n\r\n";
@@ -2058,7 +2069,7 @@ function sendLotwLogEntry(report, callsignFile, gridFile)
       header += "<PROGRAMID:" + pid.length + ">" + pid + "\r\n";
       header += "<PROGRAMVERSION:" + pver.length + ">" + pver + "\r\n";
       header += "<EOH>\r\n";
-      fs.writeFileSync(fullPath, header);
+      fs.writeFileSync(fullPath, header, { flush: true });
     }
 
     fs.appendFileSync(fullPath, report + "\r\n", { flush: true });

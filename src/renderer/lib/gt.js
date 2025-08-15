@@ -32,6 +32,7 @@ function loadAllSettings()
   GT.dxccInfoPath = path.join(GT.appData, "dxcc-info.json");
   GT.tempDxccInfoPath = path.join(GT.appData, "dxcc-info-update.json");
   GT.spotsPath = path.join(GT.appData, "spots.json");
+  GT.tempPath = electron.ipcRenderer.sendSync("getPath","temp");
 
   try
   {
@@ -4215,11 +4216,6 @@ function initAEQDprojection()
   if (ol.proj.proj4.isRegistered())
   {
     ol.proj.proj4.unregister();
-    // This is a hack because OpenLayers sucks
-    // I patched ol.js to insert the function below
-    // Tb.proj.addProjections=Ji,
-    // +++ cP.proj.deleteProjection=function(i){delete ii[i],delete oi[i]},
-    // Tb.proj.clearAllProjections=function(){ni(),ai()}
     ol.proj.deleteProjection("AEQD");
     proj4.defs("AEQD", '+');
   }

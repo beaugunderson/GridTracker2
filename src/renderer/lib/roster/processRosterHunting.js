@@ -296,7 +296,7 @@ function processRosterHunting(callRoster, rosterSettings)
         if ((RW.huntGrid || AAW.huntGrid) && callObj.grid.length > 1)
         {
           let hash = callObj.grid.substr(0, 4) + workHashSuffix;
-          let layeredHash = rosterSettings.layeredMode && (callObj.grid.substr(0, 4) + layeredHashSuffix)
+          let layeredHash = rosterSettings.layeredMode && (callObj.grid.substr(0, 4) + layeredHashSuffix);
 
           if (rosterSettings.huntIndex && !(hash in rosterSettings.huntIndex.grid))
           {
