@@ -13845,7 +13845,9 @@ function cacheLookupObject(lookup, gridPass, cacheable = false)
 
     if (lookup.cnty == null)
     {
-      lookup.county = lookup.state + "," + lookup.county;
+      if (!(lookup.county.startsWith(lookup.state + ","))) { 
+        lookup.county = lookup.state + "," + lookup.county;
+      }
       lookup.cnty = replaceAll(lookup.county.toUpperCase(), " ", "");
     }
 

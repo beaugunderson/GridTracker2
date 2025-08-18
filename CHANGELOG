@@ -156,8 +156,10 @@ App:
   Fixed mouse stutter/system slowing issue:
     Removed the rarely used and expensive to maintain Off-Air Message Service (OAMS)
 
+
 Map: Upgrade to OpenLayers map library 10.6.0
-Logging: LoTW: Use temp directory for LoTW queue file instead of AppData
+Logging: LoTW: Use temp directory for LoTW queue file
+Lookups: Fixed county bug on repeated cache hits
 
 ### Fixed
 
