@@ -2674,7 +2674,7 @@ function getPostJSONBuffer(
       method: "post",
       headers: {
         "Content-Type": "application/json",
-        "Content-Length": postData.length,
+        "Content-Length": Buffer.byteLength(postData),
         "User-Agent": gtUserAgent,
         "x-user-agent": gtUserAgent
       }

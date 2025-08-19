@@ -11308,7 +11308,7 @@ function getPostBuffer(file_url, callback, flag, mode, port, theData, timeoutMs,
     method: "post",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
-      "Content-Length": postData.length,
+      "Content-Length": Buffer.byteLength(postData),
       "User-Agent": gtUserAgent,
       "x-user-agent": gtUserAgent
     }
