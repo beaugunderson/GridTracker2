@@ -1372,7 +1372,7 @@ function sendTcpMessage(msg, length, port, address)
 function valueToAdiField(field, value)
 {
   let adi = "<" + field + ":";
-  adi += Buffer.byteLength(String(value)) + ">";
+  adi += String(value).length + ">";
   adi += String(value) + " ";
   return adi;
 }
@@ -1615,7 +1615,7 @@ function finishSendingReport(record)
       delete record[key];
       continue;
     }
-    report += "<" + key + ":" + Buffer.byteLength(record[key]) + ">" + record[key] + " ";
+    report += "<" + key + ":" + record[key].length + ">" + record[key] + " ";
   }
   report += "<EOR>";
 
@@ -1624,7 +1624,7 @@ function finishSendingReport(record)
   {
     if (key != "POTA_REF" && key != "STATE" && key != "CNTY")
     {
-      reportNoPotaNoStateNoCnty += "<" + key + ":" + Buffer.byteLength(record[key]) + ">" + record[key] + " ";
+      reportNoPotaNoStateNoCnty += "<" + key + ":" + record[key].length + ">" + record[key] + " ";
     }
   }
   reportNoPotaNoStateNoCnty += "<EOR>";
@@ -2058,7 +2058,8 @@ function sendLotwLogEntry(report, callsignFile, gridFile)
     }
     catch (e)
     {
-      console.log("Error moving old lotw queue to temp directory");
+      console.log(`Error moving old lotw queue (${path.join(GT.appData, filename)}) to temp directory`);
+      console.log("Suggest deleting the file");
     }
     
     if (!fs.existsSync(fullPath))

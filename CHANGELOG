@@ -158,8 +158,12 @@ App:
 
 
 Map: Upgrade to OpenLayers map library 10.6.0
+Map: Fixed animation toggle issue
 Logging: LoTW: Use temp directory for LoTW queue file
+Logging: Wavelog/Cloudlog: Fix for intermitten failure
+Logging: ADIF field length for unicode strings corrected
 Lookups: Fixed county bug on repeated cache hits
+
 
 ### Fixed
 

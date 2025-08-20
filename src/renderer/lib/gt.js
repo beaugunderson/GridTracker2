@@ -3664,7 +3664,11 @@ function setAnimate(enabled)
 
 function animatePaths()
 {
-  if (GT.settings.map.animate == false) return;
+  if (GT.settings.map.animate == false)
+  {
+    GT.isAnimating = false;
+    return;
+  } 
 
   GT.animateFrame++;
   GT.animateFrame %= GT.settings.map.animateSpeed;
