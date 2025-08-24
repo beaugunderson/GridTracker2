@@ -129,7 +129,7 @@ const allowedWindows = {
     options: { x: 40, y: 40, width: 860, height: 652, show: true, zoom: 0 },
     static: {
       minWidth: 217,
-      minHeight: 626,
+      minHeight: 398,
       icon: join(__dirname, '../renderer/img/gt-icon.png'),
     },
   },
