@@ -4720,7 +4720,7 @@ function createRadar()
 {
   let layerSource = new ol.source.TileWMS({
     projection: "EPSG:3857",
-    url: "https://mapservices.weather.noaa.gov/eventdriven/services/radar/radar_base_reflectivity_time/ImageServer/WMSServer",
+    url: "https://mapservices.weather.noaa.gov:443/eventdriven/services/radar/radar_base_reflectivity/MapServer/WMSServer",
     attributions: `<a href="https://radar.weather.gov/" target="_blank">NWS</a>`,
     params: { LAYERS: "0" }
   });

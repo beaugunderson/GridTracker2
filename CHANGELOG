@@ -168,6 +168,10 @@ Lookups: Fixed county bug on repeated cache hits
 Map: Reverted to OpenLayers 10.1.0 due to issue on some Windows systems
 App: Main window minimum height updated
 
+
+Map: US Weather Radar restored after service removed by NOAA
+
+
 ### Fixed
 
 
