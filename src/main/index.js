@@ -186,7 +186,7 @@ const allowedWindows = {
     honorVisibility: true,
     options: { x: 55, y: 55, width: 760, height: 400, show: false, zoom: 0 },
     static: {
-      minWidth: 390,
+      minWidth: 150,
       minHeight: 250,
       icon: join(__dirname, '../renderer/img/roster-icon.png'),
     },
