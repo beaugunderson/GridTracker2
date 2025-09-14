@@ -4346,7 +4346,7 @@ function initMap()
 
     for (const key in GT.maps)
     {
-      GT.maps[key].attributions = "&copy; <a href='https://gridtracker.org' target='_blank'>GridTracker.org</a> " + GT.maps[key].attributions;
+      GT.maps[key].attributions = "&copy; " + GT.maps[key].attributions + " <a href='https://gridtracker.org' target='_blank'>GridTracker.org</a>";
       if (GT.maps[key].sourceType == "Group")
       {
         ProcessGroupMapSource(key);

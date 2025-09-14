@@ -173,6 +173,7 @@ Map: US Weather Radar restored after service removed by NOAA
 
 
 App: Electron engine update to 35.7.5
+Map: Updated OpenStreetMaps attribution URL
 Logging: No longer add fields to ADIF record if unicode chars are present in data
 
 ### Fixed

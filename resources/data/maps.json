@@ -2,7 +2,7 @@
   "Mapnik by OpenStreetMap (Intl)": {
     "sourceType" : "XYZ",
     "url": "http://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    "attributions": "<a href=\"http://openstreetmap.org/\" target=\"_blank\">OpenStreetMap</a>",
+    "attributions": "<a href=\"http://openstreetmap.org/copyright\" target=\"_blank\">OpenStreetMap</a>",
     "minZoom": 0,
     "maxZoom": 19,
     "offline": false
@@ -10,7 +10,7 @@
   "Mapnik by OpenStreetMap (Deutsch)": {
     "sourceType" : "XYZ",
     "url": "http://{a-c}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png",
-    "attributions": "<a href=\"http://openstreetmap.de/\" target=\"_blank\">OpenStreetMap DE</a>",
+    "attributions": "<a href=\"http://openstreetmap.org/copyright\" target=\"_blank\">OpenStreetMap DE</a>",
     "minZoom": 0,
     "maxZoom": 18,
     "offline": false
@@ -18,7 +18,7 @@
   "Mapnik by OpenStreetMap (français)": {
     "sourceType" : "XYZ",
     "url": "http://{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
-    "attributions": "<a href=\"http://openstreetmap.fr/\" target=\"_blank\">OpenStreetMap FR</a>",
+    "attributions": "<a href=\"http://openstreetmap.org/copyright\" target=\"_blank\">OpenStreetMap FR</a>",
     "minZoom": 0,
     "maxZoom": 18,
     "offline": false
@@ -81,7 +81,7 @@
   "Humanitarian by OpenStreetMap (Intl)": {
     "sourceType" : "XYZ",
     "url": "http://{a-c}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
-    "attributions": "<a href=\"http://openstreetmap.org/\" target=\"_blank\">OpenStreetMap</a>",
+    "attributions": "<a href=\"http://openstreetmap.org/copyright\" target=\"_blank\">OpenStreetMap</a>",
     "minZoom": 0,
     "maxZoom": 19,
     "offline": false
