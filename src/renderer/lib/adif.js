@@ -1610,7 +1610,8 @@ function finishSendingReport(record)
   let report = "";
   for (const key in record)
   {
-    if (record[key] == null)
+    // Strip any null, those with unicode or empty
+    if (record[key] == null || record[key].length != Buffer.byteLength(record[key]) || record[key].length == 0)
     {
       delete record[key];
       continue;
@@ -1781,7 +1782,7 @@ function finishSendingReport(record)
             record.GRIDSQUARE = record.GRIDSQUARE.substr(0, 6);
           }
 
-          DXreport += "<" + key + ":" + Buffer.byteLength(record[key]) + ">" + record[key] + " ";
+          DXreport += "<" + key + ":" + record[key].length + ">" + record[key] + " ";
         }
         DXreport += "<EOR>";
 
@@ -1834,7 +1835,7 @@ function finishSendingReport(record)
       let eQSLreport = "";
       for (let key in record)
       {
-        eQSLreport += "<" + key + ":" + Buffer.byteLength(record[key]) + ">" + record[key] + " ";
+        eQSLreport += "<" + key + ":" + record[key].length + ">" + record[key] + " ";
       }
       eQSLreport += "<EOR>";
 

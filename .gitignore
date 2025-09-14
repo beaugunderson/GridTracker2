@@ -10,4 +10,3 @@ mac-signing-certificate.p12
 .VSCodeCounter
 .vscode/settings.json
 resources/media/desktop.ini
-package-lock.json

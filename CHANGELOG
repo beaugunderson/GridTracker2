@@ -172,6 +172,9 @@ App: Main window minimum height updated
 Map: US Weather Radar restored after service removed by NOAA
 
 
+App: Electron engine update to 35.7.5
+Logging: No longer add fields to ADIF record if unicode chars are present in data
+
 ### Fixed
 
 
