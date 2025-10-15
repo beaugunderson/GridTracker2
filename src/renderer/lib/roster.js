@@ -884,15 +884,22 @@ function loadFilterSettings()
     {
       slider.value = CR.rosterSettings.displayFilters[filter];
       let td = document.getElementById("filter" + filter + "Td");
-      if (filter != "huerotate")
+
+      if (filter == "invert")
       {
-        td.innerHTML = slider.value + "%";
-        filters += filter + "(" + slider.value + "%) ";
+        if (slider.value > 49 ) slider.value = 100;
+        if (slider.value <= 49) slider.value = 0;
       }
-      else
+      
+      if (filter == "huerotate")
       {
         td.innerHTML = slider.value + " deg";
         filters += "hue-rotate(" + slider.value + "deg) ";
+      }
+      else 
+      {
+        td.innerHTML = slider.value + "%";
+        filters += filter + "(" + slider.value + "%) ";
       }
     }
   }
@@ -1355,7 +1362,7 @@ function onMyKeyDown(event)
     {
       resetFilters();
     }
-    if (event.code == "KeyS")
+    else if (event.code == "KeyS")
     {
       openSettings();
     }
