@@ -2192,8 +2192,11 @@ function CloudlogGetProfiles()
   CloudLogCorrectURL();
   if (ValidateText(CloudlogURL) && ValidateText(CloudlogAPI))
   {
+    let localValue = CloudlogURL.value;
+    while (localValue.endsWith("/")) localValue = localValue.slice(0,-1);
+
     getPostJSONBuffer(
-      CloudlogURL.value + "/index.php/api/station_info/" + CloudlogAPI.value,
+      localValue + "/index.php/api/station_info/" + CloudlogAPI.value,
       CloudlogFillProfiles,
       true,
       "https",
@@ -2436,9 +2439,11 @@ function sendCloudlogEntry(report)
   if (logCloudlogQSOCheckBox.checked == true)
   {
     CloudLogCorrectURL();
+    let localValue = CloudlogURL.value;
+    while (localValue.endsWith("/")) localValue = localValue.slice(0,-1);
     let postData = { key: CloudlogAPI.value, station_profile_id: parseInt(GT.settings.adifLog.text.CloudlogStationProfileID), type: "adif", string: report };
     getPostJSONBuffer(
-      CloudlogURL.value + "/index.php/api/qso",
+      localValue + "/index.php/api/qso",
       CloudlogSendLogResult,
       null,
       "https",
@@ -2519,13 +2524,12 @@ function hrdCredentialTest(test)
   }
 }
 
-function CloudLogCorrectURL(shouldSaveIfChanged = true)
+function CloudLogCorrectURL()
 {
   let initialValue = CloudlogURL.value;
   CloudlogURL.value = CloudlogURL.value.replace("/index.php/api/qso", "");
-  CloudlogURL.value = CloudlogURL.value.endsWith("/") ? CloudlogURL.value.slice(0, -1) : CloudlogURL.value;
 
-  if (shouldSaveIfChanged == true && CloudlogURL.value != initialValue)
+  if (CloudlogURL.value != initialValue)
   {
     GT.settings.adifLog.text.CloudlogURL = CloudlogURL.value;
   }
@@ -2544,9 +2548,11 @@ function CloudlogTest(test)
     if (ValidateText(CloudlogURL) && ValidateText(CloudlogAPI))
     {
       CloudlogTestResult.innerHTML = "Testing API Key";
-
+      let localValue = CloudlogURL.value;
+      while (localValue.endsWith("/")) localValue = localValue.slice(0,-1);
+      
       getPostJSONBuffer(
-        CloudlogURL.value + "/index.php/api/auth/" + CloudlogAPI.value,
+       localValue + "/index.php/api/auth/" + CloudlogAPI.value,
         CloudlogTestApiKey,
         test,
         "https",

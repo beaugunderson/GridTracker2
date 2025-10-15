@@ -176,6 +176,10 @@ App: Electron engine update to 35.7.5
 Map: Updated OpenStreetMaps attribution URL
 Logging: No longer add fields to ADIF record if unicode chars are present in data
 
+
+Call Roster: General Settings: Window Filters: Removed 'Contrast' as people were managing to gray/wash-out the window entirely
+Wavelog: Fixed '/' entry in URL
+
 ### Fixed
 
 

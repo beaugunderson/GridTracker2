@@ -1351,6 +1351,10 @@ function onMyKeyDown(event)
 
   if (event.ctrlKey == true)
   {
+    if (event.code == "KeyL")
+    {
+      resetFilters();
+    }
     if (event.code == "KeyS")
     {
       openSettings();

@@ -524,45 +524,40 @@ GT.strictAdif = {
 function parseADIFRecordStrict(line)
 {
   let record = {};
-  while (line.length > 0)
+  let pos = line.indexOf("<");
+  while (pos > -1)
   {
-    while (line.charAt(0) != "<" && line.length > 0)
+    line = line.substr(pos + 1);
+    let where = line.indexOf(":");
+    let nextChev = line.indexOf(">");
+    if (where != -1 && nextChev > where)
     {
-      line = line.substr(1);
-    }
-    if (line.length > 0)
-    {
-      line = line.substr(1);
-      let where = line.indexOf(":");
-      let nextChev = line.indexOf(">");
-      if (where != -1 && nextChev > where)
+      let fieldName = line.substr(0, where).toUpperCase();
+      line = line.substr(fieldName.length + 1);
+      let fieldLength = parseInt(line);
+      let end = line.indexOf(">");
+      if (end > 0 && fieldName in GT.strictAdif)
       {
-        let fieldName = line.substr(0, where).toUpperCase();
-        line = line.substr(fieldName.length + 1);
-        let fieldLength = parseInt(line);
-        let end = line.indexOf(">");
-        if (end > 0 && fieldName in GT.strictAdif)
+        line = line.substr(end + 1);
+        let fieldValue;
+        if (GT.strictAdif[fieldName] == true)
         {
-          line = line.substr(end + 1);
-          let fieldValue;
-          if (GT.strictAdif[fieldName] == true)
-          {
-            fieldValue = myTextDecoder.decode(myTextEncoder.encode(line.substr(0)).slice(0, fieldLength));
-          }
-          else
-          {
-            fieldValue = line.substr(0, fieldLength);
-          }
-          line = line.substr(fieldValue.length);
-          record[fieldName] = fieldValue;
+          fieldValue = myTextDecoder.decode(myTextEncoder.encode(line.substr(0)).slice(0, fieldLength));
         }
+        else
+        {
+          fieldValue = line.substr(0, fieldLength);
+        }
+        line = line.substr(1);
+        record[fieldName] = fieldValue;
       }
     }
+
+    pos = line.indexOf("<");
   }
 
   return record;
 }
-
 
 function parseAcLog(task)
 {
