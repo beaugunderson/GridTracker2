@@ -43,11 +43,11 @@ win:build:
   before_script:
     - npm install
   script:
-    - export VERSION=$(node -e "console.log(require('./package.json').version)")
-    - echo "VERSION=$VERSION" >> build.env
-    - export APPNAME=$(node -e "console.log(require('./package.json').name)")
-    - echo "APPNAME=$APPNAME" >> build.env
-    - echo "${APPNAME}-${VERSION}"
+    - $env:VERSION = node -e "console.log(require('./package.json').version)"
+    - echo "VERSION=$env:VERSION" >> build.env
+    - $env:APPNAME = node -e "console.log(require('./package.json').name)"
+    - echo "APPNAME=$env:APPNAME" >> build.env
+    - echo "$env:APPNAME-$env:VERSION"
     - npm run build:win
     - dir dist
 
@@ -73,11 +73,11 @@ win7:build:
     - copy dev-app-update.win7.yml dev-app-update.yml
     - npm install
   script:
-    - export VERSION=$(node -e "console.log(require('./package.json').version)")
-    - echo "VERSION=$VERSION" >> build.env
-    - export APPNAME=$(node -e "console.log(require('./package.json').name)")
-    - echo "APPNAME=$APPNAME" >> build.env
-    - echo "${APPNAME}-${VERSION}"
+    - $env:VERSION = node -e "console.log(require('./package.json').version)"
+    - echo "VERSION=$env:VERSION" >> build.env
+    - $env:APPNAME = node -e "console.log(require('./package.json').name)"
+    - echo "APPNAME=$env:APPNAME" >> build.env
+    - echo "$env:APPNAME-$env:VERSION"
     - npm run build:win
     - mkdir dist/win7
     - move dist/*.* dist/win7/.
