@@ -1,0 +1,48 @@
+name: build-and-sign-windows
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  win:
+    runs-on: windows-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: use node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: install deps
+        run: npm install
+
+      - name: build and sign Windows artifact
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $env:VERSION = node -e "console.log(require('./package.json').version)"
+          echo "VERSION=$env:VERSION" >> build.env
+
+          $env:APPNAME = node -e "console.log(require('./package.json').name)"
+          echo "APPNAME=$env:APPNAME" >> build.env
+
+          echo "$env:APPNAME-$env:VERSION"
+
+          npm run build:win
+          dir dist
+
+      - name: upload signed artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-signed
+          path: "**/*.exe"
