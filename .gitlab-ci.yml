@@ -42,7 +42,6 @@ win:build:
       - node_modules/
   before_script:
     - npm install
-    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
   script:
     - export VERSION=$(node -e "console.log(require('./package.json').version)")
     - echo "VERSION=$VERSION" >> build.env
@@ -50,7 +49,7 @@ win:build:
     - echo "APPNAME=$APPNAME" >> build.env
     - echo "${APPNAME}-${VERSION}"
     - npm run build:win
-    - ls dist
+    - dir dist
 
 win7:build:
   stage: build
@@ -70,10 +69,9 @@ win7:build:
       - .cache/
       - node_modules/
   before_script:
-    - cp electron-builder.win7.yml electron-builder.yml
-    - cp dev-app-update.win7.yml dev-app-update.yml
+    - copy electron-builder.win7.yml electron-builder.yml
+    - copy dev-app-update.win7.yml dev-app-update.yml
     - npm install
-    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
   script:
     - export VERSION=$(node -e "console.log(require('./package.json').version)")
     - echo "VERSION=$VERSION" >> build.env
@@ -82,8 +80,8 @@ win7:build:
     - echo "${APPNAME}-${VERSION}"
     - npm run build:win
     - mkdir dist/win7
-    - mv dist/*.* dist/win7/.
-    - ls dist
+    - move dist/*.* dist/win7/.
+    - dir dist
 
 mac:build:
   tags:
