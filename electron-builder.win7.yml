@@ -16,6 +16,11 @@ win:
       arch:
         - x64
         - ia32
+  azureSignOptions:
+    publisherName: "Beau Gunderson"
+    codeSigningAccountName: "personal-signing"
+    certificateProfileName: "personal-trust-profile"
+    endpoint: "https://eus.codesigning.azure.net"
 nsis:
   artifactName: ${name}-${version}-win7-setup.${ext}
   shortcutName: GridTracker2
