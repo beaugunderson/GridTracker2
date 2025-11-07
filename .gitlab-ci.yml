@@ -25,7 +25,8 @@ stages:
 
 win:build:
   stage: build
-  image: electronuserland/builder:wine
+  tags:
+    - saas-windows-medium-amd64
   rules:
     - if: $CI_COMMIT_TAG =~ '/(v|test_|win_).*/'
   artifacts:
@@ -53,7 +54,8 @@ win:build:
 
 win7:build:
   stage: build
-  image: electronuserland/builder:wine
+  tags:
+    - saas-windows-medium-amd64
   rules:
     - if: $CI_COMMIT_TAG =~ '/(v|test_|win_).*/'
   artifacts:
@@ -142,7 +144,7 @@ lin:build:
     - echo "${APPNAME}-${VERSION}"
     - npm run build:linux
     - ls dist
-          
+
 arm64:build:
   stage: build
   tags:
@@ -182,7 +184,7 @@ arm64:build:
     #- export DEBUG="electron-builder,@malept/flatpak-bundler"
     - npm run build:arm64
     - ls dist
-      
+
 arm32:build:
   stage: build
   tags:
@@ -222,7 +224,7 @@ arm32:build:
     #- export DEBUG="electron-builder,@malept/flatpak-bundler"
     - npm run build:arm32
     - ls dist
-      
+
 win:upload:
   stage: upload
   image: fedora:40
@@ -283,7 +285,7 @@ lin:upload:
     #- source build.env
     - echo "${APPNAME}-${VERSION}"
     # putting this commented flatpak thing here since can't comment in multiline and these don't like single line
-    # curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-x86_64.flatpak" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x86_64.flatpak" 
+    # curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-x86_64.flatpak" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x86_64.flatpak"
     - |
       curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-amd64.deb" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-amd64.deb"
       curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-x64.apk" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x64.apk"
@@ -308,7 +310,7 @@ arm:upload:
     #- source build.env
     - echo "${APPNAME}-${VERSION}"
     # putting this commented flatpak thing here since can't comment in multiline and these don't like single line
-    # curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-x86_64.flatpak" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x86_64.flatpak" 
+    # curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-x86_64.flatpak" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-x86_64.flatpak"
     - |
       curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-arm64.deb" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-arm64.deb"
       curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "./dist/${APPNAME}-${VERSION}-armv7l.deb" "${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}-armv7l.deb"
@@ -380,7 +382,7 @@ auto-release-main:
     - job: win:build
       artifacts: true
     - job: win7:build
-      artifacts: true      
+      artifacts: true
     - job: mac:build
       artifacts: true
     - job: lin:build
@@ -392,7 +394,7 @@ auto-release-main:
     - job: win:upload
       artifacts: true
     - job: win7:upload
-      artifacts: true      
+      artifacts: true
     - job: mac:upload
       artifacts: true
     - job: lin:upload
@@ -415,7 +417,7 @@ auto-release-main:
           link_type: other
         - name: Windows $APPNAME $VERSION Win7 Latest
           url: ${PACKAGE_REGISTRY_URL_YML}/win7/latest.yml
-          link_type: other          
+          link_type: other
         - name: MacOS $APPNAME $VERSION
           url: ${PACKAGE_REGISTRY_URL}/${APPNAME}-${VERSION}.dmg
           link_type: package
