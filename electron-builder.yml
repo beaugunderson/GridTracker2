@@ -70,6 +70,8 @@ linux:
   maintainer: gridtracker.org
   category: Utility;HamRadio
   artifactName: ${name}-${version}-${arch}.${ext}
+  # lowercase on linux
+  executableName: gridtracker2
 flatpak:
   runtimeVersion: 23.08
 npmRebuild: false
