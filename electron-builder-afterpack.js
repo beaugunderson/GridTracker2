@@ -4,11 +4,7 @@ const path = require('path');
 const { exec } = require('child_process');
 
 exports.default = async function (context) {
-  console.log('ZZZ afterPack');
-
   const appOutDir = context.appOutDir;
-
-  console.log(`ZZZ context:`, context);
 
   const requirePath = (path) => {
     if (!fs.existsSync(path)) {
